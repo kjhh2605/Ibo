@@ -1,12 +1,15 @@
 import {createRequire} from 'node:module';
 import {spawn} from 'node:child_process';
-const require = createRequire('/home/user/Meta-Hackathon/app/package.json');
+import {fileURLToPath as __f} from 'node:url'; import {dirname as __d, resolve as __r} from 'node:path'; import {mkdirSync as __mk} from 'node:fs';
+const VIDEO = __r(__d(__f(import.meta.url)), '..'), REPO = __r(VIDEO, '..');
+const COMP_URL = process.env.COMP_URL ?? 'http://127.0.0.1:8811';
+const require = createRequire(__r(REPO, 'app/package.json'));
 const {chromium} = require('@playwright/test');
 const [start, end, out] = [Number(process.argv[2]), Number(process.argv[3]), process.argv[4]];
 const FPS = 30;
 let b; try { b = await chromium.launch(); } catch { b = await chromium.launch({executablePath: '/opt/pw-browsers/chromium'}); }
 const page = await b.newPage({viewport: {width: 1920, height: 1080}});
-await page.goto('http://127.0.0.1:8811/index.html');
+await page.goto(COMP_URL + '/index.html');
 await page.evaluate(() => window.ready);
 const ff = spawn('ffmpeg', ['-loglevel', 'error', '-y', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-', '-c:v', 'libx264', '-preset', 'medium', '-crf', '16', '-pix_fmt', 'yuv420p', '-r', String(FPS), out], {stdio: ['pipe', 'inherit', 'inherit']});
 await page.evaluate(t => window.seek(t), Math.max(0, start / FPS - 0.5));

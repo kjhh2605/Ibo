@@ -1,8 +1,10 @@
+import os as _os
+VIDEO = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))); REPO = _os.path.dirname(VIDEO); WORK = _os.path.join(VIDEO, '.work')
 import json, numpy as np, cv2
 from PIL import Image
 from rembg import remove, new_session
 from scipy import ndimage
-F = '/home/user/sfvideo/fixtures-demo'
+F = _os.path.join(WORK, 'fixtures-demo')
 sess = new_session('isnet-general-use')
 cache = {}
 def garments(path):
@@ -77,4 +79,4 @@ for c in cases:
 tiles = [t.resize((310, 310)) for t in tiles]
 W = Image.new('RGB', (310 * 6, 310 * 2), 'white')
 for i, t in enumerate(tiles): W.paste(t, ((i % 6) * 310, (i // 6) * 310))
-W.save('/home/user/sfvideo/contact/masks2.png'); print('done')
+W.save(_os.path.join(WORK, 'masks-preview.png')); print('done')

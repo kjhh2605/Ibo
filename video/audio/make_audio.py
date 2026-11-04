@@ -1,11 +1,13 @@
 """Generates the BGM, SFX and final mix for the Ibo demo video. Everything is synthesized here."""
+import os as _os
+VIDEO = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))); REPO = _os.path.dirname(VIDEO); WORK = _os.path.join(VIDEO, '.work')
 import json
 import numpy as np
 import soundfile as sf
 from scipy import signal
 
 SR = 48000
-ROOT = '/home/user/sfvideo/audio'
+ROOT = _os.path.join(VIDEO, 'audio'); OUT = _os.path.join(WORK, 'audio'); _os.makedirs(OUT, exist_ok=True)
 cues = json.load(open(f'{ROOT}/cues.json'))
 DUR = cues['duration'] + 0.5
 N = int(DUR * SR)
@@ -252,7 +254,7 @@ VO = [('s1', 6.0), ('s2', 14.3), ('s3', 20.8), ('s4', 25.8), ('s5', 32.8), ('s6'
       ('s7b', 57.3), ('s8', 75.5), ('s9a', 90.6), ('s9b', 99.6), ('s9c', 113.4), ('s10', 124.6), ('s11', 138.8), ('s12', 151.0)]
 voice = np.zeros((N, 2))
 for key, t0 in VO:
-    x, sr = sf.read(f'{ROOT}/vo/{key}.wav')
+    x, sr = sf.read(f'{ROOT}/vo/{key}.flac')
     if x.ndim > 1:
         x = x.mean(axis=1)
     if sr != SR:
@@ -276,6 +278,6 @@ mgain = np.interp(np.arange(N) / SR, [0, 37.0, 38.5, 149.0, 151.0, DUR], [1.0, 1
 mix = music * (duck * mgain)[:, None] + sfx + voice
 peak = np.max(np.abs(mix))
 mix = mix / peak * 0.89
-sf.write(f'{ROOT}/music.wav', music / (np.max(np.abs(music)) + 1e-9) * 0.8, SR)
-sf.write(f'{ROOT}/mix.wav', mix, SR, subtype='PCM_24')
+sf.write(f'{OUT}/music.wav', music / (np.max(np.abs(music)) + 1e-9) * 0.8, SR)
+sf.write(f'{OUT}/mix.wav', mix, SR, subtype='PCM_24')
 print('done', round(DUR, 2), 'peak', peak)

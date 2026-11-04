@@ -2,12 +2,14 @@
 
 Sources: OpenStreetMap contributors (ODbL) via an OSMnx Seoul walk network and a filtered Korea extract.
 """
+import os as _os
+VIDEO = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))); REPO = _os.path.dirname(VIDEO); WORK = _os.path.join(VIDEO, '.work')
 import heapq
 import json
 import math
 
-walk = json.load(open('/home/user/sfvideo/osm/walk.json'))
-major = json.load(open('/home/user/sfvideo/osm/major.json'))
+walk = json.load(open(_os.path.join(VIDEO, 'osm/walk.json')))
+major = json.load(open(_os.path.join(VIDEO, 'osm/major.json')))
 
 # world canvas used by the video camera
 WW, WH = 2600, 1600
@@ -128,7 +130,7 @@ for e in layers:
     col = C['major'] if w >= 25 else C['road']
     svg.append(f'<polyline points="{poly([P(a, b) for a, b in e["pts"]])}" fill="none" stroke="{col}" stroke-width="{w}" stroke-linecap="round" stroke-linejoin="round"/>')
 
-json.dump({'world': [WW, WH], 'bbox': [LAT0, LON0, LAT1, LON1]}, open('/home/user/sfvideo/osm/frame.json', 'w'))
+json.dump({'world': [WW, WH], 'bbox': [LAT0, LON0, LAT1, LON1]}, open(_os.path.join(VIDEO, 'osm/frame.json'), 'w'))
 
 # ---- shrine: snap the compound polygon to nearby road corners for a clean fit ----
 sp = [P(a, b) for a, b in shrine_poly_ll]
@@ -180,7 +182,7 @@ for la, lo, txt in [(37.57351, 127.01743, 'Dongmyo-ap Stn · Line 1'), (37.57234
                   f'<text x="26" y="8" font-family="Outfit" font-weight="700" font-size="22" fill="#34507A">{txt}</text></g>')
 svg += labels
 svg.append('</svg>')
-open('/home/user/sfvideo/comp/assets/dongmyo-map.svg', 'w').write('\n'.join(svg))
+open(_os.path.join(VIDEO, 'comp/assets/dongmyo-map.svg'), 'w').write('\n'.join(svg))
 
 # ---------------- pins on real alleys + on-road paths ----------------
 def at(la, lo):
@@ -209,5 +211,5 @@ paths = {
     'back': route(nodes_of['p6'], nodes_of['p2']),      # S10: walk back to the jacket stall
 }
 out = {'world': [WW, WH], 'pins': pins, 'paths': paths, 'shrine': [sx, sy], 'pxPerM': PXM}
-open('/home/user/sfvideo/comp/mapdata.js', 'w').write('window.MAPDATA=' + json.dumps(out) + ';\n')
+open(_os.path.join(VIDEO, 'comp/mapdata.js'), 'w').write('window.MAPDATA=' + json.dumps(out) + ';\n')
 print('px/m', round(PXM, 2), {k: (round(v[0]), round(v[1])) for k, v in pins.items()}, {k: len(v) for k, v in paths.items()})
