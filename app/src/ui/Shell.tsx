@@ -11,6 +11,7 @@ import {VisuallyHidden} from '@astryxdesign/core/VisuallyHidden';
 import {Button,VStack,HStack,Text,Heading,Icon} from './components';
 import {ArrowBackIcon,WifiOffIcon} from './icons';
 import {IboMark} from './IboMark';
+import {EASE_OUT,EASE_SPRING,reducedMotion} from './easing';
 import {titles} from './navigation';
 import {useUi} from './state';
 
@@ -27,7 +28,7 @@ export function Shell({children}:{children:ReactNode}) {
   },[]);
   useEffect(()=>{
     body.current?.scrollIntoView({block:'start'});
-    if(route.name!=='capture'&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches) body.current?.animate([{opacity:0,transform:'translateX(3%)'},{opacity:1,transform:'translateX(0)'}],{duration:180,easing:'ease-out'});
+    if(route.name!=='capture'&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches) body.current?.animate([{opacity:0,transform:'translateX(2%)'},{opacity:1,transform:'none'}],{duration:240,easing:EASE_OUT});
     if(!stack.some(entry=>entry.name==='ask'||entry.name==='pick'))void services.agent.cancel().catch(()=>{});
   },[route,stack,services]);
   const home=route.name==='home';
@@ -39,7 +40,17 @@ export function Shell({children}:{children:ReactNode}) {
       {home||capturing?<VisuallyHidden><Heading level={1}>{titles[route.name]}</Heading></VisuallyHidden>:<Heading level={1} style={{letterSpacing:'-0.02em'}}>{titles[route.name]}</Heading>}
       {children}
     </VStack>
-    {toast&&<HStack role="status" gap={2} vAlign="center" paddingInline={4} paddingBlock={3} style={{position:'fixed',left:'50%',transform:'translateX(-50%)',bottom:capturing?'calc(var(--spacing-12) * 2 + var(--spacing-6))':'var(--spacing-6)',maxWidth:'calc(100% - var(--spacing-10))',width:'max-content',background:'var(--color-background-inverted)',color:'var(--color-on-dark)',borderRadius:'var(--radius-full)',boxShadow:'var(--shadow-high)',zIndex:20,pointerEvents:'none'}}><Icon icon="check" size="sm" color="inherit"/><Text type="label" color="inherit">{toast}</Text></HStack>}
+    {toast&&<Toast key={toast} text={toast} capturing={capturing}/>}
     <BottomSheet isOpen={sheet!==null} onOpenChange={open=>{if(!open)showSheet(null);}} label={sheet?.title??'Options'} purpose="form" padding={6}>{sheet&&<VStack gap={4}><Heading level={2}>{sheet.title}</Heading>{sheet.content}<Button label="Close" variant="ghost" onClick={()=>showSheet(null)}/></VStack>}</BottomSheet>
   </AppShell>;
+}
+
+function Toast({text,capturing}:{text:string;capturing:boolean}) {
+  const pill=useRef<HTMLElement>(null);
+  useEffect(()=>{
+    if(reducedMotion())return;
+    const animation=pill.current?.animate([{opacity:0,transform:'translate(-50%, 1rem) scale(0.96)'},{opacity:1,transform:'translate(-50%, 0) scale(1)'}],{duration:320,easing:EASE_SPRING});
+    return()=>animation?.cancel();
+  },[]);
+  return <HStack ref={pill} role="status" gap={2} vAlign="center" paddingInline={4} paddingBlock={3} style={{position:'fixed',left:'50%',transform:'translateX(-50%)',bottom:capturing?'calc(var(--spacing-12) * 2 + var(--spacing-6))':'var(--spacing-6)',maxWidth:'calc(100% - var(--spacing-10))',width:'max-content',background:'var(--color-background-inverted)',color:'var(--color-on-dark)',borderRadius:'var(--radius-full)',boxShadow:'var(--shadow-high)',zIndex:20,pointerEvents:'none'}}><Icon icon="check" size="sm" color="inherit"/><Text type="label" color="inherit">{text}</Text></HStack>;
 }

@@ -1,7 +1,7 @@
 import {config} from '../config';
 import type {ComponentType, SVGProps} from 'react';
 import {Divider} from '@astryxdesign/core/Divider';
-import {Heading, Hint, HStack, IconTile, Panel, Section, Text, VStack} from '../ui/components';
+import {Heading, Hint, HStack, IconTile, Panel, Reveal, Section, Text, VStack} from '../ui/components';
 import {LockIcon, PinIcon, SendIcon, ShieldIcon, TrashIcon, WifiOffIcon} from '../ui/icons';
 
 const localOnly = [
@@ -22,7 +22,7 @@ const sentToMeta = [
 ] as const;
 
 function Group({icon, tone, rows}: {icon: ComponentType<SVGProps<SVGSVGElement>>; tone: 'success' | 'accent' | 'muted'; rows: readonly (readonly [string, string])[]}) {
-  return <Panel gap={0} padding={4}>{rows.map(([title, description], index) => <VStack key={title} gap={0}>{index > 0 && <Divider/>}<HStack gap={3} vAlign="start" paddingBlock={3}><IconTile icon={icon} tone={tone} size="sm"/><VStack gap={1} style={{flex: 1, minWidth: 0}}><Heading level={3} style={{fontSize: 'var(--font-size-base)'}}>{title}</Heading><Text size="sm" color="secondary">{description}</Text></VStack></HStack></VStack>)}</Panel>;
+  return <Panel gap={0} padding={4}>{rows.map(([title, description], index) => <Reveal key={title} index={index} gap={0}>{index > 0 && <Divider/>}<HStack gap={3} vAlign="start" paddingBlock={3}><IconTile icon={icon} tone={tone} size="sm"/><VStack gap={1} style={{flex: 1, minWidth: 0}}><Heading level={3} style={{fontSize: 'var(--font-size-base)'}}>{title}</Heading><Text size="sm" color="secondary">{description}</Text></VStack></HStack></Reveal>)}</Panel>;
 }
 const maps = [
   ['Only the route endpoints', 'Your current and destination coordinates go through the relay to FOSSGIS OSRM foot for walking directions, not to Meta. The destination is the target item’s saved photo location, or the independent location snapshot saved with a look. Shop pins and companion pieces do not replace it.'],

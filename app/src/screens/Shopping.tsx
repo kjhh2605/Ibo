@@ -5,7 +5,7 @@ import {useUi,useData,listAll} from '../ui/state';
 import type {CSSProperties} from 'react';
 import {Grid} from '@astryxdesign/core/Grid';
 import {Divider} from '@astryxdesign/core/Divider';
-import {Thumbnail,Action,Button,Chip,Confirm,EditFields,Empty,Eyebrow,Heading,Hint,HStack,Icon,IconTile,Loading,Media,Panel,PhotoView,Problem,RowButton,Section,Stat,Text,TileButton,VStack} from '../ui/components';
+import {Thumbnail,Action,Button,Chip,Confirm,EditFields,Empty,Eyebrow,Heading,Hint,HStack,Icon,IconTile,Loading,Media,Panel,PhotoView,Problem,Reveal,RowButton,Section,SkeletonGrid,SkeletonPhoto,SkeletonRows,SkeletonText,Stat,Text,TileButton,VStack} from '../ui/components';
 import {BagIcon,CameraIcon,HangerIcon,NoteIcon,PinIcon,ShieldIcon,SparkleIcon,StoreIcon,TrashIcon,PencilIcon,ImageIcon} from '../ui/icons';
 
 function failureCode(error:unknown):string {
@@ -65,21 +65,21 @@ export function Home() {
       </VStack>
     </VStack>
     <Grid columns={3} gap={3}>
-      <TileButton label="Wardrobe" onClick={()=>push({name:'wardrobe'})}><IconTile icon={HangerIcon}/><Text type="label" weight="semibold">Wardrobe</Text></TileButton>
-      <TileButton label="Try-ons" onClick={()=>push({name:'results'})}><IconTile icon={SparkleIcon}/><Text type="label" weight="semibold">Try-ons</Text></TileButton>
-      <TileButton label="Privacy" onClick={()=>push({name:'privacy'})}><IconTile icon={ShieldIcon}/><Text type="label" weight="semibold">Privacy</Text></TileButton>
+      <Reveal index={0} from="scale"><TileButton label="Wardrobe" onClick={()=>push({name:'wardrobe'})}><IconTile icon={HangerIcon}/><Text type="label" weight="semibold">Wardrobe</Text></TileButton></Reveal>
+      <Reveal index={1} from="scale"><TileButton label="Try-ons" onClick={()=>push({name:'results'})}><IconTile icon={SparkleIcon}/><Text type="label" weight="semibold">Try-ons</Text></TileButton></Reveal>
+      <Reveal index={2} from="scale"><TileButton label="Privacy" onClick={()=>push({name:'privacy'})}><IconTile icon={ShieldIcon}/><Text type="label" weight="semibold">Privacy</Text></TileButton></Reveal>
     </Grid>
     <Section title="Latest trip" action={<Button label="All trips" variant="ghost" size="sm" endContent={<Icon icon="chevronRight" size="sm"/>} onClick={()=>push({name:'trips'})}/>}>
-      {data.loading?<Loading/>:data.error?<Problem message={data.error} retry={data.retry}/>:latest?<Panel gap={1} padding={3}>
+      {data.loading&&!data.data?<Panel gap={1} padding={3}><SkeletonRows flat count={3} label="Loading your latest trip"/></Panel>:data.error?<Problem message={data.error} retry={data.retry}/>:latest?<Reveal><Panel gap={1} padding={3}>
         <RowButton flat label={new Date(latest.startedAt).toLocaleDateString('en-US',{dateStyle:'medium'})} start={<IconTile icon="calendar" tone="hero"/>} meta={`${latest.status==='recording'?'Recording now':`Ended ${clock(latest.endedAt??latest.startedAt)}`} · ${data.data!.shops.length} ${data.data!.shops.length===1?'shop':'shops'} · ${itemPhotos()} photos`} onClick={()=>push({name:'trip',tripId:latest.id})}/>
-        {data.data!.shops.map(shop=><VStack key={shop.id} gap={1}><Divider/><RowButton flat label={`Shop ${shop.n}`} start={<IconTile icon={StoreIcon} tone="muted"/>} meta={<>{clock(shop.startedAt)} · {itemPhotos(shop.id)} photos<br/>{shopLine(shop,online)}</>} onClick={()=>push({name:'trip',tripId:shop.tripId,shopId:shop.id})}/></VStack>)}
-      </Panel>:<Empty title="No trips yet" icon={BagIcon}><Text type="supporting">Start shopping to create your first trip.</Text></Empty>}
+        {data.data!.shops.map((shop,index)=><Reveal key={shop.id} index={index+1} gap={1}><Divider/><RowButton flat label={`Shop ${shop.n}`} start={<IconTile icon={StoreIcon} tone="muted"/>} meta={<>{clock(shop.startedAt)} · {itemPhotos(shop.id)} photos<br/>{shopLine(shop,online)}</>} onClick={()=>push({name:'trip',tripId:shop.tripId,shopId:shop.id})}/></Reveal>)}
+      </Panel></Reveal>:<Empty title="No trips yet" icon={BagIcon}><Text type="supporting">Start shopping to create your first trip.</Text></Empty>}
     </Section>
     <Section title="Saved pieces" action={data.data?.pieces.length?<Text type="supporting">{data.data.pieces.length} saved</Text>:undefined}>
-      {data.data?.pieces.length?<Grid columns={2} gap={3}>{data.data.pieces.map(piece=><TileButton key={piece.id} label={piece.label} onClick={()=>push({name:'item',pieceId:piece.id})}>
+      {data.loading&&!data.data?<SkeletonGrid count={2} label="Loading saved pieces"/>:data.data?.pieces.length?<Grid columns={2} gap={3}>{data.data.pieces.map((piece,index)=><Reveal key={piece.id} index={index} from="scale"><TileButton label={piece.label} onClick={()=>push({name:'item',pieceId:piece.id})}>
         <Media file={piece.cutoutFile} label="" ratio="1" fit="contain"/>
         <VStack gap={0.5} paddingInline={1}><Text type="label" weight="semibold" maxLines={1} hasTruncateTooltip={false}>{piece.label}</Text><Text type="supporting" size="xsm">{piece.category!=='unknown'?`${piece.category} · `:''}{shortDate(piece.createdAt)}</Text></VStack>
-      </TileButton>)}</Grid>:<Empty title="No saved pieces" icon={HangerIcon}><Text type="supporting">Find a garment in your trip photos to save it.</Text></Empty>}
+      </TileButton></Reveal>)}</Grid>:<Empty title="No saved pieces" icon={HangerIcon}><Text type="supporting">Find a garment in your trip photos to save it.</Text></Empty>}
     </Section>
     <Hint icon={ShieldIcon}>Your original self photo and raw location trail never leave this phone.</Hint>
   </>;
@@ -93,7 +93,7 @@ export function Trips({route}:{route:Extract<Route,{name:'trips'}>}) {
     for(const photo of photos){const count=counts.get(photo.tripId);if(count&&photo.kind==='item')count.photos++;}
     return {trips:trips.sort((a,b)=>b.startedAt-a.startedAt),counts};
   },[services]);
-  return <Section title={route.forOutfit?'Choose a trip photo':'Your trips'} description={route.forOutfit?'Open a trip, then tap a photo to cut out a companion piece.':undefined}>{data.loading?<Loading/>:data.error?<Problem message={data.error} retry={data.retry}/>:!data.data?.trips.length?<Empty title="No trips yet" icon={BagIcon}><Text type="supporting">Your shopping trips will appear here.</Text></Empty>:<VStack gap={2}>{data.data.trips.map(trip=>{const count=data.data!.counts.get(trip.id);const live=trip.status==='recording';return <RowButton key={trip.id} label={new Date(trip.startedAt).toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'})} title={new Date(trip.startedAt).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'})} start={<IconTile icon="calendar" tone={live?'hero':'accent'}/>} meta={`${live?'Recording now':`${clock(trip.startedAt)} – ${clock(trip.endedAt!)}`} · ${count?.shops??0} ${count?.shops===1?'shop':'shops'} · ${count?.photos??0} photos`} end={live?<Chip tone="success" live>Live</Chip>:undefined} onClick={()=>push({name:'trip',tripId:trip.id,forOutfit:route.forOutfit})}/>;})}</VStack>}{route.forOutfit&&<Button label="Cancel selection" variant="ghost" onClick={back}/>}</Section>;
+  return <Section title={route.forOutfit?'Choose a trip photo':'Your trips'} description={route.forOutfit?'Open a trip, then tap a photo to cut out a companion piece.':undefined}>{data.loading&&!data.data?<SkeletonRows count={3} label="Loading your trips"/>:data.error?<Problem message={data.error} retry={data.retry}/>:!data.data?.trips.length?<Empty title="No trips yet" icon={BagIcon}><Text type="supporting">Your shopping trips will appear here.</Text></Empty>:<VStack gap={2}>{data.data.trips.map((trip,index)=>{const count=data.data!.counts.get(trip.id);const live=trip.status==='recording';return <Reveal key={trip.id} index={index}><RowButton label={new Date(trip.startedAt).toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'})} title={new Date(trip.startedAt).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'})} start={<IconTile icon="calendar" tone={live?'hero':'accent'}/>} meta={`${live?'Recording now':`${clock(trip.startedAt)} – ${clock(trip.endedAt!)}`} · ${count?.shops??0} ${count?.shops===1?'shop':'shops'} · ${count?.photos??0} photos`} end={live?<Chip tone="success" live>Live</Chip>:undefined} onClick={()=>push({name:'trip',tripId:trip.id,forOutfit:route.forOutfit})}/></Reveal>;})}</VStack>}{route.forOutfit&&<Button label="Cancel selection" variant="ghost" onClick={back}/>}</Section>;
 }
 function ShopSection({shop,forOutfit}:{shop:Shop;forOutfit?:boolean}) {
   const {services,push,showSheet,online}=useUi();const data=useData(()=>listAll(services,'Photo',{shopId:shop.id}),[services,shop.id]);
@@ -116,14 +116,14 @@ function ShopSection({shop,forOutfit}:{shop:Shop;forOutfit?:boolean}) {
       </HStack>
       <Divider/>
       <Eyebrow>{forOutfit?'Tap a photo to pick a companion':'Garment photos'}</Eyebrow>
-      {data.loading?<Loading/>:data.error?<Problem message={data.error} retry={data.retry}/>:items.length?<Grid columns={4} gap={2}>{items.map(photo=><Thumbnail key={photo.id} label={`photo ${clock(photo.takenAt)}`} src={photo.file} alt="Shopping photo" style={{width:'100%',height:'auto',aspectRatio:'1'}} onClick={()=>push({name:'pick',photoId:photo.id,mode:forOutfit?'outfit':'shop'})}/>)}</Grid>:<Text type="supporting">No garment photos in this shop.</Text>}
+      {data.loading&&!data.data?<SkeletonGrid count={4} columns={4} captions={false} label="Loading garment photos"/>:data.error?<Problem message={data.error} retry={data.retry}/>:items.length?<Grid columns={4} gap={2}>{items.map((photo,index)=><Reveal key={photo.id} index={index} from="scale"><Thumbnail label={`photo ${clock(photo.takenAt)}`} src={photo.file} alt="Shopping photo" style={{width:'100%',height:'auto',aspectRatio:'1'}} onClick={()=>push({name:'pick',photoId:photo.id,mode:forOutfit?'outfit':'shop'})}/></Reveal>)}</Grid>:<Text type="supporting">No garment photos in this shop.</Text>}
     </Panel>
   </VStack>;
 }
 export function Trip({route}:{route:Extract<Route,{name:'trip'}>}) {
   const {services,deleted,popTo,push}=useUi();const data=useData(async()=>({trip:await services.store.get({entity:'Trip',id:route.tripId}),shops:await listAll(services,'Shop',{tripId:route.tripId})}),[services,route.tripId]);
   useEffect(()=>{if(data.data&&route.shopId)document.getElementById(`shop-${route.shopId}`)?.scrollIntoView({block:'start'});},[data.data,route.shopId]);
-  if(data.loading)return <Loading/>;if(data.error)return <Problem message={data.error} retry={data.retry}/>;
+  if(data.loading&&!data.data)return <><VStack gap={3}><SkeletonText lines={1} width="60%"/><SkeletonText lines={2} width="90%" index={1}/></VStack><SkeletonPhoto height="40dvh" label="Loading trip"/><SkeletonRows count={1}/></>;if(data.error)return <Problem message={data.error} retry={data.retry}/>;
   if(!data.data?.trip)return <Empty title="This trip is no longer available"><Button label="All trips" onClick={()=>popTo('home',{name:'trips'})}/></Empty>;
   const live=data.data.trip.status==='recording';
   return <>
@@ -132,7 +132,7 @@ export function Trip({route}:{route:Extract<Route,{name:'trip'}>}) {
       <Hint icon={live?PinIcon:ShieldIcon}>{live?'Your location trail is recorded while shopping mode is on.':'The raw location trail was deleted when shopping ended. Saved photo and shop locations remain on this device.'}</Hint>
       {!route.forOutfit&&<Button label="Find it" variant="secondary" icon={<Icon icon="search"/>} onClick={()=>push({name:'ask'})}/>}
     </VStack>
-    {data.data.shops.length?data.data.shops.toSorted((a,b)=>a.n-b.n).map(shop=><ShopSection key={shop.id} shop={shop} forOutfit={route.forOutfit}/>):<Empty title="No shops recorded" icon={StoreIcon}/>}
+    {data.data.shops.length?data.data.shops.toSorted((a,b)=>a.n-b.n).map((shop,index)=><Reveal key={shop.id} index={index}><ShopSection shop={shop} forOutfit={route.forOutfit}/></Reveal>):<Empty title="No shops recorded" icon={StoreIcon}/>}
     {route.forOutfit&&<Button label="Cancel selection" variant="secondary" onClick={()=>popTo('outfit')}/>}
     <Confirm title="Delete this trip?" description="Trip photos, shop notes, and the location trail will be deleted. Saved cutouts and their walking destinations stay. Shopping mode will stop if this trip is recording." action="Delete trip" icon={<Icon icon={TrashIcon}/>} onConfirm={async()=>{await services.store.deleteTrip({id:route.tripId});deleted('Trip',route.tripId);}}/>
   </>;
@@ -167,7 +167,7 @@ export function Capture({route}:{route:Extract<Route,{name:'capture'}>}) {
       {purpose==='shopping'&&banner&&session?.shop&&<VStack gap={3} padding={4} style={{background:'var(--color-accent-muted)',borderRadius:'var(--radius-container)'}}><HStack gap={3} vAlign="center"><IconTile icon={PinIcon} tone="hero" size="sm"/><VStack gap={0.5}><Heading level={2} style={{fontSize:'var(--font-size-lg)'}}>Shop {session.shop.n} started</Heading><Text type="supporting" size="sm">This spot is saved.</Text></VStack></HStack><HStack gap={2} wrap="wrap"><Button label="Storefront photo" variant="secondary" size="sm" icon={<Icon icon={StoreIcon}/>} onClick={()=>setStorefront(true)}/><Button label="Add note" variant="secondary" size="sm" icon={<Icon icon={NoteIcon}/>} onClick={()=>showSheet({title:`Note for Shop ${session.shop!.n}`,content:<EditFields label={session.shop?.note??''} onSave={note=>services.store.updateShop({id:session.shop!.id,note:note||null})}/>})}/><Button label="Dismiss" variant="ghost" size="sm" onClick={()=>setBanner(false)}/></HStack></VStack>}
       {storefront&&<Chip tone="accent">Fit the whole shop front in the frame</Chip>}
       <VStack ref={view} role="img" aria-label="Camera preview" width="100%" minHeight="25dvh" style={{background:'transparent',position:'relative',flex:1,borderRadius:'var(--radius-container)',overflow:'hidden',outline:'thin solid var(--color-border)'}}/>
-      {error?<Problem message={error==='camera_permission_denied'?'Camera access is off. Allow access in device settings, then try again.':'The camera preview could not start. Try again or return to your saved photos.'} retry={()=>setAttempt(value=>value+1)}/>:!ready?<Loading/>:null}
+      {error?<Problem message={error==='camera_permission_denied'?'Camera access is off. Allow access in device settings, then try again.':'The camera preview could not start. Try again or return to your saved photos.'} retry={()=>setAttempt(value=>value+1)}/>:!ready?<Loading label="Starting camera…"/>:null}
     </VStack>
     <HStack role="group" aria-label="Camera controls" gap={2} hAlign="between" vAlign="center" wrap="wrap" padding={3} style={{flexShrink:0,background:'var(--color-background-card)',borderRadius:'var(--radius-page)',boxShadow:'var(--shadow-low)'}}>
     {purpose==='shopping'&&!storefront&&latest&&<Thumbnail src={latest.file} alt="Latest captured garment" label="Latest photo" style={{width:'var(--spacing-12)',height:'var(--spacing-12)'}} onClick={()=>push({name:'pick',photoId:latest.id,mode:'shop'})}/>}

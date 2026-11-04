@@ -4,7 +4,9 @@ import type {Route} from '../ui/navigation';
 import type {MapView, WalkState} from '../ui/services';
 import {useData, useUi} from '../ui/state';
 import {Spinner} from '@astryxdesign/core/Spinner';
-import {Action, Button, Chip, Empty, Hint, HStack, Icon, IconTile, Loading, Panel, PhotoView, Problem, Section, Text, VStack} from '../ui/components';
+import {Action, Button, Chip, Empty, Hint, HStack, Icon, IconTile, Panel, PhotoView, Pop, Problem, Reveal, Section, SkeletonPhoto, SkeletonRows, Text, VStack} from '../ui/components';
+import {Skeleton} from '@astryxdesign/core/Skeleton';
+import {EASE_SPRING, reducedMotion} from '../ui/easing';
 import {FlagIcon, NoteIcon, PinIcon, StoreIcon} from '../ui/icons';
 
 // Map is a shared owner service. Finish a pending mount before unmounting it,
@@ -144,24 +146,27 @@ export function Walk({route}: {route: Extract<Route, {name: 'walk'}>}) {
       <Hint>Walking guidance stays in the app. The destination is where the target item was photographed.</Hint>
     </Section>
     <VStack gap={2}>
-      <VStack ref={host} as="section" role="region" aria-label="Walking map" width="100%" height="50dvh" minHeight="var(--spacing-10)" style={{borderRadius: 'var(--radius-container)', overflow: 'hidden', boxShadow: 'var(--shadow-low)', background: 'var(--color-background-muted)'}}/>
+      <VStack width="100%" style={{position: 'relative'}}>
+        <VStack ref={host} as="section" role="region" aria-label="Walking map" width="100%" height="50dvh" minHeight="var(--spacing-10)" style={{borderRadius: 'var(--radius-container)', overflow: 'hidden', boxShadow: 'var(--shadow-low)', background: 'var(--color-background-muted)'}}/>
+        {!mapReady && !mapError && <VStack aria-hidden width="100%" height="100%" style={{position: 'absolute', inset: 0, borderRadius: 'var(--radius-container)', overflow: 'hidden', pointerEvents: 'none'}}><Skeleton radius="none"/></VStack>}
+      </VStack>
       <HStack gap={1} wrap="wrap" vAlign="center"><Text type="supporting" size="xsm">Map attribution:</Text><Button label="OpenFreeMap" href="https://openfreemap.org/" variant="ghost" size="sm"/><Button label="© OpenStreetMap contributors" href="https://www.openstreetmap.org/copyright" variant="ghost" size="sm"/><Text type="supporting" size="xsm">Walking routes: FOSSGIS OSRM</Text></HStack>
     </VStack>
     {mapError && <Problem message={walkError('map_unavailable')} retry={() => setMapAttempt(value => value + 1)}/>}
-    {source.loading ? <Loading/> : source.error ? <Problem message={source.error} retry={source.retry}/> : !hasDestination ? <Empty title="No saved photo location"><Text>Walking guidance needs the location where this item was photographed. A shop pin or companion piece cannot replace it.</Text><Button label="Back" onClick={back}/></Empty> : <>
+    {source.loading && !source.data ? <VStack gap={3}><SkeletonRows count={1} label="Loading destination"/><SkeletonPhoto height="24dvh" label="Loading storefront"/></VStack> : source.error ? <Problem message={source.error} retry={source.retry}/> : !hasDestination ? <Empty title="No saved photo location"><Text>Walking guidance needs the location where this item was photographed. A shop pin or companion piece cannot replace it.</Text><Button label="Back" onClick={back}/></Empty> : <>
       {startError && <Problem message={walkError(startError)} retry={() => setWalkAttempt(value => value + 1)}/>}
       {!startError && (!state || mode === 'loading') && online && <HStack role="status" aria-live="polite" gap={3} vAlign="center" padding={4} style={{background: 'var(--color-accent-muted)', borderRadius: 'var(--radius-container)'}}><Spinner size="lg" aria-label="Loading route"/><Text color="accent">Loading your current location and walking route…</Text></HStack>}
       {mode === 'offline' && <VStack gap={3}><Problem message={walkError('offline')}/><Hint>Any previously loaded route or distance is for reference only, not live guidance.</Hint><Action label="Try again" variant="secondary" disabled={!online} run={retryWalk}/></VStack>}
       {mode === 'error' && <VStack gap={3}><Problem message={walkError(state?.errorCode ?? 'route_unavailable')}/><Action label="Try again" variant="secondary" run={retryWalk}/></VStack>}
-      {mode === 'route' && state && <Section title="Walking directions">
+      {mode === 'route' && state && <Reveal><Section title="Walking directions">
         <VStack gap={4} padding={5} style={{background: 'var(--color-hero)', color: 'var(--color-on-hero)', borderRadius: 'var(--radius-container)'}}>
         {state.rerouting ? <HStack gap={3} vAlign="center"><Spinner size="lg" shade="inherit" aria-label="Rerouting"/><Text color="inherit">Off route. Finding a new way…</Text></HStack> : instruction ? <HStack gap={4} vAlign="center"><VStack align="center" justify="center" width="var(--spacing-12)" height="var(--spacing-12)" style={{flexShrink: 0, borderRadius: 'var(--radius-element)', background: 'color-mix(in srgb, var(--color-on-hero) 14%, transparent)'}}><Text type="display-3" color="inherit">{modifier?.includes('uturn') ? '↶' : modifier?.includes('left') ? '↰' : modifier?.includes('right') ? '↱' : '↑'}</Text></VStack><VStack gap={1}>{state.stepDistanceM !== null && <Text type="large" weight="bold" color="inherit" hasTabularNumbers>In {distance(state.stepDistanceM)}</Text>}<Text color="inherit">{instruction}</Text></VStack></HStack> : <Text color="inherit">Waiting for the next walking instruction.</Text>}
         {(state.distanceM !== null || state.durationS !== null) && <HStack gap={2} vAlign="center" paddingBlock={3} style={{borderTop: 'thin solid color-mix(in srgb, var(--color-on-hero) 22%, transparent)'}}><Icon icon={FlagIcon} size="sm" color="inherit"/><Text color="inherit" hasTabularNumbers>{state.distanceM !== null ? distance(state.distanceM) : ''}{state.distanceM !== null && state.durationS !== null ? ' · ' : ''}{state.durationS !== null ? `${Math.ceil(state.durationS / 60)} min` : ''} remaining</Text></HStack>}
         </VStack>
-      </Section>}
+      </Section></Reveal>}
       {(mode === 'direction' || mode === 'nearby') && state && <Section title={mode === 'nearby' ? 'Check the surroundings' : 'Final segment'}>
         <Panel gap={3}>
-        {direction && <HStack gap={4} vAlign="center"><VStack align="center" justify="center" width="var(--spacing-12)" height="var(--spacing-12)" style={{flexShrink: 0, borderRadius: 'var(--radius-full)', background: 'var(--color-hero)', color: 'var(--color-on-hero)'}}><Text type="display-3" color="inherit">{direction.arrow}</Text></VStack><VStack gap={0.5}><Text type="large" weight="bold">{direction.arrow} {direction.name}</Text>{state.distanceM !== null && <Text type="label" hasTabularNumbers>{distance(state.distanceM)} · straight-line distance to the photo spot</Text>}</VStack></HStack>}
+        {direction && <HStack gap={4} vAlign="center"><VStack align="center" justify="center" width="var(--spacing-12)" height="var(--spacing-12)" style={{flexShrink: 0, borderRadius: 'var(--radius-full)', background: 'var(--color-hero)', color: 'var(--color-on-hero)'}}><Needle degrees={state.bearingDeg ?? 0}/></VStack><VStack gap={0.5}><Text type="large" weight="bold">{direction.arrow} {direction.name}</Text>{state.distanceM !== null && <Text type="label" hasTabularNumbers>{distance(state.distanceM)} · straight-line distance to the photo spot</Text>}</VStack></HStack>}
         {!direction && state.distanceM !== null && <Text type="label">{distance(state.distanceM)} · straight-line distance to the photo spot</Text>}
         {state.bearingDeg !== null && <Hint>{Math.round(state.bearingDeg)}° from north · the arrow is relative to north, not the direction you are facing.</Hint>}
         </Panel>
@@ -169,7 +174,7 @@ export function Walk({route}: {route: Extract<Route, {name: 'walk'}>}) {
         {mode === 'direction' && <Action label="Retry walking route" variant="secondary" run={retryWalk}/>}
         <Hint icon={StoreIcon}>{shop?.storefrontFile ? 'Look for this shop front. Stalls here sit close together, so trust the photo over the pin.' : 'No storefront photo is saved. Check the note, nearby signs and the shaded photo-spot area; the pin alone does not confirm the shop.'}</Hint>
       </Section>}
-      {mode === 'arrived' && <Section title={`You confirmed ${shopName}`}><Panel tone="muted" gap={3}><HStack gap={3} vAlign="center"><IconTile icon="check" tone="success" size="lg"/><Text>{shop?.storefrontFile ? 'You confirmed the shop using the storefront and your surroundings.' : 'You confirmed the shop using your surroundings. The photo spot stays fixed.'}</Text></HStack><Button label="Done" variant="primary" size="lg" onClick={back}/></Panel></Section>}
+      {mode === 'arrived' && <Reveal from="scale"><Section title={`You confirmed ${shopName}`}><Panel tone="muted" gap={3}><HStack gap={3} vAlign="center"><Pop><IconTile icon="check" tone="success" size="lg"/></Pop><Text>{shop?.storefrontFile ? 'You confirmed the shop using the storefront and your surroundings.' : 'You confirmed the shop using your surroundings. The photo spot stays fixed.'}</Text></HStack><Button label="Done" variant="primary" size="lg" onClick={back}/></Panel></Section></Reveal>}
       <Panel gap={3} padding={3}>
       {shop?.storefrontFile ? <PhotoView file={shop.storefrontFile} label={`Storefront of ${shopName}`}/> : <Hint icon={StoreIcon}>No storefront photo</Hint>}
       {shop?.description && <Text>{shop.description}</Text>}
@@ -180,4 +185,12 @@ export function Walk({route}: {route: Extract<Route, {name: 'walk'}>}) {
       {mode !== 'arrived' && <Button label="End" variant="secondary" onClick={back}/>}
     </>}
   </>;
+}
+
+/** North-up arrow that turns smoothly to the bearing of the photo spot. */
+function Needle({degrees}: {degrees: number}) {
+  // Keep an unwrapped angle so 350° → 10° turns 20°, not 340° (derived-state update during render).
+  const [angle, setAngle] = useState({input: degrees, shown: degrees});
+  if (angle.input !== degrees) setAngle({input: degrees, shown: angle.shown + ((((degrees - angle.shown) % 360) + 540) % 360) - 180});
+  return <Text type="display-3" color="inherit" aria-hidden style={{display: 'inline-block', transform: `rotate(${angle.shown}deg)`, transition: reducedMotion() ? undefined : `transform 700ms ${EASE_SPRING}`}}>↑</Text>;
 }
