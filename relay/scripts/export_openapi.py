@@ -10,4 +10,4 @@ from app.main import create_app
 parser = argparse.ArgumentParser()
 parser.add_argument('--output', required=True, type=Path)
 args = parser.parse_args()
-args.output.write_text(json.dumps(create_app().openapi(), indent=2, sort_keys=True, ensure_ascii=False) + '\n', encoding='utf-8')
+args.output.write_text(json.dumps(create_app(schema_only=True).openapi(), indent=2, sort_keys=True, ensure_ascii=False) + '\n', encoding='utf-8')
