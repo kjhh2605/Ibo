@@ -96,7 +96,7 @@ UI 기준은 프로토타입(`prototype/`)이다. 흐름, 문구, 상태, 인터
 
 ## Goal 실행 준비와 워크트리 초기화
 
-2026-11-04 준비 점검에서 사용자가 별도로 준비 작업을 위임했다. S00 기능 구현은 아직 시작하지 않았다.
+2026-11-04 준비 점검 이후 S00 bootstrap을 구현했다. 아래 준비 점검 기록은 당시 관찰이며, 현재 S00 실행 결과는 별도 증거와 구분한다.
 
 - 현재 OMP의 `goal.enabled=true`, `goal.continuationModes=["interactive"]`다. 터미널의 `/goal` 또는 `omp --goal "<목표>"`를 사용한다. RPC/chat에서 자동 지속을 원하면 해당 실행 모드 지원과 설정을 따로 확인한다. Goal은 API 권한·모델 파일을 대신 제공하지 않는다.
 - Orca 새 워크트리의 기준은 `origin/main`이다. S00 merge → 웨이브 1 → S01 merge 후 S02/S03 → 통합 순서를 따른다. 구현 워크트리마다 담당 슬라이스와 소유 경로를 명시하고, 검증한 PR만 통합 담당이 순차 merge한다.
@@ -105,6 +105,16 @@ UI 기준은 프로토타입(`prototype/`)이다. 흐름, 문구, 상태, 인터
 - 호스트 도구 설정은 `~/.config/street-fitting/env.sh`, 자격 증명 로더는 같은 디렉터리의 `secrets.env`(권한 0600)에 둔다. Meta 키(`meta-api-key`), Firebase Admin 키(`firebase-admin.json`), Android 설정(`google-services.json`)도 저장소 밖에 보관한다. 키를 repo setup 명령이나 에이전트 프롬프트에 넣지 않는다. `RELAY_MODE`는 자동 지정하지 않는다.
 - `.github/workflows/validate.yml`은 PR의 앱 lint/build/Astryx doctor와 프로토타입 build만 검사한다. Android·모델·live E2E를 통과했다는 뜻이 아니며, 해당 증거는 각 슬라이스와 S11이 제공한다. 저장소는 공개 전환하지 않았다.
 - Orca setup 훅의 UI 등록은 별도 확인 대상이다. CLI의 `--setup run`은 등록된 훅을 실행할 뿐 설정하지 않는다. 훅이 비어 있는 동안에는 조정자가 각 워크트리에서 위 초기화 명령을 완료한 뒤 작업자를 시작한다.
+
+### S00 구현·실행 결과 (2026-11-04, M1)
+
+- 공유 DTO/OpenAPI/TS 생성, 7개 명시적 501 경로, 8개 native/web 플러그인 등록, Firebase 인증 adapter, 모델 패키징과 실행 잠금을 구현했다. 아직 `App.tsx`는 빈 shell이며 제품 기능은 S01~S11 소유다.
+- Orca 후속 작업자는 `--agent omp`로 실행한다. 에이전트 harness와 그 안의 모델 이름은 별개다. 초기 Codex 작업자는 종료했으며, OMP 작업자가 경계 수정과 실제 Android 검증을 수행했다.
+- [S00 실행 증거](../../verification/results/2026-11-04-s00-bootstrap/README.md)에 테스트·실행·실패 수정·남은 검증을 기록했다. 16 KB APK 패키징/정렬과 실제 ONNX 추론 합격은 구분한다.
+- Capacitor의 기본 debug 응답 로그가 인증 토큰을 출력하는 것을 실제로 확인하여 `loggingBehavior: 'none'`으로 껐다. 이후 native 인증 재실행에서 ID/App Check/debug 토큰 로그 일치가 0개였다. 이후에도 미디어·좌표를 포함하는 브리지 로그를 다시 켜지 않는다.
+- Firebase App Check debug secret은 로그인된 Aside로 `M1 Medium_Phone S00` 이름으로 등록했다. Android에서 받은 ID/App Check 토큰을 Firebase Admin으로 각각 검증했으며, 이는 S01의 relay 인증 middleware 검증을 대신하지 않는다.
+- 계측 검증이나 앱 데이터 초기화 뒤에는 기존 등록 secret을 복원한다: 저장소 루트에서 `source scripts/worktree-env.sh && bash scripts/restore-app-check-debug.sh`. 이 명령은 전역 기기 잠금과 debug `run-as` 확인을 거친다. `~/.config/street-fitting/app-check-debug-token`은 권한 0600으로 유지하며 argv·로그·Git에 넣지 않는다. 재설치마다 새 토큰을 등록하지 않는다.
+- 릴레이 CORS는 Capacitor/local web의 localhost·loopback origin만 허용하고 `X-Query-Token`을 노출한다. debug Android의 평문 HTTP는 10.0.2.2·localhost·loopback 호스트만 허용하며 release는 평문을 금지한다.
 
 ### 준비 점검 실측 (2026-11-04, M1)
 
@@ -150,6 +160,6 @@ UI 기준은 프로토타입(`prototype/`)이다. 흐름, 문구, 상태, 인터
 
 **남은 선행 조건과 주의**
 
-1. App Check debug 등록은 S00의 Firebase adapter가 실제 debug 토큰을 만든 뒤 Aside로 등록하고 통합에서 검증한다. Anonymous/Admin 성공이 App Check 검증 성공을 뜻하지 않는다.
+1. App Check debug 등록과 Android 토큰 검증은 S00에서 완료했다(위 실행 결과). S01 relay의 인증 거부/허용 경로와 S11 전체 live E2E는 별도 합격 조건이다.
 2. Orca repo setup 훅은 아직 비어 있다. CLI에 훅 설정 명령이 없고, Orca Computer Use의 Accessibility/Screen Recording 권한이 없어 UI 설정은 수행하지 못했다. 자동 UI 등록을 원하면 OS 권한이 필요하다. 그 전에도 조정자가 setup 스크립트를 명시 실행하는 방식으로 초기화를 자동화할 수 있다.
 3. provider 기본 Playground의 Contributor 선택이나 무료 크레딧 안내를 무보관 보장으로 해석하지 않는다. 구현은 계약의 Standard model ID와 저장 억제 옵션을 유지한다. 무료 크레딧 소진 시 기존 결제수단으로 과금될 수 있고 spend limit은 알림이지 하드 차단이 아니다.
