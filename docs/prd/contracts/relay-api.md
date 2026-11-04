@@ -259,30 +259,29 @@ Voice 전용 전사 API의 language를 영어로 고정한다. 도구는 없음.
 | 방향 | JSON 스키마(모든 필드 필수) | 제한 |
 |---|---|---|
 | 요청 | `{image:Image}` | 정확히 1장의 cutout, PNG 투명 배경 허용, 공통 Image 상한 |
-| 200 응답 | `{label:string,category:string}` | label 영어 1~120자; category 영어 명사구 1~64자. 둘 다 공백만 불가; enum 없음 |
+| 200 응답 | `{label:string,category:"outer"\|"top"\|"bottom"\|"other"}` | label 영어 1~120자, 공백만 불가. category는 마네킹 슬롯 3개 또는 `other`(D-R13-01) |
 
 `[추론·기술 결정]` 요청에 `origin`은 추가하지 않는다. 두 출처 모두 같은 cutout 입력·프롬프트·label/category 출력으로 처리하므로 릴레이의 동작을 가르는 정보가 아니다. 앱은 `Piece.origin`과 검색 concept 유무로 호출 필요성을 판단하고, `QueueJob.refId=Piece.id`로 응답을 원래 옷에 적용한다. 출처를 바꾸거나 추정하지 않으며 출처별 처리를 위해 원본 trip 사진·가게 위치를 보내지 않는다. 근거: D-R4-06, D-R4-08, D-R9-02.
 
-사용자가 나중에 수정할 수 있으며 옷의 주인·브랜드·사람 신원을 추정하지 않는다. 오류: 공통 인증·입력·크기·Meta 오류. 두 출처 모두 오프라인은 앱 `label_piece` QueueJob 대상이다. 바로 자른 가게 옷은 저장한 옷에 자동으로 들어가고, 라벨링 대기 중에는 "Picked item"으로 표시하다가 성공 응답의 label/category를 적용한다. mock은 `describe-piece.01`에 매칭된 cutout의 녹화 label/category를 반환하며, 바로 자른 가게 옷은 §7의 `direct-cut-shop` 시나리오로 검증한다. 근거: D-R1-04, D-R4-06, D-R4-08, D-R6-03, D-R9-02; `[추론·기술 결정]`(문자 수·category 자유 문자열).
+사용자가 나중에 수정할 수 있으며 옷의 주인·브랜드·사람 신원을 추정하지 않는다. 오류: 공통 인증·입력·크기·Meta 오류. 두 출처 모두 오프라인은 앱 `label_piece` QueueJob 대상이다. 바로 자른 가게 옷은 저장한 옷에 자동으로 들어가고, 라벨링 대기 중에는 "Picked item"으로 표시하다가 성공 응답의 label/category를 적용한다. mock은 `describe-piece.01`에 매칭된 cutout의 녹화 label/category를 반환하며, 바로 자른 가게 옷은 §7의 `direct-cut-shop` 시나리오로 검증한다. 앱이 슬롯을 지정해 저장한 조각은 응답의 category로 덮어쓰지 않고 label만 반영한다. 근거: D-R1-04, D-R4-06, D-R4-08, D-R6-03, D-R9-02, D-R13-01, D-R13-04; `[추론·기술 결정]`(문자 수).
 
 ### 6.6 `POST /v1/tryon`
 
-목적: 마스킹 본인 1장 + 대상 1벌 + 함께 입을 옷 0~5벌로 **Muse Image** 이미지 1장을 생성한다. **입력 총 2~7장, 옷은 최대 6벌**이다. 이전 1+9 규칙은 쓰지 않는다. 근거: D-R4-01, D-R4-02, D-R4-07, D-R4-09.
+목적: 마스킹 본인 1장 + 마네킹 슬롯(outer·top·bottom)마다 최대 1벌, 합쳐 1~3벌로 **Muse Image** 이미지 1장을 생성한다. **입력 총 2~4장**이다. 대상 1벌 + 동반 0~5벌 규칙은 폐기했다. 근거: D-R4-02, D-R13-02.
 
 ```json
 {
-  "type":"object","additionalProperties":false,"required":["selfPhoto","target","companions"],
+  "type":"object","additionalProperties":false,"required":["selfPhoto","pieces"],
   "properties":{
     "selfPhoto":{"type":"object","additionalProperties":false,"required":["image","headMasked"],"properties":{"image":{"$ref":"#/components/schemas/Image"},"headMasked":{"const":true}}},
-    "target":{"$ref":"#/components/schemas/TryOnPiece"},
-    "companions":{"type":"array","minItems":0,"maxItems":5,"items":{"$ref":"#/components/schemas/TryOnPiece"}}
+    "pieces":{"type":"array","minItems":1,"maxItems":3,"items":{"$ref":"#/components/schemas/TryOnPiece"}}
   }
 }
 ```
 
-`TryOnPiece={pieceRef:Ref, image:Image, label:string(1~120), category:string(1~64), origin:"shop"|"wardrobe"}`; 전부 필수. target.origin은 반드시 `shop`, 모든 pieceRef는 중복 불가다. 앱이 저장되지 않은 임시 조각을 골랐다면 먼저 저장한 옷으로 만든다. 본문 44 MiB, 장당 공통 Image 상한을 적용한다. `headMasked:true`는 앱의 완료 신호이며 릴레이가 원본 얼굴을 요구하거나 얼굴 마스크 파일을 요구하지 않는다. 근거: D-R4-08, D-R4-09, D-R4-11; `[추론·기술 결정]`.
+`TryOnPiece={pieceRef:Ref, image:Image, label:string(1~120), category:"outer"|"top"|"bottom"}`; 전부 필수. pieceRef와 category는 각각 중복 불가다(슬롯마다 1벌). origin은 보내지 않는다. 앱이 저장되지 않은 임시 조각을 골랐다면 먼저 저장한 옷으로 만든다. 본문 44 MiB, 장당 공통 Image 상한을 적용한다. `headMasked:true`는 앱의 완료 신호이며 릴레이가 원본 얼굴을 요구하거나 얼굴 마스크 파일을 요구하지 않는다. 근거: D-R4-08, D-R4-09, D-R4-11; `[추론·기술 결정]`.
 
-Muse Image는 공식 `POST /v1/images/edits`를 사용한다. 실제 Responses `image_generation` 도구 요청은 400으로 거절되어 이 endpoint로 전환했다. 모델 `muse-image-1.0`, `n:1`, PNG/base64 출력, `reasoning_strength:"low"`, 가명 안전 식별자 `user`를 고정하며 `tool_enablement`의 이미지 검색·웹 검색·shell을 모두 끈다. 이 endpoint에는 문서화된 `store`/`safety_identifier` 필드가 없으므로 provider 무보관을 주장하지 않는다. 입력 순서는 selfPhoto, target, companions이며 별도 `mask` 대신 이미 얼굴·머리가 제거된 이미지를 보낸다. 출력 비율은 본인 이미지의 가로×세로를 사용하되 최대 16:1/1:16 범위로 제한한다. 실제 합성 입력으로 PNG 생성은 확인했고, 마스킹 유지·픽셀 정렬·개인정보 품질 최종 합격은 미확인이다. 근거: D-R4-03~04; [실호출 증거](../../../verification/results/2026-11-05-live-provider/final.json), [공식 이미지 API](https://dev.meta.ai/docs/image-generation).
+Muse Image는 공식 `POST /v1/images/edits`를 사용한다. 실제 Responses `image_generation` 도구 요청은 400으로 거절되어 이 endpoint로 전환했다. 모델 `muse-image-1.0`, `n:1`, PNG/base64 출력, `reasoning_strength:"low"`, 가명 안전 식별자 `user`를 고정하며 `tool_enablement`의 이미지 검색·웹 검색·shell을 모두 끈다. 이 endpoint에는 문서화된 `store`/`safety_identifier` 필드가 없으므로 provider 무보관을 주장하지 않는다. 입력 순서는 selfPhoto 다음 옷을 안쪽부터(bottom → top → outer) 정렬한 순서이고, 프롬프트는 참조 이미지마다 슬롯 역할과 D-R13-03의 빈 슬롯 규칙을 적는다. label은 프롬프트에 넣지 않는다. 별도 `mask` 대신 이미 얼굴·머리가 제거된 이미지를 보낸다. 출력 비율은 본인 이미지의 가로×세로를 사용하되 최대 16:1/1:16 범위로 제한한다. 실제 합성 입력으로 PNG 생성은 확인했고, 마스킹 유지·픽셀 정렬·개인정보 품질 최종 합격은 미확인이다. 근거: D-R4-03~04; [실호출 증거](../../../verification/results/2026-11-05-live-provider/final.json), [공식 이미지 API](https://dev.meta.ai/docs/image-generation).
 
 생성 프롬프트는 원본 신원을 추론·복원하지 않고, 기기에서 감지해 제거할 수 있는 가상의 머리·목 윤곽을 요청한다. 기존 "사각형 가림막 유지" 요청은 실제 Muse 출력에서 중심 사람 마스크의 머리를 분리해 `unsafe_output`을 유발했다. 입력은 계속 얼굴·머리를 제거한 self만 전송한다. 생성된 머리를 그대로 사용자에게 보이지 않고 [device-modules의 출력 검증·제거](device-modules.md#전송본-설정-재합성)를 거친다. native 검출·임계값은 변경하지 않았으며, 실제 Android에서 출력 검사 후 `faceless:true` 저장을 확인했다. 사람 GT·재합성 품질 합격을 뜻하지 않는다.
 
@@ -292,7 +291,7 @@ Muse Image는 공식 `POST /v1/images/edits`를 사용한다. 실제 Responses `
 
 공식 이미지 편집 응답의 `data[0].b64_json`에서 얻은 provider 파일 바이트를 **재인코딩·메타데이터 제거·워터마크 제거 없이** 반환한다. 결과는 정확히 한 장이어야 하며 URL-only 결과는 `upstream_error`로 거부한다. 파일 URL 다운로드 요청을 하지 않으며 사용자 URL도 받지 않는다. 이미지 크기가 앱 계약 상한을 넘으면 `upstream_error`로 종료하고 임의 축소하지 않는다. 앱은 받은 바이트 그대로 `Result.providerFile`에 보존하고 별도 기기 파생본으로 얼굴 재합성/얼굴 없는 결과를 만든다. 서버는 `faceless`를 결정하지 않는다. 결과 내려받기는 보존 검증까지 기능 플래그로 꺼 둔다. 근거: D-R4-04, D-R4-10, D-R11-03; [공식 출력 계약](https://dev.meta.ai/docs/image-generation).
 
-오류: 인증·입력·크기·Meta 오류. 6번째 companion/두 번째 selfPhoto/wardrobe target은 호출 전 `invalid_request`. Meta `content_policy_violation`은 400 false로 그대로 의미를 보존한다. 마스킹이 실패했다면 앱은 이 API를 호출하지 않는다. mock은 `tryon.01`에서 선택한 조합에 맞는 provider 원본 파일을 재생하며 입력 이미지를 합성한 척하지 않는다. 근거: D-R1-04, D-R4-07, D-R4-11.
+오류: 인증·입력·크기·Meta 오류. 옷 0벌·4벌 이상/같은 슬롯 2벌/슬롯이 아닌 category/두 번째 selfPhoto는 호출 전 `invalid_request`. Meta `content_policy_violation`은 400 false로 그대로 의미를 보존한다. 마스킹이 실패했다면 앱은 이 API를 호출하지 않는다. mock은 `tryon.01`에서 선택한 조합에 맞는 provider 원본 파일을 재생하며 입력 이미지를 합성한 척하지 않는다. 근거: D-R1-04, D-R4-07, D-R4-11.
 
 ### 6.7 `POST /v1/route`
 

@@ -194,8 +194,8 @@ async def main(args):
 
     async def generation():
         request = TryOnRequest(selfPhoto={'headMasked': True, 'image': image('calibration-hat-masked.png')},
-                               target={'pieceRef': 'synthetic-target', 'image': image('shop-1-candidate-1.png'),
-                                       'label': 'Blue jacket', 'category': 'jacket', 'origin': 'shop'}, companions=[])
+                               pieces=[{'pieceRef': 'synthetic-outer', 'image': image('shop-1-candidate-1.png'),
+                                        'label': 'Blue jacket', 'category': 'outer'}])
         response = await tryon(request, http)
         raw = base64.b64decode(response.image.data)
         return {'inputImageCount': 2, 'outputMimeType': response.image.mimeType,

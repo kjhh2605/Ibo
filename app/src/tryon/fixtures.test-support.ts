@@ -1,4 +1,6 @@
 import {vi} from 'vitest';
+import {GARMENT_SLOTS} from '../category';
+import type {GarmentSlot} from '../category';
 import type {ComposeMetrics, FaceMask, Piece, Result, ResultPieceSnapshot, SelfPhoto, Store} from '../native/contracts';
 import type {TryOnDependencies} from './controller';
 import {createTryOnController} from './controller';
@@ -30,10 +32,11 @@ export function fixture() {
   const files = new Map<string, Uint8Array>([['private/ORIGINAL_SELF_SENTINEL', raw], ['private/HEAD_MASK_SENTINEL', raw], ['private/masked', masked]]);
   const self: SelfPhoto = {file: 'private/ORIGINAL_SELF_SENTINEL', headMask: 'private/HEAD_MASK_SENTINEL', maskedFile: 'private/masked', updatedAt: 123};
   const pieces = new Map<string, Piece>();
+  // piece-0 outer/shop, piece-1 top/wardrobe, piece-2 bottom/shop, piece-3 outer/wardrobe, ...
   for (let index = 0; index < 8; index++) {
     const id = `piece-${index}`;
     files.set(`cutout/${id}`, masked.slice());
-    pieces.set(id, {id, origin: index % 2 ? 'wardrobe' : 'shop', label: `Label ${index}`, category: 'jacket', cutoutFile: `cutout/${id}`, createdAt: 1, photoId: 'photo-original', tripId: 'trip-original', shopId: 'shop-original', walkTo: {lat: 37, lng: 127}});
+    pieces.set(id, {id, origin: index % 2 ? 'wardrobe' : 'shop', label: `Label ${index}`, category: GARMENT_SLOTS[index % 3], cutoutFile: `cutout/${id}`, createdAt: 1, photoId: 'photo-original', tripId: 'trip-original', shopId: 'shop-original', walkTo: {lat: 37, lng: 127}});
   }
   const drafts = new Map<string, PreparedResult>();
   const results = new Map<string, Result>();
@@ -72,9 +75,14 @@ export function fixture() {
     }),
     discardTemp: vi.fn(async ({file}: {file: string}) => { files.delete(file); }),
     deleteResult: vi.fn(async ({id}: {id: string}) => { results.delete(id); }),
-    saveCandidate: vi.fn(async () => {
-      const value: Piece = {...pieces.get('piece-2')!, id: `saved-${++serial}`, label: 'Picked item', category: 'unknown'};
+    saveCandidate: vi.fn(async (input?: {category?: GarmentSlot}) => {
+      const value: Piece = {...pieces.get('piece-2')!, id: `saved-${++serial}`, label: 'Picked item', category: input?.category ?? 'unknown'};
       pieces.set(value.id, value); labels.push({cutoutFile: value.cutoutFile, label: value.label, category: value.category}); return value;
+    }),
+    updatePiece: vi.fn(async ({id, label, category}: {id: string; label: string; category: string}) => {
+      const value = pieces.get(id);
+      if (!value) throw new TryOnError('not_found');
+      const updated = {...value, label, category}; pieces.set(id, updated); return updated;
     }),
   };
   const faceMask = {

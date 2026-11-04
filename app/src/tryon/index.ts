@@ -10,7 +10,8 @@ import type {TryOnController, TryOnDependencies} from './controller';
 import {createResultExporter, resultExportPolicy} from './export';
 import {decodeImage, encodeBase64, imageDimensions} from './images';
 
-export type {TryOnController, TryOnDependencies, TryOnDraft, TryOnPhase, TryOnState} from './controller';
+export type {Outfit, TryOnController, TryOnDependencies, TryOnDraft, TryOnPhase, TryOnState} from './controller';
+export {wornSlots} from './controller';
 export type {ProvenanceApproval, ResultExportPolicy} from './export';
 export {createResultExporter, resultExportPolicy} from './export';
 export {TryOnError} from './errors';

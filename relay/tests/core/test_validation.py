@@ -79,12 +79,13 @@ def test_media_counts_and_duration_limits(image):
         audio.writeframes(b'\0\0' * 16000 * 16)
     with pytest.raises(ValueError):
         TranscribeRequest.model_validate({'audio': {'mimeType': 'audio/wav', 'data': base64.b64encode(stream.getvalue()).decode()}})
-    target = {'pieceRef': 'target', 'image': image, 'label': 'coat', 'category': 'outerwear', 'origin': 'shop'}
-    body = {'selfPhoto': {'image': image, 'headMasked': True}, 'target': target,
-            'companions': [{**target, 'pieceRef': f'piece{i}'} for i in range(6)]}
+    piece = {'pieceRef': 'outer', 'image': image, 'label': 'coat', 'category': 'outer'}
+    body = {'selfPhoto': {'image': image, 'headMasked': True},
+            'pieces': [{**piece, 'pieceRef': f'piece{i}', 'category': slot}
+                       for i, slot in enumerate(['outer', 'top', 'bottom', 'outer'])]}
     with pytest.raises(ValueError):
         TryOnRequest.model_validate(body)
-    body['companions'] = []
+    body['pieces'] = [piece]
     body['selfPhoto']['headMasked'] = False
     with pytest.raises(ValueError):
         TryOnRequest.model_validate(body)

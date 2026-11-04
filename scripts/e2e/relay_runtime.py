@@ -85,11 +85,11 @@ def main():
    changed=copy.deepcopy(body);changed[field]['lat']+=0.0001
    expect_error(lambda:loader.prepare(scenario,'route',1,changed),'fixture_request_mismatch',409,'/'+field+'/lat')
   checks.append(scenario+': canonical origin/destination accepted; unknown coordinates ->409')
- for scenario,count in [('e2e-tryon-other',1),('e2e-tryon-target-only',0)]:
-  body=request(scenario,'tryon',1);assert len(body['companions'])==count;replay(scenario,'tryon',1,body)
-  changed=copy.deepcopy(body);changed['companions'].append(copy.deepcopy(request('e2e','tryon',1)['companions'][0]))
-  expect_error(lambda:loader.prepare(scenario,'tryon',1,changed),'fixture_request_mismatch',409,'/companions')
-  checks.append(scenario+': exact companion count accepted; extra companion ->409')
+ for scenario,count in [('e2e-tryon-other',2),('e2e-tryon-target-only',1)]:
+  body=request(scenario,'tryon',1);assert len(body['pieces'])==count;replay(scenario,'tryon',1,body)
+  changed=copy.deepcopy(body);changed['pieces'].append(copy.deepcopy(request('e2e','tryon',1)['pieces'][2]))
+  expect_error(lambda:loader.prepare(scenario,'tryon',1,changed),'fixture_request_mismatch',409,'/pieces')
+  checks.append(scenario+': exact mannequin pieces accepted; extra slot ->409')
  for scenario in ['normal','e2e','e2e-tryon-other','e2e-tryon-target-only','unsafe-provider']:
   output=replay(scenario,'tryon',1,request(scenario,'tryon',1))
   source=FIX.parent/('images/derived/calibration-hat-masked.png' if scenario=='unsafe-provider' else 'images/self/positive/calibration-hat.png')

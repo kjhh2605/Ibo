@@ -1,7 +1,11 @@
 import {useCallback, useEffect, useRef, useState, useSyncExternalStore} from 'react';
 import type {ReactNode} from 'react';
 import {config} from '../config';
-import type {Asset, Piece, QueueJob, Result as SavedResult} from '../native/contracts';
+import {GARMENT_SLOTS, categoryNames, emptySlotRule, pieceCategory, slotExamples, slotNames, slotOf} from '../category';
+import type {GarmentSlot} from '../category';
+import type {Asset, Piece, QueueJob, Result as SavedResult, ResultPieceSnapshot} from '../native/contracts';
+import {wornSlots} from '../tryon';
+import type {Outfit as OutfitDraft} from '../tryon';
 import {localCompositionConfig} from '../native/compositionConfig';
 import type {Route} from '../ui/navigation';
 import type {FittingState} from '../ui/services';
@@ -11,27 +15,37 @@ import {Spinner} from '@astryxdesign/core/Spinner';
 import {Skeleton} from '@astryxdesign/core/Skeleton';
 import {Sweep} from '../ui/motion';
 import {Divider} from '@astryxdesign/core/Divider';
-import {Action, Button, Chip, Confirm, EditFields, Empty, Heading, Hint, HStack, Icon, IconTile, Media, Panel, PhotoView, Pop, Problem, Reveal, Section, SkeletonPhoto, SkeletonRows, SkeletonText, StickyBar, Text, Thumbnail, VStack} from '../ui/components';
+import {Action, Button, Chip, Confirm, EditFields, Empty, Eyebrow, Heading, Hint, HStack, Icon, IconTile, Media, Panel, PhotoView, Pop, Problem, Reveal, RowButton, Section, SkeletonPhoto, SkeletonRows, SkeletonText, StickyBar, Text, Thumbnail, VStack} from '../ui/components';
 import {CameraIcon, HangerIcon, ImageIcon, LockIcon, NoteIcon, PencilIcon, PinIcon, PlusIcon, RouteIcon, ShieldIcon, SparkleIcon, TrashIcon} from '../ui/icons';
 
-const MAX_COMPANIONS = 5;
-export function companionEligibility(draft: FittingState['draft'], pieceId: string) {
-  if (!draft.targetPieceId) return 'no_target';
-  if (pieceId === draft.targetPieceId) return 'target';
-  if (draft.companionPieceIds.includes(pieceId)) return 'selected';
-  if (draft.companionPieceIds.length >= MAX_COMPANIONS) return 'limit';
-  return 'available';
+/** Whether a piece can go in a mannequin slot, and how. */
+export function slotChoice(outfit: OutfitDraft, slot: GarmentSlot, piece: Pick<Piece, 'id' | 'category'>) {
+  if (outfit[slot] === piece.id) return 'wearing';
+  const own = slotOf(piece);
+  if (own === slot) return 'fits';
+  return own ? 'other_slot' : 'unsorted';
 }
 export function resultViewPolicy(result: SavedResult, existingPieceIds: ReadonlySet<string> | null, ownerCanChange: boolean, resultDownload: boolean = config.resultDownload) {
+  const pieces = [result.targetSnapshot, ...result.companionSnapshots];
+  const seen = new Set<string>();
   return {
     file: result.file,
     faceless: result.faceless,
-    target: result.targetSnapshot,
-    pieces: [result.targetSnapshot, ...result.companionSnapshots],
-    destination: result.targetSnapshot.walkTo,
-    canChangePieces: ownerCanChange && existingPieceIds?.has(result.targetPieceId) === true,
+    pieces,
+    title: pieces.map(piece => piece.label).join(', '),
+    // A look can hold shop pieces from several shops; offer one walk-back per shop (or per spot without one).
+    destinations: pieces.filter((piece): piece is ResultPieceSnapshot & {walkTo: NonNullable<ResultPieceSnapshot['walkTo']>} => {
+      if (piece.origin !== 'shop' || !piece.walkTo) return false;
+      const key = piece.shop ? `shop:${piece.shop.n}:${piece.shop.startedAt}` : `spot:${piece.walkTo.lat},${piece.walkTo.lng}`;
+      return !seen.has(key) && !!seen.add(key);
+    }),
+    canChangePieces: ownerCanChange && pieces.some(piece => existingPieceIds?.has(piece.pieceId) === true),
     canDownload: resultDownload,
   };
+}
+function kindOf(piece: {category: string}) {
+  const kind = pieceCategory(piece.category);
+  return kind === 'unknown' ? '' : categoryNames[kind];
 }
 const phases: Record<FittingState['phase'], string> = {
   idle: 'Ready',
@@ -52,10 +66,10 @@ function errorCode(cause: unknown) {
 }
 function fittingError(code: string) {
   switch (code) {
-    case 'offline': return 'You’re offline. Connect and tap Generate again. Your pieces are still selected.';
+    case 'offline': return 'You’re offline. Connect and tap Fit again. Your pieces are still selected.';
     case 'content_policy_violation': return 'This look goes against the image service’s content rules. Try a different photo or different pieces.';
-    case 'upstream_timeout': return 'This took too long and nothing was saved. Tap Generate to try again.';
-    case 'self_photo_changed': return 'Your photo changed while the look was being made. Check it, then tap Generate again.';
+    case 'upstream_timeout': return 'This took too long and nothing was saved. Tap Fit to try again.';
+    case 'self_photo_changed': return 'Your photo changed while the look was being made. Check it, then tap Fit again.';
     case 'unsafe_output': return 'We couldn’t finish this look safely, so nothing was saved.';
     case 'invalid_reference':
     case 'not_found': return 'One of your pieces was deleted. Check your selection, then try again.';
@@ -84,13 +98,13 @@ function Naming({piece, jobs}: {piece: Piece; jobs: QueueJob[]}) {
   const {online, services} = useUi();
   const job = jobs.find(value => value.kind === 'label_piece' && value.refId === piece.id);
   if (job) return <Text type="supporting">{!online ? 'Waiting for connection to name this piece.' : job.attempts > 0 ? 'Naming will try again soon, or you can rename it yourself.' : 'Naming this piece…'}</Text>;
-  if (piece.category !== 'unknown') return null;
+  if (pieceCategory(piece.category) !== 'unknown') return null;
   return <VStack gap={2}><Text type="supporting">Couldn’t name this piece automatically. Rename it yourself or try again.</Text><Action label="Try naming again" variant="ghost" run={() => services.store.enqueue({kind: 'label_piece', refId: piece.id})}/></VStack>;
 }
 function PieceRow({piece, jobs, action, badge}: {piece: Piece; jobs: QueueJob[]; action?: ReactNode; badge?: ReactNode}) {
   return <HStack gap={3} vAlign="center" padding={3} style={{background: 'var(--color-background-card)', borderRadius: 'var(--radius-container)', boxShadow: 'var(--shadow-low)'}}>
     <Media file={piece.cutoutFile} label={piece.label} width="var(--spacing-12)" height="var(--spacing-12)" fit="contain"/>
-    <VStack gap={1} style={{flex: 1, minWidth: 0}}><HStack gap={2} vAlign="center" wrap="wrap"><Text type="label" weight="semibold">{piece.label}</Text>{badge}</HStack><Text type="supporting" size="sm">{piece.origin === 'shop' ? 'Saved from a shop' : 'Your wardrobe'}{piece.category !== 'unknown' ? ` · ${piece.category}` : ''}</Text><Naming piece={piece} jobs={jobs}/></VStack>
+    <VStack gap={1} style={{flex: 1, minWidth: 0}}><HStack gap={2} vAlign="center" wrap="wrap"><Text type="label" weight="semibold">{piece.label}</Text>{badge}</HStack><Text type="supporting" size="sm">{kindOf(piece) ? `${kindOf(piece)} · ` : ''}{piece.origin === 'shop' ? 'Saved from a shop' : 'Your wardrobe'}</Text><Naming piece={piece} jobs={jobs}/></VStack>
     {action}
   </HStack>;
 }
@@ -117,12 +131,15 @@ export function Item({route}: {route: Extract<Route, {name: 'item'}>}) {
     <VStack as="section" gap={4}>
       <PhotoView file={piece.cutoutFile} label={piece.label}/>
       <HStack gap={3} vAlign="start" hAlign="between">
-        <VStack gap={1} style={{minWidth: 0}}><HStack gap={2} vAlign="center" wrap="wrap"><Chip tone={piece.origin === 'shop' ? 'accent' : 'muted'}>{piece.origin === 'shop' ? 'Shop piece' : 'Wardrobe'}</Chip>{piece.category !== 'unknown' && <Chip>{piece.category}</Chip>}</HStack><Heading level={2}>{piece.label}</Heading><Text type="supporting">{piece.origin === 'wardrobe' ? 'In your wardrobe' : shop ? `Shop ${shop.n} · ${dateTime(shop.startedAt)}` : 'Saved from a shop'}</Text></VStack>
-        <Button label="Rename" variant="secondary" size="sm" icon={<Icon icon={PencilIcon}/>} onClick={() => showSheet({title: 'Rename piece', form: true, content: <EditFields label={piece.label} category={piece.category} onSave={(label, category) => services.store.updatePiece({id: piece.id, label, category})}/>})}/>
+        <VStack gap={1} style={{minWidth: 0}}><HStack gap={2} vAlign="center" wrap="wrap"><Chip tone={piece.origin === 'shop' ? 'accent' : 'muted'}>{piece.origin === 'shop' ? 'Shop piece' : 'Wardrobe'}</Chip>{kindOf(piece) && <Chip>{kindOf(piece)}</Chip>}</HStack><Heading level={2}>{piece.label}</Heading><Text type="supporting">{piece.origin === 'wardrobe' ? 'In your wardrobe' : shop ? `Shop ${shop.n} · ${dateTime(shop.startedAt)}` : 'Saved from a shop'}</Text></VStack>
+        <Button label="Edit" variant="secondary" size="sm" icon={<Icon icon={PencilIcon}/>} onClick={() => showSheet({title: 'Edit piece', form: true, content: <EditFields label={piece.label} category={piece.category} onSave={(label, category) => services.store.updatePiece({id: piece.id, label, category})}/>})}/>
       </HStack>
       <Naming piece={piece} jobs={jobs}/>
     </VStack>
-    {piece.origin === 'shop' && <VStack gap={2}><HStack gap={2}><Action label="Try it on" size="lg" icon={<Icon icon={SparkleIcon}/>} style={{flex: 1}} run={async () => {await services.fitting.start(piece.id); if (alive.current) push({name: 'outfit'});}}/><Button label="Walk back" variant="secondary" size="lg" icon={<Icon icon={RouteIcon}/>} style={{flex: 1}} isDisabled={!piece.walkTo} onClick={() => push({name: 'walk', source: 'item', id: piece.id})}/></HStack>{!piece.walkTo && <Hint icon="warning">No location was saved with this photo, so walking back isn’t available.</Hint>}{!online && <Hint>You’re offline. Connect to try it on or walk back.</Hint>}</VStack>}
+    <VStack gap={2}><HStack gap={2}><Action label="Try it on" size="lg" icon={<Icon icon={SparkleIcon}/>} style={{flex: 1}} run={async () => {
+      if (!slotOf(piece)) {showSheet({title: 'What kind of piece is this?', content: <SortAndWear piece={piece}/>}); return;}
+      await services.fitting.wear(piece.id); if (alive.current) push({name: 'outfit'});
+    }}/>{piece.origin === 'shop' && <Button label="Walk back" variant="secondary" size="lg" icon={<Icon icon={RouteIcon}/>} style={{flex: 1}} isDisabled={!piece.walkTo} onClick={() => push({name: 'walk', source: 'item', id: piece.id})}/>}</HStack>{piece.origin === 'shop' && !piece.walkTo && <Hint icon="warning">No location was saved with this photo, so walking back isn’t available.</Hint>}{!online && <Hint>You’re offline. Connect to try it on{piece.origin === 'shop' ? ' or walk back' : ''}.</Hint>}</VStack>
     {piece.origin === 'shop' ? <Section title={shop ? `Shop ${shop.n}` : 'Saved photo spot'} eyebrow="Where you found it"><Panel gap={3} padding={3}>
       {storefront ? <PhotoView file={storefront.file} label={`Storefront of Shop ${shop?.n}`}/> : <HStack gap={3} vAlign="center" padding={4} style={{background: 'var(--color-background-muted)', borderRadius: 'var(--radius-element)'}}><Icon icon={ImageIcon} color="secondary"/><Text type="supporting">No storefront photo</Text></HStack>}
       {shop?.description && <Text>{shop.description}</Text>}
@@ -132,7 +149,7 @@ export function Item({route}: {route: Extract<Route, {name: 'item'}>}) {
       {piece.walkTo && <HStack gap={2} vAlign="center" style={{color: 'var(--color-text-secondary)'}}><Icon icon={PinIcon} size="sm" color="inherit"/><Text type="supporting" size="sm" hasTabularNumbers>Location saved where you took the photo</Text></HStack>}
       {photo && <Button label="Original photo" variant="secondary" size="sm" icon={<Icon icon={ImageIcon}/>} onClick={() => push({name: 'pick', mode: 'shop', photoId: photo.id})}/>}
       {!photo && <Hint>The original photo was deleted. This piece and its location are still saved.</Hint>}
-    </Panel></Section> : <Panel tone="muted" padding={4}><HStack gap={3} vAlign="center"><IconTile icon={HangerIcon}/><Text>Wear this with a piece you saved from a shop. Add it on the Try on screen.</Text></HStack></Panel>}
+    </Panel></Section> : <Panel tone="muted" padding={4}><HStack gap={3} vAlign="center"><IconTile icon={HangerIcon}/><Text>Tap Try it on to put it on the mannequin. Mix it with pieces you saved from shops.</Text></HStack></Panel>}
     <HStack gap={2} wrap="wrap" hAlign="between">{piece.origin === 'shop' && <Button label="Find another" variant="ghost" icon={<Icon icon="search"/>} onClick={()=>push({name:'ask'})}/>}
     <Confirm icon={<Icon icon={TrashIcon}/>} title="Delete this piece?" description="It will be removed from your saved pieces. Looks you made with it stay." action="Delete piece" onConfirm={async () => {await services.store.deletePiece({id: piece.id}); deleted('Piece', piece.id); say('Piece deleted');}}/></HStack>
   </>;
@@ -168,32 +185,76 @@ function SelfPhotoChooser() {
   </VStack>;
 }
 
-function CompanionChooser() {
+/** Shown before trying on a piece that isn't an outer layer, top or bottom yet. */
+function SortAndWear({piece}: {piece: Piece}) {
+  const {services, push, showSheet} = useUi();
+  const alive = useAlive();
+  return <VStack gap={4}>
+    <Text>{piece.label} isn’t sorted yet. Choose where it goes on the mannequin.</Text>
+    {GARMENT_SLOTS.map(slot => <Action key={slot} label={`Wear as ${slotNames[slot].toLowerCase()}`} variant="secondary" run={async () => {await services.fitting.setSlot(slot, piece.id); if (alive.current) {showSheet(null); push({name: 'outfit'});}}}/>)}
+    <Text type="supporting" size="sm">Shoes, bags, dresses and accessories can’t be tried on yet.</Text>
+    <Button label="Cancel" variant="ghost" onClick={() => showSheet(null)}/>
+  </VStack>;
+}
+
+function SlotChooser({slot}: {slot: GarmentSlot}) {
   const {services, push, showSheet} = useUi();
   const state = useFitting();
   const pieces = useData(async () => ({pieces: await listAll(services, 'Piece'), jobs: await listAll(services, 'QueueJob')}), [services]);
-  const full = state.draft.companionPieceIds.length >= MAX_COMPANIONS;
   const busy = generating(state) || state.selfState === 'registering';
+  const name = slotNames[slot].toLowerCase();
+  const wear = (piece: Piece) => <Action label={`Wear ${piece.label}`} text="Wear" variant="secondary" size="sm" icon={<Icon icon={PlusIcon}/>} disabled={busy} run={async () => {await services.fitting.setSlot(slot, piece.id); showSheet(null);}}/>;
+  const fits = pieces.data?.pieces.filter(piece => slotChoice(state.draft.outfit, slot, piece) !== 'other_slot' && slotChoice(state.draft.outfit, slot, piece) !== 'unsorted') ?? [];
+  // Unsorted pieces, and pieces Spark (or the user) sorted differently, can be re-sorted here.
+  const others = pieces.data?.pieces.filter(piece => ['other_slot', 'unsorted'].includes(slotChoice(state.draft.outfit, slot, piece))) ?? [];
   return <VStack gap={4}>
-    <Text>Add up to 5 pieces to wear with your shop piece.</Text>
-    {full && <Text type="supporting">You can add up to 5 pieces. Remove one to add another.</Text>}
-    <Button label="From a trip photo" variant="secondary" icon={<Icon icon={CameraIcon}/>} isDisabled={full || busy} onClick={() => push({name: 'trips', forOutfit: true})}/>
-    {pieces.loading && !pieces.data ? <SkeletonRows count={3} label="Loading your pieces"/> : pieces.error ? <Problem message={pieces.error} retry={pieces.retry}/> : (['wardrobe', 'shop'] as const).map(origin => {
-      const available = pieces.data?.pieces.filter(piece => piece.origin === origin && piece.id !== state.draft.targetPieceId) ?? [];
-      return <Section key={origin} title={origin === 'wardrobe' ? 'Your wardrobe' : 'Saved from shops'}>
-        {!available.length && <Hint>{origin === 'wardrobe' ? 'Nothing in your wardrobe yet. Add pieces from Wardrobe on Home.' : 'No other saved shop pieces. Pick one from a trip photo.'}</Hint>}
-        {available.map((piece, index) => {
-          const eligibility = companionEligibility(state.draft, piece.id);
-          return <Reveal key={piece.id} index={index}><PieceRow piece={piece} jobs={pieces.data?.jobs ?? []} action={eligibility === 'selected' ? <Action label={`Remove ${piece.label}`} variant="ghost" size="sm" disabled={busy} run={async () => {services.fitting.removeCompanion(piece.id);}}/> : <Action label={`Add ${piece.label}`} variant="secondary" size="sm" icon={<Icon icon={PlusIcon}/>} disabled={eligibility !== 'available' || busy} run={() => services.fitting.addCompanion(piece.id)}/>}/></Reveal>;
-        })}
-      </Section>;
-    })}
+    <Text>{slotExamples[slot]}. One {name} at a time; choosing another swaps it.</Text>
+    <Button label="From a trip photo" variant="secondary" icon={<Icon icon={CameraIcon}/>} isDisabled={busy} onClick={() => push({name: 'trips', forOutfit: slot})}/>
+    {pieces.loading && !pieces.data ? <SkeletonRows count={3} label="Loading your pieces"/> : pieces.error ? <Problem message={pieces.error} retry={pieces.retry}/> : <>
+      {(['wardrobe', 'shop'] as const).map(origin => {
+        const available = fits.filter(piece => piece.origin === origin);
+        return <Section key={origin} title={origin === 'wardrobe' ? 'Your wardrobe' : 'Saved from shops'}>
+          {!available.length && <Hint>{origin === 'wardrobe' ? `No ${name} pieces in your wardrobe yet.` : `No saved shop ${name} pieces yet. Pick one from a trip photo.`}</Hint>}
+          {available.map((piece, index) => <Reveal key={piece.id} index={index}><PieceRow piece={piece} jobs={pieces.data?.jobs ?? []} badge={slotChoice(state.draft.outfit, slot, piece) === 'wearing' ? <Chip tone="success">Wearing</Chip> : undefined} action={slotChoice(state.draft.outfit, slot, piece) === 'wearing' ? undefined : wear(piece)}/></Reveal>)}
+        </Section>;
+      })}
+      {others.length > 0 && <Section title="Other pieces" description={`Using one as a ${name} saves that as its kind.`}>
+        {others.map((piece, index) => <Reveal key={piece.id} index={index}><PieceRow piece={piece} jobs={pieces.data?.jobs ?? []} action={<Action label={`Use ${piece.label} as ${name}`} text={`Use as ${name}`} variant="secondary" size="sm" disabled={busy} run={async () => {await services.fitting.setSlot(slot, piece.id); showSheet(null);}}/>}/></Reveal>)}
+      </Section>}
+    </>}
     <Button label="Done choosing" variant="secondary" onClick={() => showSheet(null)}/>
   </VStack>;
 }
 
+/** A plain dress form: head and neck stay blank because only the body is ever restyled. */
+function MannequinFigure({outfit}: {outfit: OutfitDraft}) {
+  const fill = (slot: GarmentSlot) => ({fill: outfit[slot] ? 'var(--color-accent)' : 'var(--color-background-muted)', stroke: outfit[slot] ? 'var(--color-accent)' : 'var(--color-border)', strokeDasharray: outfit[slot] ? undefined : '4 3', transition: 'fill 240ms ease, stroke 240ms ease'});
+  return <svg viewBox="0 0 120 260" role="img" aria-label={`Mannequin wearing ${wornSlots(outfit).map(([slot]) => slotNames[slot].toLowerCase()).join(', ') || 'nothing yet'}`} style={{width: 'calc(var(--spacing-12) * 2)', height: 'auto', flexShrink: 0}}>
+    <circle cx="60" cy="22" r="15" style={{fill: 'var(--color-background-muted)', stroke: 'var(--color-border)'}}/>
+    <path d="M54 37h12v9H54z" style={{fill: 'var(--color-background-muted)', stroke: 'var(--color-border)'}}/>
+    <path d="M38 52q22-10 44 0l4 70H34z" style={fill('top')}/>
+    <path d="M30 50q30-14 60 0l12 86-14 2-6-58v58H38V80l-6 58-14-2z" style={{...fill('outer'), fillOpacity: outfit.outer ? 0.55 : 0.4}}/>
+    <path d="M36 140h48l-4 112H64l-4-80-4 80H40z" style={fill('bottom')}/>
+  </svg>;
+}
+
+function SlotRow({slot, outfit, piece, jobs, busy, deleted}: {slot: GarmentSlot; outfit: OutfitDraft; piece: Piece | undefined; jobs: QueueJob[]; busy: boolean; deleted: boolean}) {
+  const {services, online, showSheet} = useUi();
+  const name = slotNames[slot].toLowerCase();
+  const filled = new Set(wornSlots(outfit).map(([value]) => value));
+  const choose = () => showSheet({title: `Choose ${name}`, content: <SlotChooser slot={slot}/>});
+  const clear = (label: string) => <Action label={label} text="Remove" variant="ghost" size="sm" disabled={busy} run={async () => {services.fitting.clearSlot(slot);}}/>;
+  const naming = piece && jobs.some(job => job.kind === 'label_piece' && job.refId === piece.id);
+  return <VStack gap={1}>
+    <Eyebrow>{slotNames[slot]}</Eyebrow>
+    {deleted ? <><Text>This piece was deleted.</Text>{clear(`Clear ${name}`)}</>
+      : piece ? <><RowButton label={`Change ${name}`} title={piece.label} meta={naming ? (online ? 'Naming…' : 'Named when you’re online') : piece.origin === 'shop' ? 'Saved from a shop' : 'Your wardrobe'} start={<Media file={piece.cutoutFile} label={piece.label} width="var(--spacing-10)" height="var(--spacing-10)" fit="contain"/>} isDisabled={busy} onClick={choose}/>{clear(`Remove ${piece.label} from ${name}`)}</>
+      : <RowButton label={`Add ${name}`} meta={emptySlotRule(slot, filled)} start={<IconTile icon={PlusIcon} tone="muted"/>} isDisabled={busy} onClick={choose}/>}
+  </VStack>;
+}
+
 export function Outfit() {
-  const {services, push, popTo, showSheet, online} = useUi();
+  const {services, popTo, showSheet, online} = useUi();
   const state = useFitting();
   const alive = useAlive();
   const [refreshError, setRefreshError] = useState<string | null>(null);
@@ -207,18 +268,19 @@ export function Outfit() {
       if (generating(current)) services.fitting.cancel();
     };
   }, [services.fitting]);
-  const target = pieces.data?.pieces.find(piece => piece.id === state.draft.targetPieceId);
-  const companionIds = state.draft.companionPieceIds;
+  const outfit = state.draft.outfit;
+  const worn = wornSlots(outfit);
+  const pieceOf = (id: string | undefined) => id ? pieces.data?.pieces.find(piece => piece.id === id) : undefined;
   const busy = generating(state) || state.selfState === 'registering';
-  const allCompanionsExist = companionIds.every(id => pieces.data?.pieces.some(piece => piece.id === id));
-  const ready = !pieces.loading && !pieces.error && !refreshError && target?.origin === 'shop' && state.selfState === 'ready' && !!state.selfPhoto && companionIds.length <= MAX_COMPANIONS && allCompanionsExist && !busy && online;
-  const steps = [state.selfState === 'ready' && !!state.selfPhoto, target?.origin === 'shop', companionIds.length > 0];
-  // Say why Generate is unavailable right next to it, instead of leaving a silently disabled button.
-  const blocker = !online ? 'Connect to the internet to create your look.' : state.selfState !== 'ready' || !state.selfPhoto ? 'Add a full-body photo of yourself first.' : target?.origin !== 'shop' ? 'Choose a piece you saved from a shop first.' : !allCompanionsExist ? 'Remove the piece that was deleted.' : 'Loading your photo and pieces…';
+  const allWornExist = worn.every(([, id]) => !!pieceOf(id));
+  const ready = !pieces.loading && !pieces.error && !refreshError && worn.length > 0 && state.selfState === 'ready' && !!state.selfPhoto && allWornExist && !busy && online;
+  const steps = [state.selfState === 'ready' && !!state.selfPhoto, worn.length > 0];
+  // Say why Fit is unavailable right next to it, instead of leaving a silently disabled button.
+  const blocker = !online ? 'Connect to the internet to create your look.' : state.selfState !== 'ready' || !state.selfPhoto ? 'Add a full-body photo of yourself first.' : !worn.length ? 'Put at least one piece on the mannequin.' : !allWornExist ? 'Clear the piece that was deleted.' : 'Loading your photo and pieces…';
   return <>
     <VStack gap={3}>
-      <Text type="large">Pick a shop piece and see it on you, with up to 5 more pieces.</Text>
-      <HStack gap={2} wrap="wrap">{['Your photo', 'Shop piece', 'More pieces'].map((name, index) => <Chip key={`${name}:${steps[index]}`} tone={steps[index] ? 'success' : 'muted'}>{steps[index] ? <Pop>✓</Pop> : `${index + 1} · `}{name}</Chip>)}</HStack>
+      <Text type="large">Dress the mannequin: one outer layer, top and bottom. Fit shows the whole outfit on you in one look.</Text>
+      <HStack gap={2} wrap="wrap">{['Your photo', 'Your outfit'].map((name, index) => <Chip key={`${name}:${steps[index]}`} tone={steps[index] ? 'success' : 'muted'}>{steps[index] ? <Pop>✓</Pop> : `${index + 1} · `}{name}</Chip>)}</HStack>
     </VStack>
     {!online && <Problem message="You’re offline. You can still pick pieces. Connect to create your look." retry={pieces.retry}/>}
     {refreshError && <Problem message={refreshError}/>}
@@ -235,29 +297,23 @@ export function Outfit() {
       {state.selfState === 'registering' && <Hint>You can leave this screen. Your photo keeps processing on this phone.</Hint>}
       </Panel>
     </Section>
-    {pieces.loading && !pieces.data ? <SkeletonRows count={2} label="Loading your combination"/> : pieces.error ? <Problem message={pieces.error} retry={pieces.retry}/> : <>
-      <Section title="Shop piece" eyebrow="Step 2">
-        {target?.origin === 'shop' ? <PieceRow piece={target} jobs={pieces.data?.jobs ?? []} badge={<Chip tone="accent">From a shop</Chip>}/> : <Empty icon={HangerIcon} title={state.draft.targetPieceId ? 'This shop piece was deleted' : 'Choose a shop piece first'}><Text>Open a piece you saved from a shop and tap Try it on. Wardrobe pieces can only be worn with it.</Text><Button label="Choose a saved shop piece" isDisabled={busy} onClick={() => push({name: 'home'})}/></Empty>}
-      </Section>
-      <Section title={`Wear with it · ${companionIds.length} of ${MAX_COMPANIONS}`} eyebrow="Step 3 · optional">
-        <HStack gap={1}>{Array.from({length: MAX_COMPANIONS}, (_, index) => <VStack key={index} height="var(--spacing-1)" style={{flex: 1, borderRadius: 'var(--radius-full)', background: index < companionIds.length ? 'var(--color-accent)' : 'var(--color-background-muted)'}}/>)}</HStack>
-        {!companionIds.length && <Text type="supporting">Optional. Add pieces from your wardrobe, your saved pieces or a trip photo.</Text>}
-        {companionIds.map(id => {
-          const piece = pieces.data?.pieces.find(value => value.id === id);
-          const remove = <Action label={piece ? `Remove ${piece.label}` : 'Remove unavailable piece'} variant="ghost" size="sm" disabled={busy} run={async () => {services.fitting.removeCompanion(id);}}/>;
-          return piece ? <Reveal key={id}><PieceRow piece={piece} jobs={pieces.data?.jobs ?? []} action={remove}/></Reveal> : <HStack key={id} gap={3} wrap="wrap"><Text>This piece was deleted.</Text>{remove}</HStack>;
-        })}
-        {companionIds.length >= MAX_COMPANIONS && <Text type="supporting">You can add up to 5 pieces. Remove one to add another.</Text>}
-        <Button label="Add a companion" variant="secondary" icon={<Icon icon={PlusIcon}/>} isDisabled={!target || busy || companionIds.length >= MAX_COMPANIONS} onClick={() => showSheet({title: 'Wear with it', content: <CompanionChooser/>})}/>
-      </Section>
-    </>}
+    {pieces.loading && !pieces.data ? <SkeletonRows count={3} label="Loading your outfit"/> : pieces.error ? <Problem message={pieces.error} retry={pieces.retry}/> :
+      <Section title={`Your outfit · ${worn.length} of ${GARMENT_SLOTS.length}`} eyebrow="Step 2">
+        <HStack gap={4} vAlign="start">
+          <MannequinFigure outfit={outfit}/>
+          <VStack gap={3} style={{flex: 1, minWidth: 0}}>
+            {GARMENT_SLOTS.map(slot => <SlotRow key={slot} slot={slot} outfit={outfit} piece={pieceOf(outfit[slot])} jobs={pieces.data?.jobs ?? []} busy={busy} deleted={!!outfit[slot] && !pieceOf(outfit[slot])}/>)}
+          </VStack>
+        </HStack>
+        <Hint>Empty slots keep what you’re wearing in your photo. A jacket in your photo comes off only when you choose a top.</Hint>
+      </Section>}
     <StickyBar>
     {generating(state) && <Reveal from="scale"><VStack role="status" aria-live="polite" gap={3} padding={5} style={{background: 'var(--color-hero)', color: 'var(--color-on-hero)', borderRadius: 'var(--radius-container)'}}><HStack gap={3} vAlign="center"><Spinner size="lg" shade="inherit" aria-label="Generating"/><Text type="label" weight="semibold" color="inherit">{phases[state.phase]}</Text></HStack><HStack gap={1}>{(['preparing', 'sending', 'compositing', 'saving'] as const).map((phase, index, all) => <VStack key={phase} height="var(--spacing-1)" style={{flex: 1, borderRadius: 'var(--radius-full)', overflow: 'hidden', transition: 'background 400ms ease', background: all.indexOf(state.phase as typeof phase) > index ? 'var(--color-on-hero)' : 'color-mix(in srgb, var(--color-on-hero) 25%, transparent)'}}>{all.indexOf(state.phase as typeof phase) === index && <Sweep/>}</VStack>)}</HStack><Text size="sm" style={{color: 'color-mix(in srgb, var(--color-on-hero) 78%, transparent)'}}>Your original photo, face and hair stay on this phone.</Text><Button label="Cancel generation" variant="secondary" isDisabled={state.phase === 'cancelling'} onClick={() => services.fitting.cancel()}/></VStack></Reveal>}
     {state.phase === 'cancelled' && <Hint>{phases.cancelled}</Hint>}
     {state.error && errorCode(state.error) !== 'cancelled' && state.selfState !== 'failed' && <Problem message={fittingError(state.error.code)}/>}
     {!ready && !busy && !pieces.loading && <Hint icon="info">{blocker}</Hint>}
-    <Action label="Generate" size="lg" icon={<Icon icon={SparkleIcon}/>} disabled={!ready} run={async () => {const result = await services.fitting.generate(); if (result && alive.current) popTo('outfit', {name: 'result', resultId: result.id});}}/>
-    <Hint icon={ShieldIcon}>Only your photo with face and hair removed and the cut-outs of these pieces are sent.</Hint>
+    <Action label="Fit" size="lg" icon={<Icon icon={SparkleIcon}/>} disabled={!ready} run={async () => {const result = await services.fitting.generate(); if (result && alive.current) popTo('outfit', {name: 'result', resultId: result.id});}}/>
+    <Hint icon={ShieldIcon}>Only your photo with face and hair removed and the cut-outs on the mannequin are sent.</Hint>
     {localCompositionConfig.provenance?.humanApproved === false && <Text type="supporting">This demo bundles provisional face-restoration calibration for one synthetic self photo, used only in debug or verification builds. It has not been human-reviewed. Other photos remain faceless.</Text>}
     </StickyBar>
   </>;
@@ -285,20 +341,25 @@ export function Result({route}: {route: Extract<Route, {name: 'result'}>}) {
   const view = resultViewPolicy(result, links.data?.pieceIds ?? null, links.data?.canChange === true && !links.loading && !links.error);
   const snapshots = view.pieces;
   const canChange = view.canChangePieces;
-  const targetDeleted = links.data && !links.data.pieceIds.has(result.targetPieceId);
+  const anyDeleted = links.data && snapshots.some(piece => !links.data!.pieceIds.has(piece.pieceId));
+  const walkTo = (piece: ResultPieceSnapshot) => push({name: 'walk', source: 'result', id: result.id, pieceId: piece.pieceId});
+  const walkLabel = (piece: ResultPieceSnapshot) => piece.shop ? `Walk to Shop ${piece.shop.n}` : `Walk back to ${piece.label}`;
+  // Each shop the look's pieces came from, once.
+  const shops = [...new Map(snapshots.flatMap(piece => piece.shop ? [[`${piece.shop.n}:${piece.shop.startedAt}`, piece.shop] as const] : [])).values()];
   return <>
-    <VStack gap={3}><HStack gap={2} vAlign="center" wrap="wrap"><Chip tone="accent">{snapshots.length} {snapshots.length === 1 ? 'piece' : 'pieces'}</Chip><Text type="supporting" size="sm">{dateTime(result.createdAt)}</Text></HStack><PhotoView file={view.file} label={`Your generated look wearing ${view.target.label}`}/>{view.faceless && <Hint icon={ShieldIcon}>Your face couldn’t be put back cleanly, so this look is shown without it.</Hint>}{targetDeleted && <Hint icon="warning">The shop piece was deleted, but this look and its walk-back spot are still saved.</Hint>}</VStack>
-    <HStack gap={2}><Action label="Change pieces" variant="secondary" size="lg" icon={<Icon icon={PencilIcon}/>} style={{flex: 1}} disabled={!canChange} run={async () => {if (!await services.fitting.canChangePieces(result)) {links.retry(); return;} await services.fitting.restoreResult(result); if (alive.current) {if (stack.some(entry => entry.name === 'outfit')) popTo('outfit'); else push({name: 'outfit'});}}}/><Button label={view.target.shop ? `Walk to Shop ${view.target.shop.n}` : 'Walk back to the photo spot'} variant="primary" size="lg" icon={<Icon icon={RouteIcon}/>} style={{flex: 1}} isDisabled={!view.destination} onClick={() => push({name: 'walk', source: 'result', id: result.id})}/></HStack>
+    <VStack gap={3}><HStack gap={2} vAlign="center" wrap="wrap"><Chip tone="accent">{snapshots.length} {snapshots.length === 1 ? 'piece' : 'pieces'}</Chip><Text type="supporting" size="sm">{dateTime(result.createdAt)}</Text></HStack><PhotoView file={view.file} label={`Your generated look wearing ${view.title}`}/>{view.faceless && <Hint icon={ShieldIcon}>Your face couldn’t be put back cleanly, so this look is shown without it.</Hint>}{anyDeleted && <Hint icon="warning">Some pieces were deleted, but this look and its walk-back spots are still saved.</Hint>}</VStack>
+    <HStack gap={2}><Action label="Change pieces" variant="secondary" size="lg" icon={<Icon icon={PencilIcon}/>} style={{flex: 1}} disabled={!canChange} run={async () => {if (!await services.fitting.canChangePieces(result)) {links.retry(); return;} await services.fitting.restoreResult(result); if (alive.current) {if (stack.some(entry => entry.name === 'outfit')) popTo('outfit'); else push({name: 'outfit'});}}}/>{view.destinations.length === 1 && <Button label={walkLabel(view.destinations[0])} variant="primary" size="lg" icon={<Icon icon={RouteIcon}/>} style={{flex: 1}} onClick={() => walkTo(view.destinations[0])}/>}</HStack>
+    {view.destinations.length > 1 && <Hint icon={RouteIcon}>These pieces came from different spots. Walk back to each one from the list below.</Hint>}
     {links.error && <Problem message="Couldn’t check whether the original pieces still exist." retry={links.retry}/>}
     <Section title="Wearing">
-      {snapshots.map((piece, index) => <Reveal key={piece.pieceId} index={index}><HStack gap={3} vAlign="center" padding={3} style={{background: 'var(--color-background-card)', borderRadius: 'var(--radius-container)', boxShadow: 'var(--shadow-low)'}}><Media file={piece.cutoutFile} label={piece.label} width="var(--spacing-12)" height="var(--spacing-12)" fit="contain"/><VStack gap={1} style={{flex: 1, minWidth: 0}}><Text type="label" weight="semibold">{piece.label}</Text><Text type="supporting" size="sm">{index === 0 ? 'Shop piece · ' : 'Worn with · '}{piece.origin === 'wardrobe' ? 'Your wardrobe' : piece.shop ? `Shop ${piece.shop.n}` : 'Saved from a shop'}{links.data && !links.data.pieceIds.has(piece.pieceId) ? ' · Saved copy' : ''}</Text></VStack>{links.data?.pieceIds.has(piece.pieceId) && !links.loading && <Button label={`Open ${piece.label}`} variant="ghost" size="sm" endContent={<Icon icon="chevronRight" size="sm"/>} onClick={() => push({name: 'item', pieceId: piece.pieceId})}>Open</Button>}</HStack></Reveal>)}
+      {snapshots.map((piece, index) => <Reveal key={piece.pieceId} index={index}><HStack gap={3} vAlign="center" padding={3} style={{background: 'var(--color-background-card)', borderRadius: 'var(--radius-container)', boxShadow: 'var(--shadow-low)'}}><Media file={piece.cutoutFile} label={piece.label} width="var(--spacing-12)" height="var(--spacing-12)" fit="contain"/><VStack gap={1} style={{flex: 1, minWidth: 0}}><Text type="label" weight="semibold">{piece.label}</Text><Text type="supporting" size="sm">{kindOf(piece) ? `${kindOf(piece)} · ` : ''}{piece.origin === 'wardrobe' ? 'Your wardrobe' : piece.shop ? `Shop ${piece.shop.n}` : 'Saved from a shop'}{links.data && !links.data.pieceIds.has(piece.pieceId) ? ' · Saved copy' : ''}</Text></VStack><VStack gap={1}>{view.destinations.length > 1 && view.destinations.includes(piece as typeof view.destinations[number]) && <Button label={walkLabel(piece)} variant="secondary" size="sm" icon={<Icon icon={RouteIcon}/>} onClick={() => walkTo(piece)}>Walk</Button>}{links.data?.pieceIds.has(piece.pieceId) && !links.loading && <Button label={`Open ${piece.label}`} variant="ghost" size="sm" endContent={<Icon icon="chevronRight" size="sm"/>} onClick={() => push({name: 'item', pieceId: piece.pieceId})}>Open</Button>}</VStack></HStack></Reveal>)}
     </Section>
-    {result.targetSnapshot.shop && <Section title={`Shop ${result.targetSnapshot.shop.n}`} eyebrow="Saved with this look"><Panel gap={3} padding={3}>
-      {result.targetSnapshot.shop.storefrontFile && <PhotoView file={result.targetSnapshot.shop.storefrontFile} label={`Saved storefront of Shop ${result.targetSnapshot.shop.n}`}/>}
-      {result.targetSnapshot.shop.description && <Text>{result.targetSnapshot.shop.description}</Text>}
-      {result.targetSnapshot.shop.note && <HStack gap={2} vAlign="start" padding={3} style={{background: 'var(--color-hanok-bead)', borderRadius: 'var(--radius-element)'}}><Icon icon={NoteIcon} size="sm" color="secondary"/><Text size="sm">{result.targetSnapshot.shop.note}</Text></HStack>}
-      <Hint icon="clock">Saved with this look · {dateTime(result.targetSnapshot.shop.startedAt)}</Hint>
-    </Panel></Section>}
+    {shops.map(shop => <Section key={`${shop.n}:${shop.startedAt}`} title={`Shop ${shop.n}`} eyebrow="Saved with this look"><Panel gap={3} padding={3}>
+      {shop.storefrontFile && <PhotoView file={shop.storefrontFile} label={`Saved storefront of Shop ${shop.n}`}/>}
+      {shop.description && <Text>{shop.description}</Text>}
+      {shop.note && <HStack gap={2} vAlign="start" padding={3} style={{background: 'var(--color-hanok-bead)', borderRadius: 'var(--radius-element)'}}><Icon icon={NoteIcon} size="sm" color="secondary"/><Text size="sm">{shop.note}</Text></HStack>}
+      <Hint icon="clock">Saved with this look · {dateTime(shop.startedAt)}</Hint>
+    </Panel></Section>)}
     {!online && <Hint>You can view this look offline. Connect to walk back or change pieces.</Hint>}
     {view.canDownload && <Action label="Save look to gallery" variant="secondary" run={async () => {if (!view.canDownload) return; await services.fitting.exportResult(result.id);}}/>}
     <DeleteResult result={result}/>
@@ -311,7 +372,7 @@ export function Results() {
   if (results.loading && !results.data) return <VStack gap={4}><SkeletonText lines={1} width="35%"/><SkeletonRows count={2} media="calc(var(--spacing-12) * 2)" label="Loading your looks"/></VStack>;
   if (results.error) return <Problem message={results.error} retry={results.retry}/>;
   const saved = (results.data ?? []).toSorted((left, right) => right.createdAt - left.createdAt);
-  return <VStack gap={4}><HStack gap={2} vAlign="center"><Chip tone="accent">{saved.length} {saved.length === 1 ? 'look' : 'looks'}</Chip><Hint icon={LockIcon}>Kept on this phone</Hint></HStack>{!online && <Hint>Your saved looks can be opened and deleted offline.</Hint>}{!saved.length ? <Empty title="No looks yet" icon={SparkleIcon}><Text type="supporting">Open something you saved and tap Try it on.</Text><Button label="Open saved pieces" onClick={() => push({name: 'home'})}/></Empty> : saved.map((result, index) => <Reveal key={result.id} index={index}><Panel gap={3} padding={3}><HStack gap={3} vAlign="start"><Thumbnail src={result.file} label={`look with ${result.targetSnapshot.label}`} style={{width: 'calc(var(--spacing-12) * 2)', height: 'calc(var(--spacing-12) * 2.5)'}} onClick={() => push({name: 'result', resultId: result.id})}/><VStack gap={1} style={{flex: 1, minWidth: 0}}><Text type="label" weight="semibold">{result.targetSnapshot.label}</Text><Text type="supporting" size="sm">{result.companionSnapshots.length + 1} pieces · {dateTime(result.createdAt)}</Text>{result.faceless && <Chip>Shown without your face</Chip>}</VStack></HStack><Divider/><HStack gap={2} hAlign="between" vAlign="center"><DeleteResult result={result}/><Button label={`Open look from ${dateTime(result.createdAt)}`} variant="secondary" size="sm" endContent={<Icon icon="chevronRight" size="sm"/>} onClick={() => push({name: 'result', resultId: result.id})}>Open look</Button></HStack></Panel></Reveal>)}</VStack>;
+  return <VStack gap={4}><HStack gap={2} vAlign="center"><Chip tone="accent">{saved.length} {saved.length === 1 ? 'look' : 'looks'}</Chip><Hint icon={LockIcon}>Kept on this phone</Hint></HStack>{!online && <Hint>Your saved looks can be opened and deleted offline.</Hint>}{!saved.length ? <Empty title="No looks yet" icon={SparkleIcon}><Text type="supporting">Dress the mannequin on the Try on screen, then tap Fit.</Text><Button label="Open saved pieces" onClick={() => push({name: 'home'})}/></Empty> : saved.map((result, index) => <Reveal key={result.id} index={index}><Panel gap={3} padding={3}><HStack gap={3} vAlign="start"><Thumbnail src={result.file} label={`look with ${resultViewPolicy(result, null, false).title}`} style={{width: 'calc(var(--spacing-12) * 2)', height: 'calc(var(--spacing-12) * 2.5)'}} onClick={() => push({name: 'result', resultId: result.id})}/><VStack gap={1} style={{flex: 1, minWidth: 0}}><Text type="label" weight="semibold">{resultViewPolicy(result, null, false).title}</Text><Text type="supporting" size="sm">{result.companionSnapshots.length + 1} {result.companionSnapshots.length ? 'pieces' : 'piece'} · {dateTime(result.createdAt)}</Text>{result.faceless && <Chip>Shown without your face</Chip>}</VStack></HStack><Divider/><HStack gap={2} hAlign="between" vAlign="center"><DeleteResult result={result}/><Button label={`Open look from ${dateTime(result.createdAt)}`} variant="secondary" size="sm" endContent={<Icon icon="chevronRight" size="sm"/>} onClick={() => push({name: 'result', resultId: result.id})}>Open look</Button></HStack></Panel></Reveal>)}</VStack>;
 }
 
 function AddWardrobePiece() {
@@ -335,8 +396,8 @@ export function Wardrobe() {
   return <>
     <VStack gap={4}>
       <HStack gap={3} vAlign="center" hAlign="between"><Text type="large" weight="semibold">{wardrobe.data?.pieces.length ?? 0} pieces you own</Text><Button label="Add a piece" variant="primary" icon={<Icon icon={PlusIcon}/>} onClick={() => showSheet({title: 'Add a piece', content: <AddWardrobePiece/>})}/></HStack>
-      {wardrobe.loading && !wardrobe.data ? <SkeletonRows count={3} media="var(--spacing-12)" label="Loading your wardrobe"/> : wardrobe.error ? <Problem message={wardrobe.error} retry={wardrobe.retry}/> : !wardrobe.data?.pieces.length ? <Empty title="Your wardrobe is empty" icon={HangerIcon}><Text type="supporting">Add a piece you own, then wear it with a saved shop piece.</Text></Empty> : <VStack gap={2}>{wardrobe.data.pieces.map((piece, index) => <Reveal key={piece.id} index={index}><PieceRow piece={piece} jobs={wardrobe.data?.jobs ?? []} action={<Button label={`Open ${piece.label}`} variant="ghost" size="sm" endContent={<Icon icon="chevronRight" size="sm"/>} onClick={() => push({name: 'item', pieceId: piece.id})}>Open</Button>}/></Reveal>)}</VStack>}
-      <Hint icon={ShieldIcon}>Wear these with pieces you saved from shops. Only the cut-out is ever sent, never the whole photo.</Hint>
+      {wardrobe.loading && !wardrobe.data ? <SkeletonRows count={3} media="var(--spacing-12)" label="Loading your wardrobe"/> : wardrobe.error ? <Problem message={wardrobe.error} retry={wardrobe.retry}/> : !wardrobe.data?.pieces.length ? <Empty title="Your wardrobe is empty" icon={HangerIcon}><Text type="supporting">Add a piece you own, then try it on with anything you saved.</Text></Empty> : <VStack gap={2}>{wardrobe.data.pieces.map((piece, index) => <Reveal key={piece.id} index={index}><PieceRow piece={piece} jobs={wardrobe.data?.jobs ?? []} action={<Button label={`Open ${piece.label}`} variant="ghost" size="sm" endContent={<Icon icon="chevronRight" size="sm"/>} onClick={() => push({name: 'item', pieceId: piece.id})}>Open</Button>}/></Reveal>)}</VStack>}
+      <Hint icon={ShieldIcon}>Open a piece and tap Try it on to put it on the mannequin. Only the cut-out is ever sent, never the whole photo.</Hint>
       {!online && <Hint>You’re offline. You can still add and remove pieces. Naming finishes when you reconnect.</Hint>}
     </VStack>
   </>;

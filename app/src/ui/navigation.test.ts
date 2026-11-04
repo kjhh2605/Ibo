@@ -10,7 +10,7 @@ describe('home-rooted navigation',()=>{
     expect(popRoute(home)).toBe(home);
   });
   it('preserves the outfit entry on completed and cancelled trip-photo round trips',()=>{
-    const stack:Route[]=[{name:'home'},{name:'item',pieceId:'target'},{name:'outfit'},{name:'trips',forOutfit:true},{name:'trip',tripId:'trip-1',forOutfit:true},{name:'pick',photoId:'photo-1',mode:'outfit'}];
+    const stack:Route[]=[{name:'home'},{name:'item',pieceId:'target'},{name:'outfit'},{name:'trips',forOutfit:'top'},{name:'trip',tripId:'trip-1',forOutfit:'top'},{name:'pick',photoId:'photo-1',mode:'outfit',slot:'top'}];
     expect(returnTo(stack,'outfit')).toEqual(stack.slice(0,3));
     expect(popRoute(stack)).toEqual(stack.slice(0,-1));
   });

@@ -143,10 +143,11 @@ def build():
  pair(normal,'describe-storefront',1,{'image':image(normal,'images/storefronts/shop-1.png')},{'description':'A blue awning above a dark storefront.'},match=['/image/mimeType'])
  for scenario in ['normal','direct-cut-shop']:
   directory=FIX/'relay'/scenario
-  pair(directory,'describe-piece',1,{'image':image(directory,'images/derived/shop-1-candidate-1.png')},{'label':'Blue jacket','category':'jacket'},match=['/image/mimeType'])
+  pair(directory,'describe-piece',1,{'image':image(directory,'images/derived/shop-1-candidate-1.png')},{'label':'Blue jacket','category':'outer'},match=['/image/mimeType'])
  for scenario in ['normal','tryon-policy','unsafe-provider']:
   directory=FIX/'relay'/scenario
-  req={'selfPhoto':{'image':image(directory,'images/derived/calibration-hat-masked.png'),'headMasked':True},'target':{'pieceRef':'target-shop','image':image(directory,'images/derived/shop-1-candidate-1.png'),'label':'Blue jacket','category':'jacket','origin':'shop'},'companions':[{'pieceRef':'wardrobe-jeans','image':image(directory,'images/wardrobe/jeans-cutout.png'),'label':'Jeans','category':'pants','origin':'wardrobe'}]}
+  # Mannequin outfit in app slot order (outer, top, bottom); the relay re-layers it.
+  req={'selfPhoto':{'image':image(directory,'images/derived/calibration-hat-masked.png'),'headMasked':True},'pieces':[{'pieceRef':'target-shop','image':image(directory,'images/derived/shop-1-candidate-1.png'),'label':'Blue jacket','category':'outer'},{'pieceRef':'wardrobe-jeans','image':image(directory,'images/wardrobe/jeans-cutout.png'),'label':'Jeans','category':'bottom'}]}
   if scenario=='normal':response={'image':image(directory,'images/self/positive/calibration-hat.png','synthetic-full-person-output.png')}
   elif scenario=='unsafe-provider':response={'image':image(directory,'images/derived/calibration-hat-masked.png','synthetic-mock-output.png')}
   else:response={'error':{'code':'content_policy_violation','message':'Request rejected by policy','retryable':False}}
@@ -195,10 +196,12 @@ def build_e2e(seed):
  req={'query':query,'queryToken':'runtime-token','toolResults':[{'toolCallId':'extract-call','name':'extract_items','result':[{'photoRef':'current-item2','candidateCount':4,'topScore':1.0}]}]}
  pair(directory,'search-turn',4,req,{'final':{'photoRefs':['{{toolResults[0].result[0].photoRef}}'],'concept':concept,'summary':'Select the matching garment.'}})
  request=json.loads((directory/'tryon.01.request.json').read_text())['expected']
- request['target'].update(label=concept,category='unknown')
- request['companions']=[{**request['companions'][0],'pieceRef':'wardrobe','label':'Blue jacket','category':'jacket'},{**request['target'],'pieceRef':'direct','label':'Blue jacket','category':'jacket'}]
+ # Searched jacket sorted as outer at Try it on; trip-photo cut chosen for the top slot;
+ # wardrobe jeans (Spark mock says outer) re-sorted into the bottom slot.
+ shop,jeans=request['pieces']
+ request['pieces']=[{**shop,'label':concept,'category':'outer'},{**shop,'pieceRef':'direct','label':'Blue jacket','category':'top'},{**jeans,'pieceRef':'wardrobe','label':'Blue jacket','category':'bottom'}]
  # Native cutouts/self geometry is schema-validated, not compared to AI rectangles.
- geometry=[f'{prefix}/image/{axis}' for prefix in ['/selfPhoto','/target','/companions/0','/companions/1'] for axis in ['width','height']]
+ geometry=[f'{prefix}/image/{axis}' for prefix in ['/selfPhoto','/pieces/0','/pieces/1','/pieces/2'] for axis in ['width','height']]
  pair(directory,'tryon',1,request,json.loads((directory/'tryon.01.response.json').read_text())['body'],ignore_extra=geometry)
  dump(directory/'provenance.json',{'sourceType':'hand-authored','providerRecording':False,'purpose':'Three-shop Android full-flow replay; native PE score is schema-validated, not a quality assertion. Semantic visit order, note, candidate counts and input roles are matched. No clock/ID override.','assetDerivations':{'assets/shop-2-upload.jpg':{'source':'images/shops/shop-2-items.png','sourceSha256':hashlib.sha256((FIX/'images/shops/shop-2-items.png').read_bytes()).hexdigest(),'sha256':hashlib.sha256((directory/'assets/shop-2-upload.jpg').read_bytes()).hexdigest(),'transform':'Pillow RGB JPEG quality90; native JPEG bytes are intentionally not compared'}}})
  provenance=json.loads((directory/'provenance.json').read_text());provenance['syntheticProviderResponse']=json.loads((normal/'provenance.json').read_text())['syntheticProviderResponse'];dump(directory/'provenance.json',provenance)
@@ -226,13 +229,14 @@ def build_phases(e2e,tryon):
     for child_value in value.values():yield from assets(child_value)
   elif isinstance(value,list):
    for child_value in value:yield from assets(child_value)
- for scenario,companions in [('e2e-tryon-other',tryon['companions'][1:]),('e2e-tryon-target-only',[])]:
-  directory=FIX/'relay'/scenario;request=copy.deepcopy(tryon);request['companions']=copy.deepcopy(companions)
+ # Second look after removing the wardrobe bottom, and an outer-only look.
+ for scenario,pieces in [('e2e-tryon-other',tryon['pieces'][:2]),('e2e-tryon-target-only',tryon['pieces'][:1])]:
+  directory=FIX/'relay'/scenario;request=copy.deepcopy(tryon);request['pieces']=copy.deepcopy(pieces)
   for name in set(assets(request))|set(assets(response)):
    target=directory/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(e2e/name,target)
-  geometry=[f'{prefix}/image/{axis}' for prefix in ['/selfPhoto','/target']+[f'/companions/{i}' for i in range(len(companions))] for axis in ['width','height']]
+  geometry=[f'{prefix}/image/{axis}' for prefix in ['/selfPhoto']+[f'/pieces/{i}' for i in range(len(pieces))] for axis in ['width','height']]
   pair(directory,'tryon',1,request,response,ignore_extra=geometry)
-  dump(directory/'provenance.json',{'sourceType':'hand-authored','providerRecording':False,'purpose':'Explicit real UI Generate with chosen companion count; no Result insertion or response override','companionCount':len(companions)})
+  dump(directory/'provenance.json',{'sourceType':'hand-authored','providerRecording':False,'purpose':'Explicit real UI Fit with the chosen mannequin slots; no Result insertion or response override','pieceCount':len(pieces)})
   provenance=json.loads((directory/'provenance.json').read_text());provenance['syntheticProviderResponse']=json.loads((e2e/'provenance.json').read_text())['syntheticProviderResponse'];dump(directory/'provenance.json',provenance)
 
 def validate(root=FIX):

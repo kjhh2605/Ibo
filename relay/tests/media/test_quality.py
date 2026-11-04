@@ -56,9 +56,10 @@ def test_experiment_payload_matches_deployed_low_contract(provider):
     assert client.post('/v1/tryon',json=body).status_code==200
     wire=json.loads(calls[0].content)
     raw=base64.b64decode(body['selfPhoto']['image']['data'])
-    garments=[base64.b64decode(piece['image']['data']) for piece in [body['target'],*body['companions']]]
-    assert quality.edit_payload(raw,garments,'low',wire['user'])==wire
-    high=quality.edit_payload(raw,garments,'high',wire['user'])
+    garments=[base64.b64decode(piece['image']['data']) for piece in body['pieces']]
+    slots=[piece['category'] for piece in body['pieces']]
+    assert quality.edit_payload(raw,garments,'low',wire['user'],slots)==wire
+    high=quality.edit_payload(raw,garments,'high',wire['user'],slots)
     assert {**high,'reasoning_strength':'low'}==wire
     assert 'store' not in high and 'tools' not in high and 'safety_identifier' not in high
 

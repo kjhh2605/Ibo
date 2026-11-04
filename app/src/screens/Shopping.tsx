@@ -1,6 +1,7 @@
 import {useCallback,useEffect,useRef,useState} from 'react';
 import type {Route} from '../ui/navigation';
 import type {Photo,Piece,Shop} from '../native/contracts';
+import type {GarmentSlot} from '../category';
 import {useUi,useData,listAll} from '../ui/state';
 import type {CSSProperties} from 'react';
 import {Grid} from '@astryxdesign/core/Grid';
@@ -132,9 +133,9 @@ export function Trips({route}:{route:Extract<Route,{name:'trips'}>}) {
     for(const photo of photos){const count=counts.get(photo.tripId);if(count&&photo.kind==='item')count.photos++;}
     return {trips:trips.sort((a,b)=>b.startedAt-a.startedAt),counts};
   },[services]);
-  return <Section title={route.forOutfit?'Choose a trip photo':'Your trips'} description={route.forOutfit?'Open a trip, then tap a photo to pick a piece to wear with it.':undefined}>{data.loading&&!data.data?<SkeletonRows count={3} label="Loading your trips"/>:data.error?<Problem message={data.error} retry={data.retry}/>:!data.data?.trips.length?<Empty title="No trips yet" icon={BagIcon}><Text type="supporting">Your shopping trips will appear here.</Text></Empty>:<VStack gap={2}>{data.data.trips.map((trip,index)=>{const count=data.data!.counts.get(trip.id);const live=trip.status==='recording';return <Reveal key={trip.id} index={index}><RowButton label={new Date(trip.startedAt).toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'})} title={new Date(trip.startedAt).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'})} start={<IconTile icon="calendar" tone={live?'hero':'accent'}/>} meta={`${live?'Recording now':`${clock(trip.startedAt)} – ${clock(trip.endedAt!)}`} · ${count?.shops??0} ${count?.shops===1?'shop':'shops'} · ${count?.photos??0} photos`} end={live?<Chip tone="success" live>Live</Chip>:undefined} onClick={()=>push({name:'trip',tripId:trip.id,forOutfit:route.forOutfit})}/></Reveal>;})}</VStack>}{route.forOutfit&&<Button label="Cancel selection" variant="ghost" onClick={back}/>}</Section>;
+  return <Section title={route.forOutfit?'Choose a trip photo':'Your trips'} description={route.forOutfit?`Open a trip, then tap a photo to cut out a ${route.forOutfit} for the mannequin.`:undefined}>{data.loading&&!data.data?<SkeletonRows count={3} label="Loading your trips"/>:data.error?<Problem message={data.error} retry={data.retry}/>:!data.data?.trips.length?<Empty title="No trips yet" icon={BagIcon}><Text type="supporting">Your shopping trips will appear here.</Text></Empty>:<VStack gap={2}>{data.data.trips.map((trip,index)=>{const count=data.data!.counts.get(trip.id);const live=trip.status==='recording';return <Reveal key={trip.id} index={index}><RowButton label={new Date(trip.startedAt).toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'})} title={new Date(trip.startedAt).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'})} start={<IconTile icon="calendar" tone={live?'hero':'accent'}/>} meta={`${live?'Recording now':`${clock(trip.startedAt)} – ${clock(trip.endedAt!)}`} · ${count?.shops??0} ${count?.shops===1?'shop':'shops'} · ${count?.photos??0} photos`} end={live?<Chip tone="success" live>Live</Chip>:undefined} onClick={()=>push({name:'trip',tripId:trip.id,forOutfit:route.forOutfit})}/></Reveal>;})}</VStack>}{route.forOutfit&&<Button label="Cancel selection" variant="ghost" onClick={back}/>}</Section>;
 }
-function ShopSection({shop,forOutfit}:{shop:Shop;forOutfit?:boolean}) {
+function ShopSection({shop,forOutfit}:{shop:Shop;forOutfit?:GarmentSlot}) {
   const {services,push,showSheet,online}=useUi();const data=useData(()=>listAll(services,'Photo',{shopId:shop.id}),[services,shop.id]);
   const storefront=data.data?.find(photo=>photo.id===shop.storefrontPhotoId);
   const items=data.data?.filter(photo=>photo.kind==='item')??[];
@@ -155,7 +156,7 @@ function ShopSection({shop,forOutfit}:{shop:Shop;forOutfit?:boolean}) {
       </HStack>
       <Divider/>
       <Eyebrow>{forOutfit?'Tap a photo to pick a piece':'Garment photos'}</Eyebrow>
-      {data.loading&&!data.data?<SkeletonGrid count={4} columns={4} captions={false} label="Loading garment photos"/>:data.error?<Problem message={data.error} retry={data.retry}/>:items.length?<Grid columns={4} gap={2}>{items.map((photo,index)=><Reveal key={photo.id} index={index} from="scale"><Thumbnail label={`photo ${clock(photo.takenAt)}`} src={photo.file} alt="Shopping photo" style={{width:'100%',height:'auto',aspectRatio:'1'}} onClick={()=>push({name:'pick',photoId:photo.id,mode:forOutfit?'outfit':'shop'})}/></Reveal>)}</Grid>:<Text type="supporting">No garment photos in this shop.</Text>}
+      {data.loading&&!data.data?<SkeletonGrid count={4} columns={4} captions={false} label="Loading garment photos"/>:data.error?<Problem message={data.error} retry={data.retry}/>:items.length?<Grid columns={4} gap={2}>{items.map((photo,index)=><Reveal key={photo.id} index={index} from="scale"><Thumbnail label={`photo ${clock(photo.takenAt)}`} src={photo.file} alt="Shopping photo" style={{width:'100%',height:'auto',aspectRatio:'1'}} onClick={()=>push({name:'pick',photoId:photo.id,mode:forOutfit?'outfit':'shop',slot:forOutfit})}/></Reveal>)}</Grid>:<Text type="supporting">No garment photos in this shop.</Text>}
     </Panel>
   </VStack>;
 }

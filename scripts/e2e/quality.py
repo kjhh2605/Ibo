@@ -27,11 +27,12 @@ from instrumentation import BASE, install_driver, invoke, read_private, remove_p
 # reasoning_strength varies here; the relay itself remains fixed to low.
 if str(ROOT/'relay') not in sys.path:
     sys.path.insert(0, str(ROOT/'relay'))
-from app.routes.tryon import _PROMPT, _output_image, _size
+from app.routes.tryon import _output_image, _size, outfit_prompt
 from app.errors import strict_json
 
 METRICS=('neckColorDeltaE95','shoulderColorDeltaE95','neckOffsetRatio95','shoulderOffsetRatio95')
-GARMENTS=('images/derived/shop-2-candidate-1.png','images/wardrobe/jeans-cutout.png','images/wardrobe/shoes-cutout.png')
+# Mannequin slots in the relay's inner-to-outer order; shoes are no longer a slot.
+GARMENTS=(('images/wardrobe/jeans-cutout.png','bottom'),('images/derived/shop-2-candidate-1.png','top'))
 CONTRACT_FILES=('scripts/e2e/quality.py','scripts/e2e/instrumentation.py',
                 'scripts/e2e/android-src/com/streetfitting/verification/NativeVerificationTest.java',
                 'relay/app/routes/tryon.py','relay/app/meta_client.py',
@@ -64,12 +65,13 @@ def provider_image(value):
     return raw
 
 
-def edit_payload(raw, garments, reasoning, sub):
+def edit_payload(raw, garments, reasoning, sub, slots):
     require(reasoning in {'low','high'},'poc_invalid_reasoning')
     require(isinstance(sub,str) and re.fullmatch('[a-f0-9]{64}',sub),'poc_invalid_safety_identifier')
     with Image.open(io.BytesIO(raw)) as image:
         size=_size(SimpleNamespace(width=image.width,height=image.height))
-    return {'model':'muse-image-1.0','prompt':_PROMPT,
+    require(len(slots)==len(garments),'poc_invalid_slots')
+    return {'model':'muse-image-1.0','prompt':outfit_prompt(slots),
             'images':[{'image_url':image_url(value)} for value in (raw,*garments)],
             'n':1,'size':size,'output_format':'png','response_format':'b64_json',
             'user':sub,'reasoning_strength':reasoning,
@@ -165,7 +167,7 @@ def experiment_context(plan):
     require(len(plan.get('calibration',[]))==2 and len(set(plan['calibration']))==2 and len(plan.get('heldOut',[]))==2 and len(set(plan['heldOut']))==2 and not set(plan['calibration'])&set(plan['heldOut']) and plan.get('frozenAt') and plan.get('humanApprovalRequired') is True,'quality_split_not_frozen')
     review=load(FIX/'review/head.json');cases={c['id']:c for c in review['cases']}
     require(set(plan['calibration']+plan['heldOut'])<=set(cases),'quality_split_case_missing')
-    assets={name:hashlib.sha256((FIX/name).read_bytes()).hexdigest() for name in GARMENTS}
+    assets={name:hashlib.sha256((FIX/name).read_bytes()).hexdigest() for name,_ in GARMENTS}
     for case_id in plan['calibration']+plan['heldOut']:
         for name in (cases[case_id]['image'],cases[case_id]['groundTruthMask']):
             assets[name]=hashlib.sha256((FIX/name).read_bytes()).hexdigest()
@@ -219,7 +221,7 @@ def completed_evidence(previous, approval, final_review, completion_run):
 
 def offline_review(run,args):
     """Fit/validate recorded metrics without API credentials, device or new calls."""
-    human_head_inputs();approved_assets(GARMENTS)
+    human_head_inputs();approved_assets([name for name,_ in GARMENTS])
     previous=load(run_path(args.run)/'poc-progress.json')
     plan=load(FIX/'quality/cases.json')
     require(previous.get('schemaVersion')==1 and previous.get('plan')==plan and previous.get('planSha256')==hashlib.sha256((FIX/'quality/cases.json').read_bytes()).hexdigest(),'poc_plan_changed_on_resume')
@@ -245,7 +247,7 @@ def offline_review(run,args):
 
 def poc(run,args):
     require(args.plan==16 and args.mode=='live','poc_requires_live_16_plan')
-    human_head_inputs();approved_assets(GARMENTS)
+    human_head_inputs();approved_assets([name for name,_ in GARMENTS])
     plan=load(FIX/'quality/cases.json');context=experiment_context(plan)
     cases={c['id']:c for c in load(FIX/'review/head.json')['cases']}
     plan_sha=hashlib.sha256((FIX/'quality/cases.json').read_bytes()).hexdigest()
@@ -323,10 +325,10 @@ def poc(run,args):
         if not os.environ.get('MODEL_API_KEY') or not os.environ.get('RELAY_HMAC_SECRET'):
             raise Blocked('Local MODEL_API_KEY and RELAY_HMAC_SECRET required only for new provider calls; offline quality-review needs neither')
         raw,_,proof=inputs(planned['case'],planned['maskMode'])
-        chosen=GARMENTS[:1] if planned['kind']=='top-only' else GARMENTS
+        chosen=GARMENTS[1:] if planned['kind']=='top-only' else GARMENTS
         secret=base64.b64decode(os.environ['RELAY_HMAC_SECRET'],validate=True)
         sub=hmac.new(secret,b'safety:v1:s11-synthetic-poc',hashlib.sha256).hexdigest()
-        payload=edit_payload(raw,[(FIX/name).read_bytes() for name in chosen],planned['reasoning'],sub)
+        payload=edit_payload(raw,[(FIX/name).read_bytes() for name,_ in chosen],planned['reasoning'],sub,[slot for _,slot in chosen])
         row={'id':f'call-{len(rows)+1:02}',**planned,'status':'attempted','attemptRun':run.id,
              'maskedInputSha256':hashlib.sha256(raw).hexdigest(),'maskExposure':proof['exposedHeadPixels'],'requestSha256':fingerprint(payload)}
         rows.append(row);progress();start=time.monotonic()

@@ -17,9 +17,13 @@ export type Shop = {id: Id; tripId: Id; n: number; startedAt: Time; spot: Locati
 export type Photo = {id: Id; tripId: Id; shopId: Id; kind: 'item' | 'storefront'; takenAt: Time; location: Location; file: FileRef; w: number; h: number; indexState: 'pending' | 'done' | 'failed'};
 export type PhotoEmbedding = {photoId: Id; model: 'pe-core-t16-image'; dim: 512; vector: number[]};
 export type Candidate = {id: Id; photoId: Id; source: 'sam' | 'edgetam'; label: string; score: number; mask: FileRef; bbox: BBox};
+// `category` is a PieceCategory (src/category.ts); rows saved before it was fixed may hold
+// free text, so read it through pieceCategory()/slotOf().
 export type Piece = {id: Id; origin: 'shop' | 'wardrobe'; label: string; category: string; cutoutFile: FileRef; createdAt: Time; photoId: Id | null; shopId: Id | null; tripId: Id | null; walkTo: Point | null};
 export type SelfPhoto = {file: FileRef; headMask: FileRef; maskedFile: FileRef; updatedAt: Time};
 export type ResultPieceSnapshot = {pieceId: Id; origin: 'shop' | 'wardrobe'; label: string; category: string; cutoutFile: FileRef; walkTo: Point | null; shop: {n: number; startedAt: Time; storefrontFile: FileRef | null; description: string | null; note: string | null} | null};
+// One mannequin outfit. `target*` is the lead piece (first filled slot: outer, top, bottom) and
+// `companion*` the rest, in slot order; the lead need not be a shop piece. Kept for storage compatibility.
 export type Result = {id: Id; targetPieceId: Id; companionPieceIds: Id[]; targetSnapshot: ResultPieceSnapshot; companionSnapshots: ResultPieceSnapshot[]; file: FileRef; faceless: boolean; providerFile: FileRef; createdAt: Time};
 export type QueueJob = {id: Id; kind: 'describe_storefront' | 'label_piece'; refId: Id; attempts: number; nextAt: Time};
 
@@ -60,7 +64,8 @@ export interface Store extends Events<{changed: {entities: (keyof EntityMap | 'S
   get<K extends keyof EntityMap>(o: {entity: K; id: Id}): Promise<EntityMap[K] | null>;
   list<K extends keyof EntityMap>(o: {entity: K; tripId?: Id; shopId?: Id; origin?: 'shop' | 'wardrobe'; limit?: number; cursor?: string}): Promise<Page<EntityMap[K]>>;
   getSelfPhoto(): Promise<SelfPhoto | null>;
-  saveCandidate(o: {candidate: Candidate; origin: 'shop' | 'wardrobe'; labelMode: 'concept' | 'describe'}): Promise<Piece>;
+  // `category` set here (a mannequin slot) is kept when Spark naming later completes.
+  saveCandidate(o: {candidate: Candidate; origin: 'shop' | 'wardrobe'; labelMode: 'concept' | 'describe'; category?: 'outer' | 'top' | 'bottom'}): Promise<Piece>;
   updateShop(o: {id: Id; note: string | null}): Promise<Shop>; updatePiece(o: {id: Id; label: string; category: string}): Promise<Piece>;
   prepareResult(o: {targetPieceId: Id; companionPieceIds: Id[]}): Promise<{draftId: Id; targetSnapshot: ResultPieceSnapshot; companionSnapshots: ResultPieceSnapshot[]}>;
   saveResult(o: {draftId: Id; file: FileRef; faceless: boolean; providerFile: FileRef}): Promise<Result>; discardResultDraft(o: {draftId: Id}): Promise<void>;

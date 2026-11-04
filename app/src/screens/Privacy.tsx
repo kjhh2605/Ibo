@@ -16,7 +16,7 @@ const sentToMeta = [
   ['Shop photos you search', 'Up to 3 shop photos per search can go to Meta’s SAM model to outline the items. Other people in those photos aren’t blurred out.'],
   ['Storefront photos', 'If you take one, it goes to Muse Spark for a short description that helps you recognize the shop later.'],
   ['Naming pieces', 'Wardrobe cut-outs, and shop pieces you pick straight from a trip photo, go to Muse Spark for a name and category. Only the cut-out is sent. Pieces you find by searching are named after your search.'],
-  ['Trying on', 'Your photo with face and hair removed, one shop piece and up to 5 more cut-outs go to Meta’s Muse Image model. Your original photo and head mask are never sent.'],
+  ['Trying on', 'Your photo with face and hair removed and the cut-outs on the mannequin (one outer layer, top and bottom at most) go to Meta’s Muse Image model, along with which slot each one fills. Your original photo and head mask are never sent.'],
   ['Voice search', 'Only Find it records audio, up to 15 seconds, which goes to Meta’s speech-to-text model. The recording is deleted once it’s transcribed or cancelled.'],
   ['Anonymous sign-in', 'Ibo signs you in anonymously. Meta receives an anonymous ID based on it, for safety checks.'],
 ] as const;
@@ -57,7 +57,7 @@ export function Privacy() {
         <HStack gap={3} vAlign="start"><IconTile icon={TrashIcon} tone="muted" size="sm"/><VStack gap={3} style={{flex: 1, minWidth: 0}}>
           <Text size="sm">Ending a trip deletes its route history, but keeps its photos, shop descriptions, notes and photo locations.</Text>
           <Text size="sm">Deleting a trip or shop photo unlinks it from pieces you saved. A saved piece and its walk-back spot stay until you delete the piece.</Text>
-          <Text size="sm">Each look keeps its own copy of its pieces, shop details and walk-back spot, so deleting the original shop piece doesn’t delete the look. You just can’t change its pieces anymore. Deleting a look removes only the look and its copies.</Text>
+          <Text size="sm">Each look keeps its own copy of its pieces, shop details and walk-back spots, so deleting an original piece doesn’t delete the look. Once all of its pieces are deleted, you just can’t change its pieces anymore. Deleting a look removes only the look and its copies.</Text>
           <Text size="sm">Ibo doesn’t add photos to your gallery on its own. Photos you’ve already saved to your gallery stay there when you delete them in Ibo.</Text>
         </VStack></HStack>
       </Panel>

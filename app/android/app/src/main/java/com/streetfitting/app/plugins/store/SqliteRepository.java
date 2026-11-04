@@ -121,6 +121,9 @@ public final class SqliteRepository implements NativeRepository {
         if(value.isEmpty()||value.length()>max) throw error("invalid_input");
         return value;
     }
+    // Piece categories (app/src/category.ts): mannequin slots, `other`, and `unknown` (not sorted yet).
+    private static List<JSObject> concat(JSObject first,List<JSObject> rest) { List<JSObject> all=new ArrayList<>();all.add(first);all.addAll(rest);return all; }
+    private static String category(JSONObject input) { return choice(input,"category","outer","top","bottom","other","unknown"); }
     private static String choice(JSONObject input,String key,String... allowed) {
         String value=string(input,key);
         for(String x:allowed) if(x.equals(value)) return value;
@@ -493,7 +496,7 @@ public final class SqliteRepository implements NativeRepository {
                 if(!"edgetam".equals(candidate.optString("source"))) throw error("invalid_input");
                 item=saveCandidateInternal(input);
                 String key=item.getString("id");
-                update("Piece",values("label",text(input,"label",120),"category",text(input,"category",64)),"id",key);
+                update("Piece",values("label",text(input,"label",120),"category",category(input)),"id",key);
                 cancelJobs("label_piece",key);item=required("Piece",key);
             }
             if(replaceSlot) db.delete("DemoFixture","slot=?",new String[]{slot});
@@ -539,6 +542,7 @@ public final class SqliteRepository implements NativeRepository {
     private JSObject saveCandidateInternal(JSObject input) throws Exception {
         JSObject candidate=nested(input,"candidate");String photoId=id(candidate,"photoId"),source=choice(candidate,"source","sam","edgetam");
         String origin=choice(input,"origin","shop","wardrobe"),labelMode=choice(input,"labelMode","concept","describe");
+        String slot=input.has("category")?choice(input,"category","outer","top","bottom"):"unknown";
         if(origin.equals("wardrobe")&&!labelMode.equals("describe")) throw error("invalid_input");
         number(candidate,"score",0,1);
         JSObject photo=origin.equals("shop")?required("Photo",photoId):row("Asset","id",photoId);
@@ -575,7 +579,7 @@ public final class SqliteRepository implements NativeRepository {
             try(FileOutputStream out=new FileOutputStream(temp)) { if(!cutout.compress(Bitmap.CompressFormat.PNG,100,out)) throw error("io_error");out.getFD().sync(); }
             String file=promote(temp,"Piece",pieceId,"cutout.png");
             String label=labelMode.equals("concept")?text(candidate,"label",120):"Picked item";
-            ContentValues values=values("id",pieceId,"origin",origin,"label",label,"category","unknown","cutoutFile",file,"createdAt",System.currentTimeMillis(),"photoId",null,"shopId",null,"tripId",null,"walkLat",null,"walkLng",null);
+            ContentValues values=values("id",pieceId,"origin",origin,"label",label,"category",slot,"cutoutFile",file,"createdAt",System.currentTimeMillis(),"photoId",null,"shopId",null,"tripId",null,"walkLat",null,"walkLng",null);
             if(origin.equals("shop")) {
                 JSObject location=nested(photo,"location");
                 values.put("photoId",photoId);values.put("shopId",photo.getString("shopId"));values.put("tripId",photo.getString("tripId"));values.put("walkLat",location.getDouble("lat"));values.put("walkLng",location.getDouble("lng"));
@@ -592,7 +596,7 @@ public final class SqliteRepository implements NativeRepository {
         update("Shop",values("note",note),"id",id);return required("Shop",id);
     }); }
     @Override public synchronized JSObject updatePiece(JSObject input) { return transaction(()->{
-        String id=id(input,"id");required("Piece",id);String label=text(input,"label",120),category=text(input,"category",64);
+        String id=id(input,"id");required("Piece",id);String label=text(input,"label",120),category=category(input);
         update("Piece",values("label",label,"category",category),"id",id);cancelJobs("label_piece",id);return required("Piece",id);
     }); }
     private JSObject snapshot(JSObject piece,String draft) throws Exception {
@@ -608,12 +612,14 @@ public final class SqliteRepository implements NativeRepository {
         return obj("pieceId",id,"origin",piece.get("origin"),"label",piece.get("label"),"category",piece.get("category"),"cutoutFile",promote(owned(piece.getString("cutoutFile")),"ResultDraft",draft,"cutout"),"walkTo",piece.get("walkTo"),"shop",shop);
     }
     @Override public synchronized JSObject prepareResult(JSObject input) { return transaction(()->{
+        // One mannequin outfit: the lead piece plus up to two more, one per slot, any origin.
         String target=id(input,"targetPieceId");JSObject piece=required("Piece",target);
-        if(!"shop".equals(piece.getString("origin"))) throw error("invalid_input");
-        JSONArray companions=input.optJSONArray("companionPieceIds");if(companions==null||companions.length()>5) throw error("invalid_input");
+        JSONArray companions=input.optJSONArray("companionPieceIds");if(companions==null||companions.length()>2) throw error("invalid_input");
         Set<String> unique=new HashSet<>();unique.add(target);
         List<JSObject> pieces=new ArrayList<>();
         for(int i=0;i<companions.length();i++) {Object value=companions.opt(i);if(!(value instanceof String)||!unique.add((String)value)) throw error("invalid_input");pieces.add(required("Piece",(String)value));}
+        Set<String> slots=new HashSet<>();
+        for(JSObject worn:concat(piece,pieces)) {String slot=worn.getString("category");if(!("outer".equals(slot)||"top".equals(slot)||"bottom".equals(slot))||!slots.add(slot)) throw error("invalid_input");}
         String draft=uid();JSObject targetSnapshot=snapshot(piece,draft);JSONArray snapshots=new JSONArray();for(JSObject companion:pieces) snapshots.put(snapshot(companion,draft));
         db.insertOrThrow("ResultDraft",null,values("id",draft,"targetPieceId",target,"companionPieceIds",companions,"targetSnapshot",targetSnapshot,"companionSnapshots",snapshots));
         return obj("draftId",draft,"targetSnapshot",targetSnapshot,"companionSnapshots",snapshots);
@@ -704,7 +710,10 @@ public final class SqliteRepository implements NativeRepository {
                 update("Shop",values("description",description,"descriptionState","done"),"id",photo.getString("shopId"));
             } else {
                 if(input.has("description")) throw error("invalid_input");
-                update("Piece",values("label",text(input,"label",120),"category",text(input,"category",64)),"id",ref);
+                // A category the user already chose (e.g. the mannequin slot) wins over Spark's.
+                JSObject piece=row("Piece","id",ref);String category=category(input);
+                if(piece!=null&&!"unknown".equals(piece.optString("category"))) category=piece.getString("category");
+                update("Piece",values("label",text(input,"label",120),"category",category),"id",ref);
             }
         }
         db.delete("QueueJob","id=?",new String[]{id});claims.remove(id);changed("QueueJob",id);return new JSObject();

@@ -83,6 +83,11 @@
       "passed": true
     },
     {
+      "route": "home",
+      "state": "saved-latest-trip-only-and-see-all",
+      "passed": true
+    },
+    {
       "route": "item",
       "state": "normal",
       "passed": true
@@ -108,6 +113,11 @@
       "passed": true
     },
     {
+      "route": "outfit",
+      "state": "unsorted-piece-sorted-onto-mannequin",
+      "passed": true
+    },
+    {
       "route": "trips",
       "state": "normal",
       "passed": true
@@ -129,7 +139,7 @@
     },
     {
       "route": "outfit",
-      "state": "companion-cancel-preserves-target",
+      "state": "slot-cancel-preserves-outfit",
       "passed": true
     },
     {
@@ -154,7 +164,7 @@
     },
     {
       "route": "outfit",
-      "state": "trip-cutout-saved-and-added",
+      "state": "trip-cutout-saved-into-top-slot",
       "passed": true
     },
     {
@@ -314,12 +324,12 @@
     },
     "ids": {
       "trips": [
-        "11237d27-ff99-448f-8ca2-864e3b3bb218",
-        "4b9b4c24-721f-46c0-bf7c-eb6eba4a69e6"
+        "c3620258-1c21-481c-90a4-81c3eef3ee22",
+        "cfe55b86-9815-4885-ab1a-2bc9dded0930"
       ],
       "photos": [
-        "18f01dd6-463e-46aa-9491-6c9ddb5c7d37",
-        "1c5e4457-af15-4979-8fb3-69775dae78ae",
+        "d70e51a6-a9f4-4604-b5ba-9a308866fdfc",
+        "f5ef222d-a6a9-4b9b-b3d3-dfbf6e606b3c",
         "saturday-shop2-photo5",
         "saturday-shop2-photo4",
         "saturday-shop2-photo3",
@@ -336,8 +346,7 @@
     "queue": [],
     "fitting": {
       "draft": {
-        "targetPieceId": null,
-        "companionPieceIds": []
+        "outfit": {}
       },
       "phase": "idle",
       "selfState": "empty",

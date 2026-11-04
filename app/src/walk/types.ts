@@ -4,7 +4,8 @@ import type {RelayRequest, RelayResponse} from '../relay/client';
 export type {Fix, Point} from '../native/contracts';
 export type RouteResponse = RelayResponse<'/v1/route'>;
 export type RouteRequest = RelayRequest<'/v1/route'>;
-export type WalkSource = {source: 'item'; pieceId: string} | {source: 'result'; resultId: string};
+// A result may hold several shop pieces; `pieceId` picks one (default: the first that has a spot).
+export type WalkSource = {source: 'item'; pieceId: string} | {source: 'result'; resultId: string; pieceId?: string};
 export interface LocationAPI extends Events<{fix: Fix; error: {code: string}}> {
   start(): Promise<void>;
   current(): Promise<Fix>;

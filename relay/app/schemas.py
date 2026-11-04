@@ -429,9 +429,12 @@ class DescribeRequest(Wire):
     image: Image
 class StorefrontResponse(Wire):
     description: NonBlank300
+# Mannequin slots, one garment each. Everything else Spark names is `other`.
+GarmentSlot = Literal['outer', 'top', 'bottom']
+PieceCategory = Literal['outer', 'top', 'bottom', 'other']
 class PieceResponse(Wire):
     label: Annotated[str, StringConstraints(min_length=1, max_length=120, pattern=r'\S')]
-    category: Annotated[str, StringConstraints(min_length=1, max_length=64, pattern=r'\S')]
+    category: PieceCategory
 class MaskedSelfPhoto(Wire):
     image: Image
     headMasked: Literal[True]
@@ -439,16 +442,16 @@ class TryOnPiece(Wire):
     pieceRef: Ref
     image: Image
     label: Annotated[str, StringConstraints(min_length=1, max_length=120, pattern=r'\S')]
-    category: Annotated[str, StringConstraints(min_length=1, max_length=64, pattern=r'\S')]
-    origin: Literal['shop', 'wardrobe']
+    category: GarmentSlot
 class TryOnRequest(Wire):
+    """One mannequin outfit: at most one garment per slot, rendered as one image."""
     selfPhoto: MaskedSelfPhoto
-    target: TryOnPiece
-    companions: Annotated[list[TryOnPiece], Field(max_length=5)]
+    pieces: Annotated[list[TryOnPiece], Field(min_length=1, max_length=3)]
     @model_validator(mode='after')
     def consistency(self):
-        refs = [self.target.pieceRef, *(p.pieceRef for p in self.companions)]
-        if self.target.origin != 'shop' or len(set(refs)) != len(refs): raise ValueError('Invalid target or duplicate refs')
+        refs = [p.pieceRef for p in self.pieces]
+        slots = [p.category for p in self.pieces]
+        if len(set(refs)) != len(refs) or len(set(slots)) != len(slots): raise ValueError('Duplicate refs or slots')
         return self
 class GeneratedImage(Wire):
     mimeType: Literal['image/jpeg', 'image/png']

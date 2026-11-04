@@ -1,8 +1,17 @@
-import type {Listener, ResultPieceSnapshot} from '../native/contracts';
+import type {Listener, Result, ResultPieceSnapshot} from '../native/contracts';
 import {EventSource} from './events';
 import {bearing, distance, point, project, routeLengths, validPoint} from './geometry';
 import {WalkError, errorCode} from './types';
 import type {Fix, WalkAPI, WalkDependencies, WalkSource, WalkState} from './types';
+
+/** The shop piece of a look to walk back to: the requested one, else the first with a saved spot. */
+export function resultDestination(result: Result | null, pieceId?: string): ResultPieceSnapshot | null {
+  if (!result) return null;
+  const walkable = (piece: ResultPieceSnapshot) => piece.origin === 'shop' && validPoint(piece.walkTo) && (pieceId === undefined || piece.pieceId === pieceId);
+  // The lead piece is checked first so companions are read only when needed.
+  if (walkable(result.targetSnapshot)) return result.targetSnapshot;
+  return result.companionSnapshots.find(walkable) ?? null;
+}
 
 export class WalkController extends EventSource<{state: WalkState}> implements WalkAPI {
   private deps: WalkDependencies;
@@ -68,7 +77,7 @@ export class WalkController extends EventSource<{state: WalkState}> implements W
       info = {label: piece.label, shop: shopInfo};
     } else if (input.source === 'result') {
       const result = await this.deps.store.get({entity: 'Result', id: input.resultId});
-      const snapshot = result?.targetSnapshot;
+      const snapshot = resultDestination(result, input.pieceId);
       if (!snapshot || snapshot.origin !== 'shop' || !validPoint(snapshot.walkTo)) throw new WalkError('destination_unavailable', false);
       destination = {lat: snapshot.walkTo.lat, lng: snapshot.walkTo.lng};
       info = {label: snapshot.label, shop: structuredClone(snapshot.shop)};

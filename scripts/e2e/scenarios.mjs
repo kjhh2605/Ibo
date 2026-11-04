@@ -13,6 +13,8 @@ async function inspect(page) {
 async function click(page,name,scope=page) {await scope.getByRole('button',{name,exact:typeof name==='string'}).first().click();}
 async function route(page,name) {await page.locator(`[data-route="${name}"]`).waitFor({state:'visible'});}
 async function confirm(page,name) {await click(page,name);await click(page,name,page.getByRole('dialog'));}
+// A searched piece is not sorted yet; Try it on then asks for its mannequin slot.
+async function tryItOn(page,slot='outer') {await click(page,'Try it on');const sort=page.getByRole('button',{name:`Wear as ${slot}`,exact:true});if(await sort.waitFor({timeout:3000}).then(()=>true,()=>false))await sort.click();await route(page,'outfit');}
 async function home(page) {await deepLink('streetfitting://home');await route(page,'home');}
 async function openTrip(page,id) {
   const trips=(await list(page,'Trip')).sort((a,b)=>b.startedAt-a.startedAt);
@@ -224,15 +226,15 @@ export async function tryon(context) {
   if(!context.steps)await prepare(context);
   const pieces=await list(page,'Piece',{origin:'shop'});check(pieces.length>0,'tryon_requires_saved_shop_piece');
   const target=context.target||pieces[0];
-  await home(page);await click(page,target.label);await route(page,'item');await click(page,'Try it on');await route(page,'outfit');
+  await home(page);await click(page,target.label);await route(page,'item');await tryItOn(page);
   if(!await native(page,'Store','getSelfPhoto'))await selfPhoto(context);
   const before=new Set((await list(page,'Result')).map(result=>result.id));
   context.tryonPhase='e2e-tryon-target-only';await identities(context);
-  await click(page,'Generate');await route(page,'result');
+  await click(page,'Fit');await route(page,'result');
   const results=await until(()=>list(page,'Result'),rows=>rows.length===before.size+1,'tryon_result_not_saved',240000);
   context.result=results.find(result=>!before.has(result.id));
   check(context.result.targetPieceId===target.id,'tryon_wrong_target');
-  check(context.result.companionSnapshots.length<=5,'tryon_companion_limit');
+  check(context.result.companionSnapshots.length<=2,'tryon_one_piece_per_slot');
   await checkpoint(context,12,['generation-saved-once','target-fixed','snapshot-created']);
   await provenanceGuard(context);
   await checkpoint(context,13,['download-off','no-gallery-write']);
@@ -250,10 +252,12 @@ export async function walk(context,source='result') {
     if(!context.result){context.result=(await list(page,'Result')).sort((a,b)=>b.createdAt-a.createdAt)[0];check(context.result,'walk_requires_saved_result');await openResult(page,context.result.id);}
     expected=context.result.targetSnapshot.walkTo;
   }
+  // From a look, walk back to its lead (outer) piece; other shops have their own buttons.
+  const walkButton=source==='item'?/Walk to Shop|Walk back to the photo spot/:context.result.targetSnapshot.shop?`Walk to Shop ${context.result.targetSnapshot.shop.n}`:`Walk back to ${context.result.targetSnapshot.label}`;
   check(expected,'walk_requires_destination');
   const first=(await gpx('walk'))[0];context.routePhase='e2e-route-start';await fix(first);
   await until(()=>native(page,'Geolocation','getCurrentPosition',{enableHighAccuracy:true,timeout:15000,maximumAge:0}),p=>Math.abs(p.coords.latitude-first.lat)<1e-7&&Math.abs(p.coords.longitude-first.lng)<1e-7,'walk_initial_fix_not_received');
-  await click(page,/Walk to Shop|Walk back to the photo spot/);await route(page,'walk');
+  await click(page,walkButton);await route(page,'walk');
   const initial=await until(()=>inspect(page),s=>s.walk&&s.walk.mode!=='loading','walk_not_loaded');
   check(initial.walk.route&&initial.walk.mode!=='error','normal_walk_route_unavailable');
   check(JSON.stringify(initial.walk.destination)===JSON.stringify(expected),'walk_destination_not_target_snapshot');
@@ -380,22 +384,23 @@ export async function full(context) {
   await walk(context,'item');
   try {
     const wardrobe=await addWardrobe(context);await checkpoint(context,9,['wardrobe-cutout-saved']);
-    await home(page);await click(page,context.target.label);await click(page,'Try it on');await route(page,'outfit');
-    await click(page,'Add a companion');await click(page,`Add ${wardrobe.label}`);await click(page,'Done choosing');
-    await click(page,'Add a companion');await click(page,'From a trip photo');await route(page,'trips');await openTrip(page,tripId);await click(page,/Open photo/);await route(page,'pick');
+    await home(page);await click(page,context.target.label);await tryItOn(page);
+    // Spark's mock names the jeans an outer layer; re-sorting it into the bottom slot is the user's call.
+    await click(page,'Add bottom');await click(page,`Use ${wardrobe.label} as bottom`);
+    await click(page,'Add top');await click(page,'From a trip photo');await route(page,'trips');await openTrip(page,tripId);await click(page,/Open photo/);await route(page,'pick');
     await offline(page,true);await chooseArea(page,{x:0.75,y:0.5});await click(page,'Add to outfit');await route(page,'outfit');
-    const draft=(await inspect(page)).fitting.draft;check(draft.targetPieceId===context.target.id&&draft.companionPieceIds.length===2,'direct_cut_lost_draft');
-    await offline(page,false);await checkpoint(context,10,['offline-direct-cut','draft-preserved','two-companions']);
+    const draft=(await inspect(page)).fitting.draft;check(draft.outfit.outer===context.target.id&&draft.outfit.bottom===wardrobe.id&&!!draft.outfit.top,'direct_cut_lost_draft');
+    await offline(page,false);await checkpoint(context,10,['offline-direct-cut','draft-preserved','three-slots-filled']);
     await selfPhoto(context);await checkpoint(context,11,['self-registered','failed-replacement-preserved-self']);
-    await click(page,'Generate');await route(page,'result');
+    await click(page,'Fit');await route(page,'result');
     context.result=(await list(page,'Result'))[0];check(context.result?.companionSnapshots.length===2,'result_snapshot_companions');
     await checkpoint(context,12,['real-generation','independent-snapshots']);
     const files=await snapshotFiles(context.result);const snapshot=JSON.stringify(context.result);
     await provenanceGuard(context);
     await checkpoint(context,13,['download-not-exposed','result-displayed']);
-    await click(page,'Change pieces');await route(page,'outfit');await click(page,`Remove ${wardrobe.label}`);
+    await click(page,'Change pieces');await route(page,'outfit');await click(page,`Remove ${wardrobe.label} from bottom`);
     context.tryonPhase='e2e-tryon-other';await identities(context);
-    await click(page,'Generate');await route(page,'result');
+    await click(page,'Fit');await route(page,'result');
     context.otherResult=(await list(page,'Result')).find(result=>result.id!==context.result.id);
     check(context.otherResult?.companionSnapshots.length===1,'second_changed_combination_not_saved');
     const otherFiles=await snapshotFiles(context.otherResult);const otherSnapshot=JSON.stringify(context.otherResult);
@@ -411,7 +416,7 @@ export async function full(context) {
     for(const photo of removedPhotos)await absentPrivate(photo.file);
     const saved=await native(page,'Store','get',{entity:'Piece',id:context.target.id});check(saved&&saved.photoId===null&&saved.shopId===null&&JSON.stringify(saved.walkTo)===JSON.stringify(context.target.walkTo),'trip_delete_changed_piece');
     await checkpoint(context,16,['photo-and-trip-deleted','saved-piece-location-preserved']);
-    const deleting=[saved,...await list(page,'Piece').then(pieces=>pieces.filter(piece=>draft.companionPieceIds.includes(piece.id)))];
+    const deleting=[saved,...await list(page,'Piece').then(pieces=>pieces.filter(piece=>piece.id!==saved.id&&Object.values(draft.outfit).includes(piece.id)))];
     for(const piece of deleting){await home(page);if(piece.origin==='wardrobe'){await click(page,'Wardrobe');await click(page,`Open ${piece.label}`);}else await click(page,piece.label);await route(page,'item');await confirm(page,'Delete piece');await absentPrivate(piece.cutoutFile);}
     const unchanged=await native(page,'Store','get',{entity:'Result',id:context.result.id});
     check(JSON.stringify(unchanged)===snapshot&&JSON.stringify(await snapshotFiles(unchanged))===JSON.stringify(files),'source_delete_changed_result_snapshot');

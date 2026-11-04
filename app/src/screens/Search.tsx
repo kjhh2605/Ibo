@@ -439,10 +439,8 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
   const [prepareAttempt, setPrepareAttempt] = useState(0);
   const cache = useMemo(() => photoCache(asset), [asset]);
   const lifecycle = useRef<{live: boolean; handle: string | null; sequence: number; tap: Promise<void> | null; save: Promise<void> | null; release: (() => Promise<void>) | null; files: Set<string>; cancellation: AbortController}>({live: false, handle: null, sequence: 0, tap: null, save: null, release: null, files: new Set(), cancellation: new AbortController()});
-  const fittingSubscribe = useCallback((listener: () => void) => services.fitting.subscribe(listener), [services]);
-  const fittingSnapshot = useCallback(() => services.fitting.getSnapshot(), [services]);
-  const fitting = useSyncExternalStore(fittingSubscribe, fittingSnapshot, fittingSnapshot);
-  const atLimit = route.mode === 'outfit' && fitting.draft.companionPieceIds.length >= 5;
+  // A trip-photo cut-out for the mannequin always names the slot it fills.
+  const atLimit = route.mode === 'outfit' && !route.slot;
   const choices = useMemo<Choice[]>(() => tapping ? tapChoices : matches.map(candidate => ({candidate})), [tapping, tapChoices, matches]);
   const visible = useMemo(() => showAll ? choices : choices.slice(0, 3), [choices, showAll]);
   const visibleCandidates = useMemo(() => visible.map(choice => choice.candidate), [visible]);
@@ -585,8 +583,8 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
     const task = (async () => {
       try {
         if (route.mode === 'outfit') {
-          await services.fitting.addTripCandidate(candidate, current.cancellation.signal);
-          if (current.live) {say('Saved and added to your outfit'); popTo('outfit');}
+          await services.fitting.addTripCandidate(candidate, route.slot!, current.cancellation.signal);
+          if (current.live) {say(`Saved and put on the mannequin as ${route.slot === 'outer' ? 'the outer layer' : `the ${route.slot}`}`); popTo('outfit');}
         } else {
           const piece = await services.store.saveCandidate({candidate, origin: route.mode === 'wardrobe' ? 'wardrobe' : 'shop', labelMode: route.mode !== 'wardrobe' && route.concept ? 'concept' : 'describe'});
           if (!current.live) return;
@@ -630,7 +628,7 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
     {matches.length > 0 && <Button label={tapping ? 'Show matches' : 'Not here? Tap it'} variant="ghost" isDisabled={saving || segmenting || preparing} onClick={() => {clearTap(); setTapping(value => !value); setShowAll(false); if (tapping) setSelected(matches[0]?.id ?? null); else requestAnimationFrame(() => photoArea.current?.scrollIntoView({block: 'start', behavior: reducedMotion() ? 'auto' : 'smooth'}));}} />}
     {tapping && (tapChoices.length > 0 || segmenting) && <Button label="Cancel area selection" variant="ghost" isDisabled={saving} onClick={clearTap} />}
     <StickyBar>
-    {atLimit && <Problem message="Your outfit already has 5 extra pieces. Go back and remove one first." />}
+    {atLimit && <Problem message="Go back and choose which mannequin slot this piece is for." />}
     {saveError && <Problem message={errorMessage(saveError)} retry={maskReady && !atLimit ? complete : undefined} />}
     {chosen && !route.concept && <Text type="supporting">It’s saved as “Picked item” until it’s named. You can rename it anytime.</Text>}
     <Button label={route.mode === 'wardrobe' ? 'Add to wardrobe' : route.mode === 'outfit' ? 'Add to outfit' : 'Use this item'} variant="primary" size="lg" isLoading={saving} isDisabled={!chosen || !maskReady || segmenting || atLimit} onClick={complete} />

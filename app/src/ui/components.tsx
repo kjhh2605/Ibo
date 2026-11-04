@@ -12,6 +12,9 @@ import {Skeleton} from '@astryxdesign/core/Skeleton';
 import {Grid} from '@astryxdesign/core/Grid';
 import {Thumbnail as AstryxThumbnail} from '@astryxdesign/core/Thumbnail';
 import {TextInput} from '@astryxdesign/core/TextInput';
+import {SegmentedControl, SegmentedControlItem} from '@astryxdesign/core/SegmentedControl';
+import {categoryNames, pieceCategory} from '../category';
+import type {PieceCategory} from '../category';
 import {useUi} from './state';
 import {useImageUrl} from './images';
 import {ImageIcon} from './icons';
@@ -169,10 +172,11 @@ export function PhotoView({file, label}: {file: string; label: string}) {
   </VStack>;
 }
 
-export function Action({label, run, variant = 'primary', disabled = false, icon, size, width, style}: {label: string; run: () => Promise<unknown>; variant?: 'primary' | 'secondary' | 'ghost' | 'destructive'; disabled?: boolean; icon?: ReactNode; size?: 'sm' | 'md' | 'lg'; width?: string; style?: CSSProperties}) {
+/** `label` is the accessible name; `text` (optional) is shorter visible copy. */
+export function Action({label, text, run, variant = 'primary', disabled = false, icon, size, width, style}: {label: string; text?: string; run: () => Promise<unknown>; variant?: 'primary' | 'secondary' | 'ghost' | 'destructive'; disabled?: boolean; icon?: ReactNode; size?: 'sm' | 'md' | 'lg'; width?: string; style?: CSSProperties}) {
   const pending = useRef(false);
   const [busy, setBusy] = useState(false); const [error, setError] = useState<string | null>(null);
-  return <><Button label={label} variant={variant} icon={icon} size={size} width={width} style={style} isDisabled={disabled || busy} isLoading={busy} onClick={() => {if (pending.current || disabled) return; pending.current = true; setBusy(true); setError(null); void run().catch((cause: unknown) => {const code = typeof cause === 'object' && cause !== null && 'code' in cause ? String(cause.code) : ''; setError(code === 'offline' ? 'You’re offline. Connect and try again.' : 'That didn’t work. Please try again.');}).finally(() => {pending.current = false; setBusy(false);});}}/>{error && <Problem message={error}/>}</>;
+  return <><Button label={label} variant={variant} icon={icon} size={size} width={width} style={style} isDisabled={disabled || busy} isLoading={busy} onClick={() => {if (pending.current || disabled) return; pending.current = true; setBusy(true); setError(null); void run().catch((cause: unknown) => {const code = typeof cause === 'object' && cause !== null && 'code' in cause ? String(cause.code) : ''; setError(code === 'offline' ? 'You’re offline. Connect and try again.' : 'That didn’t work. Please try again.');}).finally(() => {pending.current = false; setBusy(false);});}}>{text}</Button>{error && <Problem message={error}/>}</>;
 }
 
 export function Confirm({title, description, action, onConfirm, tone = 'danger', style, icon}: {title: string; description: string; action: string; onConfirm: () => Promise<unknown>; tone?: 'danger' | 'plain'; style?: CSSProperties; icon?: ReactNode}) {
@@ -180,9 +184,14 @@ export function Confirm({title, description, action, onConfirm, tone = 'danger',
   return <Button label={action} variant="ghost" icon={icon} style={{...(tone === 'danger' ? {color: 'var(--color-text-error)'} : {}), ...style}} onClick={() => showSheet({title, content: <VStack gap={4}><Text>{description}</Text><Action label={action} variant="destructive" run={async () => {await onConfirm(); showSheet(null);}}/><Button label="Cancel" variant="secondary" onClick={() => showSheet(null)}/></VStack>})}/>;
 }
 
+/** Outer / Top / Bottom fill mannequin slots; Other is anything that can't be tried on. */
+export function CategoryPicker({value, onChange}: {value: PieceCategory; onChange: (value: PieceCategory) => void}) {
+  return <VStack gap={1}><Text type="label" weight="semibold">Kind</Text><SegmentedControl label="Kind of piece" value={value} layout="fill" onChange={next => onChange(pieceCategory(next))}>{(['outer', 'top', 'bottom', 'other'] as const).map(kind => <SegmentedControlItem key={kind} value={kind} label={categoryNames[kind]}/>)}</SegmentedControl>{value === 'other' && <Text type="supporting" size="sm">Only outer layers, tops and bottoms can be tried on.</Text>}</VStack>;
+}
+
 export function EditFields({label, category, onSave}: {label: string; category?: string; onSave: (label: string, category: string) => Promise<unknown>}) {
-  const [name, setName] = useState(label); const [kind, setKind] = useState(category ?? ''); const {showSheet, say} = useUi();
-  return <VStack gap={4}>{category === undefined && <Text type="supporting">Anything that helps you find it again.</Text>}<TextInput label={category === undefined ? 'Note' : 'Name'} placeholder={category === undefined ? 'e.g. cash only, army jackets at the back' : undefined} value={name} onChange={setName}/>{category !== undefined && <TextInput label="Category" value={kind} onChange={setKind}/>}<Action label="Save" disabled={!name.trim()} run={async () => {await onSave(name.trim(), kind.trim()); showSheet(null); say(category === undefined ? 'Note saved' : 'Changes saved');}}/><Button label="Cancel" variant="secondary" onClick={() => showSheet(null)}/></VStack>;
+  const [name, setName] = useState(label); const [kind, setKind] = useState<PieceCategory>(pieceCategory(category ?? '')); const {showSheet, say} = useUi();
+  return <VStack gap={4}>{category === undefined && <Text type="supporting">Anything that helps you find it again.</Text>}<TextInput label={category === undefined ? 'Note' : 'Name'} placeholder={category === undefined ? 'e.g. cash only, army jackets at the back' : undefined} value={name} onChange={setName}/>{category !== undefined && <CategoryPicker value={kind} onChange={setKind}/>}<Action label="Save" disabled={!name.trim()} run={async () => {await onSave(name.trim(), kind); showSheet(null); say(category === undefined ? 'Note saved' : 'Changes saved');}}/><Button label="Cancel" variant="secondary" onClick={() => showSheet(null)}/></VStack>;
 }
 
 /** Keeps a screen's main action within thumb reach at the bottom while the page scrolls. */

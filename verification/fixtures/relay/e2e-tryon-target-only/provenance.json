@@ -1,13 +1,13 @@
 {
   "sourceType": "hand-authored",
   "providerRecording": false,
-  "purpose": "Explicit real UI Generate with chosen companion count; no Result insertion or response override",
-  "companionCount": 0,
+  "purpose": "Explicit real UI Fit with the chosen mannequin slots; no Result insertion or response override",
   "syntheticProviderResponse": {
     "source": "images/self/positive/calibration-hat.png",
     "sourceSha256": "8cae4180d99e2673231e06eae94375468ec7373906cec7b5a6bfce4592b5b2a4",
     "transform": "byte-identical copy of existing synthetic fixture; NOT Muse Image output",
     "expectedNativeBehavior": "Actual native person/head geometry permits evaluation; uncalibrated output must be faceless",
     "humanApproval": false
-  }
+  },
+  "pieceCount": 1
 }

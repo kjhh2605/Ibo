@@ -19,7 +19,7 @@ def test_storefront_one_image_and_short_english_description(provider):
 
 
 def test_wardrobe_and_direct_shop_cutouts_share_request_schema(provider):
-    expected = {'label': 'Blue coat', 'category': 'outerwear'}
+    expected = {'label': 'Blue coat', 'category': 'outer'}
     client, calls = provider(text_output(expected))
     for color in (10, 200):
         response = client.post('/v1/describe/piece', json={'image': image(color)})
@@ -32,15 +32,16 @@ def test_wardrobe_and_direct_shop_cutouts_share_request_schema(provider):
 @pytest.mark.parametrize('extra', [{'origin': 'shop'}, {'tripPhoto': image()},
                                    {'coordinates': {'lat': 1, 'lng': 2}}, {'images': [image(), image()]}])
 def test_origin_trip_photo_and_coordinates_not_accepted(provider, extra):
-    client, calls = provider(text_output({'label': 'coat', 'category': 'coat'}))
+    client, calls = provider(text_output({'label': 'coat', 'category': 'outer'}))
     assert client.post('/v1/describe/piece', json={'image': image(), **extra}).status_code == 400
     assert not calls
 
 
 @pytest.mark.parametrize('path,body', [
-    ('piece', {'label': '', 'category': 'coat'}), ('piece', {'label': 'a' * 121, 'category': 'coat'}),
+    ('piece', {'label': '', 'category': 'outer'}), ('piece', {'label': 'a' * 121, 'category': 'outer'}),
     ('piece', {'label': 'coat', 'category': 'a' * 65}), ('piece', {'label': 'coat', 'category': ' '}),
-    ('piece', {'label': 'coat', 'category': 'coat', 'origin': 'shop'}),
+    ('piece', {'label': 'coat', 'category': 'jacket'}), ('piece', {'label': 'coat', 'category': 'unknown'}),
+    ('piece', {'label': 'coat', 'category': 'outer', 'origin': 'shop'}),
     ('storefront', {'description': ' '}), ('storefront', {'description': 'a' * 301})])
 def test_empty_or_oversize_labels_rejected(provider, path, body):
     client, calls = provider(text_output(body))

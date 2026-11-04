@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**Street Fitting** is a Meta hackathon Android app. While shopping, users take photos and the app records their location. Later, they can find a garment with an English text or voice query, pick it from a photo, virtually try on one saved shop garment with up to five companion pieces, and walk back to where that garment was photographed (`docs/prd/decisions.md`, D-R3-05, D-R4-07, D-R4-09, D-R5-01).
+**Street Fitting** is a Meta hackathon Android app. While shopping, users take photos and the app records their location. Later, they can find a garment with an English text or voice query, pick it from a photo, dress a virtual mannequin (outer, top, bottom) and try the whole outfit on in one image, and walk back to where a shop piece was photographed (`docs/prd/decisions.md`, D-R3-05, D-R5-01, D-R13-02).
 
 Current state (nothing real is wired yet):
 - `prototype/`: a clickable UI/UX demo with fixed data and timers. It has no camera, GPS, model, server, or map.
@@ -21,7 +21,7 @@ Current state (nothing real is wired yet):
 | `hackathon-info.md`, `hackathon-research.md` | Event logistics and judging; reference only |
 | `.scrapped/`, `my-info.md` | Abandoned, unrelated plans and personal background. Ignore unless asked |
 
-### Product constraints (source: `docs/prd/decisions.md`, through R7)
+### Product constraints (source: `docs/prd/decisions.md`, through R13)
 - **Meta-provided models only.** This is a product rule; the event rules do not require it (D-R0-02).
   - Server APIs, via the relay: Muse Spark 1.3 (tool-calling search, storefront descriptions, wardrobe cutout labels), SAM 3.1 (garment candidates), Muse Image (try-on), Muse Voice Transcribe (**P0**, Find it input only; D-R3-05, D-R4-06, D-R7-09).
   - On-device ONNX: EdgeTAM (tap → 3 masks, automatic head masking) and the PE-Core-T16 image tower (photo index). The PE-Core text tower runs on the relay. Automatic head-mask accuracy is unverified (D-R7-01).
@@ -29,11 +29,11 @@ Current state (nothing real is wired yet):
   - Device-only data: original self photos, raw location trails, photo embeddings, wardrobe originals, and recomposited results. Selected shop photos may go to SAM; storefront photos and wardrobe cutouts go to Spark; garment cutouts go to Muse Image. Visit summaries include shop notes (D-R3-04, D-R4-06).
   - The relay holds API keys and does not persist image, audio, or coordinate payloads. Logs contain metadata only by default; a local-development flag may additionally log query text and Spark response bodies, never images, audio, or coordinates (D-R6-04).
   - Never describe the design as "all on-device", "no photos to any server", or guaranteed provider zero retention.
-- Fixed functional limits: ≤4 Spark calls and ≤3 SAM photos per query; ≤7 try-on images (1 masked self + 1 shop target + 0–5 companion garments). The relay enforces search limits; there are no user/team quotas, cost caps, or Firestore quota ledger (D-R3-01, D-R4-07, D-R6-02).
+- Fixed functional limits: ≤4 Spark calls and ≤3 SAM photos per query; ≤4 try-on images (1 masked self + 1–3 garments, one per mannequin slot: outer, top, bottom; D-R13-02). The relay enforces search limits; there are no user/team quotas, cost caps, or Firestore quota ledger (D-R3-01, D-R4-07, D-R6-02).
 - Candidates are score-sorted: show the top 3 first, then expand with "Show all". **Never use PE-Core as a candidate filter** (D-R3-02).
 - Each shopping-mode start creates a trip. All trips are searchable/browsable; home shows the latest trip and "All trips". Provide trip, photo, saved-piece, wardrobe-piece, and result deletion. Deleting a trip preserves saved cutouts and `Piece.walkTo`, but removes original-photo links (D-R3-03, D-R3-10, D-R3-11).
-- A try-on target must be one saved shop piece. Companions come from wardrobe pieces, saved pieces, or cutouts made directly from trip photos. Keep one replaceable self photo. Result download is feature-flagged OFF until watermark/metadata preservation is verified; no Look/Original comparison or regenerate action (D-R4-01~10).
-- Walk to `Piece.walkTo`, not `Shop.spot`; result navigation uses the target piece. Pins cannot be moved. All distances remain in-app, with direction/distance for the final or unmapped segment (D-R5-01~05).
+- Try-on is a mannequin: fill the outer, top, and bottom slots (one piece each, at least one, any origin), then **Fit** renders the whole outfit as one image. `Piece.category` is `outer|top|bottom|other|unknown`. Empty top/bottom keep what the person wears; an empty outer removes a photo jacket only when a top is chosen (D-R13-01~04). Pieces come from the wardrobe, saved pieces, or cutouts made directly from trip photos. Keep one replaceable self photo. Result download is feature-flagged OFF until watermark/metadata preservation is verified; no Look/Original comparison or regenerate action (D-R4-01~10).
+- Walk to `Piece.walkTo`, not `Shop.spot`; a result offers one walk-back per shop among its shop pieces (D-R13-05). Pins cannot be moved. All distances remain in-app, with direction/distance for the final or unmapped segment (D-R5-01~05).
 - The relay is Python/FastAPI on the local Mac only. OpenAPI generates app TS types. Firebase anonymous auth + App Check use development credentials/debug provider; no dev badge. Emulator integration runs mock once and live once, using Codex-generated demo images and a debug-only adb-enabled camera fixture. No physical-device demo is required (D-R6-01, D-R6-05, D-R7-02, D-R7-05~10).
 - Excluded: video recording, location recording outside shopping mode, automatic shop splitting, shop-photo gallery import, Korean UI/queries, wardrobe similarity matching, real glasses **and DAT Mock**, voice/background/indoor navigation, and public release (D-R0-02, D-R0-03, D-R2-03, D-R2-06, D-R2-09; research §9).
 

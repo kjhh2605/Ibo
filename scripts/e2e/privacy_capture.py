@@ -118,7 +118,8 @@ class Observer:
             self.pending_cutouts.update(hashes)
         if path == '/v1/tryon':
             self.require(value.get('selfPhoto', {}).get('headMasked') is True, 'unmasked_self_tag')
-            self.require(value.get('target', {}).get('origin') == 'shop' and len(value.get('companions', [])) <= 5, 'tryon_input_limit')
+            slots = [piece.get('category') for piece in value.get('pieces', [])]
+            self.require(1 <= len(slots) <= 3 and len(set(slots)) == len(slots) and set(slots) <= {'outer', 'top', 'bottom'}, 'tryon_input_limit')
             self.require(bool(hashes) and hashes[0] in self.masked, 'native_masked_self_identity_missing')
         if boundary == 'outbound':
             self.require(host in {META_HOST, OSRM_HOST}, 'unexpected_provider_host')

@@ -15,7 +15,7 @@ from .conftest import HEADERS, ROUTE, Verifier, audio, fitting, image, image_out
 
 
 @pytest.mark.parametrize('path,body,result', [
-    ('describe/piece', {'image': image()}, text_output({'label': 'Blue coat', 'category': 'coat'})),
+    ('describe/piece', {'image': image()}, text_output({'label': 'Blue coat', 'category': 'outer'})),
     ('describe/storefront', {'image': image()}, text_output({'description': 'A blue awning.'})),
     ('tryon', fitting(), image_output())])
 def test_stateless_provider_requests_no_tools_pseudonymous_id(provider, path, body, result):
@@ -40,7 +40,7 @@ def test_stateless_provider_requests_no_tools_pseudonymous_id(provider, path, bo
 @pytest.mark.parametrize('failure', [False, True])
 def test_logs_have_no_media_audio_coordinates_or_provider_error(provider, caplog, log_text, failure):
     cases = [('transcribe', audio(), {'transcript': 'private-transcription-sentinel'}),
-             ('describe/piece', {'image': image()}, text_output({'label': 'coat', 'category': 'coat'})),
+             ('describe/piece', {'image': image()}, text_output({'label': 'coat', 'category': 'outer'})),
              ('tryon', fitting(), image_output()), ('route', ROUTE, osrm_output())]
     caplog.set_level(logging.DEBUG)
     for path, body, output in cases:
@@ -101,7 +101,7 @@ def test_cancelled_upload_create_no_temp_or_cache_files(monkeypatch):
 
 def test_request_exif_gps_rejected(provider):
     body = {'image': image(metadata={'XML:com.adobe.xmp': '<x xmlns:g="http://ns.adobe.com/exif/1.0/" g:GPSLatitude="13.1"/>'})}
-    client, calls = provider(text_output({'label': 'coat', 'category': 'coat'}))
+    client, calls = provider(text_output({'label': 'coat', 'category': 'outer'}))
     assert client.post('/v1/describe/piece', json=body).status_code == 400
     assert not calls
 

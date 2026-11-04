@@ -5,16 +5,18 @@
 ## S08 연결 계약
 
 - `getSnapshot()` / `subscribe(listener)`: React `useSyncExternalStore`에 연결한다. snapshot은 참조가 안정적이며 draft와 companion 배열은 동결된다.
-- `start(targetPieceId)`: 존재하는 shop 대상 하나로 새 조합. `addCompanion(id)` / `removeCompanion(id)`: 다른 shop/wardrobe 조각 최대 5개.
-- `addTripCandidate(candidate, signal?)`: `saveCandidate(origin=shop,labelMode=describe)` 완료 후 추가. Trips/Pick 왕복에서 인스턴스를 재생성하거나 `start`를 다시 호출하지 않는다.
+- 마네킹(D-R13-02): draft는 `{outfit:{outer?,top?,bottom?}}`, 슬롯마다 shop/wardrobe 조각 1개, 최소 1슬롯. `wornSlots(outfit)`은 슬롯 순서(outer, top, bottom) 목록이다.
+- `wear(pieceId)`: 종류(`slotOf`)가 슬롯인 조각을 그 슬롯에 넣고 다른 슬롯은 유지한다. 미분류/`other`는 `category_required`. 자유 문자열 레거시 종류는 `updatePiece`로 정규화한다.
+- `setSlot(slot, pieceId)` / `clearSlot(slot)`: 사용자가 고른 슬롯에 넣는다. 종류가 다르면 `updatePiece(category=slot)`로 다시 분류하고, 다른 슬롯에 있던 같은 조각은 빠진다.
+- `addTripCandidate(candidate, slot, signal?)`: `saveCandidate(origin=shop,labelMode=describe,category=slot)` 완료 후 그 슬롯에 넣는다. Spark 이름 붙이기는 label만 바꾼다. Trips/Pick 왕복에서 인스턴스를 재생성하지 않는다.
 - `registerSelf(asset)`: FaceMask 성공만 등록 상태로 노출. 실패한 교체는 이전 정상 self를 유지하지만 다음 성공까지 생성을 막는다. 마스킹본 미리보기는 없다.
 - `generate()`: 검증 → snapshot → masked-only 요청 → provider bytes 저장 → compose → Result 저장. 실패/취소는 `null`, 중복/동시 편집은 `busy` 오류다.
 - `cancel()`: 요청 abort와 늦은 응답 무시. `cancelling` 동안 native 연산·임시 파일 정리를 기다리며 다음 생성/편집은 계속 차단한다. 저장 중이나 저장 후 정리 중 취소도 해당 결과만 삭제한 뒤 `cancelled`가 된다. `complete` 또한 정리 종료 후에만 노출한다.
-- `canChangePieces(result)` / `restoreResult(result)`: live 대상 존재를 확인하고 살아 있는 companion만 복원. 표시/Walk는 언제나 `targetSnapshot`, `companionSnapshots`를 사용한다.
+- `canChangePieces(result)` / `restoreResult(result)`: 결과의 옷 중 살아 있고 슬롯 종류인 것을 현재 종류 슬롯에 복원(하나도 없으면 불가). Result 저장 필드 `target*`=첫 슬롯 옷, `companion*`=나머지(저장 형식 호환). 표시/Walk는 스냅샷만 사용한다.
 - `exportResult(resultId)`: flag와 S11 exporter provenance 승인이 모두 있어야 Media 호출. 현재 flag OFF, 승인 null이며 다운로드 불가가 정상이다.
 - `refresh()`는 자기 사진 상태를 새로 읽는다. `dispose()`는 화면 왕복마다 호출하지 않고 controller 수명 종료에만 호출한다.
 
-상태: `draft`, `phase` (`idle/preparing/sending/compositing/saving/cancelling/complete/failed/cancelled`), `selfState` (`empty/ready/registering/failed`), `selfPhoto`, `result`, 안전한 `error`. 본인 원본·headMask는 로컬 타입에만 있고 `serializeTryOn` 입력은 `maskedFile` 하나다. HTTP에는 opaque `garment_N`, 이미지/label/category/origin만 있으며 local 파일 경로·좌표·shop 정보는 없다.
+상태: `draft`, `phase` (`idle/preparing/sending/compositing/saving/cancelling/complete/failed/cancelled`), `selfState` (`empty/ready/registering/failed`), `selfPhoto`, `result`, 안전한 `error`. 본인 원본·headMask는 로컬 타입에만 있고 `serializeTryOn` 입력은 `maskedFile` 하나다. HTTP는 `{selfPhoto, pieces:[{pieceRef: garment_N, image, label, category: outer|top|bottom}]}`이며 origin·local 파일 경로·좌표·shop 정보는 없다. 릴레이는 옷을 안쪽부터(bottom → top → outer) 정렬하고 빈 슬롯 규칙(D-R13-03)을 프롬프트에 넣는다. label은 프롬프트에 넣지 않는다.
 
 ## 보존과 실패 경계
 

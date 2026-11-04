@@ -114,7 +114,7 @@ def record(run,args):
             if operation=='tryon':
                 masked=base64.b64decode(request['selfPhoto']['image']['data'],validate=True)
                 require(pixel_hash(masked) in native_ids.get('maskedSelfPixelHashes',[]),'recording_masked_self_has_no_native_proof')
-                garments=[request['target'],*request['companions']]
+                garments=request['pieces']
                 require(all(pixel_hash(base64.b64decode(piece['image']['data'],validate=True)) in native_ids.get('cutoutPixelHashes',[]) for piece in garments),'recording_garment_is_not_native_cutout')
             if operation=='describe-piece':
                 require(all(pixel_hash(raw) in native_ids.get('cutoutPixelHashes',[]) for raw in media(request)),'recording_describe_original_forbidden')
