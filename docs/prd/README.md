@@ -100,8 +100,33 @@ UI 기준은 프로토타입(`prototype/`)이다. 흐름, 문구, 상태, 인터
 
 - 현재 OMP의 `goal.enabled=true`, `goal.continuationModes=["interactive"]`다. 터미널의 `/goal` 또는 `omp --goal "<목표>"`를 사용한다. RPC/chat에서 자동 지속을 원하면 해당 실행 모드 지원과 설정을 따로 확인한다. Goal은 API 권한·모델 파일을 대신 제공하지 않는다.
 - Orca 새 워크트리의 기준은 `origin/main`이다. S00 merge → 웨이브 1 → S01 merge 후 S02/S03 → 통합 순서를 따른다. 구현 워크트리마다 담당 슬라이스와 소유 경로를 명시하고, 검증한 PR만 통합 담당이 순차 merge한다.
-- repo setup 명령은 `bash scripts/setup-worktree.sh`다. 이 스크립트는 `app`·`prototype`의 lockfile로 설치하고, `relay/pyproject.toml`이 생긴 뒤에는 `uv sync --locked`도 실행한다. 릴레이가 없으면 그 사실을 출력하며 준비 완료로 위장하지 않는다.
+- repo setup 명령은 `bash scripts/setup-worktree.sh`다. 이 스크립트는 `app`·`prototype`의 lockfile로 설치하고, 호스트의 `google-services.json`이 있으면 gitignored Android 경로에 권한 0600으로 복사한다. `relay/pyproject.toml`이 생긴 뒤에는 `uv sync --locked`도 실행한다. 릴레이가 없으면 그 사실을 출력하며 준비 완료로 위장하지 않는다.
 - 포트는 `~/.cache/street-fitting/ports.json`의 호스트 공통 잠금으로 워크트리마다 배정하고 `.sf-worktree.env`에 기록한다. 이는 프로세스 소켓 예약이 아니므로 실제 시작 시 포트 충돌을 오류로 처리해야 한다. 각 작업자 셸은 저장소 루트에서 `source scripts/worktree-env.sh`로 환경을 읽는다.
-- 호스트 도구 설정은 `~/.config/street-fitting/env.sh`, 자격 증명은 같은 디렉터리의 `secrets.env`(권한 0600)에 둔다. 키를 repo setup 명령이나 에이전트 프롬프트에 넣지 않는다. `RELAY_MODE`는 자동 지정하지 않는다. `MODEL_API_KEY`, Firebase Admin 자격 증명, App Check 등록은 별도로 완료해야 한다.
+- 호스트 도구 설정은 `~/.config/street-fitting/env.sh`, 자격 증명 로더는 같은 디렉터리의 `secrets.env`(권한 0600)에 둔다. Meta 키(`meta-api-key`), Firebase Admin 키(`firebase-admin.json`), Android 설정(`google-services.json`)도 저장소 밖에 보관한다. 키를 repo setup 명령이나 에이전트 프롬프트에 넣지 않는다. `RELAY_MODE`는 자동 지정하지 않는다.
 - `.github/workflows/validate.yml`은 PR의 앱 lint/build/Astryx doctor와 프로토타입 build만 검사한다. Android·모델·live E2E를 통과했다는 뜻이 아니며, 해당 증거는 각 슬라이스와 S11이 제공한다. 저장소는 공개 전환하지 않았다.
 - Orca setup 훅의 UI 등록은 별도 확인 대상이다. CLI의 `--setup run`은 등록된 훅을 실행할 뿐 설정하지 않는다. 훅이 비어 있는 동안에는 조정자가 각 워크트리에서 위 초기화 명령을 완료한 뒤 작업자를 시작한다.
+
+### 준비 점검 실측 (2026-11-04, M1)
+
+제품 구현 검증과 구분한다. 다음은 현재 빈 앱 shell과 개발 도구에 대한 관찰이다.
+
+| 항목 | 실제 확인 |
+| --- | --- |
+| GitHub | 관리자 권한·push 인증, 준비 PR #1 CI 2개 통과 및 squash merge. 저장소는 private 유지 |
+| 워크트리 | Orca 생성 성공. 준비용 checkout과 main에 서로 다른 `RELAY_PORT` 8787/8788 배정. 비밀 로딩 전 xtrace 해제 확인 |
+| 도구 | Node 26.8.2, npm 11.19.1, Java 21.0.13, uv 0.13.6, Python 3.12.16 설치. 릴레이 버전 고정은 S00 소유 |
+| Android | SDK Platform 36 r2, Build Tools 35.0.0, platform-tools 37.0.1, emulator 37.2.13. API 37.0 Play Store 16 KB ARM64 이미지 r8, `Medium_Phone` |
+| 네이티브 실행 | `assembleDebug`·설치·시작 통과. `PAGE_SIZE=16384`, Playwright-Android WebView와 host WebGL 확인. GPS 주입·UI dump·3초 webm 녹화 및 H.264/AAC mp4 변환 확인 |
+| 에뮬레이터 RAM | 설정은 2048 MB/데이터 6 GB. 현재 emulator는 부팅 때 RAM을 4096 MB로 상향하므로 2 GB 실행으로 보고하지 않음 |
+| 합성 자산 도구 | `codex exec` built-in 생성으로 PNG 실제 저장. `say`→PCM16/16 kHz/mono WAV 생성 확인. S11 fixture 제작은 아직 안 함 |
+| Meta | 개발 전용 키 저장. 인증된 `GET /v1/models` 200과 Spark 1.3/SAM 3.1/Image 1.0/Voice 1.0 모두 확인. 콘솔 무료 크레딧 $149.99. 추론·피팅 품질은 미검증 |
+| Firebase | 무료 Spark 프로젝트 `street-fitting-dev`, Android 등록·Anonymous 활성화. 실제 익명 로그인 200, 테스트 사용자 삭제 200. Admin 자격 증명으로 프로젝트 조회 200 |
+| 지도 | OpenFreeMap style과 OSRM foot 합성 좌표 경로 요청 HTTP 200. 실제 앱 지도·길 안내 기능의 합격 증거는 아님 |
+| Aside | 로그인된 콘솔 조작·개발 자격 증명 저장·로컬 프로토타입 클릭 검증 성공. 키 값은 대화·Git에 넣지 않음 |
+
+**남은 선행 조건**
+
+1. 연구 모델 묶음은 이 M1에서 발견되지 않았다. 원본 Mac의 SSH 연결이 거부되고 Aside remote host 조회도 403이라 자동 복사하지 못했다. `edgetam_encoder.onnx`, `edgetam_decoder.onnx`, `pe_image.onnx`, PE `hf_cache`, 22장/7문구 연구 자료와 export·전처리·hash 근거를 옮겨야 한다. 새로운 가중치나 합성 자료로 기존 연구 재현을 가장하지 않는다.
+2. App Check debug 등록은 S00의 Firebase adapter가 실제 debug 토큰을 만든 뒤 Aside로 등록하고 통합에서 검증한다. Anonymous/Admin 성공이 App Check 검증 성공을 뜻하지 않는다.
+3. Orca repo setup 훅은 아직 비어 있다. CLI에 훅 설정 명령이 없고, Orca Computer Use의 Accessibility/Screen Recording 권한이 없어 UI 설정은 수행하지 못했다. 자동 UI 등록을 원하면 OS 권한이 필요하다. 그 전에도 조정자가 setup 스크립트를 명시 실행하는 방식으로 초기화를 자동화할 수 있다.
+4. provider 기본 Playground의 Contributor 선택이나 무료 크레딧 안내를 무보관 보장으로 해석하지 않는다. 구현은 계약의 Standard model ID와 저장 억제 옵션을 유지한다. 무료 크레딧 소진 시 기존 결제수단으로 과금될 수 있고 spend limit은 알림이지 하드 차단이 아니다.

@@ -46,6 +46,9 @@ PY
 
 npm --prefix app ci --no-audit --no-fund
 npm --prefix prototype ci --no-audit --no-fund
+if [[ -f "$HOME/.config/street-fitting/google-services.json" ]]; then
+  install -m 600 "$HOME/.config/street-fitting/google-services.json" app/android/app/google-services.json
+fi
 if [[ -f relay/pyproject.toml ]]; then
   (cd relay && uv sync --locked)
 else

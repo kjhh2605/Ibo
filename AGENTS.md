@@ -101,7 +101,7 @@ npm run build                    # tsc -b && vite build → dist/
 npx astryx doctor --built dist   # required before delivering an app build
 npx astryx theme build src/themes/hanok-indigo/hanokIndigoTheme.ts   # after editing theme source
 npm run build && npx cap sync android && npx cap open android        # Android (not yet exercised)
-cd android && ./gradlew assembleDebug                                # CLI debug APK (not yet exercised)
+cd android && ./gradlew assembleDebug                                # CLI debug APK (shell build exercised)
 
 # prototype/
 npm run dev                      # http://127.0.0.1:5180
@@ -112,6 +112,9 @@ Last observed (2026-11-04):
 - `app`: lint exits 0 with one warning, `triple-slash-reference` in the generated `hanok-indigo.d.ts`. Build passes.
 - `doctor` exits 0 with a `theme-fonts` warning. The font is imported in `main.tsx` instead.
 - `prototype`: build passes.
+- Readiness smoke on the M1: `cap sync android` and `assembleDebug` pass; the shell APK installs and starts. `Medium_Phone`, API 37.0 Play Store 16 KB ARM64 revision 8, reports `PAGE_SIZE=16384`. Playwright-Android attaches to `com.streetfitting.app`; host WebGL works. The blank app shell is expected, not evidence of product functionality.
+- Emulator 37.2.13 raises configured 2048 MB RAM to 4096 MB at startup. Keep one emulator and serialize device checks. GPS console, UI hierarchy dump, 3-second console recording, and mono 16 kHz PCM16 speech-file generation were exercised.
+- Codex 0.166.0 noninteractive built-in image generation saved a real PNG. This is tool readiness only, not the S11 fixture corpus.
 
 ## Code Conventions & Common Patterns
 
