@@ -10,7 +10,7 @@ import {App as CapacitorApp} from '@capacitor/app';
 import {Capacitor} from '@capacitor/core';
 import {Thumbnail,Action,Button,Chip,Confirm,EditFields,Empty,Eyebrow,Heading,Hint,HStack,Icon,IconTile,Loading,Media,Panel,PhotoView,Problem,Reveal,RowButton,Section,SkeletonGrid,SkeletonPhoto,SkeletonRows,SkeletonText,Stat,Text,TileButton,VStack} from '../ui/components';
 import {reducedMotion,returning} from '../ui/easing';
-import {BagIcon,CameraIcon,HangerIcon,NoteIcon,PinIcon,ShieldIcon,SparkleIcon,StoreIcon,TrashIcon,PencilIcon,ImageIcon} from '../ui/icons';
+import {BagIcon,CameraIcon,HangerIcon,LockIcon,NoteIcon,PinIcon,ShieldIcon,SparkleIcon,StoreIcon,TrashIcon,PencilIcon,ImageIcon} from '../ui/icons';
 
 function failureCode(error:unknown):string {
   return typeof error==='object'&&error!==null&&'code'in error?String(error.code):'unknown';
@@ -52,6 +52,22 @@ function AllSaved({pieces,open,onClose,onOpenPiece}:{pieces:Piece[];open:boolean
       <Grid columns={3} gap={2}>{pieces.map(piece=><PieceTile key={piece.id} piece={piece} onOpen={()=>onOpenPiece(piece)}/>)}</Grid>
     </VStack>
   </BottomSheet>;
+}
+// The three local-only facts people ask about most, worded as on the Privacy screen, with a way into it.
+const PRIVACY_FACTS=[
+  [LockIcon,'Your original self photo stays here. Try-on uses a copy with your face and hair removed.'],
+  [PinIcon,'Your route is recorded only while shopping, and deleted when you end the trip.'],
+  ['search','Your photo search index never leaves this phone.'],
+] as const;
+function PrivacyCard({onOpen}:{onOpen:()=>void}) {
+  return <Panel gap={4} padding={4}>
+    <HStack gap={3} vAlign="center">
+      <IconTile icon={ShieldIcon} tone="success"/>
+      <VStack gap={0.5} style={{flex:1,minWidth:0}}><Heading level={3}>What stays on your phone</Heading><Text type="supporting" size="sm">Some things never leave it. Others go to Meta’s AI so you can search and try on.</Text></VStack>
+    </HStack>
+    <VStack gap={3}>{PRIVACY_FACTS.map(([glyph,text])=><HStack key={text} gap={3} vAlign="start"><IconTile icon={glyph} tone="muted" size="sm"/><Text size="sm" style={{flex:1,minWidth:0,alignSelf:'center'}}>{text}</Text></HStack>)}</VStack>
+    <Button label="See how Ibo handles your data" variant="secondary" width="100%" endContent={<Icon icon="chevronRight" size="sm"/>} onClick={onOpen}/>
+  </Panel>;
 }
 function EndShopping({style}:{style?:CSSProperties}) {
   const {services,popTo}=useUi();
@@ -112,7 +128,7 @@ export function Home() {
       <Divider/>
       <RowButton flat label="Try-ons" start={<IconTile icon={ImageIcon}/>} meta={data.data?(data.data.results?`${data.data.results} ${data.data.results===1?'look':'looks'}, kept on this phone`:'No looks yet'):undefined} onClick={()=>push({name:'results'})}/>
     </Panel>
-    <Hint icon={ShieldIcon}>Your original self photo and route history never leave this phone.</Hint>
+    <PrivacyCard onOpen={()=>push({name:'privacy'})}/>
     <AllSaved pieces={pieces} open={allSaved} onClose={closeAllSaved} onOpenPiece={piece=>{setAllSaved(false);push({name:'item',pieceId:piece.id});}}/>
   </>;
 }
