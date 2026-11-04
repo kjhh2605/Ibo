@@ -1,6 +1,6 @@
 # S08 실제 owner 통합 체크포인트
 
-상태: **실제 모듈 통합·도달 가능한 브라우저 흐름 검증 완료, 전체 acceptance 미완료**. Result 생성까지의 검증은 실제 person-mask 입력 부재로 막혔다. 이 문서는 native/model/API 성공 또는 인간 UI 승인을 의미하지 않는다.
+상태: 초기 worker 인계는 실제 person-mask 입력 부재로 전체 acceptance 미완료였다. 이후 coordinator가 실제 Android mask 산출물을 연결해 **browser full/states의 13개 route와 실제 모듈 경로의 Result 저장/삭제를 검증**했다. 아래 초기 기록과 마지막 후속 절을 구분한다. provider 응답은 명시적 합성이며 native 전체 E2E·실제 API 품질·사람 privacy 승인으로 간주하지 않는다.
 
 ## 실제 연결
 
@@ -48,9 +48,9 @@ node --experimental-strip-types src/ui/verify-web.ts --scenario full --mode mock
 node --experimental-strip-types src/ui/verify-web.ts --scenario states --mode mock
 ```
 
-**두 명령은 exit 1**: 실제 `FaceMask.register`에 필요한 person fixture가 없어 안전한 self 등록에 실패한다. Generate가 disabled인 것을 확인한 뒤 명시적으로 실패한다. `full/matrix.json`, `states/matrix.json`과 각 PNG가 도달한 흐름·실패를 기록한다. 실패를 PASS로 바꾸거나 Result를 seed하지 않았다.
+**초기 두 명령은 exit 1**이었다. 당시 person fixture가 없어 안전한 self 등록에 실패했고 Result를 seed하지 않았다. 이후 coordinator 수정·실행으로 `full/matrix.json`, `states/matrix.json` 및 PNG는 최신 통과 관측으로 갱신됐다. 변경 전 기록은 Git 이력에 보존한다.
 
-### 관측한 화면·상태
+### 초기 worker가 관측한 화면·상태
 
 | Route | 실제 관측 |
 |---|---|
@@ -83,11 +83,11 @@ Chromium의 geolocation override 변경은 새 fix 전 `POSITION_UNAVAILABLE(cod
 - 실패 입력 제거 → Start shopping 성공(recording) → 실제 End shopping 확인 → idle, camera preview DOM0을 관측했다.
 - raw 관측 값: [`cleanup-location.json`](cleanup-location.json). 시각 증거: [`cleanup-failure.png`](cleanup-failure.png), [`cleanup-recovered.png`](cleanup-recovered.png), [`media-cleanup-failure.png`](media-cleanup-failure.png), [`location-permission.png`](location-permission.png), [`location-transient.png`](location-transient.png), [`location-service.png`](location-service.png).
 
-full/states의 screenshot 파일은 각 디렉터리의 `01-home.png`, `02-capture.png`, `03-search.png`, `04-pick.png`, `05-item.png`, `06-walk-route.png`, `07-arrived.png`, `08-trips.png`, `09-trip.png`, `10-wardrobe.png`, `11-privacy.png`, `12-results-empty.png`, `failure.png`다. `failure.png`는 안전한 self 등록 실패의 Outfit 화면이지 Result 성공 화면이 아니다.
+최신 full/states screenshot 목록은 각 `matrix.json`에 기록한다. 각 15장에 `10b-wardrobe-saved.png`, `13-outfit.png`, `14-result.png`가 포함된다. 이전 실패 이미지는 현재 증거에서 제거했으며 Git 이력에 남아 있다.
 
-## 남은 실제 입력·검증 조건
+## 초기 인계에서 요청한 실제 입력·검증 조건
 
-필요한 것은 빠진 owner export가 아니라 아래 **실제 mask 값**이다. 확인된 입력 크기·bytes SHA256:
+인계 당시 빠진 것은 owner export가 아니라 아래 실제 mask 값이었다. self/provider person 산출물은 이후 M1에서 확보했으며 마지막 후속 절에 기록한다. 확인된 입력 크기·bytes SHA256:
 
 | 입력(모두 `verification/fixtures/` 아래) | 크기 | SHA256 | 필요한 출력 |
 | --- | --- | --- | --- |
@@ -154,3 +154,17 @@ verification/results/2026-11-04-s08-ui/CHECKPOINT.md
 인계된 실제 Pick screenshot에서 공통 Shell의 H1과 본문 Section의 같은 제목이 연속으로 표시되는 것을 확인했다. Search/Pick/Result/Results/Wardrobe의 중복 본문 제목만 제거하고 Shell 제목과 목적이 다른 하위 제목은 유지했다. 실제 Chromium 클릭으로 Ask/Wardrobe/Results/Pick을 열어 해당 제목이 각각 1개임을 확인했다. [Pick 시각 증거](single-title-pick.webp). Result 성공 화면은 기존 native mask 선행 조건 때문에 여전히 미확인이다.
 
 수정 후 `npm run lint && npm run build && npx astryx doctor --built dist && npx vitest run`은 exit 0, 18 files/227 tests 통과(835ms). 기존 lint 24개·theme-fonts·bundle 크기 경고는 동일하다. 검사용 탭과 서버는 종료했다.
+
+## Coordinator 후속: 실제 Android masks와 Result 경로
+
+- M1의 `d6961bf`(이 브랜치 `c9d3d8f`)는 실제 Android ORT/EdgeTAM 13개 입력 × 3개 person mask와 score를 제공한다. web loader는 source SHA256, mask SHA256, 입력 크기, full-resolution binary0/255와 유한 score를 확인한다. 실제 모델 산출물이지 사람 head GT가 아니다.
+- 실제 self 등록이 ready가 된 뒤에도 최초 runner는 초기 empty 상태를 완료로 잘못 판정했다. ready와 import sheet 종료를 기다리도록 고쳤다. 실패를 성공으로 바꾸는 상태 override는 없다.
+- 원 합성 provider `9895…`는 실제 세 mask 모두 head geometry를 찾지 못했다. FaceMask 안전 검사를 유지하며 unsafe-provider 입력으로 보존했다. 정상 mock 응답은 별도 `synthetic-full-person-output.png`(기존 calibration-hat `8cae…` bytes 복사)와 그 입력에서 실제 추출한 masks를 쓴다. **Muse 출력이나 실제 try-on 품질 증거가 아니다.**
+- 실제 모듈의 미보정 threshold 분기가 얼굴 없는 새 파일을 만들고 Store가 Result를 저장했다. 생성 직후 삭제가 완료된 Outfit으로 돌아가는 버그를 관측해 Try-ons 복귀로 고쳤고, 관련 navigation 회귀 검사를 추가했다.
+- 최초 Result 연결 후 `full` 13개 route/42개 관측, `states` 13개 route/77개 관측이 exit 0이었다. 실제 wardrobe 저장까지 확장한 최신 실행은 각각 **49개/88개 관측**, 13개 route로 exit 0이다. states의 offline 전환이 Chromium 위치 오류를 내는 경우 위치 입력을 다시 공급하고 실제 Try again으로 복구한다. 다른 오류는 허용하지 않는다.
+- browser tool로도 실제 선택→저장→self 등록→Generate를 클릭했다. try-on 요청 1회, export 0회, 새로고침 후 동일 Result ID 보존, 기록에서 재개방, 삭제 후 Results 빈 목록과 원 Piece 1개 보존을 확인했다. [시각 증거](actual-mask-result.webp), [관측 JSON](actual-mask-result.json).
+- Astryx Thumbnail의 label은 행동이 아니라 콘텐츠 이름이다. 중복 "Open Open…"을 없애고 실제 기록 버튼이 `Open look with <label>`로 접근되도록 caller를 고쳤다.
+- M1 `e68d9b3`(이 브랜치 `c0f38fb`)의 wardrobe-jeans mask3개를 기록된 `(0.5,0.5)` prompt에 연결했다. 취소 후 재수입, 실제 cutout 저장, 오프라인 naming 대기→재연결 완료, 재시작 후 동일 Piece 보존, wardrobe 상세에 Walk back 없음, 삭제 후 빈 목록을 확인했다. [직접 browser 관측](actual-mask-wardrobe.json). mock naming의 `Blue jacket`은 실제 jeans 인식 품질을 뜻하지 않는다.
+- 검증 harness는 picker sheet가 입력을 가로채지 않는지 확인한 뒤 정확한 기록 좌표의 키보드 prompt를 보낸다. native-web의 정확한 fixture 좌표 비교는 느슨하게 바꾸지 않았다. offline naming 검증 중 공통 route helper가 연결을 다시 켜던 문제도 제거했다.
+- 최종 `npm run lint && npm run build && npx astryx doctor --built dist && npx vitest run`: exit 0, 18 files/228 tests 통과(729ms). 기존 lint 24개·theme-fonts·bundle 경고 유지. 검사용 탭·서버 종료.
+- 남은 범위: native 전체 mock/live E2E, 사람 GT 기반 privacy·품질·provenance·인간 UI 승인. 13개 route 도달을 이 별도 gate들의 합격으로 확대하지 않는다.

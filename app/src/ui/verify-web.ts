@@ -12,14 +12,21 @@ const scenario=args[args.indexOf('--scenario')+1];
 if(!['full','states','serve'].includes(scenario)||args[args.indexOf('--mode')+1]!=='mock')throw new Error('Expected --scenario full|states|serve --mode mock');
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'../../..');
 const fixtureRoot=resolve(process.env.SF_UI_FIXTURE_ROOT??resolve(root,'verification/fixtures'));
+const nativeProofRoot=resolve(process.env.SF_UI_NATIVE_MASK_ROOT??resolve(root,'verification/results/2026-11-04-m1-resume'));
 const output=resolve(root,'verification/results/2026-11-04-s08-ui',scenario);
 await stat(resolve(fixtureRoot,'store/e2e.json'));
+await stat(resolve(nativeProofRoot,'person-mask-export-after.json'));
 await mkdir(output,{recursive:true});
 const fixtures=createServer(async(request,response)=>{
   response.setHeader('Access-Control-Allow-Origin','*');
   try {
-    const path=resolve(fixtureRoot,decodeURIComponent(new URL(request.url??'/', 'http://localhost').pathname).slice(1));
-    if(!path.startsWith(fixtureRoot+sep))throw new Error('Outside fixture root');
+    const requested=decodeURIComponent(new URL(request.url??'/', 'http://localhost').pathname);
+    const native=requested.startsWith('/native-proof/');
+    const relative=requested.slice(native?'/native-proof/'.length:1);
+    if(native&&relative!=='person-mask-export-after.json'&&!relative.startsWith('person-masks/'))throw new Error('Unknown native proof asset');
+    const base=native?nativeProofRoot:fixtureRoot;
+    const path=resolve(base,relative);
+    if(!path.startsWith(base+sep))throw new Error('Outside fixture root');
     const bytes=await readFile(path);
     response.setHeader('Content-Type',extname(path)==='.png'?'image/png':extname(path)==='.json'?'application/json':'application/octet-stream');response.end(bytes);
   }catch {response.writeHead(404);response.end('Fixture unavailable');}
@@ -30,7 +37,7 @@ if(!fixtureAddress||typeof fixtureAddress==='string')throw new Error('No fixture
 const reserve=createServer();reserve.listen(0,'127.0.0.1');await once(reserve,'listening');
 const address=reserve.address();if(!address||typeof address==='string')throw new Error('No browser server address');const port=address.port;
 const reservedClosed=once(reserve,'close');reserve.close();await reservedClosed;
-const server=spawn(process.execPath,['node_modules/vite/bin/vite.js','--host','127.0.0.1','--port',String(port),'--strictPort'],{cwd:resolve(root,'app'),env:{...process.env,VITE_SF_RUNTIME:'web-mock',VITE_SF_RELAY_MODE:'mock',VITE_SF_VERIFICATION:'1',VITE_SF_WEB_FIXTURES:`http://127.0.0.1:${fixtureAddress.port}`},stdio:['ignore','pipe','pipe']});
+const server=spawn(process.execPath,['node_modules/vite/bin/vite.js','--host','127.0.0.1','--port',String(port),'--strictPort'],{cwd:resolve(root,'app'),env:{...process.env,VITE_SF_RUNTIME:'web-mock',VITE_SF_RELAY_MODE:'mock',VITE_SF_VERIFICATION:'1',VITE_SF_WEB_NATIVE_MASKS:'1',VITE_SF_WEB_FIXTURES:`http://127.0.0.1:${fixtureAddress.port}`},stdio:['ignore','pipe','pipe']});
 let serverLog='';server.stdout.on('data',bytes=>{serverLog+=String(bytes);});server.stderr.on('data',bytes=>{serverLog+=String(bytes);});
 const url=`http://127.0.0.1:${port}`;
 try {

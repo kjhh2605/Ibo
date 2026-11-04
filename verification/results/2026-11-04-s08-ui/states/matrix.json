@@ -1,5 +1,5 @@
 {
-  "passed": false,
+  "passed": true,
   "scenario": "states",
   "routes": [
     "home",
@@ -13,7 +13,8 @@
     "trip",
     "wardrobe",
     "privacy",
-    "results"
+    "results",
+    "result"
   ],
   "matrix": [
     {
@@ -277,6 +278,26 @@
       "passed": true
     },
     {
+      "route": "pick",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "pick",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "wardrobe",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "wardrobe",
+      "state": "actual-tap-save-offline-naming-recovery",
+      "passed": true
+    },
+    {
       "route": "home",
       "state": "normal",
       "passed": true
@@ -347,8 +368,93 @@
       "passed": true
     },
     {
-      "route": "outfit",
-      "state": "mask-failure-blocks-upload",
+      "route": "result",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "result",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "results",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "results",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "home",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "home",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "item",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "item",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "home",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "home",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "home",
+      "state": "deletion-persists",
+      "passed": true
+    },
+    {
+      "route": "wardrobe",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "wardrobe",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "item",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "item",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "wardrobe",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "wardrobe",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "wardrobe",
+      "state": "reload-preserves-cutout-and-delete-removes-it",
       "passed": true
     }
   ],
@@ -363,20 +469,21 @@
     "08-trips.png",
     "09-trip.png",
     "10-wardrobe.png",
+    "10b-wardrobe-saved.png",
     "11-privacy.png",
     "12-results-empty.png",
-    "failure.png"
+    "13-outfit.png",
+    "14-result.png"
   ],
-  "failure": "Self registration did not succeed through the real FaceMask plugin; missing/failed person fixtures cannot be replaced by UI success.",
+  "failure": null,
   "snapshot": {
     "mode": "mock",
     "relayBaseUrl": "http://127.0.0.1:8787",
     "resultDownload": false,
-    "route": "outfit",
+    "route": "wardrobe",
     "stack": [
       "home",
-      "item",
-      "outfit"
+      "wardrobe"
     ],
     "sheet": null,
     "online": true,
@@ -387,12 +494,12 @@
     },
     "ids": {
       "trips": [
-        "19f9000b-b1f3-463e-bc15-701226cb41c4",
-        "59b6b8b8-d8a5-462a-89b0-5cf316b37a80"
+        "ce0588c2-d27b-4fd7-b0a5-877cedd36ca0",
+        "dc5315c8-6592-4e9d-b2ae-1f149d53a39a"
       ],
       "photos": [
-        "302be8aa-36bc-43a0-bd78-1fd0371a8792",
-        "ad12dff6-5dc6-4a1a-b8cf-86f84ba1326d",
+        "68fd735a-990b-41ad-826e-71734ce5dfe0",
+        "ebe4d080-3c16-47e7-a50c-98de77335617",
         "saturday-shop2-photo5",
         "saturday-shop2-photo4",
         "saturday-shop2-photo3",
@@ -402,19 +509,18 @@
         "saturday-shop1-photo1"
       ],
       "pieces": [
-        "piece:1801990a72f3f6a2f0d41d6a66e06734cc92a388f2fa4ac75dd95cb3cb1fe02d",
-        "piece:8881757de9663e89ad7b47607f4ffa20ebb2471fe69f9816f93361326fa1300a"
+        "piece:1801990a72f3f6a2f0d41d6a66e06734cc92a388f2fa4ac75dd95cb3cb1fe02d"
       ],
       "results": []
     },
     "queue": [],
     "fitting": {
       "draft": {
-        "targetPieceId": "piece:8881757de9663e89ad7b47607f4ffa20ebb2471fe69f9816f93361326fa1300a",
+        "targetPieceId": null,
         "companionPieceIds": []
       },
       "phase": "idle",
-      "selfState": "failed",
+      "selfState": "empty",
       "resultId": null
     },
     "agent": {
@@ -428,14 +534,11 @@
     },
     "walk": null,
     "transport": {
-      "counts": {
-        "/v1/route": 3,
-        "/v1/describe/piece": 1
-      },
+      "counts": {},
       "rawSelfReads": 0,
       "headMaskReads": 0,
       "resultExports": 0,
-      "knownSelfVersions": 0,
+      "knownSelfVersions": 1,
       "scope": "relay-attempts/shared-file-reads/media-export-attempts"
     }
   },
