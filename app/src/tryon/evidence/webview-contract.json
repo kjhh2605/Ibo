@@ -1,0 +1,28 @@
+{
+  "surface": "Actual Android WebView",
+  "boundary": "Explicit synthetic Store/FaceMask/provider contract fixtures; not native ML or real Meta quality proof",
+  "stages": [
+    "idle",
+    "idle",
+    "idle",
+    "idle",
+    "idle",
+    "idle",
+    "idle",
+    "preparing",
+    "sending",
+    "compositing",
+    "saving",
+    "complete"
+  ],
+  "uploadedImages": 7,
+  "exposedFixtureHeadPixels": 0,
+  "selfBytesDifferFromRaw": true,
+  "snapshotLabel": "Garment 0",
+  "snapshotWalkToPreserved": true,
+  "resultFaceless": true,
+  "providerBytesUnchanged": true,
+  "resultFilesDistinct": true,
+  "inputsExcludeResultsAndOriginals": true,
+  "temporaryFilesRemoved": true
+}

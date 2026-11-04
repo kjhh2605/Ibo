@@ -1,0 +1,16 @@
+{
+  "platform": "android",
+  "calls": [
+    "Store.get",
+    "Store.getSelfPhoto"
+  ],
+  "failures": {
+    "start": "unimplemented",
+    "generate": "invalid_composition",
+    "selfPhoto": "unimplemented",
+    "download": "result_download_disabled"
+  },
+  "generated": null,
+  "uploads": 0,
+  "scope": "Actual Android WebView controller and Store bridge; S00 native repository is unimplemented. No fake native success and no provider request."
+}
