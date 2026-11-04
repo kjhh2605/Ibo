@@ -6,7 +6,7 @@ import type {AgentState} from '../ui/services';
 import {candidateId} from '../data';
 import {imageUrl} from '../ui/images';
 import {useData, useUi} from '../ui/state';
-import {Action, Button, Confirm, Empty, Heading, HStack, Loading, Problem, Section, Text, TextInput, VStack} from '../ui/components';
+import {Action, Button, Confirm, Empty, Heading, HStack, Loading, Problem, Text, TextInput, VStack} from '../ui/components';
 
 type PickRoute = Extract<Route, {name: 'pick'}>;
 type ImagePoint = {x: number; y: number};
@@ -350,7 +350,7 @@ export function Ask() {
   const displayQuery = operationError ? (lastAttempt.current?.kind === 'text' ? lastAttempt.current.query : null) : state.query;
   const failure = operationError ?? state.error?.code;
   const examples = ['the blue puffer at the outdoor stall', 'red dress from the second shop', 'gray blazer about 20 min ago'];
-  return <Section title="Find it">
+  return <VStack gap={4}>
     <Text type="supporting">Search across all your trips</Text>
     <VStack gap={3}>
       <TextInput type="search" label="Describe the item" value={text} onChange={setText} onEnter={() => submit()} placeholder="e.g. the jacket at the blue tarp stall" isDisabled={listening || transcribing} hasClear />
@@ -387,7 +387,7 @@ export function Ask() {
     {status === 'error' && <Button label="Ask again" variant="secondary" onClick={askAgain} />}
     <Button label="Browse your trips" variant="secondary" onClick={() => push({name: 'trips'})} />
     <Text type="supporting">Your words and shop summaries from all trips, including your notes, are sent to Spark to find the photo. Up to three selected shopping photos can be sent to SAM for item outlines. Photos of you, location coordinates, and photo embeddings are not part of this search.</Text>
-  </Section>;
+  </VStack>;
 }
 
 function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
@@ -565,7 +565,8 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
     current.save = task;
   };
 
-  return <Section title={route.mode === 'wardrobe' ? 'Add to wardrobe' : 'Pick the item'}>
+  return <VStack gap={4}>
+    {route.mode === 'wardrobe' && <Heading level={2}>Add to wardrobe</Heading>}
     <Text type="supporting">{route.mode === 'wardrobe' ? 'Tap the piece you own' : `${shop ? `Shop ${shop.n} · ` : ''}${new Date(trip?.startedAt ?? photo!.takenAt).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})} · ${new Date(photo!.takenAt).toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit'})}`}</Text>
     {!online && <Text role="status">You’re offline. You can still select, save, and delete local items. New item names will be queued until you reconnect.</Text>}
     {photo && !saving && <HStack gap={3} wrap="wrap">
@@ -596,7 +597,7 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
     {chosen && !route.concept && <Text type="supporting">This will be saved as “Picked item” while its name and category are prepared. You can edit them after saving.</Text>}
     <Button label={route.mode === 'wardrobe' ? 'Add to wardrobe' : route.mode === 'outfit' ? 'Add to outfit' : 'Use this item'} variant="primary" isLoading={saving} isDisabled={!chosen || !maskReady || segmenting || atLimit} onClick={complete} />
     <Button label={route.mode === 'outfit' ? 'Cancel and return to outfit' : 'Cancel'} variant="ghost" onClick={() => {if (route.mode === 'outfit') popTo('outfit'); else back();}} />
-  </Section>;
+  </VStack>;
 }
 
 export function Pick({route}: {route: PickRoute}) {

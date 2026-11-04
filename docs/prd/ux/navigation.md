@@ -14,6 +14,7 @@ R9 추가 근거: D-R9-03(결과 스냅샷·대상 삭제), D-R9-04(Visit 제거
 - 피팅에서 trip 사진 선택을 시작하면 조합을 보존한 채 `trips(forOutfit)` → `trip(forOutfit)` → `pick(mode: outfit)`을 연다. "Add to outfit"은 조각을 자동 저장하고 동반 최대 5를 지키며 원래 `outfit`으로 반환한다. 일반 선택의 Item 완료 경로와 구분한다(D-R4-07, D-R4-08, D-R9-04).
 - 길 안내 진입은 Item과 Result뿐이다. Result는 대상 삭제 후에도 스냅샷으로 안내하며, 대상이 없을 때 "Change pieces"만 비활성화한다(D-R9-03, D-R9-04).
 - 홈 검색창은 Find it으로만 진입하며 마이크가 없다. 마이크는 Find it 입력창에만 있다(D-R7-09).
+- 구현의 공통 Shell은 화면 제목을 H1 한 번만 표시한다. Find it/Pick/Your look/Try-ons/Wardrobe 본문이 같은 제목을 H2로 반복하지 않는다. 옷장 선택의 "Add to wardrobe"처럼 목적이 다른 문맥 제목은 유지한다. 이는 중복 렌더링 수정이며 새로운 배치의 인간 승인을 뜻하지 않는다.
 
 ```mermaid
 flowchart LR
