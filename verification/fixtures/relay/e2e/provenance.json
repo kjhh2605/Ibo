@@ -1,0 +1,5 @@
+{
+  "sourceType": "hand-authored",
+  "providerRecording": false,
+  "purpose": "Three-shop Android full-flow replay; native PE score is schema-validated, not a quality assertion. Semantic visit order, note, candidate counts and input roles are matched. No clock/ID override."
+}

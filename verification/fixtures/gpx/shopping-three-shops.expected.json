@@ -54,7 +54,7 @@
       "elapsedS": 30,
       "event": "shop2-item",
       "accuracyM": 5,
-      "distanceToDestinationM": 65
+      "distanceToDestinationM": 0
     },
     {
       "index": 6,

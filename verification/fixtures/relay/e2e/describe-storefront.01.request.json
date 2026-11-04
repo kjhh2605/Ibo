@@ -1,0 +1,18 @@
+{
+  "expected": {
+    "image": {
+      "mimeType": "image/png",
+      "data": {
+        "asset": "assets/shop-1.png"
+      },
+      "width": 310,
+      "height": 309
+    }
+  },
+  "match": [
+    "/image/mimeType"
+  ],
+  "ignore": [
+    "/image/data"
+  ]
+}

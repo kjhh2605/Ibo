@@ -1,0 +1,130 @@
+{
+  "expected": {
+    "query": "Find the blue jacket in the second shop",
+    "queryToken": "runtime-token",
+    "toolResults": [
+      {
+        "toolCallId": "visit-call",
+        "name": "list_visits",
+        "result": {
+          "visits": [
+            {
+              "tripRef": "current",
+              "tripStartedAt": "2026-11-04T14:00:00+09:00",
+              "tripEndedAt": "2026-11-04T14:00:00+09:00",
+              "tripStatus": "ended",
+              "shopRef": "current-shop1",
+              "n": 1,
+              "startedAt": "2026-11-04T14:00:00+09:00",
+              "descriptionState": "done",
+              "description": "A blue awning above a dark storefront.",
+              "photoCount": 1,
+              "firstPhotoAt": "2026-11-04T14:00:00+09:00",
+              "lastPhotoAt": "2026-11-04T14:00:00+09:00",
+              "note": "blue tarp, near the entrance"
+            },
+            {
+              "tripRef": "current",
+              "tripStartedAt": "2026-11-04T14:00:00+09:00",
+              "tripEndedAt": "2026-11-04T14:00:00+09:00",
+              "tripStatus": "ended",
+              "shopRef": "current-shop2",
+              "n": 2,
+              "startedAt": "2026-11-04T14:00:00+09:00",
+              "descriptionState": "done",
+              "description": "A blue awning above a dark storefront.",
+              "photoCount": 1,
+              "firstPhotoAt": "2026-11-04T14:00:00+09:00",
+              "lastPhotoAt": "2026-11-04T14:00:00+09:00"
+            },
+            {
+              "tripRef": "current",
+              "tripStartedAt": "2026-11-04T14:00:00+09:00",
+              "tripEndedAt": "2026-11-04T14:00:00+09:00",
+              "tripStatus": "ended",
+              "shopRef": "current-shop3",
+              "n": 3,
+              "startedAt": "2026-11-04T14:00:00+09:00",
+              "descriptionState": "done",
+              "description": "A blue awning above a dark storefront.",
+              "photoCount": 1,
+              "firstPhotoAt": "2026-11-04T14:00:00+09:00",
+              "lastPhotoAt": "2026-11-04T14:00:00+09:00"
+            },
+            {
+              "tripRef": "prior",
+              "tripStartedAt": "2026-11-04T14:00:00+09:00",
+              "tripEndedAt": "2026-11-04T14:00:00+09:00",
+              "tripStatus": "ended",
+              "shopRef": "prior-shop1",
+              "n": 1,
+              "startedAt": "2026-11-04T14:00:00+09:00",
+              "descriptionState": "none",
+              "photoCount": 1,
+              "firstPhotoAt": "2026-11-04T14:00:00+09:00",
+              "lastPhotoAt": "2026-11-04T14:00:00+09:00"
+            },
+            {
+              "tripRef": "prior",
+              "tripStartedAt": "2026-11-04T14:00:00+09:00",
+              "tripEndedAt": "2026-11-04T14:00:00+09:00",
+              "tripStatus": "ended",
+              "shopRef": "prior-shop2",
+              "n": 2,
+              "startedAt": "2026-11-04T14:00:00+09:00",
+              "descriptionState": "none",
+              "photoCount": 1,
+              "firstPhotoAt": "2026-11-04T14:00:00+09:00",
+              "lastPhotoAt": "2026-11-04T14:00:00+09:00"
+            }
+          ],
+          "matchingCount": 5,
+          "truncated": false
+        }
+      }
+    ]
+  },
+  "match": [
+    "/query",
+    "/toolResults"
+  ],
+  "ignore": [
+    "/queryToken",
+    "/toolResults/0/toolCallId",
+    "/toolResults/0/result/visits/0/tripRef",
+    "/toolResults/0/result/visits/0/tripStartedAt",
+    "/toolResults/0/result/visits/0/tripEndedAt",
+    "/toolResults/0/result/visits/0/shopRef",
+    "/toolResults/0/result/visits/0/startedAt",
+    "/toolResults/0/result/visits/0/firstPhotoAt",
+    "/toolResults/0/result/visits/0/lastPhotoAt",
+    "/toolResults/0/result/visits/1/tripRef",
+    "/toolResults/0/result/visits/1/tripStartedAt",
+    "/toolResults/0/result/visits/1/tripEndedAt",
+    "/toolResults/0/result/visits/1/shopRef",
+    "/toolResults/0/result/visits/1/startedAt",
+    "/toolResults/0/result/visits/1/firstPhotoAt",
+    "/toolResults/0/result/visits/1/lastPhotoAt",
+    "/toolResults/0/result/visits/2/tripRef",
+    "/toolResults/0/result/visits/2/tripStartedAt",
+    "/toolResults/0/result/visits/2/tripEndedAt",
+    "/toolResults/0/result/visits/2/shopRef",
+    "/toolResults/0/result/visits/2/startedAt",
+    "/toolResults/0/result/visits/2/firstPhotoAt",
+    "/toolResults/0/result/visits/2/lastPhotoAt",
+    "/toolResults/0/result/visits/3/tripRef",
+    "/toolResults/0/result/visits/3/tripStartedAt",
+    "/toolResults/0/result/visits/3/tripEndedAt",
+    "/toolResults/0/result/visits/3/shopRef",
+    "/toolResults/0/result/visits/3/startedAt",
+    "/toolResults/0/result/visits/3/firstPhotoAt",
+    "/toolResults/0/result/visits/3/lastPhotoAt",
+    "/toolResults/0/result/visits/4/tripRef",
+    "/toolResults/0/result/visits/4/tripStartedAt",
+    "/toolResults/0/result/visits/4/tripEndedAt",
+    "/toolResults/0/result/visits/4/shopRef",
+    "/toolResults/0/result/visits/4/startedAt",
+    "/toolResults/0/result/visits/4/firstPhotoAt",
+    "/toolResults/0/result/visits/4/lastPhotoAt"
+  ]
+}

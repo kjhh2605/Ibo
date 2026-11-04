@@ -14,7 +14,9 @@ from pydantic import TypeAdapter
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'relay'))
 from app import schemas as wire
-FIX=ROOT/'verification/fixtures'
+from build_fixtures import FIX
+from app.mock import lookup, pointer_parts, _mismatch, _resolve
+from app.errors import ERRORS, RelayError
 REQUIRED={'normal','shop-specific','time-specific','note-specific','past-trip','not-found','turn-limit','voice-empty','photo-limit','upstream-timeout','tryon-policy','route-unavailable','direct-cut-shop'}
 MODELS={
  'search-turn':(wire.SearchTurnRequest,wire.SearchTurnResponse),
@@ -29,33 +31,13 @@ def dump(path,value):
  path.parent.mkdir(parents=True,exist_ok=True);path.write_text(json.dumps(value,indent=2)+'\n')
 
 def pointer(value,path):
- if not path:return value
- if not path.startswith('/') or re.search(r'~(?![01])',path):raise ValueError('invalid pointer')
- for key in path[1:].split('/'):
-  key=key.replace('~1','/').replace('~0','~')
-  value=value[int(key)] if isinstance(value,list) else value[key]
- return value
+ return lookup(value,pointer_parts(path))
 
 def child(path,key):return path+'/'+str(key).replace('~','~0').replace('/','~1')
 
 def mismatch(expected,actual,path,ignore):
- if path in ignore:return None
- if type(expected)!=type(actual):return path
- if isinstance(expected,dict):
-  keys=sorted(set(expected)|set(actual))
-  for key in keys:
-   at=child(path,key)
-   if at in ignore:continue
-   if key not in expected or key not in actual:return at
-   bad=mismatch(expected[key],actual[key],at,ignore)
-   if bad is not None:return bad
- elif isinstance(expected,list):
-  if len(expected)!=len(actual):return path
-  for i,(left,right) in enumerate(zip(expected,actual)):
-   bad=mismatch(left,right,child(path,i),ignore)
-   if bad is not None:return bad
- elif expected!=actual:return path
- return None
+ result=_mismatch(actual,expected,pointer_parts(path),{pointer_parts(p) for p in ignore})
+ return None if result is None else ''.join(child('',part) for part in result)
 
 def compare(definition,actual):
  for at in definition['match']:
@@ -74,13 +56,8 @@ def expand(value,directory,request=None,key=''):
   return {k:expand(v,directory,request,k) for k,v in value.items()}
  if isinstance(value,list):return [expand(v,directory,request,key) for v in value]
  if isinstance(value,str) and ('{{' in value or '}}' in value):
-  match=re.fullmatch(r'\{\{([A-Za-z][A-Za-z0-9_]*(?:(?:\.[A-Za-z][A-Za-z0-9_]*)|(?:\[\d+\]))*)\}\}',value)
-  if not match or request is None:raise ValueError('invalid echo')
-  tokens=re.findall(r'[A-Za-z][A-Za-z0-9_]*|\d+',match[1]); result=request
-  for token in tokens:result=result[int(token)] if isinstance(result,list) else result[token]
-  allowed={'photoRef','shopRef','pieceRef','toolCallId','id','photoRefs','shopRefs','pieceRefs'}
-  if key not in allowed or tokens[-1] not in allowed or not isinstance(result,str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,128}',result):raise ValueError('non-ref echo')
-  return result
+  # Reuse production ref/path rules, including whole ref arrays and tripRef.
+  return _resolve(value,request,directory,(key,))
  return value
 
 def tokens(value):
@@ -104,8 +81,8 @@ def ignored(value,path=''):
   for i,v in enumerate(value):result.extend(ignored(v,child(path,i)))
  return result
 
-def pair(directory,operation,step,request,body,status=200,match=None):
- ignore=ignored(request)
+def pair(directory,operation,step,request,body,status=200,match=None,ignore_extra=()):
+ ignore=ignored(request)+list(ignore_extra)
  if match is None:match=[child('',key) for key in request if child('',key) not in ignore]
  dump(directory/f'{operation}.{step:02}.request.json',{'expected':request,'match':match,'ignore':ignore})
  dump(directory/f'{operation}.{step:02}.response.json',{'status':status,'body':body})
@@ -176,9 +153,50 @@ def build():
   if scenario=='route-unavailable':result={'error':{'code':'route_unavailable','message':'No walking route available','retryable':False}}
   pair(directory,'route',1,{'origin':origin,'destination':dest},result,200 if scenario=='normal' else 404)
  for scenario in REQUIRED:dump(FIX/'relay'/scenario/'provenance.json',{'sourceType':'hand-authored','providerRecording':False,'purpose':'strict deterministic synthetic wire fixture; not model quality evidence','requestAssetNotation':'data.asset expanded for offline schema validation; all data paths ignored for request matching'})
+ build_e2e(seed)
+
+def build_e2e(seed):
+ """Actual three-shop capture path: dynamic IDs/times and native PE scores."""
+ directory=FIX/'relay/e2e';normal=FIX/'relay/normal';directory.mkdir(parents=True,exist_ok=True)
+ for path in normal.iterdir():
+  if path.is_dir():shutil.copytree(path,directory/path.name,dirs_exist_ok=True)
+  elif not path.name.startswith('search-'):shutil.copyfile(path,directory/path.name)
+ query='Find the blue jacket in the second shop';concept='a blue jacket'
+ context={'now':seed['now'],'timeZone':'Asia/Seoul'}
+ pair(directory,'search-turn',1,{'query':query,'context':context},{'toolCalls':[{'id':'visit-call','name':'list_visits','arguments':{}}]},ignore_extra=['/context/timeZone'])
+ visits=[]
+ for n in range(1,4):
+  visits.append({'tripRef':'current','tripStartedAt':seed['now'],'tripEndedAt':seed['now'],'tripStatus':'ended','shopRef':f'current-shop{n}','n':n,'startedAt':seed['now'],'descriptionState':'done','description':'A blue awning above a dark storefront.','photoCount':1,'firstPhotoAt':seed['now'],'lastPhotoAt':seed['now'],**({'note':'blue tarp, near the entrance'} if n==1 else {})})
+ # Runtime creates the prior trip through UI: two item-only shops, no notes.
+ for n in (1,2):
+  visits.append({'tripRef':'prior','tripStartedAt':seed['now'],'tripEndedAt':seed['now'],'tripStatus':'ended','shopRef':f'prior-shop{n}','n':n,'startedAt':seed['now'],'descriptionState':'none','photoCount':1,'firstPhotoAt':seed['now'],'lastPhotoAt':seed['now']})
+ req={'query':query,'queryToken':'runtime-token','toolResults':[{'toolCallId':'visit-call','name':'list_visits','result':{'visits':visits,'matchingCount':5,'truncated':False}}]}
+ pair(directory,'search-turn',2,req,{'toolCalls':[{'id':'find-call','name':'find_photos','arguments':{'phrase':concept,'shopRefs':['{{toolResults[0].result.visits[1].shopRef}}'],'k':3},'phraseVector':[1.0]+[0.0]*511}]})
+ found=[{'photoRef':'current-item2','shopRef':'current-shop2','takenAt':seed['now'],'score':0.5}]
+ req={'query':query,'queryToken':'runtime-token','toolResults':[{'toolCallId':'find-call','name':'find_photos','result':found}]}
+ pair(directory,'search-turn',3,req,{'toolCalls':[{'id':'extract-call','name':'extract_items','arguments':{'photoRefs':['{{toolResults[0].result[0].photoRef}}'],'concept':concept}}]},ignore_extra=['/toolResults/0/result/0/score'])
+ photos=[{'photoRef':'current-item2','image':image(directory,'images/shops/shop-2-items.png')}]
+ candidates=[]
+ for i,c in enumerate(json.loads((FIX/'masks/items/cases.json').read_text())['candidates'][4:8]):
+  candidates.append({'id':f'candidate-{i+1}','label':concept,'score':c['score'],'mask':image(directory,c['mask']),'bbox':c['bbox']})
+ pair(directory,'search-segment',1,{'queryToken':'runtime-token','photos':photos,'concept':concept},{'photos':[{'photoRef':'{{photos[0].photoRef}}','candidates':candidates}]})
+ req={'query':query,'queryToken':'runtime-token','toolResults':[{'toolCallId':'extract-call','name':'extract_items','result':[{'photoRef':'current-item2','candidateCount':4,'topScore':1.0}]}]}
+ pair(directory,'search-turn',4,req,{'final':{'photoRefs':['{{toolResults[0].result[0].photoRef}}'],'concept':concept,'summary':'Select the matching garment.'}})
+ request=json.loads((directory/'tryon.01.request.json').read_text())['expected']
+ request['target'].update(label=concept,category=concept)
+ request['companions']=[{**request['companions'][0],'pieceRef':'wardrobe','label':'Blue jacket','category':'jacket'},{**request['target'],'pieceRef':'direct','label':'Blue jacket','category':'jacket'}]
+ # Native cutouts/self geometry is schema-validated, not compared to AI rectangles.
+ geometry=[f'{prefix}/image/{axis}' for prefix in ['/selfPhoto','/target','/companions/0','/companions/1'] for axis in ['width','height']]
+ pair(directory,'tryon',1,request,json.loads((directory/'tryon.01.response.json').read_text())['body'],ignore_extra=geometry)
+ dump(directory/'provenance.json',{'sourceType':'hand-authored','providerRecording':False,'purpose':'Three-shop Android full-flow replay; native PE score is schema-validated, not a quality assertion. Semantic visit order, note, candidate counts and input roles are matched. No clock/ID override.'})
 
 def validate(root=FIX):
  errors=[];relay=root/'relay'
+ if not relay.is_dir():return ['missing relay fixture directory']
+ for directory in relay.iterdir():
+  if directory.is_dir() and not list(directory.glob('*.request.json')):errors.append('empty scenario '+directory.name)
+ for path in relay.glob('*/*.response.json'):
+  if not path.with_name(path.name.replace('.response.','.request.')).exists():errors.append('orphan response '+str(path.relative_to(root)))
  for missing in sorted(REQUIRED-{p.name for p in relay.iterdir() if p.is_dir()}):errors.append('missing scenario '+missing)
  for path in sorted(relay.glob('*/*.request.json')):
   try:
@@ -186,6 +204,7 @@ def validate(root=FIX):
    spec=json.loads(path.read_text());assert set(spec)=={'expected','match','ignore'}
    assert isinstance(spec['expected'],dict) and all(isinstance(spec[k],list) and all(isinstance(v,str) for v in spec[k]) for k in ('match','ignore'))
    assert spec['match'] and len(set(spec['match']))==len(spec['match']) and len(set(spec['ignore']))==len(spec['ignore']) and not set(spec['match'])&set(spec['ignore'])
+   assert not any(pointer_parts(m)[:len(pointer_parts(i))]==pointer_parts(i) for m in spec['match'] for i in spec['ignore']), 'ignored match ancestor'
    for at in spec['match']+spec['ignore']:
     assert not any(c in at for c in '*{}');pointer(spec['expected'],at)
    assert set(ignored(spec['expected']))<=set(spec['ignore']), 'volatile field is not ignored'
@@ -193,6 +212,14 @@ def validate(root=FIX):
    TypeAdapter(MODELS[operation][0]).validate_python(request)
    response=json.loads(path.with_name(path.name.replace('.request.','.response.')).read_text())
    assert set(response)<= {'status','body','headers'} and {'status','body'}<=set(response)
+   status=response['status'];headers=response.get('headers',{})
+   assert type(status) is int and isinstance(headers,dict) and not set(headers)-{'Retry-After'}
+   assert not headers or status==429 and isinstance(headers['Retry-After'],str) and re.fullmatch('[0-9]{1,6}',headers['Retry-After'])
+   if status!=200:
+    error=response['body']['error'];assert error['code'] in ERRORS and type(error['retryable']) is bool
+    failure=RelayError(error['code'],retryable=error['retryable'] if error['code']=='upstream_error' else None)
+    assert (failure.status,failure.retryable)==(status,error['retryable'])
+   else:assert not headers
    assert not tokens(response),'queryToken stored in response'
    body=expand(response['body'],path.parent,request)
    if response['status']<400 and operation in {'search-turn','search-segment'}:body['queryToken']='runtime-minted-test-token'

@@ -7,7 +7,7 @@
         "candidates": [
           {
             "id": "candidate-1",
-            "label": "blue jacket",
+            "label": "a blue jacket",
             "score": 1.0,
             "mask": {
               "mimeType": "image/png",
@@ -26,7 +26,7 @@
           },
           {
             "id": "candidate-2",
-            "label": "striped shirt",
+            "label": "a blue jacket",
             "score": 0.9,
             "mask": {
               "mimeType": "image/png",
@@ -45,7 +45,7 @@
           },
           {
             "id": "candidate-3",
-            "label": "gray coat",
+            "label": "a blue jacket",
             "score": 0.8,
             "mask": {
               "mimeType": "image/png",
@@ -64,7 +64,7 @@
           },
           {
             "id": "candidate-4",
-            "label": "red sweater",
+            "label": "a blue jacket",
             "score": 0.7,
             "mask": {
               "mimeType": "image/png",
@@ -85,6 +85,10 @@
       },
       {
         "photoRef": "{{photos[1].photoRef}}",
+        "candidates": []
+      },
+      {
+        "photoRef": "{{photos[2].photoRef}}",
         "candidates": []
       }
     ]

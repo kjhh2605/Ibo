@@ -1,0 +1,81 @@
+{
+  "expected": {
+    "selfPhoto": {
+      "image": {
+        "mimeType": "image/png",
+        "data": {
+          "asset": "assets/calibration-hat-masked.png"
+        },
+        "width": 508,
+        "height": 764
+      },
+      "headMasked": true
+    },
+    "target": {
+      "pieceRef": "target-shop",
+      "image": {
+        "mimeType": "image/png",
+        "data": {
+          "asset": "assets/shop-1-candidate-1.png"
+        },
+        "width": 310,
+        "height": 310
+      },
+      "label": "a blue jacket",
+      "category": "a blue jacket",
+      "origin": "shop"
+    },
+    "companions": [
+      {
+        "pieceRef": "wardrobe",
+        "image": {
+          "mimeType": "image/png",
+          "data": {
+            "asset": "assets/jeans-cutout.png"
+          },
+          "width": 310,
+          "height": 310
+        },
+        "label": "Blue jacket",
+        "category": "jacket",
+        "origin": "wardrobe"
+      },
+      {
+        "pieceRef": "direct",
+        "image": {
+          "mimeType": "image/png",
+          "data": {
+            "asset": "assets/shop-1-candidate-1.png"
+          },
+          "width": 310,
+          "height": 310
+        },
+        "label": "Blue jacket",
+        "category": "jacket",
+        "origin": "shop"
+      }
+    ]
+  },
+  "match": [
+    "/selfPhoto",
+    "/target",
+    "/companions"
+  ],
+  "ignore": [
+    "/selfPhoto/image/data",
+    "/target/pieceRef",
+    "/target/image/data",
+    "/companions/0/pieceRef",
+    "/companions/0/image/data",
+    "/companions/1/pieceRef",
+    "/companions/1/image/data",
+    "/selfPhoto/image/width",
+    "/selfPhoto/image/height",
+    "/target/image/width",
+    "/target/image/height",
+    "/companions/0/image/width",
+    "/companions/0/image/height",
+    "/companions/1/image/width",
+    "/companions/1/image/height"
+  ]
+}
