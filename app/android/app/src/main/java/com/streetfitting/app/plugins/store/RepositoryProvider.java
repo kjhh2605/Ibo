@@ -2,10 +2,12 @@ package com.streetfitting.app.plugins.store;
 
 import android.content.Context;
 
-/** S06 must replace this fail-closed extension point with its single-writer repository. */
+/** One repository and writer monitor shared by every native plugin. */
 public final class RepositoryProvider {
+    private static SqliteRepository instance;
     private RepositoryProvider() {}
-    public static NativeRepository get(Context context) {
-        throw new UnsupportedOperationException("Native repository is not implemented");
+    public static synchronized SqliteRepository get(Context context) {
+        if (instance == null) instance = new SqliteRepository(context.getApplicationContext());
+        return instance;
     }
 }
