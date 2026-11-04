@@ -93,3 +93,15 @@ UI 기준은 프로토타입(`prototype/`)이다. 흐름, 문구, 상태, 인터
 - 검증 도구는 Orca 없이 맥에서 돈다(D-R10-01). 앱 WebView는 Playwright-Android(`_android.webView`)로, 시스템 UI(권한, 알림 카드)는 `adb shell uiautomator dump`·`input tap`·`cmd statusbar expand-notifications`로 조작한다. GPS는 `adb emu geo fix`, 카메라와 음성은 debug fixture(D-R7-10), 데모 녹화는 `adb emu screenrecord`(한 번에 최대 180초, 구간별로 녹화해 ffmpeg로 이어 붙임)로 한다. Orca는 작업 분배에만 쓴다. 이 도구 조합은 M4 작업 기기에서 확인했고 M1에서는 S00·S11이 다시 확인한다(D-R10-03).
 - 실행 증거(리포트, 스크린샷, 개인정보 없는 수치)는 `verification/results/<run-id>/`에 커밋해 git으로 구현을 증명한다(D-R10-02).
 - 릴레이는 로컬 Mac에서만 돌린다. worktree마다 다른 `RELAY_PORT`를 쓰고, 에뮬레이터에서는 `10.0.2.2`로 접속한다(D-R6-05).
+
+## Goal 실행 준비와 워크트리 초기화
+
+2026-11-04 준비 점검에서 사용자가 별도로 준비 작업을 위임했다. S00 기능 구현은 아직 시작하지 않았다.
+
+- 현재 OMP의 `goal.enabled=true`, `goal.continuationModes=["interactive"]`다. 터미널의 `/goal` 또는 `omp --goal "<목표>"`를 사용한다. RPC/chat에서 자동 지속을 원하면 해당 실행 모드 지원과 설정을 따로 확인한다. Goal은 API 권한·모델 파일을 대신 제공하지 않는다.
+- Orca 새 워크트리의 기준은 `origin/main`이다. S00 merge → 웨이브 1 → S01 merge 후 S02/S03 → 통합 순서를 따른다. 구현 워크트리마다 담당 슬라이스와 소유 경로를 명시하고, 검증한 PR만 통합 담당이 순차 merge한다.
+- repo setup 명령은 `bash scripts/setup-worktree.sh`다. 이 스크립트는 `app`·`prototype`의 lockfile로 설치하고, `relay/pyproject.toml`이 생긴 뒤에는 `uv sync --locked`도 실행한다. 릴레이가 없으면 그 사실을 출력하며 준비 완료로 위장하지 않는다.
+- 포트는 `~/.cache/street-fitting/ports.json`의 호스트 공통 잠금으로 워크트리마다 배정하고 `.sf-worktree.env`에 기록한다. 이는 프로세스 소켓 예약이 아니므로 실제 시작 시 포트 충돌을 오류로 처리해야 한다. 각 작업자 셸은 저장소 루트에서 `source scripts/worktree-env.sh`로 환경을 읽는다.
+- 호스트 도구 설정은 `~/.config/street-fitting/env.sh`, 자격 증명은 같은 디렉터리의 `secrets.env`(권한 0600)에 둔다. 키를 repo setup 명령이나 에이전트 프롬프트에 넣지 않는다. `RELAY_MODE`는 자동 지정하지 않는다. `MODEL_API_KEY`, Firebase Admin 자격 증명, App Check 등록은 별도로 완료해야 한다.
+- `.github/workflows/validate.yml`은 PR의 앱 lint/build/Astryx doctor와 프로토타입 build만 검사한다. Android·모델·live E2E를 통과했다는 뜻이 아니며, 해당 증거는 각 슬라이스와 S11이 제공한다. 저장소는 공개 전환하지 않았다.
+- Orca setup 훅의 UI 등록은 별도 확인 대상이다. CLI의 `--setup run`은 등록된 훅을 실행할 뿐 설정하지 않는다. 훅이 비어 있는 동안에는 조정자가 각 워크트리에서 위 초기화 명령을 완료한 뒤 작업자를 시작한다.
