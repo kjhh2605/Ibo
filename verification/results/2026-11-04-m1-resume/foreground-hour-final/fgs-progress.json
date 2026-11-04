@@ -1,0 +1,148 @@
+{
+  "scope": "emulator liveness, not physical battery",
+  "requestedLocation": {
+    "intervalMs": 10000,
+    "minUpdateIntervalMs": 5000,
+    "maxUpdateDelayMs": 10000,
+    "source": "app/android/app/src/main/java/com/streetfitting/app/plugins/shopping/ShoppingService.java",
+    "scope": "native source configuration, not observed OS scheduling"
+  },
+  "samples": [
+    {
+      "elapsedMs": 10001,
+      "phase": "recording",
+      "foreground": true,
+      "trailCount": 4,
+      "newTrailPoints": 1,
+      "latestFixAdvanceMs": 10023
+    },
+    {
+      "elapsedMs": 50009,
+      "phase": "recording",
+      "foreground": true,
+      "trailCount": 8,
+      "newTrailPoints": 4,
+      "latestFixAdvanceMs": 40057
+    },
+    {
+      "elapsedMs": 90070,
+      "phase": "recording",
+      "foreground": true,
+      "trailCount": 12,
+      "newTrailPoints": 4,
+      "latestFixAdvanceMs": 40062
+    },
+    {
+      "elapsedMs": 130140,
+      "phase": "recording",
+      "foreground": true,
+      "trailCount": 16,
+      "newTrailPoints": 4,
+      "latestFixAdvanceMs": 40071
+    },
+    {
+      "elapsedMs": 170338,
+      "phase": "recording",
+      "foreground": true,
+      "trailCount": 20,
+      "newTrailPoints": 4,
+      "latestFixAdvanceMs": 40069
+    },
+    {
+      "elapsedMs": 201255,
+      "phase": "recording",
+      "foreground": true,
+      "trailCount": 23,
+      "newTrailPoints": 3,
+      "latestFixAdvanceMs": 31041
+    },
+    {
+      "elapsedMs": 241492,
+      "phase": "recording",
+      "foreground": true,
+      "trailCount": 27,
+      "newTrailPoints": 4,
+      "latestFixAdvanceMs": 40254
+    },
+    {
+      "elapsedMs": 272449,
+      "phase": "recording",
+      "foreground": true,
+      "trailCount": 30,
+      "newTrailPoints": 3,
+      "latestFixAdvanceMs": 30860
+    },
+    {
+      "elapsedMs": 303075,
+      "phase": "recording",
+      "foreground": true,
+      "trailCount": 33,
+      "newTrailPoints": 3,
+      "latestFixAdvanceMs": 30700
+    },
+    {
+      "elapsedMs": 333476,
+      "phase": "recording",
+      "foreground": true,
+      "trailCount": 36,
+      "newTrailPoints": 3,
+      "latestFixAdvanceMs": 30409
+    },
+    {
+      "elapsedMs": 364657,
+      "phase": "recording",
+      "foreground": true,
+      "trailCount": 39,
+      "newTrailPoints": 3,
+      "latestFixAdvanceMs": 31032
+    },
+    {
+      "elapsedMs": 404913,
+      "phase": "recording",
+      "foreground": true,
+      "trailCount": 43,
+      "newTrailPoints": 4,
+      "latestFixAdvanceMs": 40316
+    },
+    {
+      "elapsedMs": 435697,
+      "phase": "recording",
+      "foreground": true,
+      "trailCount": 46,
+      "newTrailPoints": 3,
+      "latestFixAdvanceMs": 30819
+    },
+    {
+      "elapsedMs": 475642,
+      "phase": "recording",
+      "foreground": true,
+      "trailCount": 50,
+      "newTrailPoints": 4,
+      "latestFixAdvanceMs": 40038
+    },
+    {
+      "elapsedMs": 515772,
+      "phase": "recording",
+      "foreground": true,
+      "trailCount": 54,
+      "newTrailPoints": 4,
+      "latestFixAdvanceMs": 40071
+    },
+    {
+      "elapsedMs": 555843,
+      "phase": "recording",
+      "foreground": true,
+      "trailCount": 58,
+      "newTrailPoints": 4,
+      "latestFixAdvanceMs": 40082
+    },
+    {
+      "elapsedMs": 595965,
+      "phase": "recording",
+      "foreground": true,
+      "trailCount": 62,
+      "newTrailPoints": 4,
+      "latestFixAdvanceMs": 40061
+    }
+  ]
+}

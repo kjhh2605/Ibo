@@ -35,16 +35,19 @@
 | 추론 측정 | 새 instrumentation 프로세스의 cold load 및 warmup 후 실제 encoder/decoder/PE 추론 | `ml-timing-after.json`; 전체 UI latency 합격을 대신하지 않음 |
 | 실제 권한 변형 | 최신 설치 APK에서 위치 거부/Settings, 알림 거부 상태의 실제 FGS와 notice, recording 중 위치 revoke 및 재진입 정리, camera/microphone 거부 등 5개 통과. 기존 레코드와 원래 권한 grant/user flag·Capacitor 권한 이력 복원 | `permissions-final/permissions.json`, `permissions-final/*.png`; 직전 APK 기록은 `permissions/`에 보존 |
 | release fixture 제외 | release DEX의 extra reader/fixture class 6개 marker 모두 0, fixture asset 경로 0. Debug positive control에서는 6개 모두 존재 | `release-exclusion.json`; release APK 설치·공개 배포를 의미하지 않음 |
+| 중단한 background FGS | 사용자 요청으로 1시간 테스트 중단. 마지막 관측 595,965 ms, 17개 sample이며 **1시간 합격 아님**. 테스트 소유 세션은 정상 stop으로 ended/idle 처리, Trail 71→0, FGS 종료 확인 | `foreground-hour-final/fgs-progress.json`, `foreground-hour-final/foreground-hour.json`; 실제 설치 APK hash도 c1881396… 일치 |
 
 Camera preview의 이전 최초 5초 드라이버 assertion은 실패했다. 실제 native open은 5802.3 ms 뒤 resolve했고, 이후 정상 preview와 셔터가 관측되었다. `native-capture-ui.json`, `native-capture-trace-after.json`에 실패와 관측을 보존한다. **5.8초를 latency 기준 통과로 보고하지 않는다.** 최신 UI smoke의 shopping 시작→preview 준비 측정에는 별도 synthetic GPS 갱신 대기가 포함되어 camera bind latency가 아니다.
 
 최신 native aggregate의 Capture 2건 실패는 외부 실행기가 Capture 명세의 고정 GPS 대신 다른 GPX를 주입한 결과다. 기대 좌표/제품 코드를 바꾸지 않고 명세의 GPS로 실패 class만 재실행해 6개 모두 통과했다. 원 aggregate의 실패는 `viewport-native-contracts.json`에 남겼다. 최신 APK에서 통과한 Shopping 6 + Capture 6 + Media 4 + Voice 7 + Store 14 + process 1+1의 증거를 별도로 읽어야 한다.
 
-## 남은 실행과 명시적 제외
+## 사용자 지시로 중단·제외한 범위
 
-- 실제 1시간 background FGS는 실행 중이며 아직 합격으로 보고하지 않는다. 초기 두 실행은 cm 수준의 GPS 좌표 동일성 assertion에서 중단되었다. 실제 native timestamp와 persisted trail 갱신은 `gps-freshness-diagnostic.json`에서 확인했으며, IEEE float32 원인 가설은 `gps-quantization.json`에서 일치하지 않았다. MacBook 승인 `c6eb36c`(M1 `aee8b8d`)의 metric 1 m target identity를 적용해 전체 1시간을 새로 실행한다. 이는 제품 위치 정책 변경이 아니며 strict timestamp 증가·persisted trail 갱신·최종 ≥3,600,000 ms 확인은 유지한다. 짧은 진단이나 force-stop을 1시간 지속성으로 대체하지 않는다.
+- 사용자 최신 지시 **“1시간 백그라운드 테스트 중단하고 나머지 작업 진행해. 내 개입 필요한거 빼고 전부 진행후 마무리”**에 따라 실행을 중단했다. 1시간 검증 상태는 `cancelled_by_user`, `passed:false`, `completedFullHour:false`다. 이후 정상 native stop으로 이 테스트의 세션·raw trail·FGS를 정리했다. 재실행하거나 짧은 관측을 1시간 합격으로 대체하지 않는다.
+- 초기 두 실행의 cm 수준 GPS 동일성 실패, 실제 timestamp/trail 갱신 진단, 일치하지 않은 IEEE float32 가설은 각각 `foreground-hour/`, `foreground-hour-fed/`, `gps-freshness-diagnostic.json`, `gps-quantization.json`에 보존한다. 승인 helper `c6eb36c`(M1 `aee8b8d`)는 metric 1 m target identity를 사용하되 strict timestamp·persisted trail·전체 시간 조건을 유지한다.
 - **사용자 범위 제외, PASS 아님:** 사람 승인 자산/face+hair GT·독립 heldout·재배포 동의 영어 음성과 이에 의존하는 full mock/live E2E, masking/피팅 품질·calibration·provenance/워터마크·live demo gate. self 양성 6건 GT 부재로 실패한 `face-mask-privacy-after.json`은 그대로 보존한다. 보호 조건·full CLI gate를 약화하지 않고 모델 출력을 GT로 승인하지 않는다.
-- 기존 human-dependent 최종 latency/memory·검색/음성/피팅/지도 full integration과 3분 영상도 이 체크포인트의 합격 항목이 아니다. 사람이 필요 없는 native/권한/FGS/설치 UI/패키징 검증은 별도로 계속 진행한다. result download는 계속 OFF다.
+- 기존 human-dependent 최종 latency/memory·검색/음성/피팅/지도 full integration과 3분 영상도 이 체크포인트의 합격 항목이 아니다. 사람이 필요 없는 native/권한/설치 UI/패키징 검증과 코드·증거 게시를 완료했다. result download는 계속 OFF다.
 - fixture/debug UI 관측용으로 만든 Trip/Photo ID는 각 report의 `retainedSmokeRecords`에 있다. 기존 사용자/다른 검사 데이터를 일괄 삭제하지 않는다.
+- 완료 후 소유 앱을 종료하고 `Medium_Phone` emulator shutdown 및 adb disconnect를 확인했다(`runtime-cleanup.json`). 이 세션의 기기 작업과 무거운 실행은 남아 있지 않다. main/PR 병합 없이 WIP 브랜치에만 게시한다.
 
 이전 `*-before.json`, `native-contracts*.json`, `picker-diagnostic.json`, `relay-real-pe.xml` 등의 실패는 수정 전 증거로 보존한다. 전체 batch의 실패를 일부 class 통과로 덮어쓰지 않는다.
