@@ -450,6 +450,11 @@ export const hanokIndigoTheme = {
       "base": {
         "padding": "var(--spacing-3)"
       }
+    },
+    "bottom-sheet": {
+      "base": {
+        "transitionDuration": "var(--duration-medium-min)"
+      }
     }
   },
   __onDark: {

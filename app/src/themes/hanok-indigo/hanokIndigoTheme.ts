@@ -118,5 +118,9 @@ export const hanokIndigoTheme = defineTheme({
     },
     card: {base: {borderRadius: 'var(--radius-container)'}},
     badge: {base: {borderRadius: 'var(--radius-full)'}},
+    // Sheets open from a tap, so they land in ~225ms instead of the 300ms medium band. Only the duration
+    // changes. Theme overrides can't take a media query, so under reduced motion this also applies, but there
+    // the sheet doesn't slide; only its fade is 225ms instead of 200ms.
+    'bottom-sheet': {base: {transitionDuration: 'var(--duration-medium-min)'}},
   },
 });

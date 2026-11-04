@@ -22,8 +22,9 @@ R9 추가 근거: D-R9-01(자동 수치 판정), D-R9-02(바로 자른 옷 이�
 
 ### 화면 배치·문구
 
-- 홈 "Saved this trip"은 홈에 보이는 최근 trip(`Piece.trip`)에서 저장한 가게 옷만 1행 가로 스크롤 타일로 보여 주고, 끝에 "Find another"를 둔다. 제목 옆 개수는 이 trip의 개수다. 비었으면 "Nothing saved from this trip yet."(저장한 옷이 하나도 없으면 "Nothing saved yet.")를 보인다. 새 쇼핑을 시작하면 새 trip이 최근 trip이 되므로 목록이 비어 보인다. trip 삭제로 `Piece.trip`이 지워진 옷은 홈 줄에서 빠지고 전체 목록에만 남는다(사용자 요청, 2026-11-04).
-- 섹션 오른쪽 위 "See all"은 모든 trip의 저장한 옷을 아래에서 올라오는 시트(화면 높이 약 3/4)에 3열 그리드로 보여 준다. 제목 "Saved", 부제 "N pieces from all trips"이며 그리드는 세로 스크롤한다. 시트 위쪽(손잡이·제목)을 아래로 끌어 일정 거리를 넘기면 닫히고 홈이 보인다. 짧게 끌면 제자리로 돌아온다. 배경을 눌러도 닫힌다. 타일을 누르면 Item으로 간다(사용자 요청, 2026-11-04). 실제 앱의 Astryx 시트 구현 방식은 미확인이다.
+- 홈 "Saved this trip"은 홈에 보이는 최근 trip(`Piece.tripId`)에서 저장한 가게 옷만 1행 가로 스크롤 타일로 보여 준다. 새 쇼핑을 시작하면 새 trip이 최근 trip이 되므로 그 trip에서 저장하기 전까지 줄이 비어 보인다. trip 삭제로 `tripId`가 지워진 옷은 홈 줄에서 빠지고 전체 목록에만 남는다(사용자 요청, 2026-11-04).
+- 섹션 오른쪽 위 "See all"은 모든 trip의 저장한 옷을 아래에서 올라오는 시트(화면 높이 3/4)에 3열 그리드로 보여 주며 그리드는 세로 스크롤한다. 시트 위쪽을 아래로 끌어 일정 거리를 넘기거나 빠르게 내리면 닫히고 홈이 보인다. 짧게 끌면 제자리로 돌아온다. 배경을 눌러도 닫힌다. 타일을 누르면 시트를 닫고 Item으로 간다(사용자 요청, 2026-11-04).
+- 실제 앱 문구: 섹션 "Saved this trip", 링크 "See all", 시트 "Saved pieces" / "N pieces from all your trips". 이 trip에 없으면 "Nothing saved from this trip yet. Tap See all for pieces from earlier trips.", 저장한 옷이 하나도 없으면 기존 "No saved pieces" 빈 상태다. prototype 문구("Saved", "N pieces from all trips", "Find another" 타일)와 다르며 인간 화면 세션 승인은 미확인이다.
 - Item의 큰 옷 이미지·가게 카드·"Original photo"·"Walk back"·"Try it on"은 유효한 상태에서 유지한다. 옷장 상세 부제 "In your wardrobe"도 유지한다(D-R1-03, D-R7-08).
 - 이름/종류 수정·삭제·옷장 상세의 변경된 액션·원본 삭제 후 가게 카드·빈 상태·오프라인 배치는 **프로토타입 세션에서 확정**한다. 원본이 없는 카드에 작동하지 않는 링크를 남기지 않는다(D-R3-11, D-R4-06, D-R4-09).
 - **프로토타입 초안:** "Rename" → "Rename piece"·"Save name", "Delete" → "Delete this piece?"를 제공한다. 이름 대기는 "Naming this piece…", 오프라인은 "Waiting for connection to name this piece."다. 배치·문구는 **프로토타입 화면 세션에서 확정**한다(D-R3-11, D-R4-06, D-R6-03, D-R9-02).
@@ -32,6 +33,8 @@ R9 추가 근거: D-R9-01(자동 수치 판정), D-R9-02(바로 자른 옷 이�
 
 - `Piece`와 앱 전용 `cutoutFile`을 사용한다. `walkTo`는 저장 시 사진 좌표를 복사하므로 `Shop.spot`이나 첫 번째 동반 옷으로 목적지를 다시 계산하지 않는다(D-R3-11, D-R5-01, D-R5-03).
 - 실제 앱에서 category가 `unknown`이고 naming 작업이 없다는 이유만으로 실패를 표시하지 않는다. 검색 concept나 사용자가 정한 이름을 보존하고 "Category not set. You can edit this piece or ask Spark to name the cut-out."와 "Ask Spark to name this piece"를 제공한다. 이는 이름 생성 실패 판정이 아니라 선택적 보완 안내다.
+- 홈 "See all"은 Astryx `BottomSheet`(`height="75dvh"`, `purpose="info"`)이며 끌어 닫기·배경 탭·Escape를 Astryx가 처리한다. Android 뒤로 버튼은 시트가 열려 있을 때 시트를 닫는다. 시트 내용은 닫혀 있을 때도 렌더링되어 열 때 이미지 로딩 지연이 없다.
+- 시트 등장 시간은 테마 `bottom-sheet` 오버라이드로 `--duration-medium-min`(225ms)이다. 기존 300ms 대비 Chromium 측정에서 열림 완료가 약 295ms → 230ms가 됐다. 공용 시트는 입력칸이 있는 시트(가게 메모, 이름 수정)만 `form`으로 두고 나머지 확인 시트는 `info`로 열어 끌어 닫기·배경 탭으로 닫힌다. Android 에뮬레이터 체감은 미확인이다.
 
 ### 프로토타입
 

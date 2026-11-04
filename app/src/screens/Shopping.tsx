@@ -1,10 +1,13 @@
-import {useEffect,useRef,useState} from 'react';
+import {useCallback,useEffect,useRef,useState} from 'react';
 import type {Route} from '../ui/navigation';
-import type {Photo,Shop} from '../native/contracts';
+import type {Photo,Piece,Shop} from '../native/contracts';
 import {useUi,useData,listAll} from '../ui/state';
 import type {CSSProperties} from 'react';
 import {Grid} from '@astryxdesign/core/Grid';
 import {Divider} from '@astryxdesign/core/Divider';
+import {BottomSheet} from '@astryxdesign/core/BottomSheet';
+import {App as CapacitorApp} from '@capacitor/app';
+import {Capacitor} from '@capacitor/core';
 import {Thumbnail,Action,Button,Chip,Confirm,EditFields,Empty,Eyebrow,Heading,Hint,HStack,Icon,IconTile,Loading,Media,Panel,PhotoView,Problem,Reveal,RowButton,Section,SkeletonGrid,SkeletonPhoto,SkeletonRows,SkeletonText,Stat,Text,TileButton,VStack} from '../ui/components';
 import {reducedMotion,returning} from '../ui/easing';
 import {BagIcon,CameraIcon,HangerIcon,NoteIcon,PinIcon,ShieldIcon,SparkleIcon,StoreIcon,TrashIcon,PencilIcon,ImageIcon} from '../ui/icons';
@@ -28,6 +31,28 @@ const clock=(time:number)=>new Date(time).toLocaleTimeString('en-US',{timeStyle:
 function shopLine(shop:Shop,online:boolean){
   return shop.descriptionState==='pending'?(online?'Describing the storefront…':'Will describe when you’re back online'):shop.descriptionState==='failed'?'Couldn’t describe the storefront':shop.description??shop.note??'No storefront photo';
 }
+function PieceTile({piece,onOpen}:{piece:Piece;onOpen:()=>void}) {
+  return <TileButton label={piece.label} onClick={onOpen}>
+    <Media file={piece.cutoutFile} label="" ratio="1" fit="contain"/>
+    <VStack gap={0.5} paddingInline={1}><Text type="label" weight="semibold" maxLines={1} hasTruncateTooltip={false}>{piece.label}</Text><Text type="supporting" size="xsm" maxLines={1} hasTruncateTooltip={false}>{piece.category!=='unknown'?`${piece.category} · `:''}{shortDate(piece.createdAt)}</Text></VStack>
+  </TileButton>;
+}
+// Every saved shop piece, from all trips, in a tall sheet. Swipe the top down (or tap outside) to close it.
+// The sheet renders its content while closed, so tiles and images are ready the moment it opens; no entrance stagger.
+function AllSaved({pieces,open,onClose,onOpenPiece}:{pieces:Piece[];open:boolean;onClose:()=>void;onOpenPiece:(piece:Piece)=>void}) {
+  // Home sits at the bottom of the stack, so Android Back has nothing else to do here while the sheet is open.
+  useEffect(()=>{
+    if(!open||!Capacitor.isNativePlatform())return;
+    const listener=CapacitorApp.addListener('backButton',onClose);
+    return()=>{void listener.then(handle=>handle.remove());};
+  },[open,onClose]);
+  return <BottomSheet isOpen={open} onOpenChange={next=>{if(!next)onClose();}} label="All saved pieces" purpose="info" height="75dvh" padding={5}>
+    <VStack gap={4}>
+      <VStack gap={1}><Heading level={2}>Saved pieces</Heading><Text type="supporting">{pieces.length} {pieces.length===1?'piece':'pieces'} from all your trips</Text></VStack>
+      <Grid columns={3} gap={2}>{pieces.map(piece=><PieceTile key={piece.id} piece={piece} onOpen={()=>onOpenPiece(piece)}/>)}</Grid>
+    </VStack>
+  </BottomSheet>;
+}
 function EndShopping({style}:{style?:CSSProperties}) {
   const {services,popTo}=useUi();
   return <Confirm tone="plain" style={style} title="End shopping mode?" description="Your photos and shop locations stay on this phone. Your route history will be deleted." action="End shopping" onConfirm={async()=>{await services.shopping.stop();popTo('home');}}/>;
@@ -36,7 +61,7 @@ export function Home() {
   const {services,push,session,showSheet,online}=useUi();
   const active=useRef(true);
   useEffect(()=>{active.current=true;return()=>{active.current=false;};},[]);
-  const data=useData(async()=>{const [trips,pieces,shops]=await Promise.all([listAll(services,'Trip'),listAll(services,'Piece',{origin:'shop'}),listAll(services,'Shop')]);trips.sort((a,b)=>b.startedAt-a.startedAt);const photos=trips[0]?await listAll(services,'Photo',{tripId:trips[0].id}):[];return {trips,pieces:pieces.sort((a,b)=>b.createdAt-a.createdAt),shops:shops.filter(shop=>shop.tripId===trips[0]?.id).sort((a,b)=>a.n-b.n),photos};},[services]);
+  const data=useData(async()=>{const [trips,pieces,shops,wardrobe,results]=await Promise.all([listAll(services,'Trip'),listAll(services,'Piece',{origin:'shop'}),listAll(services,'Shop'),listAll(services,'Piece',{origin:'wardrobe'}),listAll(services,'Result')]);trips.sort((a,b)=>b.startedAt-a.startedAt);const photos=trips[0]?await listAll(services,'Photo',{tripId:trips[0].id}):[];return {trips,wardrobe:wardrobe.length,results:results.length,pieces:pieces.sort((a,b)=>b.createdAt-a.createdAt),shops:shops.filter(shop=>shop.tripId===trips[0]?.id).sort((a,b)=>a.n-b.n),photos};},[services]);
   const recording=session?.phase==='recording';
   const start=async()=>{
     try {await services.shopping.start();if(active.current)push({name:'capture'});}
@@ -49,6 +74,11 @@ export function Home() {
     }
   };
   const latest=data.data?.trips[0];
+  const [allSaved,setAllSaved]=useState(false);
+  const closeAllSaved=useCallback(()=>setAllSaved(false),[]);
+  const pieces=data.data?.pieces??[];
+  // Home shows only what was saved on the latest trip; "See all" opens every saved piece.
+  const tripPieces=latest?pieces.filter(piece=>piece.tripId===latest.id):[];
   const itemPhotos=(shopId?:string)=>data.data?.photos.filter(photo=>photo.kind==='item'&&(!shopId||photo.shopId===shopId)).length??0;
   return <>
     <VStack as="section" gap={5} padding={6} style={{background:'var(--color-hero)',color:'var(--color-on-hero)',borderRadius:'var(--radius-page)',position:'relative',overflow:'hidden'}}>
@@ -65,24 +95,25 @@ export function Home() {
         <Button label="Find it" variant="ghost" icon={<Icon icon="search"/>} width="100%" style={HERO_GHOST} onClick={()=>push({name:'ask'})}/>
       </VStack>
     </VStack>
-    <Grid columns={3} gap={3}>
-      <Reveal index={0} from="scale"><TileButton label="Wardrobe" onClick={()=>push({name:'wardrobe'})}><IconTile icon={HangerIcon}/><Text type="label" weight="semibold">Wardrobe</Text></TileButton></Reveal>
-      <Reveal index={1} from="scale"><TileButton label="Try-ons" onClick={()=>push({name:'results'})}><IconTile icon={SparkleIcon}/><Text type="label" weight="semibold">Try-ons</Text></TileButton></Reveal>
-      <Reveal index={2} from="scale"><TileButton label="Privacy" onClick={()=>push({name:'privacy'})}><IconTile icon={ShieldIcon}/><Text type="label" weight="semibold">Privacy</Text></TileButton></Reveal>
-    </Grid>
     <Section title="Latest trip" action={<Button label="All trips" variant="ghost" size="sm" endContent={<Icon icon="chevronRight" size="sm"/>} onClick={()=>push({name:'trips'})}/>}>
       {data.loading&&!data.data?<Panel gap={1} padding={3}><SkeletonRows flat count={3} label="Loading your latest trip"/></Panel>:data.error?<Problem message={data.error} retry={data.retry}/>:latest?<Reveal><Panel gap={1} padding={3}>
         <RowButton flat label={new Date(latest.startedAt).toLocaleDateString('en-US',{dateStyle:'medium'})} start={<IconTile icon="calendar" tone="hero"/>} meta={`${latest.status==='recording'?'Recording now':`Ended ${clock(latest.endedAt??latest.startedAt)}`} · ${data.data!.shops.length} ${data.data!.shops.length===1?'shop':'shops'} · ${itemPhotos()} photos`} onClick={()=>push({name:'trip',tripId:latest.id})}/>
         {data.data!.shops.map((shop,index)=><Reveal key={shop.id} index={index+1} gap={1}><Divider/><RowButton flat label={`Shop ${shop.n}`} start={<IconTile icon={StoreIcon} tone="muted"/>} meta={<>{clock(shop.startedAt)} · {itemPhotos(shop.id)} photos<br/>{shopLine(shop,online)}</>} onClick={()=>push({name:'trip',tripId:shop.tripId,shopId:shop.id})}/></Reveal>)}
       </Panel></Reveal>:<Empty title="No trips yet" icon={BagIcon}><Text type="supporting">Start shopping to create your first trip.</Text></Empty>}
     </Section>
-    <Section title="Saved pieces" action={data.data?.pieces.length?<Text type="supporting">{data.data.pieces.length} saved</Text>:undefined}>
-      {data.loading&&!data.data?<SkeletonGrid count={2} label="Loading saved pieces"/>:data.data?.pieces.length?<Grid columns={2} gap={3}>{data.data.pieces.map((piece,index)=><Reveal key={piece.id} index={index} from="scale"><TileButton label={piece.label} onClick={()=>push({name:'item',pieceId:piece.id})}>
-        <Media file={piece.cutoutFile} label="" ratio="1" fit="contain"/>
-        <VStack gap={0.5} paddingInline={1}><Text type="label" weight="semibold" maxLines={1} hasTruncateTooltip={false}>{piece.label}</Text><Text type="supporting" size="xsm">{piece.category!=='unknown'?`${piece.category} · `:''}{shortDate(piece.createdAt)}</Text></VStack>
-      </TileButton></Reveal>)}</Grid>:<Empty title="No saved pieces" icon={HangerIcon}><Text type="supporting">Find a garment in your trip photos to save it.</Text></Empty>}
+    <Section title="Saved this trip" action={pieces.length?<Button label="See all" variant="ghost" size="sm" endContent={<Icon icon="chevronRight" size="sm"/>} onClick={()=>setAllSaved(true)}/>:undefined}>
+      {data.loading&&!data.data?<SkeletonGrid count={2} label="Loading saved pieces"/>:tripPieces.length?<HStack role="list" aria-label="Pieces saved on this trip" gap={3} paddingBlock={1} style={{overflowX:'auto',scrollSnapType:'x mandatory',scrollPaddingInline:'var(--spacing-5)',marginInline:'calc(-1 * var(--spacing-5))',paddingInline:'var(--spacing-5)',scrollbarWidth:'none'}}>
+        {tripPieces.map((piece,index)=><VStack key={piece.id} role="listitem" style={{flex:'none',width:'calc((100% - var(--spacing-3) * 2) / 2.3)',scrollSnapAlign:'start'}}><Reveal index={index} from="scale"><PieceTile piece={piece} onOpen={()=>push({name:'item',pieceId:piece.id})}/></Reveal></VStack>)}
+      </HStack>:pieces.length?<Text type="supporting">Nothing saved from this trip yet. Tap See all for pieces from earlier trips.</Text>:<Empty title="No saved pieces" icon={HangerIcon}><Text type="supporting">Find a garment in your trip photos to save it.</Text></Empty>}
     </Section>
+    {/* Same order as the prototype: Wardrobe and Try-ons as two rows under Saved; Privacy is the shield in the top bar. */}
+    <Panel gap={1} padding={3}>
+      <RowButton flat label="Wardrobe" start={<IconTile icon={HangerIcon}/>} meta={data.data?`${data.data.wardrobe} ${data.data.wardrobe===1?'piece':'pieces'} you own`:undefined} onClick={()=>push({name:'wardrobe'})}/>
+      <Divider/>
+      <RowButton flat label="Try-ons" start={<IconTile icon={ImageIcon}/>} meta={data.data?(data.data.results?`${data.data.results} ${data.data.results===1?'look':'looks'}, kept on this phone`:'No looks yet'):undefined} onClick={()=>push({name:'results'})}/>
+    </Panel>
     <Hint icon={ShieldIcon}>Your original self photo and route history never leave this phone.</Hint>
+    <AllSaved pieces={pieces} open={allSaved} onClose={closeAllSaved} onOpenPiece={piece=>{setAllSaved(false);push({name:'item',pieceId:piece.id});}}/>
   </>;
 }
 export function Trips({route}:{route:Extract<Route,{name:'trips'}>}) {
@@ -112,7 +143,7 @@ function ShopSection({shop,forOutfit}:{shop:Shop;forOutfit?:boolean}) {
       {shop.note&&<HStack gap={2} vAlign="start" padding={3} style={{background:'var(--color-hanok-bead)',borderRadius:'var(--radius-element)'}}><Icon icon={NoteIcon} size="sm" color="secondary"/><Text size="sm">{shop.note}</Text></HStack>}
       <HStack gap={2} wrap="wrap">
         <Button label={storefront?'Retake storefront':'Add storefront photo'} variant="secondary" size="sm" icon={<Icon icon={CameraIcon}/>} onClick={()=>push({name:'capture',purpose:'storefront',shopId:shop.id})}/>
-        <Button variant="secondary" size="sm" icon={<Icon icon={PencilIcon}/>} label={shop.note?'Edit note':'Add note'} onClick={()=>showSheet({title:`Note for Shop ${shop.n}`,content:<EditFields label={shop.note??''} onSave={note=>services.store.updateShop({id:shop.id,note:note||null})}/>})}/>
+        <Button variant="secondary" size="sm" icon={<Icon icon={PencilIcon}/>} label={shop.note?'Edit note':'Add note'} onClick={()=>showSheet({title:`Note for Shop ${shop.n}`,form:true,content:<EditFields label={shop.note??''} onSave={note=>services.store.updateShop({id:shop.id,note:note||null})}/>})}/>
         {storefront&&<Confirm title="Delete storefront photo?" description="The storefront photo and its description will be removed. Looks you’ve saved keep their copy." action="Delete storefront photo" icon={<Icon icon={TrashIcon}/>} onConfirm={()=>services.store.deletePhoto({id:storefront.id})}/>}
       </HStack>
       <Divider/>
