@@ -4,6 +4,7 @@ import type {FileRef} from './contracts';
 import {Store} from './store';
 import {getWebRepository} from '../data/web/repository';
 import {getMockContext} from './web/context';
+import {observeFileRead} from '../verification';
 
 function failure(code: string): never {
   throw {code, message: 'The device file operation could not be completed.', retryable: code === 'io_error'};
@@ -44,6 +45,7 @@ function safeError(error: unknown): never {
 
 export async function readBytes(file: FileRef): Promise<Uint8Array> {
   try {
+    observeFileRead(file);
     if (!Capacitor.isNativePlatform()) return new Uint8Array(await (await webRepository().readBlob(file)).arrayBuffer());
     await requirePrivateFile(file);
     const {data} = await Filesystem.readFile({path: file});

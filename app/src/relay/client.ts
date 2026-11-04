@@ -3,6 +3,7 @@ import type {paths} from '../generated/relay-api';
 import {config, validateRelayOrigin} from '../config';
 import {getAuthTokens} from './auth';
 import type {AuthTokens} from './auth';
+import {observeRelayAttempt} from '../verification';
 
 type Endpoint = keyof paths;
 type JsonBody<T> = T extends {content: {'application/json': infer B}} ? B : never;
@@ -92,6 +93,7 @@ export function createRelayClient(options: RelayClientOptions = {}) {
       request.signal?.throwIfAborted();
       let response: Response;
       try {
+        observeRelayAttempt(path);
         response = await transport(`${baseUrl}${path}`, {
           method: 'POST', headers, body: encodedBody, signal: request.signal, cache: 'no-store',
         });

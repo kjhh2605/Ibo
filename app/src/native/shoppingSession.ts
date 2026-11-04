@@ -43,7 +43,7 @@ export class ShoppingSessionWeb extends WebPlugin implements ShoppingSessionCont
     this.phase = 'requesting_notification'; await this.publish();
     this.phase = 'starting'; await this.publish();
     const fix = this.context.fixture<Fix>('location');
-    if (!validFix(fix, this.context.clock.now())) { this.phase = 'idle'; await this.publish(); throw deviceFailure('location_disabled'); }
+    if (!validFix(fix, this.context.clock.now())) { this.phase = 'idle'; await this.publish(); throw deviceFailure('location_unavailable'); }
     await getWebRepository().startSession({fix});
     this.phase = 'recording'; this.stopping = undefined; this.noticeSent = false;
     const state = await this.publish();
@@ -57,7 +57,7 @@ export class ShoppingSessionWeb extends WebPlugin implements ShoppingSessionCont
     const state = await this.getState();
     if (state.phase !== 'recording' || !state.trip) throw deviceFailure('not_recording');
     const fix = this.context.fixture<Fix>('location');
-    if (!validFix(fix, this.context.clock.now())) throw deviceFailure('location_disabled');
+    if (!validFix(fix, this.context.clock.now())) throw deviceFailure('location_unavailable');
     const shop = await getWebRepository().newShop({tripId: state.trip.id, fix});
     await this.publish(); return shop;
   }

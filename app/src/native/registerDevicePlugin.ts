@@ -1,5 +1,6 @@
 import {Capacitor, registerPlugin} from '@capacitor/core';
 import type {DeviceError} from './contracts';
+import {observePluginAttempt, observePluginResult} from '../verification';
 
 function normalizeDeviceError(error: unknown): DeviceError {
   const value = typeof error === 'object' && error !== null ? error : {};
@@ -27,7 +28,10 @@ export function registerDevicePlugin<T>(name: string, web: () => Promise<T>): T 
           const plugin = mock ? await (instance ??= web()) : native;
           const method = Reflect.get(plugin as object, key);
           if (typeof method !== 'function') throw new TypeError(`${name} has no such method`);
-          return await Reflect.apply(method, plugin, args);
+          observePluginAttempt(name, key);
+          const result = await Reflect.apply(method, plugin, args);
+          observePluginResult(name, key, result);
+          return result;
         } catch (error) {
           throw normalizeDeviceError(error);
         }

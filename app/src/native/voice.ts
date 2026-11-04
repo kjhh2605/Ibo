@@ -47,7 +47,7 @@ export class VoiceWeb extends WebPlugin implements VoiceContract {
   async start() {
     if (this.run && !this.run.terminal) throw deviceFailure('busy');
     const failure = this.context.failure('Voice.start'); if (failure) throw failure;
-    if (this.context.permission('microphone') !== 'granted') throw deviceFailure('permission_denied', false);
+    if (this.context.permission('microphone') !== 'granted') throw deviceFailure('microphone_permission_denied', false);
     if (this.context.isOffline()) throw deviceFailure('offline');
     const source = this.context.fixture<Int16Array>('voice');
     if (!(source instanceof Int16Array) || source.length === 0) throw deviceFailure('audio_unavailable');

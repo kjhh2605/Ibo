@@ -43,7 +43,7 @@ export class CaptureWeb extends WebPlugin implements CaptureContract {
     Object.assign(image.style, {position: 'fixed', zIndex: '-1', objectFit: 'cover', pointerEvents: 'none'});
     image.src = url;
     try { await image.decode(); }
-    catch { URL.revokeObjectURL(url); throw deviceFailure('fixture_unavailable', false); }
+    catch { URL.revokeObjectURL(url); throw deviceFailure('fixture_invalid', false); }
     if (version !== this.previewVersion || request !== this.previewRequest) { URL.revokeObjectURL(url); return; }
     this.clearPreview(); this.preview = image; this.previewUrl = url;
     document.body.prepend(image); this.positionPreview();
@@ -57,8 +57,8 @@ export class CaptureWeb extends WebPlugin implements CaptureContract {
     } else if (options.shopId !== undefined) throw deviceFailure('invalid_argument', false);
     if (options.purpose === 'shopping' && (await this.session.getState()).phase !== 'recording') throw deviceFailure('not_recording');
     const failure = this.context.failure('Capture.openPreview'); if (failure) throw failure;
-    if (this.context.permission('camera') === 'denied') throw deviceFailure('permission_denied', false);
-    const fixtures = this.context.fixture<Asset[]>('capture'); if (!fixtures?.length) throw deviceFailure('fixture_unavailable');
+    if (this.context.permission('camera') === 'denied') throw deviceFailure('camera_permission_denied', false);
+    const fixtures = this.context.fixture<Asset[]>('capture'); if (!fixtures?.length) throw deviceFailure('fixture_empty');
     const version = ++this.previewVersion;
     this.purpose = undefined; this.clearPreview();
     await this.showPreview(fixtures[this.index % fixtures.length], version);
@@ -73,7 +73,7 @@ export class CaptureWeb extends WebPlugin implements CaptureContract {
     this.previewRect = {...options}; this.positionPreview();
   }
   async takePhoto(options: {kind: 'item' | 'storefront'}) {
-    if (!this.purpose) throw deviceFailure('preview_not_ready');
+    if (!this.purpose) throw deviceFailure('preview_not_open');
     const purpose = this.purpose, shopId = this.storefrontShopId;
     const previewVersion = this.previewVersion;
     if (!['item', 'storefront'].includes(options.kind) ||
@@ -86,7 +86,7 @@ export class CaptureWeb extends WebPlugin implements CaptureContract {
     try {
       const failure = this.context.failure('Capture.takePhoto'); if (failure) throw failure;
       if (purpose === 'shopping') shutter = await this.session.acquireShutter();
-      const fixtures = this.context.fixture<Asset[]>('capture'); if (!fixtures?.length) throw deviceFailure('fixture_unavailable');
+      const fixtures = this.context.fixture<Asset[]>('capture'); if (!fixtures?.length) throw deviceFailure('fixture_empty');
       const fixture = fixtures[this.index % fixtures.length];
       const repository = getWebRepository();
       const target = purpose === 'storefront' && shopId ? await repository.get({entity: 'Shop', id: shopId}) : null;

@@ -3,6 +3,7 @@ import {Database, entities} from './database';
 import type {Draft, Transaction} from './database';
 import {browserImages, cutout, failure, prepareMask} from './images';
 import type {ImageCodec} from './images';
+import {acquireDatabaseLease} from './lease';
 
 type Change = {entities: (keyof EntityMap | 'SelfPhoto')[]; ids: Id[]};
 type ListOptions<K extends keyof EntityMap> = {entity: K; tripId?: Id; shopId?: Id; origin?: 'shop' | 'wardrobe'; limit?: number; cursor?: string};
@@ -42,6 +43,7 @@ export class WebRepository implements Store, DeviceRepository {
   private readonly epoch: string;
   private readonly runtime: {claims: Set<string>; listeners: Set<(event: Change) => void>};
   private ready: Promise<void> | undefined;
+  private releaseLease: (() => Promise<void>) | undefined;
   private sessionStopper: (() => Promise<unknown>) | undefined;
   constructor(options: Options = {}) {
     this.db = new Database(options.name ?? 'street-fitting');
@@ -53,23 +55,33 @@ export class WebRepository implements Store, DeviceRepository {
     this.runtime = runtime;
   }
   private initialize(): Promise<void> {
-    return this.ready ??= this.db.run(true, async tx => {
-      const previous = await tx.get('meta', 'epoch');
-      if (previous?.value === this.epoch) return;
-      // Incomplete drafts and cache are never product records; committed results keep their own files.
-      for (const draft of await tx.all('drafts')) await tx.delete('drafts', draft.draftId);
-      for (const asset of await tx.all('assets')) await tx.delete('assets', asset.asset.id);
-      for (const row of await tx.all('files')) {
-        if (row.discard || row.owner === 'temp' || row.owner.startsWith('draft:') || row.owner.startsWith('asset:')) await tx.delete('files', row.file);
-        else if (row.pins) await tx.put('files', row.file, {...row, pins: 0});
-      }
-      for (const version of await tx.all('self')) {
-        if (version.current) await tx.put('self', version.selfPhoto.updatedAt, {...version, refs: 0});
-        else { await tx.removeOwner(`self:${version.selfPhoto.updatedAt}`); await tx.delete('self', version.selfPhoto.updatedAt); }
-      }
-      this.runtime.claims.clear();
-      await tx.put('meta', 'epoch', {value: this.epoch});
-    });
+    return this.ready ??= this.recover().catch(error => {this.ready = undefined; throw error;});
+  }
+  private async recover(): Promise<void> {
+    this.releaseLease = await acquireDatabaseLease(this.db.name, this.epoch);
+    try {
+      await this.db.run(true, async tx => {
+        const previous = await tx.get('meta', 'epoch');
+        if (previous?.value === this.epoch) return;
+        // Incomplete drafts and cache are never product records; committed results keep their own files.
+        for (const draft of await tx.all('drafts')) await tx.delete('drafts', draft.draftId);
+        for (const asset of await tx.all('assets')) await tx.delete('assets', asset.asset.id);
+        for (const row of await tx.all('files')) {
+          if (row.discard || row.owner === 'temp' || row.owner.startsWith('draft:') || row.owner.startsWith('asset:')) await tx.delete('files', row.file);
+          else if (row.pins) await tx.put('files', row.file, {...row, pins: 0});
+        }
+        for (const version of await tx.all('self')) {
+          if (version.current) await tx.put('self', version.selfPhoto.updatedAt, {...version, refs: 0});
+          else { await tx.removeOwner(`self:${version.selfPhoto.updatedAt}`); await tx.delete('self', version.selfPhoto.updatedAt); }
+        }
+        this.runtime.claims.clear();
+        await tx.put('meta', 'epoch', {value: this.epoch});
+      });
+    } catch (error) {
+      await this.releaseLease();
+      this.releaseLease = undefined;
+      throw error;
+    }
   }
   private async run<T>(write: boolean, work: (tx: Transaction) => Promise<T>, changed?: Change): Promise<T> {
     await this.initialize();
@@ -77,7 +89,13 @@ export class WebRepository implements Store, DeviceRepository {
     if (changed) for (const listener of this.runtime.listeners) { try { listener(structuredClone(changed)); } catch { /* Listener failures cannot roll back committed data. */ } }
     return value;
   }
-  async close(): Promise<void> { await this.db.close(); }
+  async close(): Promise<void> {
+    await this.ready?.catch(() => {});
+    await this.db.close();
+    await this.releaseLease?.();
+    this.releaseLease = undefined;
+    this.ready = undefined;
+  }
   async addListener(_name: 'changed', fn: (event: Change) => void): Promise<Listener> {
     if (_name !== 'changed') failure('invalid_argument');
     this.runtime.listeners.add(fn);
