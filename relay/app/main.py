@@ -1,17 +1,13 @@
 """Runtime relay factory and an explicitly credential-free schema-export mode."""
+import asyncio
 from contextlib import asynccontextmanager
 from importlib import import_module
 from pkgutil import iter_modules
 
 from fastapi import FastAPI, Depends, Header
 from fastapi.openapi.utils import get_openapi
-from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.schemas import Error
-
-
-def stub():
-    return JSONResponse(status_code=501, content={'error': {'code': 'not_implemented', 'message': 'This endpoint is not implemented yet.', 'retryable': False}})
 
 
 def auth_headers(authorization: str = Header(), x_firebase_appcheck: str = Header(alias='X-Firebase-AppCheck')):
@@ -29,6 +25,9 @@ def create_app(*, schema_only=False, settings=None, verifier=None, transport=Non
     @asynccontextmanager
     async def lifespan(app):
         try:
+            if not schema_only and app.state.settings.mode == 'live':
+                from app.pe_text import load_pe_text
+                app.state.pe_text = await asyncio.to_thread(load_pe_text, app.state.settings.models_dir)
             yield
         finally:
             if not schema_only:
@@ -40,7 +39,7 @@ def create_app(*, schema_only=False, settings=None, verifier=None, transport=Non
     app = FastAPI(title='Street Fitting Relay', version='0.1.0', docs_url=None, redoc_url=None,
                   lifespan=lifespan, dependencies=[Depends(auth_headers)], responses={
                       status: {'model': Error, 'description': description}
-                      for status, description in [(400, 'Invalid request'), (401, 'Unauthenticated or invalid query token'), (403, 'App Check failed'), (404, 'Route unavailable'), (409, 'Conflict'), (413, 'Payload too large'), (429, 'Upstream rate limited'), (500, 'Fixture invalid'), (501, 'Not implemented or fixture not found'), (502, 'Upstream error'), (503, 'Model unavailable'), (504, 'Upstream timeout')]
+                      for status, description in [(400, 'Invalid request'), (401, 'Unauthenticated or invalid query token'), (403, 'App Check failed'), (404, 'Route unavailable'), (409, 'Conflict'), (413, 'Payload too large'), (429, 'Upstream rate limited'), (500, 'Fixture invalid'), (501, 'Fixture not found'), (502, 'Upstream error'), (503, 'Model unavailable'), (504, 'Upstream timeout')]
                   })
     if not schema_only:
         from app.auth import require_auth

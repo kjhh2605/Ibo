@@ -27,9 +27,12 @@ def wire(value):
 
 
 def validated_call(value):
-    if not isinstance(value, dict) or set(value) != {'id', 'name', 'arguments'}:
+    required = {'id', 'name', 'arguments'}
+    if not isinstance(value, dict) or not required <= set(value) or set(value) - required - {'providerCallId'}:
         raise ValueError('Invalid call')
     TypeAdapter(s.Ref).validate_python(value['id'])
+    if 'providerCallId' in value and (not isinstance(value['providerCallId'], str) or not re.fullmatch(r'[\x21-\x7e]{1,64}', value['providerCallId'])):
+        raise ValueError('Invalid provider call ID')
     cls = _ARGS.get(value['name'])
     if cls is None:
         raise ValueError('Invalid tool')
@@ -77,7 +80,7 @@ class QueryState(BaseModel):
             else:
                 raise ValueError('Invalid history')
         if self.pending is not None:
-            if set(self.pending) - {'id', 'name', 'arguments', 'summary'}:
+            if set(self.pending) - {'id', 'name', 'arguments', 'summary', 'providerCallId'}:
                 raise ValueError('Invalid pending')
             validated_call({k: v for k, v in self.pending.items() if k != 'summary'})
             if 'summary' in self.pending:
@@ -238,7 +241,7 @@ class QueryTokens:
             error.headers['X-Query-Token'] = self.sign(failed)
             raise error from None
 
-    def finish_turn(self, state: QueryState, body: dict) -> dict:
+    def finish_turn(self, state: QueryState, body: dict, *, provider_call_id: str | None = None) -> dict:
         """Validate endpoint output, strip vector from token, sign current refs."""
         try:
             response = TypeAdapter(s.SearchTurnResponse).validate_python({**body, 'queryToken': 'runtime'})
@@ -248,9 +251,14 @@ class QueryTokens:
                 if state.sparkTurns >= 4:
                     raise ValueError('Tools forbidden on last turn')
                 call = {k: v for k, v in data['toolCalls'][0].items() if k != 'phraseVector'}
+                if provider_call_id is not None:
+                    call['providerCallId'] = provider_call_id
+                validated_call(call)
                 state.pending = call
                 state.history.append({'call': call.copy()})
             else:
+                if provider_call_id is not None:
+                    raise ValueError('Provider call ID requires a tool call')
                 state.closed, state.pending = True, None
                 state.history.append(data)
             return {**data, 'queryToken': self.sign(state)}

@@ -9,7 +9,7 @@ import pytest
 from PIL import Image
 
 from app.schemas import TranscribeRequest, TryOnRequest
-from conftest import make_app
+from .conftest import make_app
 
 
 def test_unknown_fields_models_urls_messages_system_rejected(client, image, context):
