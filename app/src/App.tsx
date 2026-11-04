@@ -43,7 +43,7 @@ export default function App() {
     return()=>{live=false;};
   },[attempt]);
   if(held||(!services&&!error))return <Splash/>;
-  if(error)return <VStack padding={6} gap={4}><Heading level={1}>Ibo</Heading><Problem message="Your device services could not start. Your saved data has not been changed."/><Button label="Try again" onClick={()=>setAttempt(value=>value+1)}/></VStack>;
+  if(error)return <VStack padding={6} gap={4}><Heading level={1}>Ibo</Heading><Problem message="Ibo couldn’t start. Your saved photos and pieces are safe."/><Button label="Try again" onClick={()=>setAttempt(value=>value+1)}/></VStack>;
   if(!services)return null;
   return <UiProvider services={services}><Shell><Screen/></Shell></UiProvider>;
 }

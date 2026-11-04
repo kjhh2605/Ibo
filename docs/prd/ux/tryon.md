@@ -24,7 +24,7 @@ R9 추가 근거: D-R9-01(자동 수치 판정), D-R9-02(바로 자른 옷 이�
 
 - 홈의 잘라낸 타일·개수·"Find another", Item의 큰 옷 이미지·가게 카드·"Original photo"·"Walk back"·"Try it on"은 유효한 상태에서 유지한다. 옷장 상세 부제 "In your wardrobe"도 유지한다(D-R1-03, D-R7-08).
 - 이름/종류 수정·삭제·옷장 상세의 변경된 액션·원본 삭제 후 가게 카드·빈 상태·오프라인 배치는 **프로토타입 세션에서 확정**한다. 원본이 없는 카드에 작동하지 않는 링크를 남기지 않는다(D-R3-11, D-R4-06, D-R4-09).
-- **프로토타입 초안:** "Rename" → "Rename piece"·"Save name", "Delete" → "Delete this piece?"를 제공한다. 이름 대기는 "Spark is naming this piece…", 오프라인은 "Waiting for connection to name this piece."다. 배치·문구는 **프로토타입 화면 세션에서 확정**한다(D-R3-11, D-R4-06, D-R6-03, D-R9-02).
+- **프로토타입 초안:** "Rename" → "Rename piece"·"Save name", "Delete" → "Delete this piece?"를 제공한다. 이름 대기는 "Naming this piece…", 오프라인은 "Waiting for connection to name this piece."다. 배치·문구는 **프로토타입 화면 세션에서 확정**한다(D-R3-11, D-R4-06, D-R6-03, D-R9-02).
 
 ### 실제 구현
 
@@ -50,7 +50,7 @@ R9 추가 근거: D-R9-01(자동 수치 판정), D-R9-02(바로 자른 옷 이�
 
 ### 화면 배치·문구
 
-- "N pieces you own", 2열 타일, "Mix these with what you saved to see them together. Only the cut-out piece is ever sent, never the whole photo.", "Add a piece", "Lay it flat or hang it up. You'll tap it to cut it out.", "Take a photo", "Choose from gallery", "Added to your wardrobe"는 유지한다(D-R1-03, D-R4-06).
+- "N pieces you own", 2열 타일, "Wear these with pieces you saved from shops. Only the cut-out is ever sent, never the whole photo.", "Add a piece", "Lay it flat or hang it up. You'll tap it to cut it out.", "Take a photo", "Choose from gallery", "Added to your wardrobe"는 유지한다(D-R1-03, D-R4-06).
 - 이름 처리 중/실패·편집·삭제·빈 목록 배치 및 문구는 **프로토타입 세션에서 확정**한다(D-R3-11, D-R4-06, D-R6-03).
 
 ### 실제 구현
@@ -84,7 +84,7 @@ R9 추가 근거: D-R9-01(자동 수치 판정), D-R9-02(바로 자른 옷 이�
 
 - "Your photo", "Change", "Take a photo", "Choose from gallery", "Saved from shops", "Your wardrobe"는 유지한다. 촬영 자세 안내도 유지하되 고정 촬영 날짜는 실제 `SelfPhoto.updatedAt`을 사용한다(D-R1-03, D-R4-02).
 - 대상 고정과 동반 5벌 구분, trip 사진 고르기 경로, 개수 표시·상한 안내, 본인 사진 빈 상태·마스킹 실패, 생성 진입 버튼은 **프로토타입 세션에서 확정**한다. 기존 9벌 카운터/초과 토스트는 쓰지 않는다(D-R4-01, D-R4-07, D-R4-08, D-R4-11).
-- **프로토타입 초안:** "Target · 1 shop piece", "Wear with it · N of 5", "From a trip photo", 상한 "Up to 5 companion pieces. Remove one to add another."를 표시한다. "Change" 시트의 촬영/갤러리 선택 뒤 "Removing face and hair on this phone…" → 준비 또는 "We couldn’t safely remove your face and hair…"·"Retake"로 이어진다. 배치·문구는 **프로토타입 화면 세션에서 확정**한다(D-R4-02, D-R4-07~08, D-R4-11).
+- **프로토타입 초안:** "Shop piece", "Wear with it · N of 5", "From a trip photo", 상한 "You can add up to 5 pieces. Remove one to add another."를 표시한다. "Change" 시트의 촬영/갤러리 선택 뒤 "Removing face and hair on this phone…" → 준비 또는 "We couldn’t safely remove your face and hair…"·"Retake"로 이어진다. 배치·문구는 **프로토타입 화면 세션에서 확정**한다(D-R4-02, D-R4-07~08, D-R4-11).
 
 ### 실제 구현
 
@@ -113,7 +113,7 @@ R9 추가 근거: D-R9-01(자동 수치 판정), D-R9-02(바로 자른 옷 이�
 ### 화면 배치·문구
 
 - 진행 중임과 완료/실패 구분은 제공한다. 기존 전송 확인 화면·전송본 미리보기·확인 버튼은 제거한다. 진행 단계의 위치와 최종 문구, 실패 후 재시도 배치는 모두 **프로토타입 세션에서 확정**한다(D-R4-03, D-R6-03).
-- **프로토타입 초안:** "Generate" 후 "Sending without your face…" → "Generating the look…" → "Putting your face back…"를 인라인 표시한다. 오프라인 안내 중 Generate는 비활성이다. 배치·문구는 **프로토타입 화면 세션에서 확정**한다(D-R4-03, D-R6-03).
+- **프로토타입 초안:** "Generate" 후 "Preparing your pieces…" → "Creating your look. Your face isn’t sent." → "Adding your face back on this phone…" → "Saving your look…"를 표시한다. 오프라인 안내 중 Generate는 비활성이다. 배치·문구는 **프로토타입 화면 세션에서 확정**한다(D-R4-03, D-R6-03).
 
 ### 실제 구현
 
@@ -143,7 +143,7 @@ R9 추가 근거: D-R9-01(자동 수치 판정), D-R9-02(바로 자른 옷 이�
 
 - "Your look", "N pieces · Just now"(실제 생성 시각), "Wearing", 옷별 썸네일·이름·출처는 결과 스냅샷으로 유지한다. "Walk to Shop N"은 대상 삭제 후에도 유지하고, "Change pieces"는 대상이 남을 때만 활성화한다. 삭제된 옷 이름·이미지를 빈 자리로 바꾸지 않는다(D-R1-03, D-R5-03, D-R9-03).
 - 비교 전환과 앱 안에서만 본다는 기존 안내는 제거한다. 얼굴 없는 상태·삭제·플래그 OFF/ON의 내려받기·참조 삭제 상태 배치 및 문구는 **프로토타입 세션에서 확정**한다(D-R3-11, D-R4-04, D-R4-05, D-R4-10).
-- **프로토타입 초안:** 얼굴 없는 결과는 "Your face couldn’t be put back cleanly, so this look is shown without it.", 대상 삭제는 "The target piece was deleted. Your look and walk-back location are still saved."로 안내한다. "Delete" 확인과 함께 배치·문구는 **프로토타입 화면 세션에서 확정**한다(D-R3-11, D-R4-04, D-R9-03).
+- **프로토타입 초안:** 얼굴 없는 결과는 "Your face couldn’t be put back cleanly, so this look is shown without it.", 대상 삭제는 "The shop piece was deleted, but this look and its walk-back spot are still saved."로 안내한다. "Delete" 확인과 함께 배치·문구는 **프로토타입 화면 세션에서 확정**한다(D-R3-11, D-R4-04, D-R9-03).
 
 ### 실제 구현
 
@@ -195,7 +195,7 @@ R9 추가 근거: D-R9-01(자동 수치 판정), D-R9-02(바로 자른 옷 이�
 ### 화면 배치·문구
 
 - 화면 제목과 부제는 유지한다. 데이터별 경계와 보관 예외를 설명하는 목록이 프로토타입에 반영됐으며 최종 영어 목록·배치는 **프로토타입 세션에서 확정**한다(D-R3-01, D-R3-04, D-R4-06, D-R6-04, D-R7-08).
-- 실제 앱의 "Your location trail" 설명은 "Recorded only while shopping. The raw trail is deleted when you end the trip and is never uploaded. Saved photo locations remain for walking back. Retaking a saved shop’s storefront uses your current location once when you take the photo, even outside shopping mode; it does not start a trail. Walking guidance does not create a shopping trail."이다. prototype의 대응 문구는 "Recorded only while shopping, deleted when the trip ends. Retaking a saved shop’s storefront uses your current location once, even outside shopping mode, without starting a trail."이다. D-R11-01 예외를 반영한 구현 문구이며 인간 화면 세션 승인 여부는 미확인이다.
+- 실제 앱의 "Your route" 설명은 "Ibo records your route only while shopping mode is on, and deletes it when you end the trip. It’s never uploaded. Each photo keeps the spot where you took it, so you can walk back. Retaking a storefront photo saves your current location once, without recording a route."이다. prototype의 대응 문구는 "Recorded only while shopping, deleted when the trip ends. Retaking a saved shop’s storefront uses your current location once, even outside shopping mode, without starting a trail."이다. D-R11-01 예외를 반영한 구현 문구이며 인간 화면 세션 승인 여부는 미확인이다.
 
 ### 실제 구현
 
