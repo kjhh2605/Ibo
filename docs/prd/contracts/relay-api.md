@@ -100,7 +100,7 @@
 
 ### PE 텍스트 타워
 
-- **PE 텍스트 타워 ONNX는 없다.** 공유 준비 상태는 `/tmp/edgetam-poc/hf_cache`의 가중치뿐이며, 이미지 ONNX는 `/tmp/edgetam-poc/artifacts/pe_image.onnx`에 있다. 이를 자동 복사하거나 구현 완료로 취급하지 않는다. 사용자가 모델 준비를 마친 `SF_MODELS_DIR`에서 읽는다. 근거: D-R7-11; research §7.1·§8.1.
+- **PE 텍스트 타워 ONNX는 없다.** 사용자 위임 준비에서 원 묶음을 `SF_MODELS_DIR`에 보존했다. `hf_cache/`에 가중치, `perception_models/core/vision_encoder/`에 토크나이저·설정·코드, 루트 `pe_image.onnx`에 이미지 모델이 있다. [안정 배치·revision·호스트 검증](../README.md#모델-배치와-오프라인-검증)을 읽고, 준비 완료를 릴레이 구현 완료로 취급하지 않는다. 근거: D-R7-11; research §7.1·§8.1.
 - `[추론·기술 결정]` live 서버 시작 시 Meta PE-Core-T16 이미지 타워와 **동일한 체크포인트 쌍**의 텍스트 가중치·토크나이저·전처리 설정을 CPU inference/eval 모드로 한 번 로딩한다. 요청마다 로딩·다운로드하지 않는다. 모델/토크나이저 revision·이미지 ONNX 출처가 일치해야 한다. 누락·불일치 시 live 시작 실패다. 근거: D-R0-02, D-R1-02.
 - `find_photos.phrase`만 인코딩하고 512차원 float 벡터를 L2 정규화(`v/||v||₂`)해 `phraseVector`에 붙인다. 0 norm/비유한수/차원 불일치는 `model_unavailable`; 기기에 이미지 임베딩을 올리라고 요구하지 않는다. mock은 녹화된 정규화 벡터를 쓰므로 PE 로딩이 필요 없다. 근거: D-R1-04; research §8.1; `[추론·기술 결정]`.
 

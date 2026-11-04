@@ -132,7 +132,7 @@ interface Segmenter extends Events<{prepared:{handle:string; assetId:Id}}> {
 
 ### ONNX 입출력 — PoC export와 일치
 
-근거 파일은 `/tmp/edgetam-poc/run_edge.py`, `EdgeTAM/sam2/utils/transforms.py`, `artifacts/android_runs.json`이다. export는 고정 batch=1, point=1이며 멀티포인트를 임의로 전달하지 않는다. (D-R7-03; research §7.1)
+근거 파일은 원 `/tmp/edgetam-poc/`에서 보존한 `$SF_MODELS_DIR/run_edge.py`, `EdgeTAM/sam2/utils/transforms.py`, `artifacts/android_runs.json`이다(뒤 두 경로도 같은 모델 루트 기준). [안정 배치·hash](../README.md#모델-배치와-오프라인-검증)를 따른다. export는 고정 batch=1, point=1이며 멀티포인트를 임의로 전달하지 않는다. (D-R7-03; research §7.1)
 
 | 단계 | 이름/타입 | shape/내용 |
 | --- | --- | --- |
@@ -405,7 +405,7 @@ interface Walk extends Events<{state:WalkState}> {
 ## 12. 모델 배포·Android 16 KB 선행 조건
 
 - **선택: 빌드 때 `SF_MODELS_DIR`의 모델을 APK assets로 복사한다. 모델을 첫 실행 adb push로 넣는 경로는 두지 않는다.** Gradle project property `SF_MODELS_DIR` > 환경 변수 > 기본 `~/.cache/street-fitting/models` 순으로 해석한다. Gradle generated assets task가 `models/edgetam_encoder.onnx`, `models/edgetam_decoder.onnx`, `models/pe_image.onnx`를 포함하며 누락은 build 실패. `noCompress 'onnx'`, model manifest의 SHA-256/shape로 일치 확인한다. (D-R7-03, D-R7-11)
-- EdgeTAM 합계 약 **36 MB**(18.8+15.7 MiB), PE 이미지 약 **32 MB**(30.5 MiB). PE text tower는 릴레이 전용으로 APK에 넣지 않는다. 현재 출처 `/tmp/edgetam-poc/artifacts/`와 export 코드/전처리는 임시 경로이므로 사용자가 모델을 안정 경로에 복사하는 선행 작업이 필요하다. 이 문서는 복사를 실행하거나 승인한 것이 아니다. (D-R7-11; research §7.1·8.1)
+- EdgeTAM 합계 약 **36 MB**(18.8+15.7 MiB), PE 이미지 약 **32 MB**(30.5 MiB). PE text tower는 릴레이 전용으로 APK에 넣지 않는다. 원 `/tmp/edgetam-poc` 묶음은 사용자 위임 준비에서 `SF_MODELS_DIR`에 보존했고, 루트 ONNX 3개는 `artifacts/` 원본을 가리킨다. export 코드·전처리·hash 및 M1 검증은 [준비 기록](../README.md#모델-배치와-오프라인-검증)을 읽는다. (D-R7-11; research §7.1·8.1)
 - Java loader는 assets를 앱 전용 `files/models/<hash>/`에 최초 1회 원자 복사하고 OrtSession을 파일 경로로 연다. 매 실행 model byte[]/base64 복사 금지. hash가 같으면 재복사 안 함. 여러 feature는 공유 session을 사용하고 모델 없는 경우 mock으로 자동 전환하지 않는다. (D-R7-03)
 - ONNX Runtime Android AAR의 arm64 `.so`가 16 KB ELF page alignment를 제공하는 버전을 선정한다. 자체 JNI가 필요하면 NDK r28+ 또는 `-Wl,-z,max-page-size=16384`로 빌드한다. Java만 작성해도 패키징된 ORT `.so` 검증 의무가 사라지지 않는다. APK zip alignment와 ELF segment alignment를 모두 S11에서 확인하고 16 KB 에뮬레이터에서 로드·추론한다. research §7.1의 standalone runner 해결을 앱 AAR 검증으로 대체하지 않는다. (D-R7-03, D-R1-04)
-- 문서 단계에서는 모델 복사·빌드·테스트·실제 API 호출을 실행하지 않았다. 설치·export model hash와 Android 앱 검증은 각 구현 및 S11 작업의 명시 gate다. (D-R7-05, D-R7-11)
+- 문서 작성 당시 미실행이던 모델 복사·호스트 추론은 별도 준비 기록에 구분했다. Android 앱의 설치·모델 패키징·16 KB 실제 추론·실제 API 검증은 여전히 각 구현 및 S11 작업의 명시 gate다. (D-R7-05, D-R7-11)

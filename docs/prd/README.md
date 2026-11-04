@@ -60,15 +60,15 @@ UI 기준은 프로토타입(`prototype/`)이다. 흐름, 문구, 상태, 인터
 | S10 | data-model(피팅 규칙), device-modules(FaceMask), relay-api(§6.6) | tryon | privacy |
 | S11 | 전부 | 전부 | 전부 |
 
-## 선행 조건 (사용자가 직접 처리, D-R7-11)
+## 선행 조건 (사용자 책임, D-R7-11)
 
-슬라이스를 나눠 주기 전에 끝내야 한다. 에이전트가 대신 하지 않는다.
+슬라이스를 나눠 주기 전에 확인한다. 사용자가 별도 위임한 준비 작업의 이행 상태는 아래 준비 점검에 기록하며, 구현 슬라이스가 임의로 계정·키·모델을 대체하지 않는다.
 
 | # | 할 일 | 막히는 것 | 근거 |
 | --- | --- | --- | --- |
 | 1 | `docs/prd/`, `AGENTS.md`, 프로토타입 변경을 커밋한다. Orca worktree는 git 브랜치에서 만들어진다 | 모든 worktree가 PRD를 볼 수 없음 | D-R7-11 |
 | 2 | 제출 전에 GitHub 저장소를 public으로 바꾸고 문서와 코드를 push한다 | 제출 요건 | D-R8-01 |
-| 3 | 모델 파일을 기준 기기(M1)로 옮기고 `SF_MODELS_DIR`를 설정한다. 지금은 PRD 작성 기기(M4)의 `/tmp/edgetam-poc`에만 있다. 대상은 `edgetam_encoder.onnx`, `edgetam_decoder.onnx`, `pe_image.onnx`와 PE 텍스트 타워 가중치(`hf_cache`)다. 22장·7문구 검색 실험 자료(`/tmp/edgetam-poc/images`, `retrieval_r4`, `run_*.py`)도 S02·S05 호환 검사에 쓰므로 함께 옮긴다 | S02, S05, 통합 | D-R7-11, D-R10-03 |
+| 3 | 모델·PE 텍스트 가중치·원 연구 자료를 기준 기기(M1)에 보존하고 `SF_MODELS_DIR`를 설정한다. **완료:** `~/.cache/street-fitting/models`; 배치 구조·hash·오프라인 검증은 아래 "모델 배치와 오프라인 검증" 참조 | S02, S05, 통합 | D-R7-11, D-R10-03 |
 | 3a | 기준 기기에 아래 "기준 기기 준비"의 도구와 AVD를 만든다 | 모든 빌드·에뮬레이터 검증 | D-R10-03 |
 | 4 | Orca repo setup 훅을 설정한다: `app`·`prototype` `npm ci`, `relay` `uv sync` | 새 worktree 의존성 설치 | D-R7-11 |
 | 5 | Meta API 키를 넣는다(릴레이 환경 변수) | 실제 API 통합과 데모 녹화 | D-R1-04, D-R8-01 |
@@ -124,9 +124,32 @@ UI 기준은 프로토타입(`prototype/`)이다. 흐름, 문구, 상태, 인터
 | 지도 | OpenFreeMap style과 OSRM foot 합성 좌표 경로 요청 HTTP 200. 실제 앱 지도·길 안내 기능의 합격 증거는 아님 |
 | Aside | 로그인된 콘솔 조작·개발 자격 증명 저장·로컬 프로토타입 클릭 검증 성공. 키 값은 대화·Git에 넣지 않음 |
 
-**남은 선행 조건**
+### 모델 배치와 오프라인 검증
 
-1. 연구 모델 묶음은 이 M1에서 발견되지 않았다. 원본 Mac의 SSH 연결이 거부되고 Aside remote host 조회도 403이라 자동 복사하지 못했다. `edgetam_encoder.onnx`, `edgetam_decoder.onnx`, `pe_image.onnx`, PE `hf_cache`, 22장/7문구 연구 자료와 export·전처리·hash 근거를 옮겨야 한다. 새로운 가중치나 합성 자료로 기존 연구 재현을 가장하지 않는다.
-2. App Check debug 등록은 S00의 Firebase adapter가 실제 debug 토큰을 만든 뒤 Aside로 등록하고 통합에서 검증한다. Anonymous/Admin 성공이 App Check 검증 성공을 뜻하지 않는다.
-3. Orca repo setup 훅은 아직 비어 있다. CLI에 훅 설정 명령이 없고, Orca Computer Use의 Accessibility/Screen Recording 권한이 없어 UI 설정은 수행하지 못했다. 자동 UI 등록을 원하면 OS 권한이 필요하다. 그 전에도 조정자가 setup 스크립트를 명시 실행하는 방식으로 초기화를 자동화할 수 있다.
-4. provider 기본 Playground의 Contributor 선택이나 무료 크레딧 안내를 무보관 보장으로 해석하지 않는다. 구현은 계약의 Standard model ID와 저장 억제 옵션을 유지한다. 무료 크레딧 소진 시 기존 결제수단으로 과금될 수 있고 spend limit은 알림이지 하드 차단이 아니다.
+2026-11-04 사용자가 MacBook Air의 원본 묶음을 이 M1의 `/tmp/edgetam-poc`로 전송했다. 원본 Mac과 ONNX 3종의 SHA-256 일치는 사용자 확인이며, 준비 작업에서는 **전송본과 새 안정 배치본**을 비교했다.
+
+- 안정 경로: `SF_MODELS_DIR=$HOME/.cache/street-fitting/models`. 호스트 `env.sh`에 설정했고 `source scripts/worktree-env.sh`에서 모델 3개가 읽히는 것을 확인했다.
+- 원 묶음의 일반 파일 **697개 / 883,092,888 bytes**를 SHA-256으로 대조해 불일치 0개. 기존 상대 심볼릭 링크 6개도 대상 문자열·실제 해석 경로가 일치하며 모두 안정 디렉터리 안에서 해석된다.
+- 루트의 `edgetam_encoder.onnx`, `edgetam_decoder.onnx`, `pe_image.onnx`는 각각 `artifacts/`의 원 파일을 가리키는 상대 링크다. `hf_cache/`, `perception_models/`, `EdgeTAM/`, `images/`, `retrieval_r4/`, 원 export 코드·기준 출력도 함께 보존했다. `.venv`는 복사하지 않았고 ONNX를 재-export하지 않았다.
+- 원 스크립트·manifest의 `/tmp/edgetam-poc` 문자열은 출처 보존을 위해 수정하지 않았다. **원 `run_*.py`를 그대로 실행하면 임시 경로를 사용하고 기준 출력을 덮어쓰므로 실행하지 않는다.** 소비자는 그 prefix를 `SF_MODELS_DIR`로 해석해 읽고 검증 결과는 별도 경로에 쓴다.
+- PE 코드·토크나이저·설정: `$SF_MODELS_DIR/perception_models/core/vision_encoder/`. HF checkpoint: `$SF_MODELS_DIR/hf_cache/hub/models--facebook--PE-Core-T16-384/snapshots/8b4722741a516c18e7d311f158f13c600fea6c78/PE-Core-T16-384.pt`. 로더는 `HF_HOME=$SF_MODELS_DIR/hf_cache`, `HF_HUB_OFFLINE=1`, `local_files_only=True`로 캐시를 해석하고 CPU/eval로 strict state-dict 로딩했다. 네트워크 연결 차단 아래 연결 시도 0회였다.
+- 연구 저장소 revision: EdgeTAM `7711e012a30a2402c4eaab637bdb00a521302c91`, perception_models `3e352cca660658d4b5c90f42a7808b11469e4c66`.
+- 별도 호스트 검증 환경: `~/.cache/street-fitting/model-validation-venv`의 Python 3.12.16, torch 2.15.0, torchvision 0.29.2, ONNX Runtime 1.31.1, NumPy 2.1.2, Pillow 11.0.0, timm 1.0.15, einops 0.8.1. 전체 설치 버전은 아래 환경 manifest에 있다. 이는 S00의 relay lockfile을 대체하지 않는다.
+
+| ONNX | bytes | SHA-256 |
+| --- | --- | --- |
+| `edgetam_encoder.onnx` | 19,753,637 | `b13dd3cc3a60996e9f2a1ef55cdc3b9e70366706bd108d65ed6ea615543c918e` |
+| `edgetam_decoder.onnx` | 16,421,792 | `ceaa17668b6bd70fb7d1d79f8b78274d71101696e16ba31eef7ee5d8fef16978` |
+| `pe_image.onnx` | 31,994,387 | `10b2683490922a82a61ee108673fc94ea455c6ad3996b1f2dc86f93a935d114c` |
+
+**M1 CPU 실행 결과:** ONNX 3종 로딩·실제 추론·계약 shape·유한수 확인. 보존된 encoder 입력→decoder의 저해상도 mask 3개는 기준 이진 mask와 각각 IoU=1.0(logit max abs 1.1826e-4, score max abs 6.8546e-7). PE 기준 binary 입력의 출력 max abs는 9.9652e-7. PE tokenizer·텍스트 타워는 7×512 유한 벡터와 L2 norm 최대 오차 5.9605e-8을 확인했다.
+
+원 연구의 **동일 22장**을 PE ONNX로 다시 임베딩하고 **동일 7문구**를 실제 텍스트 타워로 인코딩했다. top-3 7/7, top-1 6/7이며 각 문구의 top-3 순서도 기존 결과와 일치했다. 이미지 벡터는 보존된 연구 벡터 대비 max abs 1.81795e-6, 최소 cosine 0.99999994였다.
+
+호스트 증거는 `~/.cache/street-fitting/model-bundle-manifest.json`(697개 파일 hash·기존 링크·모델 hash), `model-smoke-results.json`(shape·오차·검색 결과), `model-validation-environment.json`(의존성·revision)에 보관한다. 원 묶음·가중치·자격 증명을 Git에 넣지 않는다. **이는 Android 앱의 16 KB ORT AAR·모델 패키징·두 원본 사진의 mask PNG·FaceMask 안전성·live E2E 합격을 대신하지 않는다.** 해당 검사는 S00/S02/S05/S11에서 수행한다.
+
+**남은 선행 조건과 주의**
+
+1. App Check debug 등록은 S00의 Firebase adapter가 실제 debug 토큰을 만든 뒤 Aside로 등록하고 통합에서 검증한다. Anonymous/Admin 성공이 App Check 검증 성공을 뜻하지 않는다.
+2. Orca repo setup 훅은 아직 비어 있다. CLI에 훅 설정 명령이 없고, Orca Computer Use의 Accessibility/Screen Recording 권한이 없어 UI 설정은 수행하지 못했다. 자동 UI 등록을 원하면 OS 권한이 필요하다. 그 전에도 조정자가 setup 스크립트를 명시 실행하는 방식으로 초기화를 자동화할 수 있다.
+3. provider 기본 Playground의 Contributor 선택이나 무료 크레딧 안내를 무보관 보장으로 해석하지 않는다. 구현은 계약의 Standard model ID와 저장 억제 옵션을 유지한다. 무료 크레딧 소진 시 기존 결제수단으로 과금될 수 있고 spend limit은 알림이지 하드 차단이 아니다.
