@@ -1,0 +1,10 @@
+{
+  "status": "passed",
+  "scope": "synthetic device-independent boundary smoke",
+  "checks": [
+    "calibration threshold equality accepted",
+    "strict exceedance faceless decision",
+    "NaN infinity negative boolean metrics fail closed",
+    "transparent hidden RGB canonicalized without changing visible identity"
+  ]
+}

@@ -55,7 +55,14 @@ def generate():
    if not found:
     found=next((str(p.relative_to(FIX)) for directory in ['masks','audio'] for p in (FIX/directory).rglob('*') if p.is_file() and digest(p)==digest(path)),None)
    if found:parents=[found];source_type='derived';terms_url=OPENAI if not found.startswith('audio/') else 'source/generation.json';terms='Inherits fixture parent terms';procedure='Byte-identical synthetic fixture asset, not provider recording'
-   else:source_type='unverified';approved=False;terms='Unmapped relay binary: explicit source provenance required before publication';procedure='No approved source identity; not claimed to be generated or provider-recorded'
+   else:
+    provenance_path=path.parent.parent/'provenance.json'
+    record=json.loads(provenance_path.read_text()).get('assetDerivations',{}).get('assets/'+path.name,{}) if provenance_path.exists() else {}
+    source=(FIX/record.get('source','')).resolve()
+    if record and source.is_relative_to(FIX.resolve()) and source.is_file() and record.get('sha256')==digest(path) and record.get('sourceSha256')==digest(source):
+     parents=[str(source.relative_to(FIX.resolve()))];source_type='derived';terms_url=OPENAI;terms='Inherits hash-bound generated parent terms; publication still requires separate human approval';procedure=record['transform']
+    else:
+     source_type='unverified';approved=False;terms='Unmapped relay binary: explicit source provenance required before publication';procedure='No approved source identity; not claimed to be generated or provider-recorded'
   if source_type in {'codex-generated','derived','original-research'} or rel.startswith(('images/','capture/','masks/')):
    approval=approvals.get(rel,{})
    approved=False

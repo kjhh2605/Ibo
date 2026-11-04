@@ -8,6 +8,9 @@ import json
 import re
 import shutil
 import sys
+import hashlib
+import math
+import xml.etree.ElementTree as ET
 from PIL import Image
 from pydantic import TypeAdapter
 
@@ -17,7 +20,7 @@ from app import schemas as wire
 from build_fixtures import FIX
 from app.mock import lookup, pointer_parts, _mismatch, _resolve
 from app.errors import ERRORS, RelayError
-REQUIRED={'normal','shop-specific','time-specific','note-specific','past-trip','not-found','turn-limit','voice-empty','photo-limit','upstream-timeout','tryon-policy','route-unavailable','direct-cut-shop'}
+REQUIRED={'normal','shop-specific','time-specific','note-specific','past-trip','not-found','turn-limit','voice-empty','photo-limit','upstream-timeout','tryon-policy','route-unavailable','direct-cut-shop','e2e','e2e-route-start','e2e-route-reroute','e2e-tryon-other','e2e-tryon-target-only'}
 MODELS={
  'search-turn':(wire.SearchTurnRequest,wire.SearchTurnResponse),
  'search-segment':(wire.SearchSegmentRequest,wire.SearchSegmentResponse),
@@ -175,7 +178,10 @@ def build_e2e(seed):
  found=[{'photoRef':'current-item2','shopRef':'current-shop2','takenAt':seed['now'],'score':0.5}]
  req={'query':query,'queryToken':'runtime-token','toolResults':[{'toolCallId':'find-call','name':'find_photos','result':found}]}
  pair(directory,'search-turn',3,req,{'toolCalls':[{'id':'extract-call','name':'extract_items','arguments':{'photoRefs':['{{toolResults[0].result[0].photoRef}}'],'concept':concept}}]},ignore_extra=['/toolResults/0/result/0/score'])
- photos=[{'photoRef':'current-item2','image':image(directory,'images/shops/shop-2-items.png')}]
+ with Image.open(FIX/'images/shops/shop-2-items.png') as original:
+  original.convert('RGB').save(directory/'assets/shop-2-upload.jpg','JPEG',quality=90)
+  upload={'mimeType':'image/jpeg','data':{'asset':'assets/shop-2-upload.jpg'},'width':original.width,'height':original.height}
+ photos=[{'photoRef':'current-item2','image':upload}]
  candidates=[]
  for i,c in enumerate(json.loads((FIX/'masks/items/cases.json').read_text())['candidates'][4:8]):
   candidates.append({'id':f'candidate-{i+1}','label':concept,'score':c['score'],'mask':image(directory,c['mask']),'bbox':c['bbox']})
@@ -183,12 +189,43 @@ def build_e2e(seed):
  req={'query':query,'queryToken':'runtime-token','toolResults':[{'toolCallId':'extract-call','name':'extract_items','result':[{'photoRef':'current-item2','candidateCount':4,'topScore':1.0}]}]}
  pair(directory,'search-turn',4,req,{'final':{'photoRefs':['{{toolResults[0].result[0].photoRef}}'],'concept':concept,'summary':'Select the matching garment.'}})
  request=json.loads((directory/'tryon.01.request.json').read_text())['expected']
- request['target'].update(label=concept,category=concept)
+ request['target'].update(label=concept,category='unknown')
  request['companions']=[{**request['companions'][0],'pieceRef':'wardrobe','label':'Blue jacket','category':'jacket'},{**request['target'],'pieceRef':'direct','label':'Blue jacket','category':'jacket'}]
  # Native cutouts/self geometry is schema-validated, not compared to AI rectangles.
  geometry=[f'{prefix}/image/{axis}' for prefix in ['/selfPhoto','/target','/companions/0','/companions/1'] for axis in ['width','height']]
  pair(directory,'tryon',1,request,json.loads((directory/'tryon.01.response.json').read_text())['body'],ignore_extra=geometry)
- dump(directory/'provenance.json',{'sourceType':'hand-authored','providerRecording':False,'purpose':'Three-shop Android full-flow replay; native PE score is schema-validated, not a quality assertion. Semantic visit order, note, candidate counts and input roles are matched. No clock/ID override.'})
+ dump(directory/'provenance.json',{'sourceType':'hand-authored','providerRecording':False,'purpose':'Three-shop Android full-flow replay; native PE score is schema-validated, not a quality assertion. Semantic visit order, note, candidate counts and input roles are matched. No clock/ID override.','assetDerivations':{'assets/shop-2-upload.jpg':{'source':'images/shops/shop-2-items.png','sourceSha256':hashlib.sha256((FIX/'images/shops/shop-2-items.png').read_bytes()).hexdigest(),'sha256':hashlib.sha256((directory/'assets/shop-2-upload.jpg').read_bytes()).hexdigest(),'transform':'Pillow RGB JPEG quality90; native JPEG bytes are intentionally not compared'}}})
+ build_phases(directory,request)
+
+def build_phases(e2e,tryon):
+ """Explicit harness phase selection; coordinates remain exact schema/match inputs."""
+ side=json.loads((FIX/'gpx/walk.expected.json').read_text())
+ destination=side['destination'];waypoint=side['routeWaypoint']
+ for scenario,trace,index in [('e2e-route-start','walk',0),('e2e-route-reroute','walk-off-route',3)]:
+  points=[{'lat':float(node.attrib['lat']),'lng':float(node.attrib['lon'])} for node in ET.parse(FIX/f'gpx/{trace}.gpx').iter() if node.tag.endswith('trkpt')]
+  origin=points[index];coords=[[origin['lng'],origin['lat']],[waypoint['lng'],waypoint['lat']]]
+  def distance(a,b):
+   lat1,lat2=math.radians(a['lat']),math.radians(b['lat']);dlat=lat2-lat1;dlng=math.radians(b['lng']-a['lng'])
+   return 6371008.8*2*math.atan2(math.sqrt(math.sin(dlat/2)**2+math.cos(lat1)*math.cos(lat2)*math.sin(dlng/2)**2),math.sqrt(1-(math.sin(dlat/2)**2+math.cos(lat1)*math.cos(lat2)*math.sin(dlng/2)**2)))
+  length=distance(origin,waypoint);directory=FIX/'relay'/scenario
+  response={'geometry':{'type':'LineString','coordinates':coords},'distanceM':length,'durationS':length/1.3,'steps':[{'distanceM':length,'durationS':length/1.3,'name':'Synthetic walkway','maneuver':{'type':'depart','location':coords[0],'bearingBefore':180,'bearingAfter':180}}],'waypoints':[{'location':coords[0],'distanceM':0},{'location':coords[1],'distanceM':distance(waypoint,destination)}]}
+  pair(directory,'route',1,{'origin':origin,'destination':destination},response)
+  dump(directory/'provenance.json',{'sourceType':'hand-authored','providerRecording':False,'purpose':'Explicit GPX phase header only; exact origin and target matching, never body-selected response','trace':trace,'checkpointIndex':index})
+ response=json.loads((e2e/'tryon.01.response.json').read_text())['body']
+ def assets(value):
+  if isinstance(value,dict):
+   if set(value)=={'asset'}:yield value['asset']
+   else:
+    for child_value in value.values():yield from assets(child_value)
+  elif isinstance(value,list):
+   for child_value in value:yield from assets(child_value)
+ for scenario,companions in [('e2e-tryon-other',tryon['companions'][1:]),('e2e-tryon-target-only',[])]:
+  directory=FIX/'relay'/scenario;request=copy.deepcopy(tryon);request['companions']=copy.deepcopy(companions)
+  for name in set(assets(request))|set(assets(response)):
+   target=directory/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(e2e/name,target)
+  geometry=[f'{prefix}/image/{axis}' for prefix in ['/selfPhoto','/target']+[f'/companions/{i}' for i in range(len(companions))] for axis in ['width','height']]
+  pair(directory,'tryon',1,request,response,ignore_extra=geometry)
+  dump(directory/'provenance.json',{'sourceType':'hand-authored','providerRecording':False,'purpose':'Explicit real UI Generate with chosen companion count; no Result insertion or response override','companionCount':len(companions)})
 
 def validate(root=FIX):
  errors=[];relay=root/'relay'

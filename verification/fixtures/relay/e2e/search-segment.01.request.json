@@ -5,9 +5,9 @@
       {
         "photoRef": "current-item2",
         "image": {
-          "mimeType": "image/png",
+          "mimeType": "image/jpeg",
           "data": {
-            "asset": "assets/shop-2-items.png"
+            "asset": "assets/shop-2-upload.jpg"
           },
           "width": 309,
           "height": 310

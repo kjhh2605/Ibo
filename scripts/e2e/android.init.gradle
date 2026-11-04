@@ -1,0 +1,10 @@
+// S11 instrumentation sources remain outside the production app tree.
+gradle.projectsEvaluated {
+    def target = gradle.rootProject.findProject(':app')
+    if (target == null || !target.plugins.hasPlugin('com.android.application')) {
+        throw new GradleException('S11 requires the Capacitor Android app project')
+    }
+    def sources = System.getProperty('sf.verification.sources')
+    if (sources == null) throw new GradleException('Set -Dsf.verification.sources to scripts/e2e/android-src')
+    target.android.sourceSets.androidTest.java.srcDir(new File(sources))
+}

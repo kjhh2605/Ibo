@@ -78,6 +78,17 @@ def main():
    body=request(scenario,operation,int(step));envelope=json.loads(path.with_name(path.name.replace('.request.','.response.')).read_text())
    if envelope['status']==200:replay(scenario,operation,int(step),body)
    else:expect_error(lambda:replay(scenario,operation,int(step),body),envelope['body']['error']['code'],envelope['status'])
+ for scenario in ['e2e-route-start','e2e-route-reroute']:
+  body=request(scenario,'route',1);replay(scenario,'route',1,body)
+  for field in ['origin','destination']:
+   changed=copy.deepcopy(body);changed[field]['lat']+=0.0001
+   expect_error(lambda:loader.prepare(scenario,'route',1,changed),'fixture_request_mismatch',409,'/'+field+'/lat')
+  checks.append(scenario+': canonical origin/destination accepted; unknown coordinates ->409')
+ for scenario,count in [('e2e-tryon-other',1),('e2e-tryon-target-only',0)]:
+  body=request(scenario,'tryon',1);assert len(body['companions'])==count;replay(scenario,'tryon',1,body)
+  changed=copy.deepcopy(body);changed['companions'].append(copy.deepcopy(request('e2e','tryon',1)['companions'][0]))
+  expect_error(lambda:loader.prepare(scenario,'tryon',1,changed),'fixture_request_mismatch',409,'/companions')
+  checks.append(scenario+': exact companion count accepted; extra companion ->409')
  base=request('normal','search-turn',1);changed=copy.deepcopy(base);changed['query']='Different semantic query'
  expect_error(lambda:loader.prepare('normal','search-turn',1,changed,tokens=tokens,sub=sub),'fixture_request_mismatch',409,'/query');checks.append('semantic mutation ->409 first JSON pointer only')
  changed=copy.deepcopy(base);changed['context']['now']='2026-11-04T15:01:00+09:00';result=replay('normal','search-turn',1,changed);assert tokens.verify(result['queryToken'],sub,scenario='normal').context['now']==changed['context']['now'];checks.append('ignored timestamp replays and token records actual timestamp')
