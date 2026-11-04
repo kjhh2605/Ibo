@@ -1,0 +1,18 @@
+[
+ ["s1", "af_heart", "This is Dongmyo, in Seoul. Hundreds of street stalls. No signs, no addresses, and every piece is one of a kind."],
+ ["s2", "af_heart", "You spot a jacket you love. An hour later, which stall was it? And which of your forty photos?"],
+ ["s3", "af_heart", "Will it go with the jeans you already own? You can't try that on here."],
+ ["s4", "af_heart", "And the shirt two stalls down. Would it work with that jacket? Walk away, and it might be gone."],
+ ["s5", "af_heart", "Meet Ibo. Find it, try it on, and walk back, with Meta's models."],
+ ["s6", "af_heart", "Turn on shopping mode and just snap. Every photo keeps the spot where you took it. PE-Core indexes each photo right on your phone, and Muse Spark describes every storefront."],
+ ["s7a", "af_heart", "Later, just ask."],
+ ["s7q", "am_michael", "Find the blue jacket in the second shop."],
+ ["s7b", "af_heart", "Muse Voice Transcribe turns your voice into text. Muse Spark plans the search with tool calls. It checks your trips, narrows to the right shop, and searches your photos. Then SAM 3.1 outlines every garment. Best match first."],
+ ["s8", "af_heart", "Tap the jacket and save it. Flea markets have no product photos, so your photo becomes one. If SAM missed something, EdgeTAM cuts it out on the phone with a single tap. And the piece remembers where you found it."],
+ ["s9a", "af_heart", "Now, will it work with what you own? Add your jeans from your wardrobe, or pieces saved from other stalls. Up to five."],
+ ["s9b", "af_heart", "Before anything leaves your phone, your face and hair are masked on the device. Only that masked photo and the garment cutouts go to Muse Image."],
+ ["s9c", "af_heart", "Your face is put back on the phone. If it can't be done cleanly, the look is shown without it."],
+ ["s10", "af_heart", "One tap, and Ibo walks you back to the spot where you took the photo. Street stalls aren't on any map. Your photo is the address. Near the end, check the storefront, and confirm."],
+ ["s11", "af_heart", "One of a kind pieces. No signs. No fitting rooms. Every flea market has this problem. Ibo lets you find it, try it on, and walk back."],
+ ["s12", "af_heart", "Built this week: the Ibo app, its relay, and all product code. Pre-existing: the Astryx design system, the Capacitor template, a vendored UI kit for the prototype, and Meta's open EdgeTAM and PE-Core weights."]
+]
