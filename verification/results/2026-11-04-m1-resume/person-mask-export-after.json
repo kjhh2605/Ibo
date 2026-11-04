@@ -1,0 +1,794 @@
+{
+  "humanGroundTruth": false,
+  "privacyApproval": false,
+  "point": [
+    0.5,
+    0.5
+  ],
+  "cases": [
+    {
+      "id": "calibration-hat",
+      "sourceSha256": "8cae4180d99e2673231e06eae94375468ec7373906cec7b5a6bfce4592b5b2a4",
+      "w": 508,
+      "h": 764,
+      "masks": [
+        {
+          "rank": 0,
+          "decoderIndex": 1,
+          "score": 0.3461449146270752,
+          "png": "person-masks/calibration-hat-1.png",
+          "binary": "person-masks/calibration-hat-1.bin",
+          "pngSha256": "e2ce6a5bbfec820a56965fccd3a32feba2aefc623100802e88d8a04f39178477",
+          "binarySha256": "0459d7396a2f91afa548db83cb414705c4b64f952358f7e77ff51d1a52657ade",
+          "bboxPixels": [
+            161,
+            156,
+            183,
+            229
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "person_not_found"
+        },
+        {
+          "rank": 1,
+          "decoderIndex": 0,
+          "score": 0.2466227412223816,
+          "png": "person-masks/calibration-hat-0.png",
+          "binary": "person-masks/calibration-hat-0.bin",
+          "pngSha256": "fe08db34b53bb774152c644de5a40a9fa659647c06f2e8f0d146c443ae927045",
+          "binarySha256": "8ceef8bd35306999860e0b3f587d97a500eb0969783e619dcde8c9c86987171b",
+          "bboxPixels": [
+            149,
+            44,
+            210,
+            668
+          ],
+          "geometryAccepted": true,
+          "headBoxPixels": [
+            184,
+            18,
+            138,
+            133
+          ]
+        },
+        {
+          "rank": 2,
+          "decoderIndex": 2,
+          "score": 0.08123677968978882,
+          "png": "person-masks/calibration-hat-2.png",
+          "binary": "person-masks/calibration-hat-2.bin",
+          "pngSha256": "f6b036a3063c79bad162ed535b15b85516f4cb46cc515786a12cc40ffa3ea5be",
+          "binarySha256": "b3a786995e2c294e93b5b20041e33170d34c7b5a1af48e4ac555cf93d8be5736",
+          "bboxPixels": [
+            189,
+            159,
+            129,
+            226
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "person_not_found"
+        }
+      ]
+    },
+    {
+      "id": "calibration-long-hair",
+      "sourceSha256": "29ec7dce6072db707c2aa37b727a2fd290c1daed836d04a9f0212ce5f7f7a958",
+      "w": 508,
+      "h": 764,
+      "masks": [
+        {
+          "rank": 0,
+          "decoderIndex": 1,
+          "score": 0.7229105234146118,
+          "png": "person-masks/calibration-long-hair-1.png",
+          "binary": "person-masks/calibration-long-hair-1.bin",
+          "pngSha256": "e84064c12ea1795d4d7956b4389eecc81aed29d21c373316e7e306a88bf89ff7",
+          "binarySha256": "ead0bfa221c39e42a4024d87271ceaa8b9ca3af76922e7259b9ba0e974888e63",
+          "bboxPixels": [
+            186,
+            320,
+            141,
+            360
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "person_not_found"
+        },
+        {
+          "rank": 1,
+          "decoderIndex": 0,
+          "score": 0.4992859363555908,
+          "png": "person-masks/calibration-long-hair-0.png",
+          "binary": "person-masks/calibration-long-hair-0.bin",
+          "pngSha256": "a30811ff9b0c35b9216dcd0315f1c49521e5b91471163b0084e993c64c13ce61",
+          "binarySha256": "bc1a2fde59d7f8eb2d0dbd43b3950664a0b9e20147dee324987146ea68d259b2",
+          "bboxPixels": [
+            148,
+            66,
+            215,
+            655
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "head_not_found"
+        },
+        {
+          "rank": 2,
+          "decoderIndex": 2,
+          "score": 0.15015822649002075,
+          "png": "person-masks/calibration-long-hair-2.png",
+          "binary": "person-masks/calibration-long-hair-2.bin",
+          "pngSha256": "ae4cdd15f7d38212071111952d78a336ab6c946426d0f71344c8d2a24dfaa2bd",
+          "binarySha256": "70605fad2c6192d9030992da4bf8362d670132401623057d9570548ef4213332",
+          "bboxPixels": [
+            189,
+            335,
+            137,
+            151
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "person_not_found"
+        }
+      ]
+    },
+    {
+      "id": "hat",
+      "sourceSha256": "d4448dc0cef1bbeaade1d0e455c39ddf95e0131f85f080048025d256355a271c",
+      "w": 309,
+      "h": 309,
+      "masks": [
+        {
+          "rank": 0,
+          "decoderIndex": 1,
+          "score": 0.8387001752853394,
+          "png": "person-masks/hat-1.png",
+          "binary": "person-masks/hat-1.bin",
+          "pngSha256": "07052719556aea93dac80b312b9bec491bb39b4bb4a1045264ded138fde9064c",
+          "binarySha256": "1686da5459fb744353f2d89dff6f23098c0f07e1062425ad8ed4f4fc2e68c4fd",
+          "bboxPixels": [
+            121,
+            135,
+            66,
+            146
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "person_not_found"
+        },
+        {
+          "rank": 1,
+          "decoderIndex": 0,
+          "score": 0.38978707790374756,
+          "png": "person-masks/hat-0.png",
+          "binary": "person-masks/hat-0.bin",
+          "pngSha256": "008f37a8d90e56dafb441c1ebbe253711b5c0d651d2235767bcb743f7f276ef6",
+          "binarySha256": "3108b236ab321e390c226af3498a721f07637fe3f66128616c6c2847cb69f420",
+          "bboxPixels": [
+            109,
+            1,
+            89,
+            303
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "unsafe_boundary"
+        },
+        {
+          "rank": 2,
+          "decoderIndex": 2,
+          "score": 0.1033172607421875,
+          "png": "person-masks/hat-2.png",
+          "binary": "person-masks/hat-2.bin",
+          "pngSha256": "91dbc8f6bf6e39c0e37e171ca7dde6ded514435889638e1d3a0a31a2f3eb5bef",
+          "binarySha256": "ef4b96fded43a5c4f699447f98c98389506a3e2f7873a6a3d37fe9f97a8d5b08",
+          "bboxPixels": [
+            119,
+            99,
+            45,
+            181
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "person_not_found"
+        }
+      ]
+    },
+    {
+      "id": "heldout-hat",
+      "sourceSha256": "d9227821bc64a2459052aad583e4e4a0c741b83e0f98b4291c380ff453b9f732",
+      "w": 508,
+      "h": 764,
+      "masks": [
+        {
+          "rank": 0,
+          "decoderIndex": 2,
+          "score": 0.9295960664749146,
+          "png": "person-masks/heldout-hat-2.png",
+          "binary": "person-masks/heldout-hat-2.bin",
+          "pngSha256": "47aa566e1ed6b3295a97de7d0331b7cc8c59e2a88050baec245050eb6c05a0a3",
+          "binarySha256": "67229639c257eb13d669367513bc958fb6653c54471269d8b57e4491e994988f",
+          "bboxPixels": [
+            161,
+            162,
+            193,
+            240
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "person_not_found"
+        },
+        {
+          "rank": 1,
+          "decoderIndex": 1,
+          "score": 0.9279793500900269,
+          "png": "person-masks/heldout-hat-1.png",
+          "binary": "person-masks/heldout-hat-1.bin",
+          "pngSha256": "7de32f20ab8473a30b019f59d65633c6538b41899896a8e9fb362ae0a13ec1ed",
+          "binarySha256": "23a56f2d7437ba7087ce8174c5286d33c414558a49a74fa87ee5c1518456ebe4",
+          "bboxPixels": [
+            160,
+            162,
+            194,
+            240
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "person_not_found"
+        },
+        {
+          "rank": 2,
+          "decoderIndex": 0,
+          "score": 0.4920608699321747,
+          "png": "person-masks/heldout-hat-0.png",
+          "binary": "person-masks/heldout-hat-0.bin",
+          "pngSha256": "e3f3e12c3d702d68282cc44326992e32a83ed7fd87b08bb0ab94f1f0f690c5f3",
+          "binarySha256": "d284de6f76cd220390585f18d4ace9dcafab8a90826b7b160c30b8b021e1f5cb",
+          "bboxPixels": [
+            146,
+            53,
+            218,
+            667
+          ],
+          "geometryAccepted": true,
+          "headBoxPixels": [
+            188,
+            26,
+            134,
+            133
+          ]
+        }
+      ]
+    },
+    {
+      "id": "heldout-long-hair",
+      "sourceSha256": "3f1673b5e43d5ec9841f2eccc13e735401002f6f8c79ef72b3dd0eb62fd2fabd",
+      "w": 508,
+      "h": 764,
+      "masks": [
+        {
+          "rank": 0,
+          "decoderIndex": 1,
+          "score": 0.937604546546936,
+          "png": "person-masks/heldout-long-hair-1.png",
+          "binary": "person-masks/heldout-long-hair-1.bin",
+          "pngSha256": "7bb558f625d13da8d1ccca1793bc63dd14c4669ae125e6e21672f324694ddb03",
+          "binarySha256": "2c3b282eb4ae322e31f81df5b95bbecd090b32ba8bc46997860695663a75d445",
+          "bboxPixels": [
+            189,
+            344,
+            140,
+            334
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "person_not_found"
+        },
+        {
+          "rank": 1,
+          "decoderIndex": 0,
+          "score": 0.4855174720287323,
+          "png": "person-masks/heldout-long-hair-0.png",
+          "binary": "person-masks/heldout-long-hair-0.bin",
+          "pngSha256": "e1faba537e5aa3124d913e3ec76ed38ffe9bbfc939319383b3f1fb7e60564afe",
+          "binarySha256": "9d5a3d83c855155e396495792b7572f12b6d16b55b3d26daf7021572745b95b8",
+          "bboxPixels": [
+            149,
+            58,
+            215,
+            662
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "head_not_found"
+        },
+        {
+          "rank": 2,
+          "decoderIndex": 2,
+          "score": 0.25488758087158203,
+          "png": "person-masks/heldout-long-hair-2.png",
+          "binary": "person-masks/heldout-long-hair-2.bin",
+          "pngSha256": "ba4985f69d15c07ef5809773c0c94e2d6953c5f334a99642061cda63ea907582",
+          "binarySha256": "462eeea1964c9f04316c6b9d0003e77003fb8f44cfd1faa449d84591435f0cbf",
+          "bboxPixels": [
+            189,
+            177,
+            134,
+            501
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "person_not_found"
+        }
+      ]
+    },
+    {
+      "id": "long-hair",
+      "sourceSha256": "3673e5094135a75c875102c732e8e35d78376ccf76e27bc517aa933f7209b1dc",
+      "w": 310,
+      "h": 309,
+      "masks": [
+        {
+          "rank": 0,
+          "decoderIndex": 2,
+          "score": 0.6452099084854126,
+          "png": "person-masks/long-hair-2.png",
+          "binary": "person-masks/long-hair-2.bin",
+          "pngSha256": "a937c35235bfcca1c9d60b5d3d6cc8be031a785debf0430b68f2a9a8534ba855",
+          "binarySha256": "154247afc2a7e9bd0fba8eba75de555faec6371296a3085c32f236912782cd22",
+          "bboxPixels": [
+            152,
+            150,
+            5,
+            11
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "person_not_found"
+        },
+        {
+          "rank": 1,
+          "decoderIndex": 1,
+          "score": 0.026887506246566772,
+          "png": "person-masks/long-hair-1.png",
+          "binary": "person-masks/long-hair-1.bin",
+          "pngSha256": "694c63ffe2eeadaee144f06fe48cd9567898a6390c6ecdc667b3790c8b3b0d66",
+          "binarySha256": "81447a0fcf819a49ed4d22d48ab074971533f693dfedc81c74097ce55760bc7f",
+          "bboxPixels": [
+            125,
+            111,
+            59,
+            166
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "person_not_found"
+        },
+        {
+          "rank": 2,
+          "decoderIndex": 0,
+          "score": 0.002462416887283325,
+          "png": "person-masks/long-hair-0.png",
+          "binary": "person-masks/long-hair-0.bin",
+          "pngSha256": "bc1bebf4dca4d96bb1785615cbf667f601eb858de25341853a388e0471e4f90f",
+          "binarySha256": "a658f956ba3a0be75c504321d0c74c89f2c66fc0f4ad72111cfae033a9ee2f0e",
+          "bboxPixels": [
+            120,
+            5,
+            71,
+            295
+          ],
+          "geometryAccepted": true,
+          "headBoxPixels": [
+            124,
+            36,
+            75,
+            60
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cropped-head",
+      "sourceSha256": "dda1f884a1d1765ca8639d4c9a57f12aca23a2961ab01a1c46f9670d9cafdf32",
+      "w": 309,
+      "h": 310,
+      "masks": [
+        {
+          "rank": 0,
+          "decoderIndex": 1,
+          "score": 0.936592698097229,
+          "png": "person-masks/cropped-head-1.png",
+          "binary": "person-masks/cropped-head-1.bin",
+          "pngSha256": "63deed27ee194330b4fdfd9d8637bb225bf5ea9782768b215c07ff741865b55d",
+          "binarySha256": "bde2de093db3082cad4daa0cb23bdf5cce45ed83958d90260828d0873f2892cd",
+          "bboxPixels": [
+            25,
+            12,
+            260,
+            297
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "head_not_found"
+        },
+        {
+          "rank": 1,
+          "decoderIndex": 0,
+          "score": 0.8553255796432495,
+          "png": "person-masks/cropped-head-0.png",
+          "binary": "person-masks/cropped-head-0.bin",
+          "pngSha256": "0153a27dbe1334753b14bdba508fefb1e2bfebdc4846a0c2e0df67fb42e6a9d3",
+          "binarySha256": "4106d8fceac567ae6619fa4fb94c54ada6cc87a5470fd73db032fa01681c1331",
+          "bboxPixels": [
+            20,
+            0,
+            268,
+            310
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "unsafe_boundary"
+        },
+        {
+          "rank": 2,
+          "decoderIndex": 2,
+          "score": 0.04272502660751343,
+          "png": "person-masks/cropped-head-2.png",
+          "binary": "person-masks/cropped-head-2.bin",
+          "pngSha256": "fe16c4263e5fd11807bca15252c3103cd0defa6f74e595c5e1d40f8b73e98297",
+          "binarySha256": "682764b74afad20458ec3e8f59a1ae104a4f7fa0ccd09a4912a5734c723a87e5",
+          "bboxPixels": [
+            132,
+            131,
+            99,
+            70
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "person_not_found"
+        }
+      ]
+    },
+    {
+      "id": "half-body",
+      "sourceSha256": "f8fb2e6791a9591c04753e1b6372c397a2399b139caa4a596b68faebe6926c30",
+      "w": 309,
+      "h": 309,
+      "masks": [
+        {
+          "rank": 0,
+          "decoderIndex": 1,
+          "score": 0.7950361967086792,
+          "png": "person-masks/half-body-1.png",
+          "binary": "person-masks/half-body-1.bin",
+          "pngSha256": "3b77552c94ec95163e8cfb2ae86328682c4b2d13834c56368debd93d47b80cee",
+          "binarySha256": "1a6bd634754c7dc59407ab01ec623cd4555ae737cd57e76b4fa6c3cc9c941add",
+          "bboxPixels": [
+            111,
+            33,
+            91,
+            158
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "person_not_found"
+        },
+        {
+          "rank": 1,
+          "decoderIndex": 2,
+          "score": 0.5142544507980347,
+          "png": "person-masks/half-body-2.png",
+          "binary": "person-masks/half-body-2.bin",
+          "pngSha256": "3ef927f1813da1f6fc0eb16b59ccce4c304e36fdd8c6614e8fbd01914058ff8a",
+          "binarySha256": "acfc19494290d47a5d604e022f3bb959b9e2b34c89a31ad8f3977145436fc984",
+          "bboxPixels": [
+            128,
+            64,
+            62,
+            127
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "person_not_found"
+        },
+        {
+          "rank": 2,
+          "decoderIndex": 0,
+          "score": 0.1659604012966156,
+          "png": "person-masks/half-body-0.png",
+          "binary": "person-masks/half-body-0.bin",
+          "pngSha256": "691f9c4bf9b4f5d880284f6c7344c7d828753d9ed2a0fe6d3253750877ff38d3",
+          "binarySha256": "441a63ce420c5da4901e2a29e8d42186156bdbf20be21078712a09d377c1aa46",
+          "bboxPixels": [
+            22,
+            6,
+            276,
+            303
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "unsafe_boundary"
+        }
+      ]
+    },
+    {
+      "id": "multiple-people",
+      "sourceSha256": "afa5bed13c109ab45bfd48acceb91864cf85df00499a9faf77720b4bbe1fe783",
+      "w": 310,
+      "h": 310,
+      "masks": [
+        {
+          "rank": 0,
+          "decoderIndex": 1,
+          "score": 0.9272348880767822,
+          "png": "person-masks/multiple-people-1.png",
+          "binary": "person-masks/multiple-people-1.bin",
+          "pngSha256": "187dbb44ec8c2519e4d3121509f3f8ad243277072dd9e3452d5c17e277aef35a",
+          "binarySha256": "71d410cf119da2f95fe481dc9cff7c416c869df81525bcde90abf81f8603f6de",
+          "bboxPixels": [
+            14,
+            88,
+            170,
+            191
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "head_not_found"
+        },
+        {
+          "rank": 1,
+          "decoderIndex": 0,
+          "score": 0.6658897995948792,
+          "png": "person-masks/multiple-people-0.png",
+          "binary": "person-masks/multiple-people-0.bin",
+          "pngSha256": "9b6249865fd2f54d6751f8446b8b8bceedd79855ddf9b30686e6fe827fbf1125",
+          "binarySha256": "331a541a43b1c740ca23c98ddb3e3c611b18a37461f86eca773608857635dd91",
+          "bboxPixels": [
+            14,
+            3,
+            169,
+            307
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "unsafe_boundary"
+        },
+        {
+          "rank": 2,
+          "decoderIndex": 2,
+          "score": 0.1958734393119812,
+          "png": "person-masks/multiple-people-2.png",
+          "binary": "person-masks/multiple-people-2.bin",
+          "pngSha256": "d89639cb41adc4c7f05203396baca7c445500c069cd3d19e0014feaa6e76f701",
+          "binarySha256": "cad2cfee2cb54c1570650d91fd634790d55c80c25438af375068ce94073ba1ca",
+          "bboxPixels": [
+            15,
+            89,
+            169,
+            119
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "person_not_found"
+        }
+      ]
+    },
+    {
+      "id": "neck-hidden",
+      "sourceSha256": "644fcdd1ac02b624d63766ecbaa63e382c5d4495f03dc784de30539fed5e6b39",
+      "w": 310,
+      "h": 309,
+      "masks": [
+        {
+          "rank": 0,
+          "decoderIndex": 2,
+          "score": 0.5292088985443115,
+          "png": "person-masks/neck-hidden-2.png",
+          "binary": "person-masks/neck-hidden-2.bin",
+          "pngSha256": "398061afa97e615789a5cc9da410f794774d5328ccd42c2e8082f3fa129803ff",
+          "binarySha256": "d44d4c00bd13dadde29340a3d9ef3a67be592794dd8abdd4a922d27688234f4b",
+          "bboxPixels": [
+            82,
+            106,
+            166,
+            200
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "person_not_found"
+        },
+        {
+          "rank": 1,
+          "decoderIndex": 1,
+          "score": 0.528663694858551,
+          "png": "person-masks/neck-hidden-1.png",
+          "binary": "person-masks/neck-hidden-1.bin",
+          "pngSha256": "750754e962d07efb884f734804c9368e4f1156198eb49bb4aa3fed13d0a8eb2b",
+          "binarySha256": "0f714d911cc02bae8973e1b367d626f251a892c44c864f463091fa834412bf21",
+          "bboxPixels": [
+            52,
+            68,
+            218,
+            241
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "head_not_found"
+        },
+        {
+          "rank": 2,
+          "decoderIndex": 0,
+          "score": 0.39889681339263916,
+          "png": "person-masks/neck-hidden-0.png",
+          "binary": "person-masks/neck-hidden-0.bin",
+          "pngSha256": "622dde1c1a1075e45b298ee71bda07c3f1771c0a3c7e7fdb4790debba1247ba5",
+          "binarySha256": "aa52334cfe68223807554197e4f3d8d86318f0ab490e1110dd00ec64503dda99",
+          "bboxPixels": [
+            33,
+            7,
+            249,
+            302
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "head_not_found"
+        }
+      ]
+    },
+    {
+      "id": "hanger",
+      "sourceSha256": "98a502b7f44771a19cb1dfb36d94e2b6fccdc3f7560ea04b9948768ad8d00fb3",
+      "w": 309,
+      "h": 310,
+      "masks": [
+        {
+          "rank": 0,
+          "decoderIndex": 1,
+          "score": 0.7926796674728394,
+          "png": "person-masks/hanger-1.png",
+          "binary": "person-masks/hanger-1.bin",
+          "pngSha256": "61593778d9e09a6944c4a39bc7700f961ab72af8e92a74649797d4ead4e61e9c",
+          "binarySha256": "8b1d150e1da29854c9136438a77dc1b1573ed242bc49cd5f260b1e284d0414b6",
+          "bboxPixels": [
+            1,
+            139,
+            307,
+            170
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "head_not_found"
+        },
+        {
+          "rank": 1,
+          "decoderIndex": 0,
+          "score": 0.6296193599700928,
+          "png": "person-masks/hanger-0.png",
+          "binary": "person-masks/hanger-0.bin",
+          "pngSha256": "6395119f86131f90e4023134bdb5408ad71d6746b9df025e9e0049b474307f13",
+          "binarySha256": "69f72f207d0cb2da0663f3e628ecbd5575714b43b1ef29ced1acb69c6ede41a1",
+          "bboxPixels": [
+            0,
+            0,
+            309,
+            309
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "unsafe_boundary"
+        },
+        {
+          "rank": 2,
+          "decoderIndex": 2,
+          "score": 0.04317671060562134,
+          "png": "person-masks/hanger-2.png",
+          "binary": "person-masks/hanger-2.bin",
+          "pngSha256": "e1f4d8ff9e08ae488066104409ed88229670db7124a7b7b329f0e49e77081707",
+          "binarySha256": "098cda442e84a2d0bc33496430d8dfd576f7338b1c93765938673fd2dd3c8f33",
+          "bboxPixels": [
+            36,
+            143,
+            234,
+            77
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "person_not_found"
+        }
+      ]
+    },
+    {
+      "id": "mannequin",
+      "sourceSha256": "1f112bbf46301a9b24dbe02d260347f8176b8592e5b34eaffb5b416954f4c5a1",
+      "w": 310,
+      "h": 310,
+      "masks": [
+        {
+          "rank": 0,
+          "decoderIndex": 1,
+          "score": 0.9097132086753845,
+          "png": "person-masks/mannequin-1.png",
+          "binary": "person-masks/mannequin-1.bin",
+          "pngSha256": "61eff038fd45d5de79d4c3f7869f1dcf065515f5a518176b587952c2cf24e120",
+          "binarySha256": "0e0f1e873e2f7ba534e3c1a78f2fce4f81c88b565d5689e7a5dcd2db92d840c8",
+          "bboxPixels": [
+            125,
+            67,
+            60,
+            115
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "person_not_found"
+        },
+        {
+          "rank": 1,
+          "decoderIndex": 0,
+          "score": 0.8539148569107056,
+          "png": "person-masks/mannequin-0.png",
+          "binary": "person-masks/mannequin-0.bin",
+          "pngSha256": "49d78faf910207b5aa1f4bb4b031f14d2b7ffd9a76710a70e15665b1d4ec85e1",
+          "binarySha256": "9b1287c7174687ddde4d3b6b8fa8390b3aa23d9233223cefaa92c027789c5135",
+          "bboxPixels": [
+            124,
+            50,
+            61,
+            239
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "person_not_found"
+        },
+        {
+          "rank": 2,
+          "decoderIndex": 2,
+          "score": 0.27666231989860535,
+          "png": "person-masks/mannequin-2.png",
+          "binary": "person-masks/mannequin-2.bin",
+          "pngSha256": "4164214391c0f202657f6b272a4f4f945e72b28df5369c9781be2970e7456e05",
+          "binarySha256": "b067545939b507585ab72216c2c31cedf5b28b451cfa3207d2ad58ad10fcdb22",
+          "bboxPixels": [
+            129,
+            131,
+            51,
+            50
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "person_not_found"
+        }
+      ]
+    },
+    {
+      "id": "synthetic-mock-provider",
+      "sourceSha256": "9895c86dd714697ba5e342a8aec7f9a792a840be4534d1c52f3243c163fb9a16",
+      "w": 508,
+      "h": 764,
+      "masks": [
+        {
+          "rank": 0,
+          "decoderIndex": 1,
+          "score": 0.7544686198234558,
+          "png": "person-masks/synthetic-mock-provider-1.png",
+          "binary": "person-masks/synthetic-mock-provider-1.bin",
+          "pngSha256": "0476e09da798872e22c9be50cfd0871cc26c19482beb6aec8d08234ef6ffef8d",
+          "binarySha256": "2c84abc5fdab776f794a40cfd12e523465772bc7d9ce2e316b3288fc318c6d26",
+          "bboxPixels": [
+            162,
+            244,
+            183,
+            141
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "person_not_found"
+        },
+        {
+          "rank": 1,
+          "decoderIndex": 0,
+          "score": 0.43633943796157837,
+          "png": "person-masks/synthetic-mock-provider-0.png",
+          "binary": "person-masks/synthetic-mock-provider-0.bin",
+          "pngSha256": "10d6b0cc91f6228d0786871fb9341c1f1649d097d387ccbb41b8a57c9a249d86",
+          "binarySha256": "bc500ebb03e7f89f2ab0d924df2fbf5412f7d2651518759d1f9cae74a29ca9a8",
+          "bboxPixels": [
+            149,
+            150,
+            211,
+            568
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "head_not_found"
+        },
+        {
+          "rank": 2,
+          "decoderIndex": 2,
+          "score": 0.06646838784217834,
+          "png": "person-masks/synthetic-mock-provider-2.png",
+          "binary": "person-masks/synthetic-mock-provider-2.bin",
+          "pngSha256": "33c5554931d9f28acc76b603a35ca2f00f90c127ab99e65c77e318343001c09c",
+          "binarySha256": "f2a7eef665dc83c5ca5ed4ce3f1ac93f8c6931e4bda9bf4b8eed18c9af058f04",
+          "bboxPixels": [
+            189,
+            246,
+            129,
+            139
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "person_not_found"
+        }
+      ]
+    }
+  ],
+  "package": "com.streetfitting.app",
+  "ortVersion": "1.22.0"
+}

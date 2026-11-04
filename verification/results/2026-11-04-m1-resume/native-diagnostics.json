@@ -1,0 +1,26 @@
+{
+  "apk_sha256": "c8bcc67c443c11c65706082ecedbeee5627cac5ae020c579acbaa766b3979e91",
+  "global_device_lock": true,
+  "cases": [
+    {
+      "classes": [
+        "store.StoreRepositoryTest#discardedCandidateReleasesOwnershipAndSurvivesLateCleanup"
+      ],
+      "passed": false,
+      "elapsed_seconds": 0.8404785000000001,
+      "instrumentation_output": "\ncom.streetfitting.app.plugins.store.StoreRepositoryTest:\nError in discardedCandidateReleasesOwnershipAndSurvivesLateCleanup(com.streetfitting.app.plugins.store.StoreRepositoryTest):\njava.lang.AssertionError: Candidate lookup: file:///data/user/0/com.streetfitting.app/cache/relay/candidate-mask/5fa571bc-6633-4f27-b3cf-29791b62a1e5.png; canonical=/data/data/com.streetfitting.app/cache/relay/candidate-mask/5fa571bc-6633-4f27-b3cf-29791b62a1e5.png expected:<1> but was:<0>\n\tat org.junit.Assert.fail(Assert.java:89)\n\tat org.junit.Assert.failNotEquals(Assert.java:835)\n\tat org.junit.Assert.assertEquals(Assert.java:647)\n\tat com.streetfitting.app.plugins.store.StoreRepositoryTest.discardedCandidateReleasesOwnershipAndSurvivesLateCleanup(StoreRepositoryTest.java:72)\n\n\nTime: 0.097\nThere was 1 failure:\n1) discardedCandidateReleasesOwnershipAndSurvivesLateCleanup(com.streetfitting.app.plugins.store.StoreRepositoryTest)\njava.lang.AssertionError: Candidate lookup: file:///data/user/0/com.streetfitting.app/cache/relay/candidate-mask/5fa571bc-6633-4f27-b3cf-29791b62a1e5.png; canonical=/data/data/com.streetfitting.app/cache/relay/candidate-mask/5fa571bc-6633-4f27-b3cf-29791b62a1e5.png expected:<1> but was:<0>\n\tat org.junit.Assert.fail(Assert.java:89)\n\tat org.junit.Assert.failNotEquals(Assert.java:835)\n\tat org.junit.Assert.assertEquals(Assert.java:647)\n\tat com.streetfitting.app.plugins.store.StoreRepositoryTest.discardedCandidateReleasesOwnershipAndSurvivesLateCleanup(StoreRepositoryTest.java:72)\n\nFAILURES!!!\nTests run: 1,  Failures: 1\n\n\n"
+    },
+    {
+      "classes": [
+        "photoindex.PhotoIndexResearchTest",
+        "segmenter.SegmenterResearchTest",
+        "facemask.FaceMaskComposeTest",
+        "facemask.FaceMaskPrivacyTest",
+        "segmenter.PersonMaskExportTest"
+      ],
+      "passed": false,
+      "elapsed_seconds": 20.924344708,
+      "instrumentation_output": "\ncom.streetfitting.app.plugins.photoindex.PhotoIndexResearchTest:..\ncom.streetfitting.app.plugins.segmenter.SegmenterResearchTest:\nError in exactFrozenMasksAndCacheLifecycle(com.streetfitting.app.plugins.segmenter.SegmenterResearchTest):\njava.lang.AssertionError: All six frozen binary masks must have IoU=1\n\tat org.junit.Assert.fail(Assert.java:89)\n\tat org.junit.Assert.assertTrue(Assert.java:42)\n\tat com.streetfitting.app.plugins.segmenter.SegmenterResearchTest.exactFrozenMasksAndCacheLifecycle(SegmenterResearchTest.java:55)\n\ncom.streetfitting.app.plugins.facemask.FaceMaskComposeTest:.\ncom.streetfitting.app.plugins.facemask.FaceMaskPrivacyTest:.\nError in frozenSelfCorpusRequiresActualDetectionAndApprovedGroundTruth(com.streetfitting.app.plugins.facemask.FaceMaskPrivacyTest):\njava.lang.AssertionError: BLOCKED: human-reviewed face+hair GT required for every positive; drafts and model masks are not approval: [\"calibration-hat\",\"calibration-long-hair\",\"hat\",\"heldout-hat\",\"heldout-long-hair\",\"long-hair\"]\n\tat org.junit.Assert.fail(Assert.java:89)\n\tat org.junit.Assert.assertTrue(Assert.java:42)\n\tat com.streetfitting.app.plugins.facemask.FaceMaskPrivacyTest.frozenSelfCorpusRequiresActualDetectionAndApprovedGroundTruth(FaceMaskPrivacyTest.java:65)\n.\ncom.streetfitting.app.plugins.segmenter.PersonMaskExportTest:.\n\nTime: 20.233\nThere were 2 failures:\n1) exactFrozenMasksAndCacheLifecycle(com.streetfitting.app.plugins.segmenter.SegmenterResearchTest)\njava.lang.AssertionError: All six frozen binary masks must have IoU=1\n\tat org.junit.Assert.fail(Assert.java:89)\n\tat org.junit.Assert.assertTrue(Assert.java:42)\n\tat com.streetfitting.app.plugins.segmenter.SegmenterResearchTest.exactFrozenMasksAndCacheLifecycle(SegmenterResearchTest.java:55)\n2) frozenSelfCorpusRequiresActualDetectionAndApprovedGroundTruth(com.streetfitting.app.plugins.facemask.FaceMaskPrivacyTest)\njava.lang.AssertionError: BLOCKED: human-reviewed face+hair GT required for every positive; drafts and model masks are not approval: [\"calibration-hat\",\"calibration-long-hair\",\"hat\",\"heldout-hat\",\"heldout-long-hair\",\"long-hair\"]\n\tat org.junit.Assert.fail(Assert.java:89)\n\tat org.junit.Assert.assertTrue(Assert.java:42)\n\tat com.streetfitting.app.plugins.facemask.FaceMaskPrivacyTest.frozenSelfCorpusRequiresActualDetectionAndApprovedGroundTruth(FaceMaskPrivacyTest.java:65)\n\nFAILURES!!!\nTests run: 8,  Failures: 2\n\n\n"
+    }
+  ]
+}
