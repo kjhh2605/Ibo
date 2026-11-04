@@ -41,7 +41,7 @@
 
 모델 자체는 **실제 ONNX**를 사용하며 에뮬레이터 ML 합격을 mock으로 대체하지 않는다. 웹 소비자 테스트만 동일 계약의 mock을 쓴다. 초기 unit test의 Store fake는 S06 merge 뒤 실제 SQLite 연결 검사로 보완한다. 네트워크/Meta 호출은 S05에 없고, Muse Image 결과 입력은 승인 provider fixture를 읽는다. S11이 준비하는 head GT/negative/no-person/provider 출력은 읽기 전용이며 보정/검증 세트를 사전에 분리한다.
 
-모델 출처는 현재 `/tmp/edgetam-poc/artifacts`, 연구 실험/결과는 `/tmp/edgetam-poc/`이다. 사용자가 안정 경로로 복사하는 D-R7-11 준비를 S05가 대행하지 않는다. 22장/7문구 호환 검사를 위해 기기 이미지 벡터·model hash·전처리/사진 hash를 S02/S11에 제공하되 **네트워크 업로드가 아니라 로컬 검증 산출물**이다. 벡터/원본을 일반 앱 로그에 기록하지 않는다.
+모델·연구 실험/결과의 원 출처는 `/tmp/edgetam-poc/`이며, 사용자 위임 준비로 `SF_MODELS_DIR`에 보존됐다([배치·hash·호스트 검증](../README.md#모델-배치와-오프라인-검증)). S05는 기존 export를 덮어쓰거나 재-export하지 않는다. 22장/7문구 호환 검사를 위해 기기 이미지 벡터·model hash·전처리/사진 hash를 S02/S11에 제공하되 **네트워크 업로드가 아니라 로컬 검증 산출물**이다. 벡터/원본을 일반 앱 로그에 기록하지 않는다.
 
 ## 합격 기준
 

@@ -11,7 +11,7 @@
 | 확인할 준비 | 완료 증거와 미완료 처리 |
 |---|---|
 | 기준 커밋 | 사용자가 PRD/기존 앱을 기준 브랜치에 커밋했는지 확인. 미커밋 변경을 대신 커밋하지 않음 |
-| 모델 안정 경로 복사 | 사용자가 `/tmp/edgetam-poc/artifacts`의 이미지 ONNX 3개와 `/tmp/edgetam-poc/hf_cache`의 PE 텍스트 가중치·토크나이저·설정을 `SF_MODELS_DIR` 아래 준비. hash/revision/전처리 출처 확인. 임시 경로를 기본값으로 고정하지 않음 |
+| 모델 안정 경로 복사 | 사용자 위임 준비로 원 묶음과 ONNX 3개·PE 가중치·토크나이저·설정이 `SF_MODELS_DIR=$HOME/.cache/street-fitting/models`에 배치됐다. [준비 기록](../README.md#모델-배치와-오프라인-검증)의 hash/revision/전처리 출처를 사용한다. 임시 경로를 기본값으로 고정하지 않으며 호스트 검증을 앱 패키징·16 KB 추론 합격으로 대체하지 않음 |
 | Orca setup 훅 | 사용자 설정이 worktree마다 의존성·비밀 환경을 준비하고 서로 다른 `RELAY_PORT`를 제공하는지 확인. 설정 변경은 하지 않음 |
 | Meta API 키 | 사용자가 서버 전용 `MODEL_API_KEY`를 저장소 밖에 준비. 값은 출력/앱 번들/fixture에 넣지 않음 |
 | Firebase dev 프로젝트 | 개발 프로젝트·Android app 등록, 익명 인증, App Check debug provider와 Admin 자격 증명이 준비됐는지 확인. 비밀은 저장소 밖. 앱에는 dev 표시 없음 |
