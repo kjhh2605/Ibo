@@ -28,6 +28,21 @@
       "passed": true
     },
     {
+      "route": "capture",
+      "state": "shutter-visible-without-scroll",
+      "passed": true
+    },
+    {
+      "route": "capture",
+      "state": "storefront-shutter-visible-without-scroll",
+      "passed": true
+    },
+    {
+      "route": "capture",
+      "state": "thumbnail-shutter-visible-without-scroll",
+      "passed": true
+    },
+    {
       "route": "home",
       "state": "normal",
       "passed": true
@@ -299,12 +314,12 @@
     },
     "ids": {
       "trips": [
-        "fa483675-1be6-4df2-9247-3dd9c84b4106",
-        "079e0470-5913-4dd3-92b0-38f5fbc7b733"
+        "d5ac46d5-2a1a-424c-84f2-d7aaa2e67a0b",
+        "19b27fda-02de-479c-8fb9-b091a7407214"
       ],
       "photos": [
-        "357d5c07-a6d6-4c31-8379-2791d242743b",
-        "6e03f7d8-b881-4f13-81b5-af1ac80b506f",
+        "3503fbd0-c660-4d34-99d9-850a9ce32c0a",
+        "f5c4d81a-3481-4501-9ab3-095dbafc6d9f",
         "saturday-shop2-photo5",
         "saturday-shop2-photo4",
         "saturday-shop2-photo3",

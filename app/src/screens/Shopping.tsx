@@ -2,7 +2,7 @@ import {useEffect,useRef,useState} from 'react';
 import type {Route} from '../ui/navigation';
 import type {Photo,Shop} from '../native/contracts';
 import {useUi,useData,listAll} from '../ui/state';
-import {Action,Button,Confirm,EditFields,Empty,HStack,Loading,PhotoView,Problem,Section,Text,Thumbnail,VStack} from '../ui/components';
+import {Action,Button,Confirm,EditFields,Empty,Heading,HStack,Loading,PhotoView,Problem,Section,Text,Thumbnail,VStack} from '../ui/components';
 
 function failureCode(error:unknown):string {
   return typeof error==='object'&&error!==null&&'code'in error?String(error.code):'unknown';
@@ -111,12 +111,16 @@ export function Capture({route}:{route:Extract<Route,{name:'capture'}>}) {
     return()=>{active=false;observer?.disconnect();window.removeEventListener('resize',resize);window.removeEventListener('scroll',resize,true);void withCamera(()=>services.capture.closePreview()).catch(()=>{});ancestors.forEach((element,index)=>{element.style.background=backgrounds[index];});};
   },[services,purpose,route.purpose,route.shopId,attempt,recording]);
   if(purpose==='shopping'&&session&&session.phase!=='recording')return <Empty title="Shopping mode is off"><Text>Start shopping from Home before taking shop photos.</Text><Button label="Home" onClick={()=>popTo('home')}/></Empty>;
-  return <>
-    <VStack gap={3}>{purpose==='shopping'?<><Text>Shop {session?.shop?.n??'—'} · {session?.photos??0} photos</Text><Text type="supporting">{session?.latestFix?`Location accuracy ${Math.round(session.latestFix.accuracyM)} m`:'Waiting for location…'}</Text></>:<Text>{purpose==='self'?'Stand back so your full body is visible. Your original photo stays on this device.':purpose==='storefront'?'Fit the whole shop front in the frame. Taking this photo uses your current location once; it does not start a shopping trail.':'Photograph one wardrobe piece.'}</Text>}</VStack>
-    <VStack ref={view} role="img" aria-label="Camera preview" width="100%" minHeight="45dvh" style={{background:'transparent',aspectRatio:'3 / 4',position:'relative'}}/>
-    {error?<Problem message={error==='camera_permission_denied'?'Camera access is off. Allow access in device settings, then try again.':'The camera preview could not start. Try again or return to your saved photos.'} retry={()=>setAttempt(value=>value+1)}/>:!ready?<Loading/>:null}
-    {purpose==='shopping'&&banner&&session?.shop&&<Section title={`Shop ${session.shop.n} started`}><Text>This spot is saved.</Text><HStack gap={3} wrap="wrap"><Button label="Storefront photo" variant="secondary" onClick={()=>setStorefront(true)}/><Button label="Add note" variant="secondary" onClick={()=>showSheet({title:`Note for Shop ${session.shop!.n}`,content:<EditFields label={session.shop?.note??''} onSave={note=>services.store.updateShop({id:session.shop!.id,note:note||null})}/>})}/><Button label="Dismiss" variant="ghost" onClick={()=>setBanner(false)}/></HStack></Section>}
-    {storefront&&<Text>Fit the whole shop front in the frame</Text>}
+  return <VStack gap={3} minHeight={0} style={{flex:1}}>
+    <VStack gap={3} minHeight={0} isScrollable style={{flex:1}}>
+      {purpose==='shopping'?<HStack gap={3} hAlign="between" vAlign="start" wrap="wrap"><VStack gap={1}><Text>Shop {session?.shop?.n??'—'} · {session?.photos??0} photos</Text><Text type="supporting">{session?.latestFix?`Location accuracy ${Math.round(session.latestFix.accuracyM)} m`:'Waiting for location…'}</Text></VStack><EndShopping/></HStack>:<Text>{purpose==='self'?'Stand back so your full body is visible. Your original photo stays on this device.':purpose==='storefront'?'Fit the whole shop front in the frame. Taking this photo uses your current location once; it does not start a shopping trail.':'Photograph one wardrobe piece.'}</Text>}
+      {purpose==='shopping'&&banner&&session?.shop&&<VStack gap={2}><Heading level={2}>Shop {session.shop.n} started</Heading><Text>This spot is saved.</Text><HStack gap={2} wrap="wrap"><Button label="Storefront photo" variant="secondary" onClick={()=>setStorefront(true)}/><Button label="Add note" variant="secondary" onClick={()=>showSheet({title:`Note for Shop ${session.shop!.n}`,content:<EditFields label={session.shop?.note??''} onSave={note=>services.store.updateShop({id:session.shop!.id,note:note||null})}/>})}/><Button label="Dismiss" variant="ghost" onClick={()=>setBanner(false)}/></HStack></VStack>}
+      {storefront&&<Text>Fit the whole shop front in the frame</Text>}
+      <VStack ref={view} role="img" aria-label="Camera preview" width="100%" minHeight="25dvh" style={{background:'transparent',position:'relative',flex:1}}/>
+      {error?<Problem message={error==='camera_permission_denied'?'Camera access is off. Allow access in device settings, then try again.':'The camera preview could not start. Try again or return to your saved photos.'} retry={()=>setAttempt(value=>value+1)}/>:!ready?<Loading/>:null}
+    </VStack>
+    <HStack role="group" aria-label="Camera controls" gap={2} hAlign="between" vAlign="center" wrap="wrap" style={{flexShrink:0,background:'var(--color-surface)'}}>
+    {purpose==='shopping'&&!storefront&&latest&&<Thumbnail src={latest.file} alt="Latest captured garment" label="Latest photo" style={{width:'var(--spacing-10)',height:'var(--spacing-10)'}} onClick={()=>push({name:'pick',photoId:latest.id,mode:'shop'})}/>}
     <Action label={storefront||purpose==='storefront'?'Capture storefront':purpose==='self'?'Use this photo':'Take photo'} disabled={!ready||Boolean(error)} run={async()=>{
       const {asset,photo}=await withCamera(()=>services.capture.takePhoto({kind:storefront||purpose==='storefront'?'storefront':'item'}));
       if(!active.current){if(purpose==='self'||purpose==='wardrobe')await services.media.discard({assetId:asset.id});return;}
@@ -128,5 +132,7 @@ export function Capture({route}:{route:Extract<Route,{name:'capture'}>}) {
       else if(purpose==='storefront'){say('Storefront saved');back();}
       else{if(photo?.kind==='item')setLast(photo);setStorefront(false);if(!storefront)setBanner(false);say(storefront?'Storefront saved':'Photo saved');}
     }}/>
-    {storefront?<Button label="Cancel storefront" variant="ghost" onClick={()=>setStorefront(false)}/>:purpose==='shopping'?<HStack gap={3} wrap="wrap"><Action label="New shop" variant="secondary" run={async()=>{await services.shopping.newShop();setBanner(true);}}/>{latest&&<Thumbnail src={latest.file} alt="Latest captured garment" label="Latest photo" onClick={()=>push({name:'pick',photoId:latest.id,mode:'shop'})}/>}<EndShopping/></HStack>:<Button label="Cancel" variant="ghost" onClick={back}/>}</>;
+    {storefront?<Button label="Cancel storefront" variant="ghost" onClick={()=>setStorefront(false)}/>:purpose==='shopping'?<Action label="New shop" variant="secondary" run={async()=>{await services.shopping.newShop();setBanner(true);}}/>:<Button label="Cancel" variant="ghost" onClick={back}/>}
+    </HStack>
+  </VStack>;
 }

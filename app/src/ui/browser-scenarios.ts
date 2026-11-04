@@ -23,14 +23,25 @@ export async function runBrowserScenario(scenario:'full'|'states',url:string,out
   let failure:string|null=null;
   const button=(name:string|RegExp)=>page.getByRole('button',{name,exact:typeof name==='string'}).first();
   async function click(name:string|RegExp){await button(name).click();}
+  async function captureControls(state:string){
+    const original=page.viewportSize()!;
+    const shutter=page.getByRole('group',{name:'Camera controls'}).getByRole('button',{name:/^(Take photo|Capture storefront|Use this photo)$/});
+    await expect(shutter).toBeInViewport({ratio:1});
+    await page.setViewportSize({width:360,height:640});
+    await expect(shutter).toBeInViewport({ratio:1});
+    await page.setViewportSize(original);
+    matrix.push({route:'capture',state,passed:true});
+  }
   async function route(name:string,exerciseOffline=true){
     await expect(page.locator(`[data-route="${name}"]`)).toBeVisible();
     await expect.poll(async()=>(await inspect(page)).route).toBe(name);
     routes.add(name);matrix.push({route:name,state:'normal',passed:true});
     await expect(page.getByRole('button',{name:/^(Demo|Walk a step|Go off route|Download result)$/})).toHaveCount(0);
+    if(name==='capture')await captureControls('shutter-visible-without-scroll');
     if(scenario==='states'&&exerciseOffline){
       await context.setOffline(true);
       await expect(page.getByText('You’re offline. Saved photos and pieces are still available.')).toBeVisible();
+      if(name==='capture')await captureControls('offline-shutter-visible-without-scroll');
       matrix.push({route:name,state:'offline',passed:true});
       await context.setOffline(false);
       await expect(page.getByText('You’re offline. Saved photos and pieces are still available.')).toHaveCount(0);
@@ -49,8 +60,9 @@ export async function runBrowserScenario(scenario:'full'|'states',url:string,out
   try{
     await page.goto(url);await route('home');await shot('01-home');
     await click('Start shopping');await route('capture');
-    await click('Storefront photo');await click('Capture storefront');await click('Take photo');
+    await click('Storefront photo');await captureControls('storefront-shutter-visible-without-scroll');await click('Capture storefront');await click('Take photo');
     await expect.poll(async()=>(await inspect(page)).ids.photos.length).toBe(9);
+    await captureControls('thumbnail-shutter-visible-without-scroll');
     await shot('02-capture');await click('End shopping');await confirm('End shopping');await route('home');
     await click('Find it');await route('ask');await page.getByRole('searchbox').fill('a blue jacket');await click('Find');
     await expect.poll(async()=>(await inspect(page)).agent.status,{timeout:30000}).toBe('results');

@@ -10,8 +10,9 @@
 - `7e8a9d5`: portable fixture/엄격 replay·review import/validator. 구조 오류 0이지만 사람 승인/GT/배포 가능한 음성/연구 corpus의 외부 선행 조건은 그대로 보존한다. review UI의 polygon anti-alias를 binary mask로 보수적 변환하는 수정도 실제 화면에서 확인했다.
 - `f0213c4`: 실제 경계 계측과 native debug gate, web cross-tab GC 유실 수정, canonical device 오류 및 구형 bootstrap 제거. 실제 Chromium에서 계측 count 증가와 두 탭 소유권/파일 보존을 확인했다. M1의 private Store debug 메서드와 함께 검증 flag를 켜야 observer를 노출한다.
 - S01 M1 gate: 72 pytest + 실제 TCP 22 응답, 외부 호출/요청 파일 쓰기 0. M1 증거 `f237e2a`를 MacBook의 `5169aa8`로 가져왔다.
-- M1 보고: 실제 APK Home·Store 반복 정리·debug gate, 16 KB Android에서 ORT 추론 실행 확인. 원본 22장 비교의 5장 오차와 head detection 실패는 아직 조사 중이며 합격 기준을 낮추지 않았다. native 변경 checkpoint는 실제 검증 후 별도 SHA로 전달한다.
-- 남은 작업: native 원본 입력/전처리 일치, 사람 GT 기반 privacy, 실제 self/provider/wardrobe mask 연결, UI Result 종단, S11 mock/live E2E·16-call PoC·성능/출처·데모. 코드 checkpoint나 synthetic mock 성공을 이 gate들의 합격으로 대체하지 않는다.
+- M1 native `6207b15`를 이 브랜치 `58cca12`로 통합했다. 실제 원본 JPEG/PNG 각각 22장 벡터와 6개 segmentation mask가 엄격 기준을 통과했고, 실제 relay text tower × Android 22장 검색은 top3 7/7이다. CameraX·Store v2·private fixture와 실제 masks 기반 web Result/wardrobe 연결은 각 `2026-11-04-m1-resume/checkpoint.md`, `2026-11-04-s08-ui/CHECKPOINT.md` 증거를 따른다. native 전체 E2E나 사람 privacy 승인을 뜻하지 않는다.
+- **2026-11-05 KST 사용자 범위 변경:** “맥미니에서 사람 입력 대기중인 작업은 이번 작업범위에서 제외”. 사람 head GT·item-mask/분류 검토·자산 공개 승인·사용 동의 영어 녹음 및 그 입력에 의존하는 전체 mock/live E2E·품질/threshold·privacy/provenance 최종 판정·live 데모는 이번 재개 범위에서 제외한다. 제외는 PASS/승인/제품 요구사항 삭제가 아니다. 기존 CLI의 사람 입력 gate와 fail-closed 동작을 유지하며 승인 자료를 만들어 넣지 않는다.
+- 남은 이번 범위는 사람 입력이 필요 없는 실제 native 알림/권한·1시간 FGS 위치 유지·촬영 viewport 검증과 발견된 결함 수정, 양쪽 branch의 명시 SHA 통합 및 증거 기록이다. main/PR 병합은 하지 않는다.
 
 ## 중단 당시 지시와 Git 상태
 
