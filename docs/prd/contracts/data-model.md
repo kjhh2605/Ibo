@@ -70,6 +70,8 @@
 
 갤러리에서 선택한 옷장·본인 원본은 Photo 테이블에 넣지 않는다. `Photo`는 위치를 갖는 쇼핑 기록만 의미한다. 사진 검색 기본 집합은 kind=item이며 외관 사진도 한 번 색인하되 가게 설명 용도와 구별한다. (D-R2-09, D-R4-02, D-R3-03)
 
+예외적으로 Trip의 과거 가게 외관 추가/재촬영도 `kind=storefront` Photo로 저장한다. 이 경로는 ended Trip에도 허용하되 명시적 셔터 시 현재 위치 1회가 필수이며 기존 Shop.spot을 복사하지 않는다. 연속 trail/FGS는 생성하지 않는다. Photo·Shop.storefrontPhotoId·description pending·묘사 QueueJob은 같은 transaction으로 반영한다(D-R11-01).
+
 ### PhotoEmbedding
 
 | 필드 | 타입·키 | null | 제약 | 근거 |
