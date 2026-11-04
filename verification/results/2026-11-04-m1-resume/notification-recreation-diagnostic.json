@@ -1,0 +1,728 @@
+{
+  "scope": "diagnosis of the observed real notification/lifecycle failure, unchanged product/test",
+  "passed": false,
+  "elapsedSeconds": 98.599,
+  "instrumentationOutput": "\ncom.streetfitting.app.plugins.shopping.ShoppingSessionContractTest:\nError in notificationActionsOpenAndNewShopExactlyOnce(com.streetfitting.app.plugins.shopping.ShoppingSessionContractTest):\njava.lang.AssertionError: Activity never becomes requested state \"[RESUMED]\" (last lifecycle transition = \"PAUSED\")\n\tat androidx.test.core.app.ActivityScenario.waitForActivityToBecomeAnyOf(ActivityScenario.java:454)\n\tat androidx.test.core.app.ActivityScenario.moveToState(ActivityScenario.java:689)\n\tat androidx.test.core.app.ActivityScenario.recreate(ActivityScenario.java:718)\n\tat com.streetfitting.app.plugins.shopping.ShoppingSessionContractTest.notificationActionsOpenAndNewShopExactlyOnce(ShoppingSessionContractTest.java:51)\n\tSuppressed: java.lang.AssertionError: Activity never becomes requested state \"[DESTROYED]\" (last lifecycle transition = \"PAUSED\")\n\t\tat androidx.test.core.app.ActivityScenario.waitForActivityToBecomeAnyOf(ActivityScenario.java:454)\n\t\tat androidx.test.core.app.ActivityScenario.moveToState(ActivityScenario.java:689)\n\t\tat androidx.test.core.app.ActivityScenario.close(ActivityScenario.java:421)\n\t\tat com.streetfitting.app.plugins.shopping.NativeHarness.close(NativeHarness.java:71)\n\t\tat com.streetfitting.app.plugins.shopping.ShoppingSessionContractTest.notificationActionsOpenAndNewShopExactlyOnce(ShoppingSessionContractTest.java:33)\n\n\nTime: 97.801\nThere was 1 failure:\n1) notificationActionsOpenAndNewShopExactlyOnce(com.streetfitting.app.plugins.shopping.ShoppingSessionContractTest)\njava.lang.AssertionError: Activity never becomes requested state \"[RESUMED]\" (last lifecycle transition = \"PAUSED\")\n\tat androidx.test.core.app.ActivityScenario.waitForActivityToBecomeAnyOf(ActivityScenario.java:454)\n\tat androidx.test.core.app.ActivityScenario.moveToState(ActivityScenario.java:689)\n\tat androidx.test.core.app.ActivityScenario.recreate(ActivityScenario.java:718)\n\tat com.streetfitting.app.plugins.shopping.ShoppingSessionContractTest.notificationActionsOpenAndNewShopExactlyOnce(ShoppingSessionContractTest.java:51)\n\tSuppressed: java.lang.AssertionError: Activity never becomes requested state \"[DESTROYED]\" (last lifecycle transition = \"PAUSED\")\n\t\tat androidx.test.core.app.ActivityScenario.waitForActivityToBecomeAnyOf(ActivityScenario.java:454)\n\t\tat androidx.test.core.app.ActivityScenario.moveToState(ActivityScenario.java:689)\n\t\tat androidx.test.core.app.ActivityScenario.close(ActivityScenario.java:421)\n\t\tat com.streetfitting.app.plugins.shopping.NativeHarness.close(NativeHarness.java:71)\n\t\tat com.streetfitting.app.plugins.shopping.ShoppingSessionContractTest.notificationActionsOpenAndNewShopExactlyOnce(ShoppingSessionContractTest.java:33)\n\t\t... 33 more\n\nFAILURES!!!\nTests run: 1,  Failures: 1\n\n\n",
+  "activitySamples": [
+    {
+      "elapsedSeconds": 8.48,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 9.61,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 10.68,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 11.84,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 13.01,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 14.13,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 15.22,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 16.37,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 17.52,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 18.63,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 19.75,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 20.83,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 22.15,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 23.33,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 24.48,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 25.61,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 26.75,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 27.91,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 29.09,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 30.2,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 31.3,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 32.46,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 33.57,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 34.67,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 35.84,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 36.94,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 38.11,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 39.27,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 40.44,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 41.53,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 42.62,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 43.72,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 44.88,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 46.03,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 47.19,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 48.35,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 49.52,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 50.61,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 51.71,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 52.86,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ac93eb8 u0 com.streetfitting.app/com.streetfitting.app.MainActivity}",
+        "mFocusedApp=ActivityRecord{71231747 u0 com.streetfitting.app/.MainActivity t219}"
+      ]
+    },
+    {
+      "elapsedSeconds": 53.95,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 55.09,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 56.26,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 57.42,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 58.57,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 59.66,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 60.81,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 61.9,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 63.04,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 64.16,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 65.32,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 66.49,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 67.65,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 68.8,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 69.96,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 71.12,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 72.2,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 73.38,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 74.53,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 75.61,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 76.75,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 77.87,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 79.02,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 80.17,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 81.34,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 82.43,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 83.56,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 84.66,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 85.82,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 86.99,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 88.13,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 89.3,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 90.46,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 91.59,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 92.67,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 93.82,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 94.98,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 96.14,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 97.32,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    },
+    {
+      "elapsedSeconds": 98.49,
+      "stateLines": [
+        "topResumedActivity=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}",
+        "state=RESUMED finishing=false",
+        "mCurrentFocus=Window{ff58fdb u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}",
+        "mFocusedApp=ActivityRecord{164979974 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t2}"
+      ]
+    }
+  ]
+}

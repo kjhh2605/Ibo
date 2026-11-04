@@ -1,0 +1,15 @@
+{
+  "debug": {
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "release": {
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "scope": "JUnit XML from latest viewport build; APK identity bound in apk-layout-latest.json"
+}

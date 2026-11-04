@@ -1,0 +1,49 @@
+{
+  "scope": "actual Android permission dialogs, native state/SQLite and app UI; no mock or live model acceptance",
+  "cases": [
+    {
+      "name": "locationDenied",
+      "passed": true,
+      "tripShopPhotoPieceDelta": 0,
+      "trailDelta": 0,
+      "serviceCreated": false,
+      "appSettingsOpened": true
+    },
+    {
+      "name": "notificationDenied",
+      "passed": true,
+      "foreground": true,
+      "noticeCount": 1,
+      "notificationCard": false,
+      "repeatedStartSameTrip": true
+    },
+    {
+      "name": "locationRevoked",
+      "passed": true,
+      "scope": "OS stops the process/service; real app reopening commits orphan-session end and trail deletion",
+      "trailAfterReopen": 0,
+      "shopPreserved": true
+    },
+    {
+      "name": "cameraDenied",
+      "passed": true,
+      "source": "CameraX, no fixture extras",
+      "shutterEnabled": false,
+      "tripShopPhotoPieceDelta": 0
+    },
+    {
+      "name": "microphoneDenied",
+      "passed": true,
+      "source": "real microphone permission path, not hardware-recording proof",
+      "completed": 0,
+      "transcriptionRequests": 0,
+      "audioFileDelta": 0
+    }
+  ],
+  "passed": true,
+  "api": 37,
+  "pageSize": 16384,
+  "existingRecordsPreserved": true,
+  "ownEndedTrip": "0b0a6cd9-cb82-4f1e-80b9-48442edfb0b2",
+  "originalPermissionsAndHistoryRestored": true
+}

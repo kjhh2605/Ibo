@@ -93,7 +93,7 @@ public class CapturePlugin extends Plugin {
         String[] names = {"x", "y", "width", "height"};
         for (int i = 0; i < 4; i++) {
             Double value = call.getDouble(names[i]);
-            if (value == null || !Double.isFinite(value) || value < 0) { reject(call, "invalid_argument"); return; }
+            if (value == null || !Double.isFinite(value) || (i >= 2 && value < 0)) { reject(call, "invalid_argument"); return; }
             rect[i] = value.floatValue();
         }
         getActivity().runOnUiThread(() -> { applyRect(); call.resolve(); });

@@ -1,0 +1,27 @@
+{
+  "apk_sha256": "ad62dea13af50eddcd719e47a6a7cd357fce34b5b03c803de6f6e5e15a68bb76",
+  "release": {
+    "dexMarkerMatches": {
+      "sf_capture_source": 0,
+      "sf_capture_fixture_dir": 0,
+      "sf_voice_source": 0,
+      "sf_voice_fixture_dir": 0,
+      "CaptureSourceFactory$FixtureSource": 0,
+      "VoiceSourceFactory$FixtureSource": 0
+    },
+    "fixtureAssetPaths": []
+  },
+  "debugPositiveControl": {
+    "apk_sha256": "c18813965a9d3078c753e89df8511d9a588f2520daaa7e564bfbb3177d699cef",
+    "dexMarkerMatches": {
+      "sf_capture_source": 1,
+      "sf_capture_fixture_dir": 1,
+      "sf_voice_source": 1,
+      "sf_voice_fixture_dir": 1,
+      "CaptureSourceFactory$FixtureSource": 2,
+      "VoiceSourceFactory$FixtureSource": 2
+    },
+    "fixtureAssetPaths": []
+  },
+  "passed": true
+}

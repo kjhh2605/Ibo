@@ -80,6 +80,10 @@ public class CaptureContractTest {
         try (NativeHarness harness = new NativeHarness(new Intent().putExtra("sf_capture_source", "camera"))) {
             assertEquals("Setup: grant CAMERA", android.content.pm.PackageManager.PERMISSION_GRANTED, androidx.core.content.ContextCompat.checkSelfPermission(harness.context, android.Manifest.permission.CAMERA));
             preview(harness, "self"); SystemClock.sleep(1000); harness.evidence("camerax-preview");
+            assertEquals("invalid_argument", harness.invoke("Capture", "setPreviewRect",
+                new JSObject().put("x", -10).put("y", -120).put("width", -1).put("height", 320)).failure());
+            harness.invoke("Capture", "setPreviewRect",
+                new JSObject().put("x", -10).put("y", -120).put("width", 240).put("height", 320)).await();
             JSObject result = harness.invoke("Capture", "takePhoto", new JSObject().put("kind", "item")).await();
             File file = ImageFiles.local(result.getJSObject("asset").optString("file")); assertNotNull(BitmapFactory.decodeFile(file.getPath()));
             harness.activity.moveToState(androidx.lifecycle.Lifecycle.State.CREATED);

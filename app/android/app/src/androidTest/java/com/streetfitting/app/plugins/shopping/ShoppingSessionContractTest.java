@@ -7,12 +7,18 @@ import android.content.pm.PackageManager;
 import android.service.notification.StatusBarNotification;
 import androidx.core.content.ContextCompat;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
+import androidx.test.runner.lifecycle.Stage;
 import androidx.test.uiautomator.By;
+import androidx.test.uiautomator.BySelector;
 import androidx.test.uiautomator.UiObject2;
 import androidx.test.uiautomator.Until;
 import com.getcapacitor.JSObject;
+import com.streetfitting.app.MainActivity;
 import com.streetfitting.app.plugins.store.RepositoryProvider;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.junit.Assert.*;
@@ -29,28 +35,78 @@ public class ShoppingSessionContractTest {
     private JSObject start(NativeHarness harness) throws Exception {
         return harness.invoke("ShoppingSession", "start", new JSObject()).await();
     }
+    private MainActivity resumedActivity() {
+        AtomicReference<MainActivity> current = new AtomicReference<>();
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+            for (android.app.Activity activity : ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED))
+                if (activity instanceof MainActivity) current.set((MainActivity) activity);
+        });
+        return current.get();
+    }
+    private MainActivity awaitActivity(MainActivity previous) {
+        AtomicReference<MainActivity> current = new AtomicReference<>();
+        NativeHarness.until(() -> {
+            MainActivity activity = resumedActivity();
+            if (activity == null || activity == previous) return false;
+            current.set(activity); return true;
+        }, 10000);
+        return current.get();
+    }
+    private void tapNotification(NativeHarness harness, String action) throws Exception {
+        harness.device.openNotification();
+        BySelector selector = (action == null ? By.textContains("photos") : By.text(action)).pkg("com.android.systemui");
+        UiObject2 target = harness.device.wait(Until.findObject(selector), 3000);
+        if (target == null) {
+            UiObject2 expand = harness.device.findObject(By.descContains("Expand").pkg("com.android.systemui"));
+            if (expand != null) expand.click();
+            target = harness.device.wait(Until.findObject(selector), 3000);
+        }
+        assertNotNull("Notification target unavailable", target);
+        harness.evidence(action == null ? "shopping-notification" : "shopping-notification-" + action.replace(' ', '-'));
+        target.click();
+    }
     @Test public void notificationActionsOpenAndNewShopExactlyOnce() throws Exception {
         try (NativeHarness harness = new NativeHarness()) {
             assertTrue("Setup: grant location and inject a current emulator GPS fix", LocationFixes.permitted(harness.context));
             assertEquals("Setup: grant POST_NOTIFICATIONS", PackageManager.PERMISSION_GRANTED, ContextCompat.checkSelfPermission(harness.context, Manifest.permission.POST_NOTIFICATIONS));
             clean(harness); JSObject initial = start(harness);
-            NativeHarness.TestCall opened = harness.listen("ShoppingSession", "open");
             NotificationManager manager = harness.context.getSystemService(NotificationManager.class);
             StatusBarNotification[] cards = manager.getActiveNotifications(); assertEquals(1, cards.length);
             Notification card = cards[0].getNotification(); assertEquals(2, card.actions.length);
-            assertEquals("Take photo", card.actions[0].title.toString()); assertEquals("New shop", card.actions[1].title.toString());
-            harness.device.openNotification(); assertNotNull(harness.device.wait(Until.findObject(By.textContains("photos")), 3000));
-            UiObject2 expand = harness.device.findObject(By.descContains("Expand")); if (expand != null) expand.click();
-            assertNotNull(harness.device.wait(Until.findObject(By.text("Take photo")), 3000)); assertNotNull(harness.device.findObject(By.text("New shop"))); harness.evidence("shopping-notification"); harness.device.pressBack();
-            card.contentIntent.send(); NativeHarness.until(() -> opened.values.size() == 1, 4000); assertEquals("streetfitting://home", opened.values.get(0).optString("url"));
-            card.actions[0].actionIntent.send(); NativeHarness.until(() -> opened.values.size() == 2, 4000); assertEquals("streetfitting://capture", opened.values.get(1).optString("url"));
-            card.actions[1].actionIntent.send(); NativeHarness.until(() -> opened.values.size() == 3, 20000);
-            assertEquals("streetfitting://capture?newShop=1", opened.values.get(2).optString("url"));
-            int n = initial.getJSObject("shop").optInt("n") + 1;
-            assertEquals(n, harness.invoke("ShoppingSession", "getState", new JSObject()).await().getJSObject("shop").optInt("n"));
-            harness.activity.recreate();
-            assertEquals(n, harness.invoke("ShoppingSession", "getState", new JSObject()).await().getJSObject("shop").optInt("n"));
-            harness.invoke("ShoppingSession", "stop", new JSObject()).await();
+            // ActivityScenario filters by the launch Intent. Real notification
+            // delivery changes it, so observe the subsequent real lifecycle directly.
+            harness.activity.close();
+            try {
+                tapNotification(harness, null);
+                awaitActivity(null);
+                assertTrue(harness.device.wait(Until.hasObject(By.text("Shopping mode is on").pkg("com.streetfitting.app")), 20000));
+                tapNotification(harness, "Take photo");
+                awaitActivity(null);
+                assertTrue(harness.device.wait(Until.hasObject(By.text("Camera").pkg("com.streetfitting.app")), 20000));
+                harness.device.swipe(harness.device.getDisplayWidth()/2, harness.device.getDisplayHeight()*3/4,
+                    harness.device.getDisplayWidth()/2, harness.device.getDisplayHeight()/3, 30);
+                boolean shutterReady = harness.device.wait(Until.hasObject(By.text("Take photo").enabled(true).pkg("com.streetfitting.app")), 20000);
+                harness.evidence("shopping-notification-capture");
+                assertTrue("Preview must reopen after the notification", shutterReady);
+                tapNotification(harness, "New shop");
+                MainActivity previous = awaitActivity(null);
+                int n = initial.getJSObject("shop").optInt("n") + 1;
+                NativeHarness.until(() -> ShoppingService.active().state().getJSObject("shop").optInt("n") == n, 20000);
+                assertTrue(harness.device.wait(Until.hasObject(By.text("Shop " + n + " started").pkg("com.streetfitting.app")), 20000));
+                InstrumentationRegistry.getInstrumentation().runOnMainSync(previous::recreate);
+                MainActivity recreated = awaitActivity(previous);
+                NativeHarness.TestCall state = new NativeHarness.TestCall("ShoppingSession", "getState", new JSObject());
+                InstrumentationRegistry.getInstrumentation().runOnMainSync(() ->
+                    ((ShoppingSessionPlugin) recreated.getBridge().getPlugin("ShoppingSession").getInstance()).getState(state));
+                assertEquals(n, state.await().getJSObject("shop").optInt("n"));
+            } finally {
+                clean(harness);
+                InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+                    for (Stage stage : Stage.values())
+                        for (android.app.Activity screen : ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(stage))
+                            if (screen instanceof MainActivity && !screen.isFinishing() && !screen.isDestroyed()) screen.finish();
+                });
+            }
         }
     }
     @Test public void swipeRecentsThenReopenRestoresRecording() throws Exception {
