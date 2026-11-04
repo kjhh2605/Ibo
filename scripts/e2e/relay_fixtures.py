@@ -20,7 +20,7 @@ from app import schemas as wire
 from build_fixtures import FIX
 from app.mock import lookup, pointer_parts, _mismatch, _resolve
 from app.errors import ERRORS, RelayError
-REQUIRED={'normal','shop-specific','time-specific','note-specific','past-trip','not-found','turn-limit','voice-empty','photo-limit','upstream-timeout','tryon-policy','route-unavailable','direct-cut-shop','e2e','e2e-route-start','e2e-route-reroute','e2e-tryon-other','e2e-tryon-target-only'}
+REQUIRED={'normal','shop-specific','time-specific','note-specific','past-trip','not-found','turn-limit','voice-empty','photo-limit','upstream-timeout','tryon-policy','unsafe-provider','route-unavailable','direct-cut-shop','e2e','e2e-route-start','e2e-route-reroute','e2e-tryon-other','e2e-tryon-target-only'}
 MODELS={
  'search-turn':(wire.SearchTurnRequest,wire.SearchTurnResponse),
  'search-segment':(wire.SearchSegmentRequest,wire.SearchSegmentResponse),
@@ -144,11 +144,13 @@ def build():
  for scenario in ['normal','direct-cut-shop']:
   directory=FIX/'relay'/scenario
   pair(directory,'describe-piece',1,{'image':image(directory,'images/derived/shop-1-candidate-1.png')},{'label':'Blue jacket','category':'jacket'},match=['/image/mimeType'])
- for scenario in ['normal','tryon-policy']:
+ for scenario in ['normal','tryon-policy','unsafe-provider']:
   directory=FIX/'relay'/scenario
   req={'selfPhoto':{'image':image(directory,'images/derived/calibration-hat-masked.png'),'headMasked':True},'target':{'pieceRef':'target-shop','image':image(directory,'images/derived/shop-1-candidate-1.png'),'label':'Blue jacket','category':'jacket','origin':'shop'},'companions':[{'pieceRef':'wardrobe-jeans','image':image(directory,'images/wardrobe/jeans-cutout.png'),'label':'Jeans','category':'pants','origin':'wardrobe'}]}
-  response={'image':image(directory,'images/derived/calibration-hat-masked.png','synthetic-mock-output.png')} if scenario=='normal' else {'error':{'code':'content_policy_violation','message':'Request rejected by policy','retryable':False}}
-  pair(directory,'tryon',1,req,response,200 if scenario=='normal' else 400)
+  if scenario=='normal':response={'image':image(directory,'images/self/positive/calibration-hat.png','synthetic-full-person-output.png')}
+  elif scenario=='unsafe-provider':response={'image':image(directory,'images/derived/calibration-hat-masked.png','synthetic-mock-output.png')}
+  else:response={'error':{'code':'content_policy_violation','message':'Request rejected by policy','retryable':False}}
+  pair(directory,'tryon',1,req,response,400 if scenario=='tryon-policy' else 200)
  for scenario in ['normal','route-unavailable']:
   directory=FIX/'relay'/scenario
   origin={'lat':37.5454,'lng':127.0555};dest={'lat':37.5445,'lng':127.0555}; coords=[[origin['lng'],origin['lat']],[dest['lng'],dest['lat']+.0002]]
@@ -156,6 +158,10 @@ def build():
   if scenario=='route-unavailable':result={'error':{'code':'route_unavailable','message':'No walking route available','retryable':False}}
   pair(directory,'route',1,{'origin':origin,'destination':dest},result,200 if scenario=='normal' else 404)
  for scenario in REQUIRED:dump(FIX/'relay'/scenario/'provenance.json',{'sourceType':'hand-authored','providerRecording':False,'purpose':'strict deterministic synthetic wire fixture; not model quality evidence','requestAssetNotation':'data.asset expanded for offline schema validation; all data paths ignored for request matching'})
+ for scenario,source,expectation in [('normal','images/self/positive/calibration-hat.png','Actual native person/head geometry permits evaluation; uncalibrated output must be faceless'),('unsafe-provider','images/derived/calibration-hat-masked.png','Actual native person/head detector rejects this head-removed output; app must fail unsafe_output')]:
+  provenance=json.loads((FIX/'relay'/scenario/'provenance.json').read_text())
+  provenance['syntheticProviderResponse']={'source':source,'sourceSha256':hashlib.sha256((FIX/source).read_bytes()).hexdigest(),'transform':'byte-identical copy of existing synthetic fixture; NOT Muse Image output','expectedNativeBehavior':expectation,'humanApproval':False}
+  dump(FIX/'relay'/scenario/'provenance.json',provenance)
  build_e2e(seed)
 
 def build_e2e(seed):
@@ -195,6 +201,7 @@ def build_e2e(seed):
  geometry=[f'{prefix}/image/{axis}' for prefix in ['/selfPhoto','/target','/companions/0','/companions/1'] for axis in ['width','height']]
  pair(directory,'tryon',1,request,json.loads((directory/'tryon.01.response.json').read_text())['body'],ignore_extra=geometry)
  dump(directory/'provenance.json',{'sourceType':'hand-authored','providerRecording':False,'purpose':'Three-shop Android full-flow replay; native PE score is schema-validated, not a quality assertion. Semantic visit order, note, candidate counts and input roles are matched. No clock/ID override.','assetDerivations':{'assets/shop-2-upload.jpg':{'source':'images/shops/shop-2-items.png','sourceSha256':hashlib.sha256((FIX/'images/shops/shop-2-items.png').read_bytes()).hexdigest(),'sha256':hashlib.sha256((directory/'assets/shop-2-upload.jpg').read_bytes()).hexdigest(),'transform':'Pillow RGB JPEG quality90; native JPEG bytes are intentionally not compared'}}})
+ provenance=json.loads((directory/'provenance.json').read_text());provenance['syntheticProviderResponse']=json.loads((normal/'provenance.json').read_text())['syntheticProviderResponse'];dump(directory/'provenance.json',provenance)
  build_phases(directory,request)
 
 def build_phases(e2e,tryon):
@@ -226,6 +233,7 @@ def build_phases(e2e,tryon):
   geometry=[f'{prefix}/image/{axis}' for prefix in ['/selfPhoto','/target']+[f'/companions/{i}' for i in range(len(companions))] for axis in ['width','height']]
   pair(directory,'tryon',1,request,response,ignore_extra=geometry)
   dump(directory/'provenance.json',{'sourceType':'hand-authored','providerRecording':False,'purpose':'Explicit real UI Generate with chosen companion count; no Result insertion or response override','companionCount':len(companions)})
+  provenance=json.loads((directory/'provenance.json').read_text());provenance['syntheticProviderResponse']=json.loads((e2e/'provenance.json').read_text())['syntheticProviderResponse'];dump(directory/'provenance.json',provenance)
 
 def validate(root=FIX):
  errors=[];relay=root/'relay'

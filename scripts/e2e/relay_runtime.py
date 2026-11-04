@@ -5,6 +5,7 @@ Unit-level contract proof only: authenticated pseudonymous subject is supplied t
 loader directly. This does not claim HTTP authentication or emulator E2E acceptance.
 """
 import copy
+import base64
 import hashlib
 import json
 import os
@@ -89,6 +90,14 @@ def main():
   changed=copy.deepcopy(body);changed['companions'].append(copy.deepcopy(request('e2e','tryon',1)['companions'][0]))
   expect_error(lambda:loader.prepare(scenario,'tryon',1,changed),'fixture_request_mismatch',409,'/companions')
   checks.append(scenario+': exact companion count accepted; extra companion ->409')
+ for scenario in ['normal','e2e','e2e-tryon-other','e2e-tryon-target-only','unsafe-provider']:
+  output=replay(scenario,'tryon',1,request(scenario,'tryon',1))
+  source=FIX.parent/('images/derived/calibration-hat-masked.png' if scenario=='unsafe-provider' else 'images/self/positive/calibration-hat.png')
+  assert base64.b64decode(output['image']['data'],validate=True)==source.read_bytes()
+  provenance=json.loads((FIX/scenario/'provenance.json').read_text())
+  assert provenance['providerRecording'] is False and provenance['syntheticProviderResponse']['humanApproval'] is False
+  assert provenance['syntheticProviderResponse']['sourceSha256']==hashlib.sha256(source.read_bytes()).hexdigest()
+ checks.append('distinct full-person positive and head-removed unsafe-provider bytes replay unchanged; synthetic/unapproved provenance explicit')
  base=request('normal','search-turn',1);changed=copy.deepcopy(base);changed['query']='Different semantic query'
  expect_error(lambda:loader.prepare('normal','search-turn',1,changed,tokens=tokens,sub=sub),'fixture_request_mismatch',409,'/query');checks.append('semantic mutation ->409 first JSON pointer only')
  changed=copy.deepcopy(base);changed['context']['now']='2026-11-04T15:01:00+09:00';result=replay('normal','search-turn',1,changed);assert tokens.verify(result['queryToken'],sub,scenario='normal').context['now']==changed['context']['now'];checks.append('ignored timestamp replays and token records actual timestamp')
