@@ -258,7 +258,7 @@ export function Result({route}: {route: Extract<Route, {name: 'result'}>}) {
   const canChange = view.canChangePieces;
   const targetDeleted = links.data && !links.data.pieceIds.has(result.targetPieceId);
   return <>
-    <Section title="Your look"><Text>{snapshots.length} {snapshots.length === 1 ? 'piece' : 'pieces'} · {dateTime(result.createdAt)}</Text><PhotoView file={view.file} label={`Your generated look wearing ${view.target.label}`}/>{view.faceless && <Text>Your face couldn’t be put back cleanly, so this look is shown without it.</Text>}{targetDeleted && <Text>The target piece was deleted. Your look and walk-back location are still saved.</Text>}</Section>
+    <VStack gap={4}><Text>{snapshots.length} {snapshots.length === 1 ? 'piece' : 'pieces'} · {dateTime(result.createdAt)}</Text><PhotoView file={view.file} label={`Your generated look wearing ${view.target.label}`}/>{view.faceless && <Text>Your face couldn’t be put back cleanly, so this look is shown without it.</Text>}{targetDeleted && <Text>The target piece was deleted. Your look and walk-back location are still saved.</Text>}</VStack>
     {links.error && <Problem message="Your look is available, but links to the original pieces could not be checked." retry={links.retry}/>}
     <Section title="Wearing">
       {snapshots.map((piece, index) => <HStack key={piece.pieceId} gap={4} wrap="wrap" vAlign="center"><Thumbnail src={piece.cutoutFile} label={piece.label} alt={piece.label}/><VStack gap={2}><Text type="label">{piece.label}</Text><Text type="supporting">{index === 0 ? 'Target · ' : 'Companion · '}{piece.origin === 'wardrobe' ? 'Your wardrobe' : piece.shop ? `Shop ${piece.shop.n}` : 'Saved from a shop'}{links.data && !links.data.pieceIds.has(piece.pieceId) ? ' · Saved snapshot' : ''}</Text></VStack>{links.data?.pieceIds.has(piece.pieceId) && !links.loading && <Button label={`Open ${piece.label}`} variant="ghost" onClick={() => push({name: 'item', pieceId: piece.pieceId})}/>}</HStack>)}
@@ -282,7 +282,7 @@ export function Results() {
   if (results.loading) return <Loading/>;
   if (results.error) return <Problem message={results.error} retry={results.retry}/>;
   const saved = (results.data ?? []).toSorted((left, right) => right.createdAt - left.createdAt);
-  return <Section title="Try-ons"><Text>{saved.length} {saved.length === 1 ? 'look' : 'looks'} · kept on this phone</Text>{!online && <Text type="supporting">Your saved looks can be opened and deleted offline.</Text>}{!saved.length ? <Empty title="No looks yet"><Text>Open something you saved and tap Try it on.</Text><Button label="Open saved pieces" onClick={() => push({name: 'home'})}/></Empty> : saved.map(result => <VStack key={result.id} gap={3}><HStack gap={4} wrap="wrap" vAlign="center"><Thumbnail src={result.file} alt={`Look with ${result.targetSnapshot.label}`} label={`Open look with ${result.targetSnapshot.label}`} onClick={() => push({name: 'result', resultId: result.id})}/><VStack gap={2}><Text type="label">{result.targetSnapshot.label}</Text><Text type="supporting">{result.companionSnapshots.length + 1} pieces · {dateTime(result.createdAt)}</Text>{result.faceless && <Text type="supporting">Shown without your face</Text>}</VStack><Button label={`Open look from ${dateTime(result.createdAt)}`} variant="secondary" onClick={() => push({name: 'result', resultId: result.id})}/></HStack><DeleteResult result={result}/></VStack>)}</Section>;
+  return <VStack gap={4}><Text>{saved.length} {saved.length === 1 ? 'look' : 'looks'} · kept on this phone</Text>{!online && <Text type="supporting">Your saved looks can be opened and deleted offline.</Text>}{!saved.length ? <Empty title="No looks yet"><Text>Open something you saved and tap Try it on.</Text><Button label="Open saved pieces" onClick={() => push({name: 'home'})}/></Empty> : saved.map(result => <VStack key={result.id} gap={3}><HStack gap={4} wrap="wrap" vAlign="center"><Thumbnail src={result.file} alt={`Look with ${result.targetSnapshot.label}`} label={`Open look with ${result.targetSnapshot.label}`} onClick={() => push({name: 'result', resultId: result.id})}/><VStack gap={2}><Text type="label">{result.targetSnapshot.label}</Text><Text type="supporting">{result.companionSnapshots.length + 1} pieces · {dateTime(result.createdAt)}</Text>{result.faceless && <Text type="supporting">Shown without your face</Text>}</VStack><Button label={`Open look from ${dateTime(result.createdAt)}`} variant="secondary" onClick={() => push({name: 'result', resultId: result.id})}/></HStack><DeleteResult result={result}/></VStack>)}</VStack>;
 }
 
 function AddWardrobePiece() {
@@ -304,12 +304,12 @@ export function Wardrobe() {
   const {services, push, showSheet, online} = useUi();
   const wardrobe = useData(async () => ({pieces: await listAll(services, 'Piece', {origin: 'wardrobe'}), jobs: await listAll(services, 'QueueJob')}), [services]);
   return <>
-    <Section title="Wardrobe">
+    <VStack gap={4}>
       <Text>{wardrobe.data?.pieces.length ?? 0} pieces you own</Text>
       {wardrobe.loading ? <Loading/> : wardrobe.error ? <Problem message={wardrobe.error} retry={wardrobe.retry}/> : !wardrobe.data?.pieces.length ? <Empty title="Your wardrobe is empty"><Text>Add a piece you own, then wear it with a saved shop piece.</Text></Empty> : wardrobe.data.pieces.map(piece => <PieceRow key={piece.id} piece={piece} jobs={wardrobe.data?.jobs ?? []} action={<Button label={`Open ${piece.label}`} variant="secondary" onClick={() => push({name: 'item', pieceId: piece.id})}/>}/>)}
       <Text type="supporting">Mix these with what you saved to see them together. Only the cut-out piece is ever sent, never the whole photo.</Text>
       {!online && <Text type="supporting">You can add, browse and delete pieces offline. Naming waits for a connection.</Text>}
       <Button label="Add a piece" variant="primary" onClick={() => showSheet({title: 'Add a piece', content: <AddWardrobePiece/>})}/>
-    </Section>
+    </VStack>
   </>;
 }

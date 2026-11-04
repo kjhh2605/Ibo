@@ -148,3 +148,9 @@ verification/results/2026-11-04-s08-ui/CHECKPOINT.md
 ```
 
 추가 실행 산출물은 위 full/states matrix·PNG·server.log 및 최종 cleanup/location JSON·PNG다. 코드/문구 연결을 같은 UX 문서에 기록했으며 승인되지 않은 product decision·인간 승인·모델 성공을 추가하지 않았다. 모든 owned source/docs/evidence는 coordinator publish를 위해 동결하며, worker는 commit/merge/reset/cherry-pick을 하지 않았다.
+
+## Coordinator 후속: 중복 제목 제거
+
+인계된 실제 Pick screenshot에서 공통 Shell의 H1과 본문 Section의 같은 제목이 연속으로 표시되는 것을 확인했다. Search/Pick/Result/Results/Wardrobe의 중복 본문 제목만 제거하고 Shell 제목과 목적이 다른 하위 제목은 유지했다. 실제 Chromium 클릭으로 Ask/Wardrobe/Results/Pick을 열어 해당 제목이 각각 1개임을 확인했다. [Pick 시각 증거](single-title-pick.webp). Result 성공 화면은 기존 native mask 선행 조건 때문에 여전히 미확인이다.
+
+수정 후 `npm run lint && npm run build && npx astryx doctor --built dist && npx vitest run`은 exit 0, 18 files/227 tests 통과(835ms). 기존 lint 24개·theme-fonts·bundle 크기 경고는 동일하다. 검사용 탭과 서버는 종료했다.
