@@ -4001,6 +4001,46 @@
       "mode": "RGB"
     },
     {
+      "path": "relay/e2e/assets/shop-2-upload.jpg",
+      "sha256": "7b7929af48ad301d86a795f079a8082c9c41eb606e34e9de48f223132ca37171",
+      "mimeType": "image/jpeg",
+      "bytes": 28078,
+      "sourceType": "derived",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Pillow RGB JPEG quality90; native JPEG bytes are intentionally not compared",
+      "terms": {
+        "url": "https://openai.com/policies/row-terms-of-use/",
+        "checkedAt": "2026-11-04",
+        "summary": "Inherits hash-bound generated parent terms; publication still requires separate human approval",
+        "publicUseApproved": false
+      },
+      "parents": [
+        {
+          "path": "images/shops/shop-2-items.png",
+          "sha256": "7bf8c267f3f132e240eea8a782d3039061a031226e96e3d60aba9c3549e991d3"
+        }
+      ],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "width": 309,
+      "height": 310,
+      "mode": "RGB"
+    },
+    {
       "path": "relay/e2e/assets/synthetic-mock-output.png",
       "sha256": "9895c86dd714697ba5e342a8aec7f9a792a840be4534d1c52f3243c163fb9a16",
       "mimeType": "image/png",
@@ -4170,9 +4210,9 @@
     },
     {
       "path": "relay/e2e/provenance.json",
-      "sha256": "2c23e563865c31b51e182b7d350f782a0d7d74d3cd9bda60e15090f618922e57",
+      "sha256": "e195248497639bc46529d8aa96ce7a779ef068a50af2c62bd4f256bceeb2abd7",
       "mimeType": "application/json",
-      "bytes": 277,
+      "bytes": 666,
       "sourceType": "hand-authored",
       "generator": {
         "tool": "OMP fixture tooling",
@@ -4266,9 +4306,9 @@
     },
     {
       "path": "relay/e2e/search-segment.01.request.json",
-      "sha256": "fd890e8f4ce6a987da99efa1b0007c93aa3741ae2ceae8433cad4c40ea28a5e9",
+      "sha256": "f91f639d4ccd4fd5a9ca657f183e489aa4a83d04df39821440481a2feaca11a8",
       "mimeType": "application/json",
-      "bytes": 497,
+      "bytes": 499,
       "sourceType": "hand-authored",
       "generator": {
         "tool": "OMP fixture tooling",
@@ -4650,9 +4690,9 @@
     },
     {
       "path": "relay/e2e/tryon.01.request.json",
-      "sha256": "3f57501e0a06189613f24ca0098cd97429aa30c6844ab90bda0938b069bb521a",
+      "sha256": "270dc39cc3b86cfc60338080eb17c49d9f9eee5ae51ebf69569d4aae287e8648",
       "mimeType": "application/json",
-      "bytes": 1822,
+      "bytes": 1816,
       "sourceType": "hand-authored",
       "generator": {
         "tool": "OMP fixture tooling",
@@ -4682,6 +4722,630 @@
     },
     {
       "path": "relay/e2e/tryon.01.response.json",
+      "sha256": "c98ccfa61df76a3bba401503ba199931c8f301562c6a4371bbb306983b58c4c8",
+      "mimeType": "application/json",
+      "bytes": 206,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e-route-reroute/provenance.json",
+      "sha256": "d04ade4e888fab7e58c49753c45ba9420ae916fda67e2eb5a1d641326432aba3",
+      "mimeType": "application/json",
+      "bytes": 230,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e-route-reroute/route.01.request.json",
+      "sha256": "64a6fff96e47c3d895859bc62ce2263e989d4e8db1f40509908f894300b33dd4",
+      "mimeType": "application/json",
+      "bytes": 234,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e-route-reroute/route.01.response.json",
+      "sha256": "2bfa9a73143acec3643795bf3c9b9242443840f7f358992bb143613c3708bb6e",
+      "mimeType": "application/json",
+      "bytes": 961,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e-route-start/provenance.json",
+      "sha256": "17122d947108c66f512feb0c0ef035c0c28c830f8cc36f461dd2831dd472da0c",
+      "mimeType": "application/json",
+      "bytes": 220,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e-route-start/route.01.request.json",
+      "sha256": "76f8c6c06c89d5a5e513c81fce01a7df8d752a510cde474d9061efa1dcb139b8",
+      "mimeType": "application/json",
+      "bytes": 235,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e-route-start/route.01.response.json",
+      "sha256": "37babb9b7d9309777846be1f5077b36f0b52ccb911619f6c9ce556f7bbeef37b",
+      "mimeType": "application/json",
+      "bytes": 964,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e-tryon-other/assets/calibration-hat-masked.png",
+      "sha256": "9895c86dd714697ba5e342a8aec7f9a792a840be4534d1c52f3243c163fb9a16",
+      "mimeType": "image/png",
+      "bytes": 343475,
+      "sourceType": "derived",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
+      "terms": {
+        "url": "https://openai.com/policies/row-terms-of-use/",
+        "checkedAt": "2026-11-04",
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
+      },
+      "parents": [
+        {
+          "path": "images/derived/calibration-hat-masked.png",
+          "sha256": "9895c86dd714697ba5e342a8aec7f9a792a840be4534d1c52f3243c163fb9a16"
+        }
+      ],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "width": 508,
+      "height": 764,
+      "mode": "RGB"
+    },
+    {
+      "path": "relay/e2e-tryon-other/assets/shop-1-candidate-1.png",
+      "sha256": "037256a587aa41ea6c3a44e4ebf2db761d5e6962f586bea8ba5fd4899553dd56",
+      "mimeType": "image/png",
+      "bytes": 167163,
+      "sourceType": "derived",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
+      "terms": {
+        "url": "https://openai.com/policies/row-terms-of-use/",
+        "checkedAt": "2026-11-04",
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
+      },
+      "parents": [
+        {
+          "path": "images/derived/shop-1-candidate-1.png",
+          "sha256": "037256a587aa41ea6c3a44e4ebf2db761d5e6962f586bea8ba5fd4899553dd56"
+        }
+      ],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "width": 310,
+      "height": 310,
+      "mode": "RGBA"
+    },
+    {
+      "path": "relay/e2e-tryon-other/assets/synthetic-mock-output.png",
+      "sha256": "9895c86dd714697ba5e342a8aec7f9a792a840be4534d1c52f3243c163fb9a16",
+      "mimeType": "image/png",
+      "bytes": 343475,
+      "sourceType": "derived",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
+      "terms": {
+        "url": "https://openai.com/policies/row-terms-of-use/",
+        "checkedAt": "2026-11-04",
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
+      },
+      "parents": [
+        {
+          "path": "images/derived/calibration-hat-masked.png",
+          "sha256": "9895c86dd714697ba5e342a8aec7f9a792a840be4534d1c52f3243c163fb9a16"
+        }
+      ],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "width": 508,
+      "height": 764,
+      "mode": "RGB"
+    },
+    {
+      "path": "relay/e2e-tryon-other/provenance.json",
+      "sha256": "138976e87362c54f85a12abcdafdc16f0587827281130cd5effc1087391ed1ba",
+      "mimeType": "application/json",
+      "bytes": 201,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e-tryon-other/tryon.01.request.json",
+      "sha256": "648e250eeaaa3e605a19c2b98ba4273d9af0180145cf05284140437db4c99dd2",
+      "mimeType": "application/json",
+      "bytes": 1354,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e-tryon-other/tryon.01.response.json",
+      "sha256": "c98ccfa61df76a3bba401503ba199931c8f301562c6a4371bbb306983b58c4c8",
+      "mimeType": "application/json",
+      "bytes": 206,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e-tryon-target-only/assets/calibration-hat-masked.png",
+      "sha256": "9895c86dd714697ba5e342a8aec7f9a792a840be4534d1c52f3243c163fb9a16",
+      "mimeType": "image/png",
+      "bytes": 343475,
+      "sourceType": "derived",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
+      "terms": {
+        "url": "https://openai.com/policies/row-terms-of-use/",
+        "checkedAt": "2026-11-04",
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
+      },
+      "parents": [
+        {
+          "path": "images/derived/calibration-hat-masked.png",
+          "sha256": "9895c86dd714697ba5e342a8aec7f9a792a840be4534d1c52f3243c163fb9a16"
+        }
+      ],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "width": 508,
+      "height": 764,
+      "mode": "RGB"
+    },
+    {
+      "path": "relay/e2e-tryon-target-only/assets/shop-1-candidate-1.png",
+      "sha256": "037256a587aa41ea6c3a44e4ebf2db761d5e6962f586bea8ba5fd4899553dd56",
+      "mimeType": "image/png",
+      "bytes": 167163,
+      "sourceType": "derived",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
+      "terms": {
+        "url": "https://openai.com/policies/row-terms-of-use/",
+        "checkedAt": "2026-11-04",
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
+      },
+      "parents": [
+        {
+          "path": "images/derived/shop-1-candidate-1.png",
+          "sha256": "037256a587aa41ea6c3a44e4ebf2db761d5e6962f586bea8ba5fd4899553dd56"
+        }
+      ],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "width": 310,
+      "height": 310,
+      "mode": "RGBA"
+    },
+    {
+      "path": "relay/e2e-tryon-target-only/assets/synthetic-mock-output.png",
+      "sha256": "9895c86dd714697ba5e342a8aec7f9a792a840be4534d1c52f3243c163fb9a16",
+      "mimeType": "image/png",
+      "bytes": 343475,
+      "sourceType": "derived",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
+      "terms": {
+        "url": "https://openai.com/policies/row-terms-of-use/",
+        "checkedAt": "2026-11-04",
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
+      },
+      "parents": [
+        {
+          "path": "images/derived/calibration-hat-masked.png",
+          "sha256": "9895c86dd714697ba5e342a8aec7f9a792a840be4534d1c52f3243c163fb9a16"
+        }
+      ],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "width": 508,
+      "height": 764,
+      "mode": "RGB"
+    },
+    {
+      "path": "relay/e2e-tryon-target-only/provenance.json",
+      "sha256": "ca728380afff1ff216c52ec93d32eae065cfa3cc77fcd9b262fc0767827aeddc",
+      "mimeType": "application/json",
+      "bytes": 201,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e-tryon-target-only/tryon.01.request.json",
+      "sha256": "0ffeaf475456c0c8f75903be26202efefe493423f63f950d9db1d1dbd5cf27d1",
+      "mimeType": "application/json",
+      "bytes": 888,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e-tryon-target-only/tryon.01.response.json",
       "sha256": "c98ccfa61df76a3bba401503ba199931c8f301562c6a4371bbb306983b58c4c8",
       "mimeType": "application/json",
       "bytes": 206,
@@ -10456,9 +11120,9 @@
     },
     {
       "path": "review/index.html",
-      "sha256": "b7fbf5cbfd6c5df908587ce4eb147de78672df66d85e33d6cfafb18b0c6d1f15",
+      "sha256": "89c6dea6a02830ef50c0d2f0912e5d4a5be4938c8009739542e9dc07ab77450e",
       "mimeType": "text/html",
-      "bytes": 5020,
+      "bytes": 5297,
       "sourceType": "hand-authored",
       "generator": {
         "tool": "OMP fixture tooling",

@@ -1,0 +1,52 @@
+{
+  "status": 200,
+  "body": {
+    "geometry": {
+      "type": "LineString",
+      "coordinates": [
+        [
+          127.0555,
+          37.545399321
+        ],
+        [
+          127.0555,
+          37.54472483025316
+        ]
+      ]
+    },
+    "distanceM": 75.00005271158041,
+    "durationS": 57.69234823967724,
+    "steps": [
+      {
+        "distanceM": 75.00005271158041,
+        "durationS": 57.69234823967724,
+        "name": "Synthetic walkway",
+        "maneuver": {
+          "type": "depart",
+          "location": [
+            127.0555,
+            37.545399321
+          ],
+          "bearingBefore": 180,
+          "bearingAfter": 180
+        }
+      }
+    ],
+    "waypoints": [
+      {
+        "location": [
+          127.0555,
+          37.545399321
+        ],
+        "distanceM": 0
+      },
+      {
+        "location": [
+          127.0555,
+          37.54472483025316
+        ],
+        "distanceM": 25.000018039011106
+      }
+    ]
+  }
+}

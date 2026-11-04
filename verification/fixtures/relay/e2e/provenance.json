@@ -1,5 +1,13 @@
 {
   "sourceType": "hand-authored",
   "providerRecording": false,
-  "purpose": "Three-shop Android full-flow replay; native PE score is schema-validated, not a quality assertion. Semantic visit order, note, candidate counts and input roles are matched. No clock/ID override."
+  "purpose": "Three-shop Android full-flow replay; native PE score is schema-validated, not a quality assertion. Semantic visit order, note, candidate counts and input roles are matched. No clock/ID override.",
+  "assetDerivations": {
+    "assets/shop-2-upload.jpg": {
+      "source": "images/shops/shop-2-items.png",
+      "sourceSha256": "7bf8c267f3f132e240eea8a782d3039061a031226e96e3d60aba9c3549e991d3",
+      "sha256": "7b7929af48ad301d86a795f079a8082c9c41eb606e34e9de48f223132ca37171",
+      "transform": "Pillow RGB JPEG quality90; native JPEG bytes are intentionally not compared"
+    }
+  }
 }

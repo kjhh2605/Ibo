@@ -1,0 +1,17 @@
+{
+  "expected": {
+    "origin": {
+      "lat": 37.545399321,
+      "lng": 127.0555
+    },
+    "destination": {
+      "lat": 37.5445,
+      "lng": 127.0555
+    }
+  },
+  "match": [
+    "/origin",
+    "/destination"
+  ],
+  "ignore": []
+}

@@ -1,0 +1,44 @@
+{
+  "expected": {
+    "selfPhoto": {
+      "image": {
+        "mimeType": "image/png",
+        "data": {
+          "asset": "assets/calibration-hat-masked.png"
+        },
+        "width": 508,
+        "height": 764
+      },
+      "headMasked": true
+    },
+    "target": {
+      "pieceRef": "target-shop",
+      "image": {
+        "mimeType": "image/png",
+        "data": {
+          "asset": "assets/shop-1-candidate-1.png"
+        },
+        "width": 310,
+        "height": 310
+      },
+      "label": "a blue jacket",
+      "category": "unknown",
+      "origin": "shop"
+    },
+    "companions": []
+  },
+  "match": [
+    "/selfPhoto",
+    "/target",
+    "/companions"
+  ],
+  "ignore": [
+    "/selfPhoto/image/data",
+    "/target/pieceRef",
+    "/target/image/data",
+    "/selfPhoto/image/width",
+    "/selfPhoto/image/height",
+    "/target/image/width",
+    "/target/image/height"
+  ]
+}

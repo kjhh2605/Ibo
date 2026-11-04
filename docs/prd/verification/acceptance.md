@@ -11,7 +11,7 @@
 - [fixtures](fixtures.md), [S11 실행 인터페이스](../slices/S11-verification.md#구현할-검증-cli), [research §10](../../../street-fitting-research.md#10-남은-미정검증-항목).
 
 ## 소유 경로
-S11은 `verification/**`, `docs/prd/verification/*`, `scripts/e2e/**`만 변경한다. 앱/relay 결함은 해당 slice가 고친다. 아래 CLI는 각 슬라이스가 구현할 실행 계약이며 현재 파일 존재나 성공을 뜻하지 않는다.
+S11은 `verification/**`, `docs/prd/verification/*`, `scripts/e2e/**`만 변경한다. 앱/relay 결함은 해당 slice가 고친다. CLI 구현과 host smoke는 아래 실행 절에 기록하며, 파일 존재나 host 성공을 Android/live 합격으로 간주하지 않는다.
 
 ## 구현 항목
 ### 슬라이스별 합격 명령 요약
@@ -41,7 +41,7 @@ mock도 실제 촬영 시각/로컬 ID를 유지한다. relay는 scenario/operat
 
 | 단계 | 하는 일 | 담당 슬라이스 | 관찰 기준·합격 조건 |
 | --- | --- | --- | --- |
-| 0. 준비 | 모델/인증/relay mode·port·fixture hash 확인, 과거 trip seed와 빈 현재 쇼핑 상태, camera/voice debug source 활성화, `-gpu host` 에뮬레이터에서 앱 WebView WebGL 확인 | S00/S01/S11 | API37 PAGE_SIZE=16384, actual API 키 앱 없음, 모델 누락 fallback 없음, dev 배지0. live는 auth skip0. WebGL을 못 얻으면 지도 단계는 "검증 불가"로 기록하고 성공 처리하지 않음(GPU 이름은 기대하지 않음) |
+| 0. 준비 | 모델/인증/relay mode·port·fixture hash 확인, 실제 UI로 과거 trip 생성 후 빈 현재 쇼핑 상태, camera/voice debug source 활성화, `-gpu host` 에뮬레이터에서 앱 WebView WebGL 확인 | S00/S01/S11 | API37 PAGE_SIZE=16384, actual API 키 앱 없음, 모델 누락 fallback 없음, dev 배지0. live는 auth skip0. WebGL을 못 얻으면 지도 단계는 "검증 불가"로 기록하고 성공 처리하지 않음(GPU 이름은 기대하지 않음) |
 | 1. 시작 | Home에서 "Start shopping", 위치 허용·알림 허용. GPX 첫 점 주입 | S04/S06/S08/S11 | Trip1 recording+Shop1+trail 생성, 알림 카드1·액션2. 별도 변형에서 위치 거부 생성0/알림 거부 기록성공 |
 | 2. Shop 1 | 외관과 옷 사진 촬영, 메모 입력. 외관 묘사 처리 관찰 | S04/S05/S06/S08/S03 | 앱 전용 Photo·GPS/셔터시각, 사진당 index1회, 묘사는 background queue, 카메라 묘사 카드 없음 |
 | 3. Shop 2 | GPX 이동 뒤 알림 "New shop" 사용, 파란 재킷 포함 사진/외관 촬영 | S04/S05/S06/S08 | 수동 newShop 1회→n=2, 딥링크 중복 생성0. Shop.spot과 Photo.location 차이를 유지 |
@@ -83,7 +83,7 @@ mock도 실제 촬영 시각/로컬 ID를 유지한다. relay는 scenario/operat
 | 앱 키·원본 UID/토큰 유출 없음 (D-R6-01) | S00/S01/S11 | 번들/fixture 공개 검사, outbound safety_identifier 가명, 로그 인증/키0. dev UI0 |
 
 ## research 10장 잔여 검증
-기존 연구 실측을 앱 통과로 간주하지 않는다. 다음을 `scripts/emulator-lock.sh scripts/e2e/measure.sh --suite research10 --mode live`와 각 전용 명령으로 기록한다. 수치 SLA/정확도 목표가 합의되지 않은 행은 임의 임계값을 만들지 않고 측정 자체의 완전성과 기능 계약을 합격으로 둔다 [추론·검증 기준]. 현장·실기기 부재는 미확인으로 남기되 이번 에뮬레이터 납품 조건과 분리한다.
+기존 연구 실측을 앱 통과로 간주하지 않는다. 다음을 `scripts/emulator-lock.sh scripts/e2e/measure.sh --suite research10 --mode live --full-run <live-full-run> --poc-run <16-call-run> --seed-search`와 각 전용 명령으로 기록한다. 수치 SLA/정확도 목표가 합의되지 않은 행은 임의 임계값을 만들지 않고 측정 자체의 완전성과 기능 계약을 합격으로 둔다 [추론·검증 기준]. 현장·실기기 부재는 미확인으로 남기되 이번 에뮬레이터 납품 조건과 분리한다.
 
 | research 항목 | 현재 남은 것·담당 | 검증/합격 조건 |
 | --- | --- | --- |
@@ -118,4 +118,29 @@ mock도 실제 촬영 시각/로컬 ID를 유지한다. relay는 scenario/operat
 - 계약 변경 요청 또는 "없음". 결함은 담당 slice·재현 명령·기대/관측을 함께 보낸다.
 
 ## 미확인·위험
-현재 문서는 검사 설계이며 코드·build·실호출을 수행하지 않았다. 개인정보 무저장은 앱/릴레이 경계의 보장이고 Meta 서비스의 즉시 삭제를 보장하지 않는다. 생성 fixture 성공이 실제 사람/실제 매장의 일반 성능을 증명하지 않는다.
+Host 구현 smoke 범위는 아래에 기록한다. 전체 Android/live 합격은 아직 미확인이다. 개인정보 무저장은 앱/릴레이 경계의 보장이고 Meta 서비스의 즉시 삭제를 보장하지 않는다. 생성 fixture 성공이 실제 사람/실제 매장의 일반 성능을 증명하지 않는다.
+
+## S11 실행 구현과 남은 입력 (2026-11-04)
+
+`scripts/e2e/entry.py`가 10개 shell CLI의 실제 backend다. 종료값은 passed=0, failed=1, blocked/사용법=2이며 새 `verification/results/<UTC-operation-id>/summary.json`에 상태를 남긴다. 예전 결과를 덮어쓰지 않는다. shell은 임의 cwd에서도 저장소 루트로 이동하며 relay의 uv 환경을 사용한다. `scripts/e2e`의 `npm ci`로 Playwright-Android 의존성을 설치한다.
+
+- Android APK는 `VITE_SF_VERIFICATION=1`, `VITE_SF_RELAY_MODE=mock|live`, mock의 `VITE_SF_FIXTURE=e2e`로 빌드한다. native `FLAG_DEBUGGABLE` 확인 뒤 읽기 전용 `window.__sfVerification.inspect()`를 사용한다. 서비스/state setter나 JS clock/ID override는 없다.
+- 기기 명령은 `ANDROID_SERIAL`과 상위 `scripts/emulator-lock.sh`를 요구한다. 앱 전용 `getFilesDir()/capture-fixtures`, `capture-cases/<case>`, `voice-fixtures`만 사용한다. shell 임시파일→`run-as cp` 후 임시파일 제거, root/권한 우회/외부 저장소 fallback 없음. 모든 `am start`/deep link에 현재 source/directory extras를 보존한다. 실제 Home으로 Capture를 unmount한 뒤 새 intent/reopen으로 source를 교체한다. `MainActivity.onNewIntent`의 실제 intent 갱신과 두 폴더/index reset은 M1 검증 항목이다.
+- full은 실제 UI로 과거2가게 trip, 현재3가게 trip, 검색/저장, Item/Result Walk, 두 조합의 Result를 만든다. 한 Result 삭제 시 다른 Result의 row·모든 복사본 hash 불변을 확인한 뒤 두 번째를 삭제한다. 자체 파일 삭제와 PhotoEmbedding cascade도 확인한다. 추가 오류/경합 변형의 slice suite를 대체하지 않는다.
+- mock route는 `e2e-route-start`/`e2e-route-reroute`, 두 번째 조합은 `e2e-tryon-other`(동반1), 분할 tryon 영상은 `e2e-tryon-target-only`(동반0)를 사용한다. harness phase/path만으로 실제 POST의 `X-SF-Fixture` 헤더를 바꾸며 body/response는 그대로 전달한다. 좌표·동반 수를 ignore하지 않으며 잘못된 값은409이다. live는 헤더 interception을 설치하지 않는다. 실제 Android WebView의 header 전달은 **미확인**이며 host Chromium 성공으로 대신하지 않는다.
+- `privacy.sh`는 실제 ASGI 입력/HTTPX Meta·OSRM 출력, request-context 파일/DB audit, metadata 로그를 검사한다. body는 메모리에서 폐기하며 hash/count/허용 assertion만 저장한다. native Store 파일 hash inventory와 실제 12개 head 검사 결과를 결합한다. 앱 inspector counter 범위는 `relay-attempts/shared-file-reads/media-export-attempts`이며 native 전체 호출 spy라고 주장하지 않는다. 다운로드 차단은 별도 실제 native export 실패·MediaStore 전후로 확인한다.
+- `tryon-poc.sh --plan 16 --mode live`는 12개 calibration 뒤 사람의 구도 승인/최적 mode 선택을 기다리고 `--resume <run-id>`로 나머지3+1을 실행한다. 원본 provider bytes는 로컬 `~/.cache/street-fitting/poc/<run-id>/`에 보관한다. 자동 metric/thresholdVersion과 held-out 재현을 기록하지만 product threshold를 몰래 승격하지 않는다. `provenance.sh --run <poc-run> --app-run <full-run>`으로 실제 앱 download-OFF 증거를 연결한다. 워터마크 판정 미확인은 그대로 OFF이다.
+- `measure.sh`는 원본22×7 native proof, 실제 query/SAM 결과·IoU, 1시간 background FGS, 실제 ASGI endpoint 지연·모델 load/encode와 app PSS/relay RSS 표본을 연결한다. `--seed-search`만 S11 test APK의 실제 native repository/인덱싱을 통한 과거 합성 방문 import를 허용한다. 합성 embedding 주입이나 실제 연구 수치 대체는 없다. 표본 peak는 무관측 구간의 절대 peak가 아니다.
+- 영상은 `demo.sh --mode live --segment shopping|search|tryon|walk --seconds <1..180>`를 순서대로 실행하고 `demo.sh --concat --inputs <shopping-run> <search-run> <tryon-run> <walk-run>`으로 합친다. 단일 full 영상도 가능하나 실제 시나리오가 녹화시간을 넘으면 실패한다. concat은 성공 live 입력과 전체 흐름 순서, 최종180초 이하, ffmpeg 끝까지 decode를 요구한다.
+
+### 사람이 제공해야 하는 입력
+
+현재 승인/GT는 **0**이다. 생성 초안은 parser/replay smoke에만 사용하며 승인 corpus로 취급하지 않는다.
+
+1. `verification/fixtures/review/head.json`: 12개 정확한 case의 사람 annotation/classification·검토자/일자·source/GT hash. positive6은 실제 머리 GT, negative6은 사람 판정이 필요하다. 자동 person-mask proof는 GT가 아니다.
+2. `verification/fixtures/masks/items/cases.json`, `review/items.html`: 실제 사람의 옷 경계 annotation/검토를 `import_review.py --kind items`로 반영한다. manifest public-use 승인과 각 relay recording 승인은 별개다.
+3. `verification/fixtures/review/search.json`: `humanAttestation:true`, `reviewer`, `reviewedAt`, `fixtureSha256`(`store/search.json`), 정확한9개 `cases` ID(`normal`, `shop-specific`, `time-specific`, `note-specific`, `past-trip`, `not-found`, `storefront-1..3`). 각 case에 실제 영어 `query`, `expectedStatus`(`results|not_found`), `relevantPhotoIds`, 필요 시 `expectedShopIds`, `maskGroundTruth`(photo ID→GT 경로), `groundTruthSha256`(경로→SHA256)을 기록한다. `time-specific.expectedTime={kind:"relative-minutes",minutes:N}`, `past-trip.expectedTime={kind:"saturday",last:true}`를 요구한다. `storefronts`는 서로 다른3가게의 `{shopId,image,sha256}`이며 해당 자산도 public-use 승인 대상이다.
+4. 원본 연구 파일: validator는 `verification/fixtures/research/retrieval/results.json`과 원본22장/7문구·embedding을 요구한다. native gate는 `SF_ML_PROOF_DIR/research.json`의 원본 JPEG hash·canonical PNG·512 float binary·query GT·두 segmentation 사례를 사용한다. 원본 연구의 path remap만 허용하며 새 embedding/GT를 원본으로 꾸미지 않는다.
+5. 승인 가능한 영어 speech WAV와 자산 배포/생성 서비스 조건 확인. Apple `say` 출력은 commit/배포하지 않는다. `fixture_manifest.py`는 파생 JPEG source/output hash만 연결하며 사람 승인을 만들어내지 않는다.
+
+Host에서 18개 relay scenario/326개 자산의 구조 검사와 production loader replay가 통과했다. `validate-fixtures.sh --all`은 오류0, 승인/GT/원본 연구 누락155건으로 blocked(2)이며, 실제 fragmented ASGI 입력200·privacy 거부 경계·16KB ELF/ZIP parser·host Chromium header-only forwarding만 smoke했다. Android visual/native/model/live, 실제 corpus 품질·최종3분 영상은 M1에서 실행 전까지 **미확인**이다.

@@ -52,7 +52,7 @@ S11만 `verification/**`, `docs/prd/verification/*`, `scripts/e2e/**`를 변경�
 - GPX는 lon/lat/time를 가진 합성 경로다. `shopping-three-shops`의 각 가게에 도착한 뒤 사용자가 "New shop"/셔터를 누르는 checkpoint를 sidecar에 둔다. 자동 가게 판정 시험이 아니다.
 - walk trace는 같은 대상 Photo.location을 목적지로 사용한다. Shop.spot과 충분히 다른 좌표를 넣어 잘못된 목적지 선택을 검출한다. 경로 끝 waypoint와 실제 목적지 차이도 포함한다.
 - replay는 S00 `scripts/gpx-replay.sh`를 사용하고 내부적으로 `adb -s "$ANDROID_SERIAL" emu geo fix <lng> <lat>`를 호출한다(에뮬레이터 콘솔 `geo fix`, D-R10-01). 다른 GPS·카메라 주입 도구를 가정하지 않는다. accuracyM은 GPX 표준 필드로 속이지 않고 unit mock sidecar에 주입하며, AVD 실제 accuracy는 관측값을 보고한다.
-- 촬영 폴더는 UTF-8 파일명 순서이므로 `01-shop1-storefront.png`, `02-shop1-item.png`처럼 셔터 일정에 맞게 배열한다. debug extra `sf_capture_source=fixture`, `sf_capture_fixture_dir=/sdcard/Android/data/com.streetfitting.app/files/capture-fixtures/`를 사용한다. EXIF 시간이 아닌 셔터 시각과 주입 GPS가 DB에 들어가야 한다.
+- 촬영 폴더는 UTF-8 파일명 순서이므로 `01-shop1-storefront.png`, `02-shop1-item.png`처럼 셔터 일정에 맞게 배열한다. debug extra `sf_capture_source=fixture`, `sf_capture_fixture_dir=/data/user/0/com.streetfitting.app/files/capture-fixtures/`를 사용한다. self/wardrobe/과거-trip 개별 입력은 같은 `getFilesDir()/capture-cases/<case>/` 아래다. `adb push`는 고유 `/data/local/tmp/sf-e2e-*`에만 임시 복사하고 `run-as com.streetfitting.app cp`로 앱 전용 폴더에 옮긴 후 임시 파일을 삭제한다. root/권한 우회·외부 `/sdcard` 경로 fallback은 없다. EXIF 시간이 아닌 셔터 시각과 주입 GPS가 DB에 들어가야 한다.
 
 ### 4. WAV 제작과 배포 경계
 Apple `say` 출력은 공개 fixture로 배포하지 않는다. 기존 say 예제는 배포 절차에서 제거했으며 `build_fixtures.py`도 say/afconvert를 호출하지 않는다. `query.wav`와 `voice/normal/01-query.wav`는 실제 사람의 영어 녹음·명시 동의·재배포 권한을 받은 뒤 `import_review.py --kind speech`로만 등록한다. 아직 두 경로 모두 배포용 입력이 없으며 `--all`은 이를 nonzero로 보고한다.
@@ -61,7 +61,7 @@ Apple `say` 출력은 공개 fixture로 배포하지 않는다. 기존 say 예�
 
 `build_fixtures.py`는 silence=80000, limit-15s=240000, over-15s=240001 samples를 만들고 staging에 byte-identical 복사한다. `tone-silence`는 400ms 220Hz + 1초 무음, `leading-5s`는 5초 무음 뒤 400ms 신호다. 이 신호는 amplitude VAD/경계 시험용이며 영어 음성·전사 품질의 대체물이 아니다. mock transcribe의 silent WAV→수기 문장은 wire replay일 뿐 실제 전사 증거가 아니다.
 
-음성 E2E는 [device §8](../contracts/device-modules.md#8-voice--s04)의 debug 전용 `sf_voice_source=fixture`, `sf_voice_fixture_dir=/sdcard/Android/data/com.streetfitting.app/files/voice-fixtures/`를 사용한다. WAV를 adb push한 뒤 Find it 마이크를 누르면 start마다 파일명순 PCM을 실시간 속도로 **실제와 동일한 VAD**에 공급한다. 무음 자동 종료→completed 1회→실제 전사 endpoint 연결까지 검증한다. 직접 WAV를 HTTP로 보내는 시험만으로 native VAD 검증을 대체하지 않는다. 호스트 마이크/사람 발화는 합격 기준이 아니다. release에서는 extra/fixture 코드가 없고 화면 표시도 없어야 한다(D-R7-10 원칙 확장의 계약상 [추론·기술 결정], D-R7-07).
+음성 E2E는 [device §8](../contracts/device-modules.md#8-voice--s04)의 debug 전용 `sf_voice_source=fixture`, `sf_voice_fixture_dir=/data/user/0/com.streetfitting.app/files/voice-fixtures/`를 사용한다. WAV도 고유 shell 임시 경로→`run-as cp`→임시 삭제 순서로 앱 전용 폴더에 둔다. Find it 마이크를 누르면 start마다 파일명순 PCM을 실시간 속도로 **실제와 동일한 VAD**에 공급한다. 무음 자동 종료→completed 1회→실제 전사 endpoint 연결까지 검증한다. 직접 WAV를 HTTP로 보내는 시험만으로 native VAD 검증을 대체하지 않는다. 호스트 마이크/사람 발화는 합격 기준이 아니다. release에서는 extra/fixture 코드가 없고 화면 표시도 없어야 한다(D-R7-10 원칙 확장의 계약상 [추론·기술 결정], D-R7-07).
 
 ### 5. relay mock과 실제 API 녹화
 근거: [relay §7](../contracts/relay-api.md#7-mock-녹화-선택-계약), D-R1-04, D-R6-04.
