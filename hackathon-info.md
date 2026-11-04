@@ -57,11 +57,11 @@
 
 - **독창성:** 제출물은 참가자(팀)의 원작이어야 하고, 다른 사람의 권리가 없어야 한다. 외부 기술 지원을 받을 수 있지만 구성 요소의 권리는 참가자에게 있어야 한다.
 - **오픈소스:** 라이선스를 지키고, 제출물이 원래 오픈소스를 개선·확장하는 경우에 허용한다.
-- **사전 작성 코드:** 기간 제한 문구는 없다. 원작 요건만 있다.
+- **사전 작성 코드:** 공식 규정에는 기간 제한 문구가 없고 원작 요건만 있다. 그러나 참가자 가이드("New work only")와 Discord #rules가 모두 기간 제한을 둔다. Discord #rules 원문: "Everything you present has to be built during the hackathon, Oct 26 to Nov 4." CV는 빌드 기간이 킥오프 이후부터라고 정정했다. 원작 기여를 구분하지 못하면 실격된다. 기존 코드를 쓰는 경우의 FAQ 지침: 저장소는 "a fresh repo containing only work done during the event"로 만들고, 영상은 "with one line stating what was pre-existing and what you built this week"로 시작한다. 우리는 이 기준을 따른다.
 - **비Meta 모델:** 금지 문구는 없다. 다만 심사의 25%가 Meta AI 도구 활용이다.
 - **권리:** 소유권은 참가자에게 남는다. 주최 측과 파트너는 영구·무상의 비독점 이용권을 받는다.
 - **기밀 유지 없음:** 주최 측은 참가자 자료에 대해 비밀 유지 의무를 지지 않는다. 공유한 자료는 기밀로 취급되지 않는다. 실제 팀 대화·개인정보는 동의를 받았거나 합성한 자료만 쓴다.
-- **팀:** 대표자가 제출하며 팀원을 모두 명시한다. 개인 트랙은 최대 4인이다.
+- **팀:** 대표자가 제출하며 팀원을 모두 명시한다. 개인 트랙은 최대 4인이다. 스타트업 트랙의 대표자는 해당 스타트업의 현직 직원이어야 하고, 공지와 상금을 받을 권한이 있어야 한다("The startup Representative must be an active employee of the startup…", 공식 규정, 11월 4일 확인).
 - **자격:** 만 18세 이상이고 거주지 성년이어야 한다. 한국은 제외 국가가 아니다.
 - **상금 지급:** Cerebral Valley가 Tremendous 은행 송금으로 지급한다. 비미국 거주자는 W-8BEN을 내야 하며, 확인 후 30일 이내에 지급한다. 송금·환전 수수료와 세금은 수상자가 부담한다.
 
@@ -78,11 +78,37 @@
 
 심사위원단이 결선 진출자를 정하며, 그 결정이 최종이다. 심사위원 명단은 공개 페이지에서 확인되지 않았다.
 
+## 제출 요건 (11월 4일 확인)
+
+로그인한 [제출 양식](https://cerebralvalley.ai/e/meta-ai-developer-hackathon/hackathon/submit), [참가자 가이드](https://cerebralvalley.ai/e/meta-ai-developer-hackathon/details), 대시보드 공지, 주최 측 메일(11월 2·3일 리마인더)에서 확인했다.
+
+- **필수 입력:** Team Name, 트랙(Indie Developer / Startups), 문제 주제(Build for Your World / Push the Frontier), Project Description, Public GitHub Repository URL, 3-Minute Demo Video URL, Meta 제품 활용 설명, Meta 모델이 중요한 이유, Meta Model API 사용 의향·전반적 평가(5점 척도 2문항).
+- **선택 입력:** Most Viral용 X 게시물 링크, 파트너 기술 피드백, 홍보 이용 동의 체크박스(필수 표시 없음), 설문 7문항. 프로젝트 제목·파일 업로드·라이브 데모 URL·APK 필드는 없다. 글자 수 제한 표시도 없다.
+- **팀원:** 대표자가 제출하고, 참여자 전원을 "Add Team Member"(이름·핸들·이메일 검색)로 등록한다.
+- **저장소:** "Open source: Repositories must be public." 공지는 이를 모든 프로젝트의 필수 요건이라고 강조한다.
+- **영상:** 3분 분량이다. 해커톤 기간에 만든 기능·코드만 보여야 하며, 원작 기여를 구분하지 못하면 즉시 실격될 수 있다. 예시 URL은 YouTube이고, 공개 범위 요건은 명시되지 않았다. 링크 접근 가능 여부를 확인하라고 안내한다.
+- **심사 자료:** 영상, 코드, "live product"를 본다. 루브릭에는 "Does the product hold up live?"가 있다. 결선(트랙별 상위 5팀)에서는 심사위원이 영상을 실시간으로 보며 순위를 매긴다. 결선·시상: 11월 9일 12:00 ET(한국시간 11월 10일 02:00).
+- **늦은 제출:** "Late submissions won't be considered." 공지는 일찍 제출하라고 권한다.
+- **API 크레딧:** $150 신청 마감은 제출 마감과 같다(11월 4일 21:00 ET). 적용된 크레딧은 만료되지 않는다(크레딧 약관 §3.5). 호출하려면 카드 등록이 필요하다. 카드를 등록하면 일시 승인 금액이 잡혔다가 해제된다. 이 승인에 실패하면 계정이 제한되고 API를 호출할 수 없다. Billing 페이지에는 "While using free credits your content may be used for product improvement."라고 적혀 있다(11월 4일 확인).
+- **보너스상:** Most Viral은 X 게시물의 참여도를 11월 8일 EOD까지 집계한다. Open Weight상은 Muse Glimmer와 Muse Spark Open만 대상이다.
+
+## 우리 제출 계획
+
+[decisions.md](docs/prd/decisions.md) R8에 따른다.
+
+- **제출물:** 3분 데모 영상(YouTube)과 public GitHub 저장소(D-R8-01).
+- **배포 안 함:** APK 공개와 클라우드 릴레이를 모두 하지 않는다. 심사위원이 직접 실행할 수 있는 "live product"는 없다. 따라서 영상에서 실제 API로 동작하는 장면을 보여 주는 것이 Demo 평가의 근거가 된다(D-R8-01).
+- **문제 주제:** Build for Your World(D-R8-02).
+- **참가 트랙:** Indie Developer. 팀원 없이 개인으로 제출한다(D-R8-03).
+
 ## 아직 확인되지 않은 것
 
-- 제출 양식의 필드. 영상 길이, 저장소 공개 여부, 배포 URL 필요 여부 등은 로그인이 필요한 [제출 포털](https://cerebralvalley.ai/e/meta-ai-developer-hackathon/hackathon/submit)에서 직접 확인해야 한다.
-- 참가자 전용 메일·Discord 공지에 추가된 요건.
+- 제출 후 수정할 수 있는지 여부. 양식, 가이드, 규정 어디에도 명시되지 않았다.
+- 심사 시작일. 대시보드는 11월 4~8일, 가이드는 11월 5~8일로 표기한다.
+- 심사위원이 live product에 접근하는 방법(APK, 기기, 테스트 계정). 별도 안내가 없다. 우리는 배포하지 않기로 했으므로(D-R8-01) 준비할 것은 없다. 다만 심사위원이 live product를 직접 보려 한다면 Demo 점수에 불리할 수 있다.
+- Discord: #questions와 #office-hours에서 Android/APK 관련 안내는 검색하지 못했다. #rules, #faqs, #announcements는 11월 4일에 확인했다.
+- W-8BEN 제출 절차와 시점. 수상 후 안내가 오는지 미확인이다.
 
 자원·주최사·심사위원 조사와 주제 선정 참고사항은 [hackathon-research.md](hackathon-research.md)에 정리했다.
 
-출처: 공식 행사 페이지(Cerebral Valley·Meta), 행사 개요·동의서의 공식 규정. 최종 확인일: 2026년 11월 2일.
+출처: 공식 행사 페이지(Cerebral Valley·Meta), 행사 개요·동의서의 공식 규정, 로그인한 제출 양식·참가자 가이드, 주최 측 메일. 최종 확인일: 2026년 11월 4일.

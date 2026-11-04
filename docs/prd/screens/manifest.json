@@ -1,0 +1,197 @@
+{
+  "source": "prototype/ (http://127.0.0.1:5180)",
+  "date": "2026-11-04",
+  "flows": [
+    {
+      "id": "shopping",
+      "title": "쇼핑 모드와 촬영",
+      "summary": "쇼핑 모드를 켜면 새 trip과 Shop 1이 생긴다. 위치 권한은 필수, 알림은 선택. 카메라에서 옷을 찍고, \"New shop\"으로 가게를 나누며, 외관 사진과 메모는 선택이다. 상태 표시줄을 내리면 알림 카드에서 바로 촬영할 수 있다.",
+      "decisions": "D-R2-01~11, D-R3-03, D-R6-03",
+      "shots": [
+        {
+          "file": "img/shopping-01.jpg",
+          "screen": "Home",
+          "state": "쇼핑 모드 꺼짐 · 최근 trip(Sun, Nov 1)",
+          "action": "앱 시작"
+        },
+        {
+          "file": "img/shopping-02.jpg",
+          "screen": "OS 권한",
+          "state": "위치 권한 요청",
+          "action": "\"Start shopping\""
+        },
+        {
+          "file": "img/shopping-03.jpg",
+          "screen": "Home",
+          "state": "위치 거부 → 시작 불가 안내 시트",
+          "action": "\"Don't allow\""
+        },
+        {
+          "file": "img/shopping-04.jpg",
+          "screen": "OS 권한",
+          "state": "알림 권한 요청",
+          "action": "다시 \"Start shopping\" → \"While using the app\""
+        },
+        {
+          "file": "img/shopping-05.jpg",
+          "screen": "Home",
+          "state": "기록 중 · 새 trip의 Shop 1",
+          "action": "\"Allow\""
+        },
+        {
+          "file": "img/shopping-06.jpg",
+          "screen": "Camera",
+          "state": "촬영 대기 · Shop 1 · 0 new",
+          "action": "\"Take photo\""
+        },
+        {
+          "file": "img/shopping-07.jpg",
+          "screen": "Camera",
+          "state": "옷 사진 2장 촬영 · 썸네일과 \"2 new\"",
+          "action": "셔터 2번"
+        },
+        {
+          "file": "img/shopping-08.jpg",
+          "screen": "Camera",
+          "state": "\"New shop\" 즉시 시작 · Shop 2 배너(외관/메모 선택)",
+          "action": "\"New shop\""
+        },
+        {
+          "file": "img/shopping-09.jpg",
+          "screen": "Camera",
+          "state": "외관 촬영 모드",
+          "action": "\"Storefront photo\""
+        },
+        {
+          "file": "img/shopping-10.jpg",
+          "screen": "Camera",
+          "state": "외관 저장 후 · 배너 유지",
+          "action": "\"Take storefront photo\""
+        },
+        {
+          "file": "img/shopping-11.jpg",
+          "screen": "Note 시트",
+          "state": "가게 메모 입력",
+          "action": "\"Add note\" → 입력"
+        },
+        {
+          "file": "img/shopping-12.jpg",
+          "screen": "Home",
+          "state": "기록 중 · Shop 2 · 사진 수",
+          "action": "Camera에서 뒤로"
+        },
+        {
+          "file": "img/shopping-13.jpg",
+          "screen": "알림 창(시뮬레이션)",
+          "state": "상시 알림 카드 · \"Take photo\" / \"New shop\"",
+          "action": "상태 표시줄 누르기"
+        },
+        {
+          "file": "img/shopping-14.jpg",
+          "screen": "Camera",
+          "state": "알림 카드에서 바로 촬영 진입",
+          "action": "알림 \"Take photo\""
+        },
+        {
+          "file": "img/shopping-15.jpg",
+          "screen": "Home",
+          "state": "종료 확인 시트",
+          "action": "\"End\""
+        },
+        {
+          "file": "img/shopping-16.jpg",
+          "screen": "Home",
+          "state": "종료 후 · 최근 trip이 오늘(Wed, Nov 4)",
+          "action": "시트 \"End\""
+        },
+        {
+          "file": "img/shopping-17.jpg",
+          "screen": "Home",
+          "state": "알림 거부 → 기록은 시작, 토스트 안내",
+          "action": "위치 허용 → 알림 \"Don't allow\""
+        },
+        {
+          "file": "img/shopping-18.jpg",
+          "screen": "알림 창(시뮬레이션)",
+          "state": "알림 거부 시 카드 없음",
+          "action": "상태 표시줄 누르기"
+        }
+      ]
+    },
+    {
+      "id": "trips",
+      "title": "기록 탐색: All trips → Trip",
+      "summary": "홈에는 최근 trip 하나와 \"All trips\"가 있다. 별도 가게(Visit) 화면 없이 Trip 한 화면에 가게별 외관·묘사·메모·사진이 모인다. Trip에는 길 안내가 없고, trip 삭제를 제공한다. 오프라인이면 외관 묘사는 대기열에서 기다린다.",
+      "decisions": "D-R3-03, D-R3-10, D-R3-11, D-R6-03, D-R9-04",
+      "shots": [
+        {
+          "file": "img/trips-01.jpg",
+          "screen": "Home",
+          "state": "최근 trip과 \"All trips\" 진입",
+          "action": "앱 시작"
+        },
+        {
+          "file": "img/trips-02.jpg",
+          "screen": "All trips",
+          "state": "날짜별 trip 목록",
+          "action": "\"All trips\""
+        },
+        {
+          "file": "img/trips-03.jpg",
+          "screen": "Trip",
+          "state": "Sun, Nov 1 · 가게별 외관·묘사·메모·사진",
+          "action": "\"Sun, Nov 1\""
+        },
+        {
+          "file": "img/trips-04.jpg",
+          "screen": "Trip",
+          "state": "스크롤 · Shop 2~3 영역",
+          "action": "아래로 스크롤"
+        },
+        {
+          "file": "img/trips-05.jpg",
+          "screen": "Trip",
+          "state": "Sat, Oct 24 · 외관 사진 없는 가게",
+          "action": "\"Sat, Oct 24\""
+        },
+        {
+          "file": "img/trips-06.jpg",
+          "screen": "Trip",
+          "state": "trip 삭제 확인",
+          "action": "\"Delete trip\""
+        },
+        {
+          "file": "img/trips-07.jpg",
+          "screen": "All trips",
+          "state": "삭제 후 목록",
+          "action": "시트 \"Delete trip\""
+        },
+        {
+          "file": "img/trips-08.jpg",
+          "screen": "Trip",
+          "state": "기록 중 trip · 오프라인이라 외관 묘사 대기",
+          "action": "host \"Offline\" 켬 → 쇼핑 시작 → 촬영·New shop·외관 → All trips → Wed, Nov 4",
+          "note": "오프라인 시뮬레이션은 화면 밖 host 막대의 스위치다"
+        },
+        {
+          "file": "img/trips-09.jpg",
+          "screen": "Trip",
+          "state": "연결 복구 · 묘사 처리 중",
+          "action": "host \"Offline\" 끔"
+        },
+        {
+          "file": "img/trips-10.jpg",
+          "screen": "Trip",
+          "state": "묘사 완료",
+          "action": "잠시 대기"
+        },
+        {
+          "file": "img/trips-11.jpg",
+          "screen": "Note 시트",
+          "state": "Trip에서 가게 메모 추가",
+          "action": "\"Add note\""
+        }
+      ]
+    }
+  ]
+}
