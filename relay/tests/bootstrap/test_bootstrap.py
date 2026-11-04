@@ -33,20 +33,15 @@ REQUESTS = {
     '/v1/route': {'origin': {'lat': 0, 'lng': 0}, 'destination': {'lat': 1, 'lng': 1}},
 }
 
-def test_all_seven_routes_have_501_stubs(client):
-    assert set(client.app.openapi()['paths']) == set(REQUESTS)
-    for path, payload in REQUESTS.items():
-        assert client.post(path, json=payload, headers=HEADERS).status_code == 501
-
-def test_stub_errors_follow_schema(client):
-    from app.schemas import Error
-    for path, payload in REQUESTS.items():
-        response = client.post(path, json=payload, headers=HEADERS)
-        assert Error.model_validate(response.json()).error.code == 'not_implemented'
-        assert response.headers['cache-control'] == 'no-store'
-
 def test_unknown_fields_rejected(client):
     for path, payload in REQUESTS.items():
+        if path == '/v1/search/segment':
+            from app.auth import pseudonym
+            tokens = client.app.state.tokens
+            settings = client.app.state.settings
+            state = tokens.start(pseudonym(settings.hmac_secret, 'street-fitting-mock'),
+                                 'jacket', REQUESTS['/v1/search/turn']['context'], scenario='normal')
+            payload = {**payload, 'queryToken': tokens.sign(state)}
         response = client.post(path, json={**payload, 'unexpected': 'secret'}, headers=HEADERS)
         assert response.status_code == 400
         assert response.json()['error']['code'] == 'invalid_request'
@@ -98,10 +93,12 @@ def test_local_webview_preflight_and_error_headers(client):
     assert preflight.status_code == 200
     assert preflight.headers['access-control-allow-origin'] == origin
     assert preflight.headers['cache-control'] == 'no-store'
-    response = client.post('/v1/route', content=b' ' * 4097, headers={**HEADERS, 'Origin': origin})
+    response = client.post('/v1/route', content=b' ' * 4097,
+                           headers={**HEADERS, 'Origin': origin, 'Content-Type': 'application/json'})
     assert response.status_code == 413
     assert response.headers['access-control-allow-origin'] == origin
-    assert response.headers['access-control-expose-headers'] == 'X-Query-Token'
+    exposed = {header.strip().lower() for header in response.headers['access-control-expose-headers'].split(',')}
+    assert {'x-query-token', 'retry-after'} <= exposed
     assert response.json()['error']['code'] == 'payload_too_large'
 
 
