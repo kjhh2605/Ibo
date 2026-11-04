@@ -104,7 +104,7 @@ embedding 삽입과 Photo.indexState=done을 한 트랜잭션으로 처리한다
 | id | Id PK | 아니오 | 중복 저장 규칙의 결정적 ID | D-R3-11, D-R4-08 |
 | origin | string | 아니오 | `shop` / `wardrobe`, 생성 후 불변 | D-R4-08, D-R4-09 |
 | label | string | 아니오 | 영어 1~120자, 사용자 수정 가능 | D-R4-06 |
-| category | string | 아니오 | 자유 영어 명사구 1~64자. 미분류 초기값 `"unknown"`; enum/PE 분류기 없음 | D-R4-06 |
+| category | string | 아니오 | `outer`/`top`/`bottom`/`other`/`unknown`. 초기값 `"unknown"`(슬롯을 지정해 자른 조각은 그 슬롯). 쓰기는 이 값만 허용하고, D-R13 이전의 자유 문자열은 읽을 때 키워드로 해석한다(`app/src/category.ts`). PE 분류기 없음 | D-R4-06, D-R13-01 |
 | cutoutFile | File | 아니오 | bbox 크기의 투명 RGBA PNG, 실제 mask를 적용한 독립 파일 | D-R3-11 |
 | createdAt | Time | 아니오 | 첫 저장 시각, 중복 저장으로 변경 안 함 | D-R4-08 |
 | photoId | Id FK Photo | 예 | shop 생성 시 필수, 원본 삭제 후 null, ON DELETE SET NULL | D-R3-11 |
@@ -130,16 +130,16 @@ SQL 내부 singleton key는 `CHECK(key=1)`이며 제품 DTO에 id를 추가하�
 | 필드 | 타입·키 | null | 제약 | 근거 |
 | --- | --- | --- | --- | --- |
 | id | Id PK | 아니오 | prepareResult의 draftId로 발급하고 성공 확정 시 그대로 사용; 같은 draft 재저장은 같은 Result 반환 | D-R4-05, D-R9-03 |
-| targetPieceId | Id 논리 참조 | 아니오 | 요청 시작 시 존재하는 origin=shop Piece. 삭제와 결과는 독립이므로 SQL FK로 묶지 않음; 이후에는 이력/Change pieces 활성 판단에만 사용 | D-R4-09, D-R9-03 |
-| companionPieceIds | Id[] | 아니오 | 순서 유지, 0~5개, 중복 및 target ID 금지. DB JSON 배열, 요청 시작 시 모두 존재 | D-R4-07, D-R9-03 |
-| targetSnapshot | ResultPieceSnapshot | 아니오 | 대상 옷의 불변 복사본, pieceId=targetPieceId, origin=shop, walkTo 필수 | D-R9-03 |
-| companionSnapshots | ResultPieceSnapshot[] | 아니오 | companionPieceIds와 같은 길이·순서·pieceId. 0~5개, 각각 독립 복사본 | D-R9-03 |
+| targetPieceId | Id 논리 참조 | 아니오 | 마네킹 조합의 첫 슬롯(outer → top → bottom 순) 옷. origin 제한 없음. 이름은 저장 형식 호환을 위해 유지. SQL FK 없음 | D-R13-02, D-R13-05 |
+| companionPieceIds | Id[] | 아니오 | 나머지 슬롯 옷을 슬롯 순서로 0~2개. 중복 금지, 모든 옷의 category가 서로 다른 슬롯 값이어야 함. DB JSON 배열, 요청 시작 시 모두 존재 | D-R13-02 |
+| targetSnapshot | ResultPieceSnapshot | 아니오 | 첫 슬롯 옷의 불변 복사본, pieceId=targetPieceId | D-R9-03, D-R13-05 |
+| companionSnapshots | ResultPieceSnapshot[] | 아니오 | companionPieceIds와 같은 길이·순서·pieceId. 0~2개, 각각 독립 복사본 | D-R9-03, D-R13-05 |
 | file | File | 아니오 | 로컬 재합성 또는 얼굴 제거 결과 파일, providerFile과 별도 | D-R4-04 |
 | faceless | boolean | 아니오 | 얼굴 재합성을 쓰지 않은 최종 표시본이면 true | D-R4-04 |
 | providerFile | File | 아니오 | Muse Image 원본 바이트와 메타데이터를 변경 없이 보관 | D-R4-10 |
 | createdAt | Time | 아니오 | 생성 성공 시각 | D-R4-05 |
 
-Result는 렌더링과 길 안내에 원본 Piece 조회를 요구하지 않는다. 대상 삭제 후에도 targetSnapshot.walkTo로 안내하고 결과 이미지를 표시한다. 원본 targetPieceId가 없으면 `"Change pieces"`만 비활성화한다. 함께 입은 옷의 위치로 안내하지 않는다. Item과 Result에서만 길 안내를 시작하며 Trip/Shop.spot에서 시작하는 경로는 없다. (D-R9-03~04, D-R5-03)
+Result는 렌더링과 길 안내에 원본 Piece 조회를 요구하지 않는다. 원본을 지운 뒤에도 각 가게 옷 스냅샷의 walkTo로 안내하고(가게마다 하나) 결과 이미지를 표시한다. 결과의 원본 Piece가 하나도 남지 않으면 `"Change pieces"`만 비활성화한다(D-R13-05). Item과 Result에서만 길 안내를 시작하며 Trip/Shop.spot에서 시작하는 경로는 없다. (D-R9-03~04, D-R5-03)
 
 #### ResultPieceSnapshot — Result에 포함되는 값 객체
 
@@ -205,8 +205,8 @@ DB와 앱 전용 파일을 갤러리에 자동 등록하지 않는다. Photo의 
 ## 5. 저장·피팅 불변식
 
 - **같은 후보 두 번 저장 금지:** [추론] Candidate.id=`SHA-256(photoId + source + 정방향 이진 mask 픽셀)`의 안정적 문자열, Piece.id=`piece:<Candidate.id>`. label/score/bbox 표시 변화는 동일 후보 ID에 영향 없음. `saveCandidate`는 insert-if-absent 후 기존 Piece를 반환하여 파일·라벨 작업을 중복 생성하지 않는다. 후보 ID 생성 시 본인 사진 입력은 금지한다. 같은 옷을 다른 사진에서 잘랐거나 다른 mask를 골랐으면 다른 후보이며 의미 기반 중복 검출은 없다. (D-R4-08, D-R3-11)
-- 피팅 draft는 `{targetPieceId, companionPieceIds}`인 메모리 상태이며 별도 영구 엔티티가 아니다. target은 존재하는 origin=shop 1개, companions는 origin=shop/wardrobe 0~5개, 중복/target 재선택 금지다. 제출 시 다시 존재를 확인한다. 전송은 SelfPhoto.maskedFile 1장 + 옷 1~6장 = 2~7장이다. (D-R4-07~09)
-- trip 사진에서 즉석으로 자르면 Piece 저장이 완료된 뒤 companion에 넣는다. 저장 취소/실패는 companion에 추가하지 않는다. 최대 5개가 찼으면 추가 전에 알리고 임의 기존 항목을 교체하지 않는다. (D-R4-08)
+- 피팅 draft는 `{outfit: {outer?, top?, bottom?}}`인 메모리 상태(마네킹)이며 별도 영구 엔티티가 아니다. 슬롯마다 origin=shop/wardrobe 옷 1개, 최소 1슬롯. 같은 옷은 한 슬롯에만 있다. 제출 시 각 옷이 존재하고 `category`가 정확히 그 슬롯 값인지 다시 확인한다. 전송은 SelfPhoto.maskedFile 1장 + 옷 1~3장 = 2~4장이다. (D-R13-02)
+- trip 사진에서 즉석으로 자르면 고른 슬롯을 `category`로 저장(`saveCandidate({category})`)한 뒤 그 슬롯에 넣는다. 슬롯에 옷이 있으면 교체한다. 저장 취소/실패는 draft를 바꾸지 않는다. 늦게 끝난 label_piece는 이미 정해진 종류를 덮어쓰지 않고 label만 바꾼다. (D-R4-08, D-R13-04)
 - 검색 concept가 있는 shop label은 concept를 쓴다. 검색 없이 바로 자른 shop 및 wardrobe는 `"Picked item"`/`"unknown"`으로 먼저 저장하고 둘 다 label_piece로 `/v1/describe/piece`에 cutout을 보낸다. source=edgetam이어도 검색 concept가 있는 흐름이면 자동 이름 붙이기를 추가하지 않는다. 이름 붙이기 여부는 표시 문자열 비교가 아니라 saveCandidate의 `labelMode`로 전달한다. 사용자가 label/category를 고치면 해당 대기 작업을 취소해 늦은 응답이 수정을 덮지 않도록 한다. (D-R4-06, D-R6-03, D-R9-02)
 - **기능 플래그 `resultDownload: boolean = false`**. 앱 빌드/런타임 개발 설정이며 DB 제품 엔티티가 아니다. S11에서 원본 워터마크·provenance 메타데이터 보존 검증을 승인한 설정에만 true를 허용한다. false면 UI와 Media 호출 양쪽에서 결과 내보내기를 차단한다. 일반 Photo 다운로드에는 이 플래그를 적용하지 않는다. (D-R4-10, D-R2-11)
 

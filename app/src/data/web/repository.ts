@@ -4,6 +4,7 @@ import type {Draft, Transaction} from './database';
 import {browserImages, cutout, failure, prepareMask} from './images';
 import type {ImageCodec} from './images';
 import {acquireDatabaseLease} from './lease';
+import {isGarmentSlot, isPieceCategory} from '../../category';
 
 type Change = {entities: (keyof EntityMap | 'SelfPhoto')[]; ids: Id[]};
 type ListOptions<K extends keyof EntityMap> = {entity: K; tripId?: Id; shopId?: Id; origin?: 'shop' | 'wardrobe'; limit?: number; cursor?: string};
@@ -14,6 +15,7 @@ const runtimes = new Map<string, {claims: Set<string>; listeners: Set<(event: Ch
 const validId = (value: string) => { if (typeof value !== 'string' || !value.length || value.length > 128) failure('invalid_argument'); };
 const time = (value: number) => { if (!Number.isSafeInteger(value) || value < 0) failure('invalid_argument'); };
 const text = (value: string, max: number) => { if (typeof value !== 'string' || !value.trim() || value.trim().length > max) failure('invalid_argument'); return value.trim(); };
+const category = (value: string) => { if (!isPieceCategory(value)) failure('invalid_argument'); return value; };
 function location(value: {lat: number; lng: number; accuracyM: number}) {
   if (!value || !Number.isFinite(value.lat) || Math.abs(value.lat) > 90 || !Number.isFinite(value.lng) || Math.abs(value.lng) > 180 || !Number.isFinite(value.accuracyM) || value.accuracyM < 0) failure('invalid_argument');
 }
@@ -283,8 +285,9 @@ export class WebRepository implements Store, DeviceRepository {
       await tx.delete('PhotoEmbedding', photoId); await tx.put('Photo', photoId, {...photo, indexState: 'failed'});
     }, {entities: ['Photo', 'PhotoEmbedding'], ids: [photoId]});
   }
-  async saveCandidate({candidate, origin, labelMode}: {candidate: Candidate; origin: 'shop' | 'wardrobe'; labelMode: 'concept' | 'describe'}): Promise<Piece> {
+  async saveCandidate({candidate, origin, labelMode, category: slot}: {candidate: Candidate; origin: 'shop' | 'wardrobe'; labelMode: 'concept' | 'describe'; category?: 'outer' | 'top' | 'bottom'}): Promise<Piece> {
     validId(candidate.photoId); text(candidate.label, 120);
+    if (slot !== undefined && !isGarmentSlot(slot)) failure('invalid_argument');
     if (!['shop', 'wardrobe'].includes(origin) || !['concept', 'describe'].includes(labelMode) || (origin === 'wardrobe' && labelMode !== 'describe') || !['sam', 'edgetam'].includes(candidate.source) || !Number.isFinite(candidate.score) || candidate.score < 0 || candidate.score > 1 || !Array.isArray(candidate.bbox) || candidate.bbox.length !== 4) failure('invalid_argument');
     const pinned = [candidate.mask];
     const maskBlob = await this.run(true, async tx => {
@@ -316,7 +319,7 @@ export class WebRepository implements Store, DeviceRepository {
         const photo = origin === 'shop' ? await tx.get('Photo', candidate.photoId) : undefined;
         if (origin === 'shop' && !photo) failure('not_found');
         if (origin === 'wardrobe' && !(await tx.get('assets', candidate.photoId))) failure('not_found');
-        const piece: Piece = {id: cropped.id, origin, label: labelMode === 'concept' ? candidate.label.trim() : 'Picked item', category: 'unknown', cutoutFile: await tx.blob(cropped.blob, `piece:${cropped.id}`, 'cutout', this.epoch), createdAt: this.now(), photoId: photo?.id ?? null, tripId: photo?.tripId ?? null, shopId: photo?.shopId ?? null, walkTo: photo ? {lat: photo.location.lat, lng: photo.location.lng} : null};
+        const piece: Piece = {id: cropped.id, origin, label: labelMode === 'concept' ? candidate.label.trim() : 'Picked item', category: slot ?? 'unknown', cutoutFile: await tx.blob(cropped.blob, `piece:${cropped.id}`, 'cutout', this.epoch), createdAt: this.now(), photoId: photo?.id ?? null, tripId: photo?.tripId ?? null, shopId: photo?.shopId ?? null, walkTo: photo ? {lat: photo.location.lat, lng: photo.location.lng} : null};
         time(piece.createdAt); await tx.put('Piece', piece.id, piece);
         if (labelMode === 'describe') await this.addJob(tx, 'label_piece', piece.id);
         if (origin === 'wardrobe') await tx.removeFile(source.file);
@@ -340,7 +343,7 @@ export class WebRepository implements Store, DeviceRepository {
     return this.run(true, async tx => { const shop = await tx.get('Shop', id); if (!shop) failure('not_found'); const updated = {...shop, note: value}; await tx.put('Shop', id, updated); return updated; }, {entities: ['Shop'], ids: [id]});
   }
   async updatePiece({id, label, category}: {id: Id; label: string; category: string}): Promise<Piece> {
-    validId(id); label = text(label, 120); category = text(category, 64);
+    validId(id); label = text(label, 120); category = text(category, 64); if (!isPieceCategory(category)) failure('invalid_argument');
     return this.run(true, async tx => {
       const piece = await tx.get('Piece', id); if (!piece) failure('not_found');
       const updated = {...piece, label, category}; await tx.put('Piece', id, updated); await this.removeJobs(tx, 'label_piece', id); return updated;
@@ -353,12 +356,15 @@ export class WebRepository implements Store, DeviceRepository {
   }
   async prepareResult({targetPieceId, companionPieceIds}: {targetPieceId: Id; companionPieceIds: Id[]}): Promise<Draft> {
     validId(targetPieceId); companionPieceIds.forEach(validId);
-    if (companionPieceIds.length > 5 || new Set([targetPieceId, ...companionPieceIds]).size !== companionPieceIds.length + 1) failure('invalid_argument');
+    // One mannequin outfit: at most one piece per slot (outer, top, bottom), any origin.
+    if (companionPieceIds.length > 2 || new Set([targetPieceId, ...companionPieceIds]).size !== companionPieceIds.length + 1) failure('invalid_argument');
     return this.run(true, async tx => {
       const target = await tx.get('Piece', targetPieceId);
-      if (!target || target.origin !== 'shop' || !target.walkTo) failure('invalid_reference');
+      if (!target) failure('invalid_reference');
       const companions: Piece[] = [];
       for (const id of companionPieceIds) { const piece = await tx.get('Piece', id); if (!piece) failure('invalid_reference'); companions.push(piece); }
+      const slots = [target, ...companions].map(piece => piece.category);
+      if (!slots.every(isGarmentSlot) || new Set(slots).size !== slots.length) failure('invalid_argument');
       const draftId = crypto.randomUUID(), owner = `draft:${draftId}`;
       const targetSnapshot = await this.snapshot(tx, target, owner), companionSnapshots: ResultPieceSnapshot[] = [];
       for (const piece of companions) companionSnapshots.push(await this.snapshot(tx, piece, owner));
@@ -484,18 +490,19 @@ export class WebRepository implements Store, DeviceRepository {
     } catch (error) { this.runtime.claims.delete(id); throw error; }
   }
   async completeJob(options: {id: Id; description?: string; label?: string; category?: string}): Promise<void> {
-    const {id, description, label, category} = options;
+    const {id, description, label, category: categoryValue} = options;
     await this.run(true, async tx => {
       const job = await tx.get('QueueJob', id); if (!job) return;
       if (!this.runtime.claims.has(id)) failure('job_not_claimed');
       if (job.kind === 'describe_storefront') {
-        if (description === undefined || label !== undefined || category !== undefined) failure('invalid_argument');
+        if (description === undefined || label !== undefined || categoryValue !== undefined) failure('invalid_argument');
         const value = text(description, 300), photo = await tx.get('Photo', job.refId), shop = photo && await tx.get('Shop', photo.shopId);
         if (shop?.storefrontPhotoId === job.refId) await tx.put('Shop', shop.id, {...shop, description: value, descriptionState: 'done'});
       } else {
-        if (description !== undefined || label === undefined || category === undefined) failure('invalid_argument');
-        const name = text(label, 120), type = text(category, 64), piece = await tx.get('Piece', job.refId);
-        if (piece) await tx.put('Piece', piece.id, {...piece, label: name, category: type});
+        if (description !== undefined || label === undefined || categoryValue === undefined) failure('invalid_argument');
+        const name = text(label, 120), type = category(text(categoryValue, 64)), piece = await tx.get('Piece', job.refId);
+        // A category the user already chose (e.g. the mannequin slot) wins over Spark's.
+        if (piece) await tx.put('Piece', piece.id, {...piece, label: name, category: piece.category === 'unknown' ? type : piece.category});
       }
       await tx.delete('QueueJob', id);
     }, {entities: ['QueueJob', 'Shop', 'Piece'], ids: [id]});

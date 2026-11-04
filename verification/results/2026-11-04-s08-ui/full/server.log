@@ -1,12 +1,4 @@
 
-  VITE v8.3.5  ready in 167 ms
+  VITE v8.3.5  ready in 157 ms
 
-  ➜  Local:   http://127.0.0.1:55008/
-4:31:26 AM [vite] (client) page reload android/app/src/main/assets/public/index.html
-4:31:26 AM [vite] (client) page reload android/app/build/intermediates/assets/debug/mergeDebugAssets/public/index.html
-4:31:31 AM [vite] (client) page reload android/app/build/reports/tests/testDebugUnitTest/classes/com.streetfitting.app.plugins.voice.EnergyVadTest.html
-4:31:31 AM [vite] (client) page reload android/app/build/reports/tests/testDebugUnitTest/index.html
-4:31:31 AM [vite] (client) page reload android/app/build/reports/tests/testDebugUnitTest/classes/com.streetfitting.app.plugins.voice.WavWriterTest.html
-4:31:31 AM [vite] (client) page reload android/app/build/reports/tests/testDebugUnitTest/packages/com.streetfitting.app.plugins.facemask.html
-4:31:31 AM [vite] (client) page reload android/app/build/reports/tests/testDebugUnitTest/packages/com.streetfitting.app.plugins.voice.html
-4:31:31 AM [vite] (client) page reload android/app/build/reports/tests/testDebugUnitTest/classes/com.streetfitting.app.plugins.facemask.FaceMaskRulesTest.html
+  ➜  Local:   http://127.0.0.1:33597/

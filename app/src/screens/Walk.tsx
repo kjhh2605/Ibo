@@ -1,6 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import type {Listener, ResultPieceSnapshot} from '../native/contracts';
 import type {Route} from '../ui/navigation';
+import {resultDestination} from '../walk/controller';
 import type {MapView, WalkState} from '../ui/services';
 import {useData, useUi} from '../ui/state';
 import {Spinner} from '@astryxdesign/core/Spinner';
@@ -42,18 +43,19 @@ type Destination = Pick<ResultPieceSnapshot, 'label' | 'walkTo' | 'shop'>;
 
 export function Walk({route}: {route: Extract<Route, {name: 'walk'}>}) {
   const {services, back, online} = useUi();
-  const sourceKey = `${route.source}:${route.id}`;
+  const sourceKey = `${route.source}:${route.id}:${route.pieceId ?? ''}`;
   const source = useData<{key: string; destination: Destination} | null>(async () => {
     if (route.source === 'result') {
       const result = await services.store.get({entity: 'Result', id: route.id});
-      return result ? {key: sourceKey, destination: result.targetSnapshot} : null;
+      const destination = resultDestination(result, route.pieceId);
+      return destination ? {key: sourceKey, destination} : null;
     }
     const piece = await services.store.get({entity: 'Piece', id: route.id});
     if (!piece || piece.origin !== 'shop') return null;
     const shop = piece.shopId ? await services.store.get({entity: 'Shop', id: piece.shopId}) : null;
     const storefront = shop?.storefrontPhotoId ? await services.store.get({entity: 'Photo', id: shop.storefrontPhotoId}) : null;
     return {key: sourceKey, destination: {label: piece.label, walkTo: piece.walkTo, shop: shop ? {n: shop.n, startedAt: shop.startedAt, storefrontFile: storefront?.file ?? null, description: shop.description, note: shop.note} : null}};
-  }, [services, route.source, route.id]);
+  }, [services, route.source, route.id, route.pieceId, sourceKey]);
   const destination = source.data?.key === sourceKey ? source.data.destination : null;
   const hasDestination = !!destination?.walkTo;
   const [walking, setWalking] = useState<{key: string; state: WalkState | null; error: string | null}>({key: sourceKey, state: null, error: null});
@@ -77,7 +79,7 @@ export function Walk({route}: {route: Extract<Route, {name: 'walk'}>}) {
         if (!live) {await handle.remove(); return;}
         listener = handle;
         started = true;
-        const next = await services.walk.start(route.source === 'item' ? {source: 'item', pieceId: route.id} : {source: 'result', resultId: route.id});
+        const next = await services.walk.start(route.source === 'item' ? {source: 'item', pieceId: route.id} : {source: 'result', resultId: route.id, pieceId: route.pieceId});
         if (live) setWalking({key: sourceKey, state: next, error: null});
       } catch (cause) {
         if (!live) return;
@@ -90,7 +92,7 @@ export function Walk({route}: {route: Extract<Route, {name: 'walk'}>}) {
       if (listener) void listener.remove().catch(() => {});
       if (started) void services.walk.stop().catch(() => {});
     };
-  }, [services.walk, hasDestination, sourceKey, route.source, route.id, walkAttempt]);
+  }, [services.walk, hasDestination, sourceKey, route.source, route.id, route.pieceId, walkAttempt]);
 
   useEffect(() => {
     const element = host.current;

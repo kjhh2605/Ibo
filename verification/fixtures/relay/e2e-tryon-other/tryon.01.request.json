@@ -11,21 +11,20 @@
       },
       "headMasked": true
     },
-    "target": {
-      "pieceRef": "target-shop",
-      "image": {
-        "mimeType": "image/png",
-        "data": {
-          "asset": "assets/shop-1-candidate-1.png"
+    "pieces": [
+      {
+        "pieceRef": "target-shop",
+        "image": {
+          "mimeType": "image/png",
+          "data": {
+            "asset": "assets/shop-1-candidate-1.png"
+          },
+          "width": 310,
+          "height": 310
         },
-        "width": 310,
-        "height": 310
+        "label": "a blue jacket",
+        "category": "outer"
       },
-      "label": "a blue jacket",
-      "category": "unknown",
-      "origin": "shop"
-    },
-    "companions": [
       {
         "pieceRef": "direct",
         "image": {
@@ -37,27 +36,25 @@
           "height": 310
         },
         "label": "Blue jacket",
-        "category": "jacket",
-        "origin": "shop"
+        "category": "top"
       }
     ]
   },
   "match": [
     "/selfPhoto",
-    "/target",
-    "/companions"
+    "/pieces"
   ],
   "ignore": [
+    "/pieces/0/image/data",
+    "/pieces/0/image/height",
+    "/pieces/0/image/width",
+    "/pieces/0/pieceRef",
+    "/pieces/1/image/data",
+    "/pieces/1/image/height",
+    "/pieces/1/image/width",
+    "/pieces/1/pieceRef",
     "/selfPhoto/image/data",
-    "/target/pieceRef",
-    "/target/image/data",
-    "/companions/0/pieceRef",
-    "/companions/0/image/data",
-    "/selfPhoto/image/width",
     "/selfPhoto/image/height",
-    "/target/image/width",
-    "/target/image/height",
-    "/companions/0/image/width",
-    "/companions/0/image/height"
+    "/selfPhoto/image/width"
   ]
 }

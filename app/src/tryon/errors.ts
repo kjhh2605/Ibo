@@ -1,8 +1,8 @@
 import type {DeviceError} from '../native/contracts';
 
 const messages: Record<string, string> = {
-  invalid_composition: 'Choose one saved shop piece and up to five different companion pieces.',
-  companion_limit: 'Up to 5 companion pieces. Remove one to add another.',
+  invalid_composition: 'Put at least one piece on the mannequin, one per slot: outer, top and bottom.',
+  category_required: 'Choose whether this piece is an outer layer, a top or a bottom first.',
   invalid_reference: 'A selected piece is no longer available.',
   self_photo_required: 'Add your photo before generating a look.',
   masking_failed: 'Retake your photo with your full head and body visible.',

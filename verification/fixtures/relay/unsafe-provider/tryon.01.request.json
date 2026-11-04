@@ -11,21 +11,20 @@
       },
       "headMasked": true
     },
-    "target": {
-      "pieceRef": "target-shop",
-      "image": {
-        "mimeType": "image/png",
-        "data": {
-          "asset": "assets/shop-1-candidate-1.png"
+    "pieces": [
+      {
+        "pieceRef": "target-shop",
+        "image": {
+          "mimeType": "image/png",
+          "data": {
+            "asset": "assets/shop-1-candidate-1.png"
+          },
+          "width": 310,
+          "height": 310
         },
-        "width": 310,
-        "height": 310
+        "label": "Blue jacket",
+        "category": "outer"
       },
-      "label": "Blue jacket",
-      "category": "jacket",
-      "origin": "shop"
-    },
-    "companions": [
       {
         "pieceRef": "wardrobe-jeans",
         "image": {
@@ -37,21 +36,19 @@
           "height": 310
         },
         "label": "Jeans",
-        "category": "pants",
-        "origin": "wardrobe"
+        "category": "bottom"
       }
     ]
   },
   "match": [
     "/selfPhoto",
-    "/target",
-    "/companions"
+    "/pieces"
   ],
   "ignore": [
-    "/selfPhoto/image/data",
-    "/target/pieceRef",
-    "/target/image/data",
-    "/companions/0/pieceRef",
-    "/companions/0/image/data"
+    "/pieces/0/image/data",
+    "/pieces/0/pieceRef",
+    "/pieces/1/image/data",
+    "/pieces/1/pieceRef",
+    "/selfPhoto/image/data"
   ]
 }

@@ -59,12 +59,17 @@ def audio(samples=160, *, rate=16000, channels=1, bits=16, extra=b''):
     return {'audio': {'mimeType': 'audio/wav', 'data': base64.b64encode(raw).decode()}}
 
 
-def fitting(companions=0):
-    def piece(index):
+SLOTS = ('bottom', 'top', 'outer')
+
+
+def fitting(count=1, slots=None):
+    """A mannequin outfit; default slots follow the relay's inner-to-outer layer order."""
+    slots = list(slots or SLOTS[:count])
+    def piece(index, slot):
         return {'pieceRef': f'piece_{index}', 'image': image(index + 20),
-                'label': 'blue coat', 'category': 'coat', 'origin': 'shop' if index == 0 else 'wardrobe'}
-    return {'selfPhoto': {'image': image(10), 'headMasked': True}, 'target': piece(0),
-            'companions': [piece(i + 1) for i in range(companions)]}
+                'label': f'blue {slot}', 'category': slot}
+    return {'selfPhoto': {'image': image(10), 'headMasked': True},
+            'pieces': [piece(i, slot) for i, slot in enumerate(slots)]}
 
 
 def text_output(body):

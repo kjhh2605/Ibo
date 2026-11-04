@@ -34,8 +34,8 @@ def second_request(response, context):
 
 
 def test_scenario_operation_step_select_exact_response(tmp_path, image):
-    fixture(tmp_path, 'describe-piece', {'label': 'coat', 'category': 'outerwear'})
-    fixture(tmp_path, 'describe-piece', {'label': 'shoe', 'category': 'footwear'}, scenario='other')
+    fixture(tmp_path, 'describe-piece', {'label': 'coat', 'category': 'outer'})
+    fixture(tmp_path, 'describe-piece', {'label': 'shoe', 'category': 'other'}, scenario='other')
     fixture(tmp_path, 'describe-storefront', {'description': 'A clothing shop.'})
     loader = FixtureLoader(tmp_path)
     assert loader.prepare('normal', 'describe-piece', 1, {'image': image})[0].result()['label'] == 'coat'
@@ -48,7 +48,7 @@ def test_scenario_operation_step_select_exact_response(tmp_path, image):
 
 def test_match_pointer_mismatch_returns_409_without_values(tmp_path, image):
     expected = {'image': {**image, 'mimeType': 'PRIVATE_EXPECTED_VALUE', 'width': 999}}
-    fixture(tmp_path, 'describe-piece', {'label': 'coat', 'category': 'outerwear'}, expected=expected, match=['/image'], ignore=['/image/data'])
+    fixture(tmp_path, 'describe-piece', {'label': 'coat', 'category': 'outer'}, expected=expected, match=['/image'], ignore=['/image/data'])
     with pytest.raises(RelayError) as error:
         FixtureLoader(tmp_path).prepare('normal', 'describe-piece', 1, {'image': image})
     assert error.value.code == 'fixture_request_mismatch'
@@ -69,12 +69,12 @@ def test_ignored_time_refs_bytes_and_token_replay(tmp_path, tokens, sub, context
     replay, state = loader.prepare('normal', 'search-turn', 2, request, tokens=tokens, sub=sub)
     with tokens.attempt(state, 'spark') as consumed:
         assert replay.result(tokens=tokens, state=consumed)['not_found']['reason'] == 'No match.'
-    fixture(tmp_path, 'describe-piece', {'label': 'coat', 'category': 'outerwear'}, expected={'image': {**image, 'data': 'recorded-bytes'}}, match=['/image'], ignore=['/image/data'])
+    fixture(tmp_path, 'describe-piece', {'label': 'coat', 'category': 'outer'}, expected={'image': {**image, 'data': 'recorded-bytes'}}, match=['/image'], ignore=['/image/data'])
     assert loader.prepare('normal', 'describe-piece', 1, {'image': image})[0].result()['label'] == 'coat'
 
 
 def test_ignore_does_not_bypass_schema_media_or_limits(tmp_path, tokens, sub, context, image):
-    fixture(tmp_path, 'describe-piece', {'label': 'coat', 'category': 'outerwear'}, expected={'image': image}, match=['/image'], ignore=['/image/data', '/image/width'])
+    fixture(tmp_path, 'describe-piece', {'label': 'coat', 'category': 'outer'}, expected={'image': image}, match=['/image'], ignore=['/image/data', '/image/width'])
     loader = FixtureLoader(tmp_path)
     for value in ({**image, 'data': '!!!!'}, {**image, 'width': 9}, {**image, 'width': 2049}):
         with pytest.raises(RelayError) as error:
@@ -109,17 +109,17 @@ def test_echo_refs_propagate_to_response_and_token(tmp_path, tokens, sub, contex
 
 
 @pytest.mark.parametrize('body', [
-    {'label': '{{image.data}}', 'category': 'outerwear'},
-    {'label': 'partial {{query}}', 'category': 'outerwear'},
-    {'label': 'coat', 'category': 'outerwear', 'queryToken': 'recorded'},
-    {'label': '', 'category': 'outerwear'},
+    {'label': '{{image.data}}', 'category': 'outer'},
+    {'label': 'partial {{query}}', 'category': 'outer'},
+    {'label': 'coat', 'category': 'outer', 'queryToken': 'recorded'},
+    {'label': '', 'category': 'outer'},
 ])
 def test_invalid_echo_or_definition_returns_500(tmp_path, image, body):
     fixture(tmp_path, 'describe-piece', body)
     with pytest.raises(RelayError) as error:
         FixtureLoader(tmp_path).prepare('normal', 'describe-piece', 1, {'image': image})
     assert error.value.code == 'fixture_invalid'
-    fixture(tmp_path, 'describe-piece', {'label': 'coat', 'category': 'outerwear'}, expected={'image': image}, match=['/image/data'], ignore=['/image'])
+    fixture(tmp_path, 'describe-piece', {'label': 'coat', 'category': 'outer'}, expected={'image': image}, match=['/image/data'], ignore=['/image'])
     with pytest.raises(RelayError) as error:
         FixtureLoader(tmp_path).prepare('normal', 'describe-piece', 1, {'image': image})
     assert error.value.code == 'fixture_invalid'
@@ -158,8 +158,8 @@ def test_missing_fixture_returns_501_without_network(tmp_path, image):
 
 
 def test_asset_path_escape_rejected(tmp_path, image):
-    request = {'selfPhoto': {'image': image, 'headMasked': True}, 'target': {'pieceRef': 'target', 'image': image,
-               'label': 'coat', 'category': 'outerwear', 'origin': 'shop'}, 'companions': []}
+    request = {'selfPhoto': {'image': image, 'headMasked': True}, 'pieces': [{'pieceRef': 'outer', 'image': image,
+               'label': 'coat', 'category': 'outer'}]}
     for asset in ('assets/../../private.png', '/tmp/private.png', 'https://private.invalid/image'):
         fixture(tmp_path, 'tryon', {'image': {**image, 'data': {'asset': asset}}})
         with pytest.raises(RelayError) as error:

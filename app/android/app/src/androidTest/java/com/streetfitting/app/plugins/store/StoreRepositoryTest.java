@@ -51,6 +51,7 @@ public class StoreRepositoryTest {
     JSObject commit(String kind) throws Exception {return store.commitPhoto(photoInput(kind));}
     JSObject candidate(String source) throws Exception {return o("id","untrusted-id","photoId",source,"source","edgetam","label","Red jacket","score",0.8,"mask",png(true),"bbox",new JSONArray(new int[]{1,1,2,2}));}
     JSObject piece(String source,String mode) throws Exception {return store.saveCandidate(o("candidate",candidate(source),"origin","shop","labelMode",mode));}
+    JSObject worn(String source,String slot) throws Exception {return store.saveCandidate(o("candidate",candidate(source),"origin","shop","labelMode","describe","category",slot));}
     JSObject get(String entity,String id){return store.get(o("entity",entity,"id",id));}
     JSONArray list(String entity) throws Exception{return store.list(o("entity",entity)).getJSONArray("items");}
     File file(String ref){return new File(Uri.parse(ref).getPath());}
@@ -85,7 +86,7 @@ public class StoreRepositoryTest {
         String original=get("Photo",photo).getString("file");
         rejects("file_not_owned",()->store.discardTemp(o("file",original)));
         assertTrue(file(original).isFile());
-        JSObject target=piece(photo,"concept");
+        JSObject target=worn(photo,"outer");
         JSObject draft=store.prepareResult(o("targetPieceId",target.getString("id"),"companionPieceIds",new JSONArray()));
         String snapshot=draft.getJSObject("targetSnapshot").getString("cutoutFile");
         rejects("file_not_owned",()->store.discardTemp(o("file",snapshot)));
@@ -210,14 +211,29 @@ public class StoreRepositoryTest {
         rejects("constraint_violation",()->store.saveCandidate(o("candidate",invalid,"origin","shop","labelMode","describe")));assertEquals(0,events.size());assertEquals(1,list("Piece").length());
     }
     String listIdUnchecked(String entity){try{return list(entity).getJSONObject(0).getString("id");}catch(Exception e){throw new AssertionError(e);}}
+    @Test public void slotCategoryIsKeptAndOutfitsTakeOnePiecePerSlot() throws Exception {
+        JSObject shoes=o("candidate",candidate(photo),"origin","shop","labelMode","describe","category","shoes");
+        rejects("invalid_input",()->store.saveCandidate(shoes));
+        JSObject top=worn(photo,"top");String id=top.getString("id");assertEquals("top",top.getString("category"));
+        JSObject job=null;JSONArray jobs=list("QueueJob");
+        for(int i=0;i<jobs.length();i++) if(id.equals(jobs.getJSONObject(i).getString("refId"))) job=store.get(o("entity","QueueJob","id",jobs.getJSONObject(i).getString("id")));
+        assertNotNull(job);store.beginJob(o("id",job.getString("id"),"now",job.getLong("nextAt")));
+        store.completeJob(o("id",job.getString("id"),"label","Striped shirt","category","outer"));
+        assertEquals("Striped shirt",get("Piece",id).getString("label"));assertEquals("top",get("Piece",id).getString("category"));
+        rejects("invalid_input",()->store.updatePiece(o("id",id,"label","Shirt","category","shirt")));
+        JSObject other=worn(commit("item").getString("id"),"top");
+        rejects("invalid_input",()->store.prepareResult(o("targetPieceId",id,"companionPieceIds",new JSONArray().put(other.getString("id")))));
+        JSObject unsorted=piece(commit("item").getString("id"),"concept");
+        rejects("invalid_input",()->store.prepareResult(o("targetPieceId",unsorted.getString("id"),"companionPieceIds",new JSONArray())));
+    }
     @Test public void snapshotBytesSurviveEverySourceDeletionAndRename() throws Exception {
-        JSObject storefront=commit("storefront"),target=piece(photo,"concept"),companion=piece(commit("item").getString("id"),"concept");
+        JSObject storefront=commit("storefront"),target=worn(photo,"outer"),companion=worn(commit("item").getString("id"),"bottom");
         String targetId=target.getString("id"),companionId=companion.getString("id");
         store.updateShop(o("id",shop,"note","  upstairs  "));
         JSObject draft=store.prepareResult(o("targetPieceId",targetId,"companionPieceIds",new JSONArray().put(companionId)));
         JSObject snapshot=draft.getJSObject("targetSnapshot");String cutout=snapshot.getString("cutoutFile"),front=snapshot.getJSONObject("shop").getString("storefrontFile");
         assertNotEquals(target.getString("cutoutFile"),cutout);assertArrayEquals(Files.readAllBytes(file(target.getString("cutoutFile")).toPath()),Files.readAllBytes(file(cutout).toPath()));assertNotEquals(storefront.getString("file"),front);
-        store.updatePiece(o("id",targetId,"label","Changed","category","coat"));store.deletePiece(o("id",targetId));store.deletePiece(o("id",companionId));store.stopSession(o("tripId",trip,"endedAt",2000));store.deleteTrip(o("id",trip));
+        store.updatePiece(o("id",targetId,"label","Changed","category","top"));store.deletePiece(o("id",targetId));store.deletePiece(o("id",companionId));store.stopSession(o("tripId",trip,"endedAt",2000));store.deleteTrip(o("id",trip));
         assertTrue(file(cutout).exists());assertTrue(file(front).exists());assertEquals("Red jacket",snapshot.getString("label"));assertEquals("upstairs",snapshot.getJSONObject("shop").getString("note"));
         String provider=png(false);byte[] providerBytes=Files.readAllBytes(file(provider).toPath());
         JSObject result=store.saveResult(o("draftId",draft.getString("draftId"),"file",provider,"providerFile",provider,"faceless",true));
@@ -234,7 +250,7 @@ public class StoreRepositoryTest {
         }
         store.beginJob(o("id",jobId,"now",now));long before=System.currentTimeMillis();store.failJob(o("id",jobId,"retryable",true,"retryAfterMs",10000000));assertTrue(get("QueueJob",jobId).getLong("nextAt")>=before+10000000);
         JSObject fresh=store.enqueue(o("kind","label_piece","refId",id));assertNotEquals(jobId,fresh.getString("id"));assertEquals(0,fresh.getLong("attempts"));
-        store.beginJob(o("id",fresh.getString("id"),"now",fresh.getLong("nextAt")));store.updatePiece(o("id",id,"label","User title","category","custom"));store.completeJob(o("id",fresh.getString("id"),"label","Late AI","category","coat"));assertEquals("User title",get("Piece",id).getString("label"));
+        store.beginJob(o("id",fresh.getString("id"),"now",fresh.getLong("nextAt")));store.updatePiece(o("id",id,"label","User title","category","top"));store.completeJob(o("id",fresh.getString("id"),"label","Late AI","category","outer"));assertEquals("top",get("Piece",id).getString("category"));assertEquals("User title",get("Piece",id).getString("label"));
         JSObject old=commit("storefront");JSObject describe=store.nextJob(o("now",System.currentTimeMillis()));store.beginJob(o("id",describe.getString("id"),"now",describe.getLong("nextAt")));JSObject replacement=commit("storefront");store.completeJob(o("id",describe.getString("id"),"description","Late old description"));assertEquals(replacement.getString("id"),get("Shop",shop).getString("storefrontPhotoId"));assertTrue(get("Shop",shop).isNull("description"));assertNotNull(get("Photo",old.getString("id")));
         store.deletePhoto(o("id",replacement.getString("id")));assertEquals("none",get("Shop",shop).getString("descriptionState"));assertEquals(0,list("QueueJob").length());
     }
@@ -255,7 +271,7 @@ public class StoreRepositoryTest {
         assertTrue(file(first.getString("file")).exists());store.releaseSelf(o("updatedAt",100));assertFalse(file(first.getString("file")).exists());assertTrue(file(second.getString("file")).exists());
         rejects("file_not_owned",()->store.replaceSelfPhoto(o("selfPhoto",o("file",raw,"headMask","file:///not-owned/missing","maskedFile",raw,"updatedAt",300))));
         assertEquals(200,store.getSelfPhoto().getLong("updatedAt"));
-        JSObject target=piece(photo,"concept"),draft=store.prepareResult(o("targetPieceId",target.getString("id"),"companionPieceIds",new JSONArray()));String draftFile=draft.getJSObject("targetSnapshot").getString("cutoutFile");
+        JSObject target=worn(photo,"top"),draft=store.prepareResult(o("targetPieceId",target.getString("id"),"companionPieceIds",new JSONArray()));String draftFile=draft.getJSObject("targetSnapshot").getString("cutoutFile");
         File orphan=new File(new File(context.getFilesDir(),directory),"orphan.tmp");try(FileOutputStream output=new FileOutputStream(orphan)){output.write(7);}
         store.close();store=new SqliteRepository(context,database,directory);assertFalse(file(draftFile).exists());assertFalse(orphan.exists());assertTrue(file(second.getString("file")).exists());
         rejects("invalid_reference",()->store.saveResult(o("draftId",draft.getString("draftId"),"file",raw,"providerFile",raw,"faceless",true)));

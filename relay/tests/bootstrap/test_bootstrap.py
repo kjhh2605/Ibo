@@ -29,7 +29,7 @@ REQUESTS = {
     '/v1/transcribe': {'audio': {'mimeType': 'audio/wav', 'data': WAV}},
     '/v1/describe/storefront': {'image': {'mimeType': 'image/png', 'data': PNG, 'width': 1, 'height': 1}},
     '/v1/describe/piece': {'image': {'mimeType': 'image/png', 'data': PNG, 'width': 1, 'height': 1}},
-    '/v1/tryon': {'selfPhoto': {'image': {'mimeType': 'image/png', 'data': PNG, 'width': 1, 'height': 1}, 'headMasked': True}, 'target': {'pieceRef': 'p', 'image': {'mimeType': 'image/png', 'data': PNG, 'width': 1, 'height': 1}, 'label': 'coat', 'category': 'coat', 'origin': 'shop'}, 'companions': []},
+    '/v1/tryon': {'selfPhoto': {'image': {'mimeType': 'image/png', 'data': PNG, 'width': 1, 'height': 1}, 'headMasked': True}, 'pieces': [{'pieceRef': 'p', 'image': {'mimeType': 'image/png', 'data': PNG, 'width': 1, 'height': 1}, 'label': 'coat', 'category': 'outer'}]},
     '/v1/route': {'origin': {'lat': 0, 'lng': 0}, 'destination': {'lat': 1, 'lng': 1}},
 }
 
@@ -53,7 +53,8 @@ def test_cross_field_constraints():
     with pytest.raises(ValidationError): SearchTurnRequest(query='coat')
     with pytest.raises(ValidationError): FindPhotosCall(id='x', name='find_photos', arguments={'phrase': 'coat'}, phraseVector=[0.0]*512)
     request = REQUESTS['/v1/tryon']
-    with pytest.raises(ValidationError): TryOnRequest.model_validate({**request, 'companions': [request['target']]})
+    with pytest.raises(ValidationError): TryOnRequest.model_validate({**request, 'pieces': request['pieces'] * 2})
+    with pytest.raises(ValidationError): TryOnRequest.model_validate({**request, 'pieces': [{**request['pieces'][0], 'pieceRef': 'q'}, *request['pieces']]})
 
 def test_optional_alias_rejects_explicit_null_but_accepts_omission():
     assert ListVisitsArguments.model_validate({}).model_dump(exclude_none=True) == {}

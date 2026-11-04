@@ -806,9 +806,12 @@
         "additionalProperties": false,
         "properties": {
           "category": {
-            "maxLength": 64,
-            "minLength": 1,
-            "pattern": "\\S",
+            "enum": [
+              "outer",
+              "top",
+              "bottom",
+              "other"
+            ],
             "title": "Category",
             "type": "string"
           },
@@ -1279,9 +1282,11 @@
         "additionalProperties": false,
         "properties": {
           "category": {
-            "maxLength": 64,
-            "minLength": 1,
-            "pattern": "\\S",
+            "enum": [
+              "outer",
+              "top",
+              "bottom"
+            ],
             "title": "Category",
             "type": "string"
           },
@@ -1293,14 +1298,6 @@
             "minLength": 1,
             "pattern": "\\S",
             "title": "Label",
-            "type": "string"
-          },
-          "origin": {
-            "enum": [
-              "shop",
-              "wardrobe"
-            ],
-            "title": "Origin",
             "type": "string"
           },
           "pieceRef": {
@@ -1315,34 +1312,31 @@
           "pieceRef",
           "image",
           "label",
-          "category",
-          "origin"
+          "category"
         ],
         "title": "TryOnPiece",
         "type": "object"
       },
       "TryOnRequest": {
         "additionalProperties": false,
+        "description": "One mannequin outfit: at most one garment per slot, rendered as one image.",
         "properties": {
-          "companions": {
+          "pieces": {
             "items": {
               "$ref": "#/components/schemas/TryOnPiece"
             },
-            "maxItems": 5,
-            "title": "Companions",
+            "maxItems": 3,
+            "minItems": 1,
+            "title": "Pieces",
             "type": "array"
           },
           "selfPhoto": {
             "$ref": "#/components/schemas/MaskedSelfPhoto"
-          },
-          "target": {
-            "$ref": "#/components/schemas/TryOnPiece"
           }
         },
         "required": [
           "selfPhoto",
-          "target",
-          "companions"
+          "pieces"
         ],
         "title": "TryOnRequest",
         "type": "object"

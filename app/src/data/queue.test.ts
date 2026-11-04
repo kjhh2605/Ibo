@@ -49,10 +49,10 @@ async function commit(kind: Photo['kind']) {
   photos.push(photo);
   return photo;
 }
-async function saved(mode: 'describe' | 'concept' = 'describe') {
+async function saved(mode: 'describe' | 'concept' = 'describe', category?: 'outer' | 'top' | 'bottom') {
   const photo = await commit('item');
   const mask = await store.writeBlob(rgba(true), 'candidate-mask', photo.id);
-  return store.saveCandidate({candidate: {id: 'not-trusted', photoId: photo.id, source: 'edgetam', label: 'Red jacket', score: 0.8, mask, bbox: [0, 0, 2, 2]}, origin: 'shop', labelMode: mode});
+  return store.saveCandidate({candidate: {id: 'not-trusted', photoId: photo.id, source: 'edgetam', label: 'Red jacket', score: 0.8, mask, bbox: [0, 0, 2, 2]}, origin: 'shop', labelMode: mode, category});
 }
 async function jobs(): Promise<QueueJob[]> { return (await store.list({entity: 'QueueJob'})).items; }
 
@@ -63,7 +63,7 @@ beforeEach(async () => {
   const session = await store.startSession({fix: {t: Date.now(), lat: 37, lng: -122, accuracyM: 3}});
   tripId = session.trip.id; shopId = session.shop.id; photos = []; calls.length = 0;
   online = true; foreground = true;
-  respond = async path => path === '/v1/describe/storefront' ? {description: 'Red brick entrance'} : {label: 'Red wool jacket', category: 'jacket'};
+  respond = async path => path === '/v1/describe/storefront' ? {description: 'Red brick entrance'} : {label: 'Red wool jacket', category: 'outer'};
   environment = {now: () => Date.now(), foreground: () => foreground, online: () => online, schedule: (fn, ms) => setTimeout(fn, ms), cancel: handle => clearTimeout(handle as number), image: async () => wire};
 });
 afterEach(async () => { await worker?.stop(); worker = undefined; await store.close(); vi.useRealTimers(); vi.unstubAllGlobals(); });
@@ -77,7 +77,15 @@ describe('queue foreground durable dispatcher', () => {
     online = true; worker.wake(); worker.wake();
     await until(async () => (await jobs()).length === 0);
     expect(calls.map(call => call.path)).toEqual(['/v1/describe/piece']);
-    expect(await store.get({entity: 'Piece', id: piece.id})).toMatchObject({label: 'Red wool jacket', category: 'jacket', origin: 'shop'});
+    expect(await store.get({entity: 'Piece', id: piece.id})).toMatchObject({label: 'Red wool jacket', category: 'outer', origin: 'shop'});
+  });
+  it('names a piece cut for a mannequin slot but keeps the slot as its category', async () => {
+    const piece = await saved('describe', 'bottom');
+    expect(piece).toMatchObject({label: 'Picked item', category: 'bottom'});
+    worker = new DescribeQueue(store, transport, environment); await worker.start();
+    await until(async () => (await jobs()).length === 0);
+    expect(await store.get({entity: 'Piece', id: piece.id})).toMatchObject({label: 'Red wool jacket', category: 'bottom'});
+    await expect(store.updatePiece({id: piece.id, label: 'Jeans', category: 'jeans'})).rejects.toMatchObject({code: 'invalid_argument'});
   });
   it('keeps reconnect and foreground wake behind persisted nextAt with 5s,10s,20s through 300s backoff', async () => {
     await saved(); respond = async () => { throw {code: 'upstream_timeout', retryable: true}; };
@@ -97,7 +105,7 @@ describe('queue foreground durable dispatcher', () => {
   });
   it('honors Retry-After without a transport retry', async () => {
     await saved(); let failures = 1;
-    respond = async () => { if (failures--) throw {code: 'unauthorized', retryable: true, retryAfterMs: 90_000}; return {label: 'Authenticated jacket', category: 'jacket'}; };
+    respond = async () => { if (failures--) throw {code: 'unauthorized', retryable: true, retryAfterMs: 90_000}; return {label: 'Authenticated jacket', category: 'outer'}; };
     worker = new DescribeQueue(store, transport, environment); await worker.start();
     await until(async () => (await jobs())[0]?.nextAt === 190_000);
     await vi.advanceTimersByTimeAsync(89_999); expect(calls.length).toBe(1);
@@ -180,11 +188,11 @@ describe('queue foreground durable dispatcher', () => {
     const piece = await saved(); let finish!: (value: object) => void;
     respond = () => new Promise(resolve => { finish = resolve; });
     worker = new DescribeQueue(store, transport, environment); await worker.start(); await until(() => calls.length === 1);
-    await store.updatePiece({id: piece.id, label: 'My title', category: 'my category'}); finish({label: 'Late model title', category: 'coat'});
+    await store.updatePiece({id: piece.id, label: 'My title', category: 'top'}); finish({label: 'Late model title', category: 'outer'});
     await until(async () => (await jobs()).length === 0);
-    expect(await store.get({entity: 'Piece', id: piece.id})).toMatchObject({label: 'My title'});
+    expect(await store.get({entity: 'Piece', id: piece.id})).toMatchObject({label: 'My title', category: 'top'});
     const next = await store.enqueue({kind: 'label_piece', refId: piece.id}); worker.wake(); await until(() => calls.length === 2);
-    await store.deletePiece({id: piece.id}); finish({label: 'Late deleted title', category: 'coat'});
+    await store.deletePiece({id: piece.id}); finish({label: 'Late deleted title', category: 'outer'});
     await until(async () => await store.get({entity: 'QueueJob', id: next.id}) === null);
     expect(await store.get({entity: 'Piece', id: piece.id})).toBeNull();
   });

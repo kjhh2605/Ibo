@@ -1,3 +1,5 @@
+import {GARMENT_SLOTS, isGarmentSlot, slotOf} from '../category';
+import type {GarmentSlot} from '../category';
 import type {Asset, Candidate, DeviceError, FaceMask, Media, Piece, Result, SelfPhoto, Store} from '../native/contracts';
 import type {RelayResponse} from '../relay/client';
 import type {UploadImageReader} from '../relay/selfPhoto';
@@ -5,7 +7,13 @@ import {safeError, TryOnError} from './errors';
 import {serializeTryOn} from './request';
 import type {PreparedResult, TryOnRequest} from './request';
 
-export type TryOnDraft = {readonly targetPieceId: string | null; readonly companionPieceIds: readonly string[]};
+/** The mannequin: at most one piece per slot. Empty slots follow the relay's slot rules. */
+export type Outfit = Readonly<Partial<Record<GarmentSlot, string>>>;
+export type TryOnDraft = {readonly outfit: Outfit};
+/** Filled slots in mannequin order (outer, top, bottom); also the stored Result order. */
+export function wornSlots(outfit: Outfit): [GarmentSlot, string][] {
+  return GARMENT_SLOTS.flatMap(slot => outfit[slot] ? [[slot, outfit[slot]] as [GarmentSlot, string]] : []);
+}
 export type TryOnPhase = 'idle' | 'preparing' | 'sending' | 'compositing' | 'saving' | 'cancelling' | 'complete' | 'failed' | 'cancelled';
 export type TryOnState = {
   readonly draft: TryOnDraft;
@@ -28,10 +36,12 @@ export interface TryOnDependencies {
 export interface TryOnController {
   getSnapshot(): TryOnState;
   subscribe(listener: () => void): () => void;
-  start(targetPieceId: string): Promise<void>;
-  addCompanion(id: string): Promise<void>;
-  removeCompanion(id: string): void;
-  addTripCandidate(candidate: Candidate, signal?: AbortSignal): Promise<Piece>;
+  /** Put a sorted piece on the mannequin in its own slot, keeping the other slots. */
+  wear(pieceId: string): Promise<GarmentSlot>;
+  /** Put a piece in `slot`; a piece not yet sorted into that slot is re-categorised first. */
+  setSlot(slot: GarmentSlot, pieceId: string): Promise<void>;
+  clearSlot(slot: GarmentSlot): void;
+  addTripCandidate(candidate: Candidate, slot: GarmentSlot, signal?: AbortSignal): Promise<Piece>;
   registerSelf(asset: Asset): Promise<boolean>;
   generate(): Promise<Result | null>;
   cancel(): void;
@@ -43,7 +53,7 @@ export interface TryOnController {
 }
 
 export function createTryOnController(deps: TryOnDependencies): TryOnController {
-  let state: TryOnState = Object.freeze({draft: Object.freeze({targetPieceId: null, companionPieceIds: Object.freeze([])}), phase: 'idle', selfState: 'empty', selfPhoto: null, result: null, error: null});
+  let state: TryOnState = Object.freeze({draft: Object.freeze({outfit: Object.freeze({})}), phase: 'idle', selfState: 'empty', selfPhoto: null, result: null, error: null});
   const listeners = new Set<() => void>();
   let active: AbortController | null = null;
   let running: Promise<Result | null> | null = null;
@@ -55,32 +65,39 @@ export function createTryOnController(deps: TryOnDependencies): TryOnController 
     state = Object.freeze({...state, ...patch});
     if (!disposed) for (const listener of listeners) listener();
   };
-  const draft = (targetPieceId: string | null, ids: readonly string[]) => {
+  const draft = (outfit: Outfit) => {
     revision++;
-    publish({draft: Object.freeze({targetPieceId, companionPieceIds: Object.freeze([...ids])}), phase: 'idle', result: null, error: null});
+    publish({draft: Object.freeze({outfit: Object.freeze({...outfit})}), phase: 'idle', result: null, error: null});
+  };
+  const withSlot = (slot: GarmentSlot, id: string | undefined): Outfit => {
+    const next: Partial<Record<GarmentSlot, string>> = {...state.draft.outfit};
+    // A piece moved to another slot leaves its old one.
+    for (const other of GARMENT_SLOTS) if (id && next[other] === id) delete next[other];
+    if (id) next[slot] = id; else delete next[slot];
+    return next;
   };
   const idle = () => {
     if (disposed) throw new TryOnError('cancelled');
     if (active || editing || state.selfState === 'registering') throw new TryOnError('busy');
   };
-  const piece = async (id: string, target = false) => {
+  const piece = async (id: string) => {
     if (typeof id !== 'string' || !id) throw new TryOnError('invalid_composition');
     const value = await deps.store.get({entity: 'Piece', id});
     if (!value) throw new TryOnError('invalid_reference');
-    if ((value.origin !== 'shop' && value.origin !== 'wardrobe') || (target && value.origin !== 'shop')) throw new TryOnError('invalid_composition');
+    if (value.origin !== 'shop' && value.origin !== 'wardrobe') throw new TryOnError('invalid_composition');
     return value;
   };
+  // A piece is worn only under its exact stored slot, so the wire category is never guessed.
   const validate = async (value: TryOnDraft) => {
-    if (!value.targetPieceId || value.companionPieceIds.length > 5 ||
-        new Set([value.targetPieceId, ...value.companionPieceIds]).size !== value.companionPieceIds.length + 1) throw new TryOnError('invalid_composition');
-    await piece(value.targetPieceId, true);
-    for (const id of value.companionPieceIds) await piece(id);
+    const worn = wornSlots(value.outfit);
+    if (!worn.length || Object.keys(value.outfit).some(slot => !isGarmentSlot(slot)) ||
+        new Set(worn.map(([, id]) => id)).size !== worn.length) throw new TryOnError('invalid_composition');
+    for (const [slot, id] of worn) if ((await piece(id)).category !== slot) throw new TryOnError('invalid_composition');
+    return worn;
   };
-  const room = (id?: string) => {
-    if (!state.draft.targetPieceId) throw new TryOnError('invalid_composition');
-    if (id === state.draft.targetPieceId || (id && state.draft.companionPieceIds.includes(id))) throw new TryOnError('invalid_composition');
-    if (state.draft.companionPieceIds.length >= 5) throw new TryOnError('companion_limit');
-  };
+  // Sorting is an explicit user choice; it keeps the label, like a rename.
+  const sortInto = async (value: Piece, slot: GarmentSlot) =>
+    value.category === slot ? value : deps.store.updatePiece({id: value.id, label: value.label, category: slot});
   const edit = async (action: () => Promise<void>) => {
     idle();
     editing = true;
@@ -109,15 +126,16 @@ export function createTryOnController(deps: TryOnDependencies): TryOnController 
       if (state.selfState === 'failed') throw new TryOnError('masking_failed');
       if (!await deps.online()) throw new TryOnError('offline', true);
       signal.throwIfAborted();
-      const selection = state.draft;
-      await validate(selection);
+      const worn = await validate(state.draft);
       signal.throwIfAborted();
       const currentSelf = await deps.store.getSelfPhoto();
       const self = currentSelf ? {...currentSelf} : null;
       if (!self) throw new TryOnError('self_photo_required');
       if (!self.maskedFile || self.maskedFile === self.file || self.maskedFile === self.headMask) throw new TryOnError('masking_failed');
       signal.throwIfAborted();
-      prepared = await deps.store.prepareResult({targetPieceId: selection.targetPieceId!, companionPieceIds: [...selection.companionPieceIds]});
+      // Stored as lead piece + the rest, in mannequin slot order.
+      const ids = worn.map(([, id]) => id);
+      prepared = await deps.store.prepareResult({targetPieceId: ids[0], companionPieceIds: ids.slice(1)});
       signal.throwIfAborted();
       const body = await serializeTryOn(self.maskedFile, prepared, deps.readImage, signal);
       signal.throwIfAborted();
@@ -166,25 +184,37 @@ export function createTryOnController(deps: TryOnDependencies): TryOnController 
   return {
     getSnapshot: () => state,
     subscribe(listener) { listeners.add(listener); return () => { listeners.delete(listener); }; },
-    async start(targetPieceId) {
-      await edit(async () => { await piece(targetPieceId, true); draft(targetPieceId, []); });
+    async wear(pieceId) {
+      let slot: GarmentSlot | null = null;
+      await edit(async () => {
+        const value = await piece(pieceId);
+        slot = slotOf(value);
+        if (!slot) throw new TryOnError('category_required');
+        await sortInto(value, slot);
+        draft(withSlot(slot, pieceId));
+      });
       await refresh();
+      return slot!;
     },
-    async addCompanion(id) {
-      await edit(async () => { room(id); await piece(id); draft(state.draft.targetPieceId, [...state.draft.companionPieceIds, id]); });
+    async setSlot(slot, pieceId) {
+      if (!isGarmentSlot(slot)) throw new TryOnError('invalid_composition');
+      await edit(async () => { await sortInto(await piece(pieceId), slot); draft(withSlot(slot, pieceId)); });
     },
-    removeCompanion(id) { idle(); draft(state.draft.targetPieceId, state.draft.companionPieceIds.filter(value => value !== id)); },
-    async addTripCandidate(candidate, signal) {
+    clearSlot(slot) { idle(); if (isGarmentSlot(slot)) draft(withSlot(slot, undefined)); },
+    async addTripCandidate(candidate, slot, signal) {
+      if (!isGarmentSlot(slot)) throw new TryOnError('invalid_composition');
       let saved: Piece | undefined;
       await edit(async () => {
-        room();
         const version = revision;
         signal?.throwIfAborted();
-        saved = await deps.store.saveCandidate({candidate, origin: 'shop', labelMode: 'describe'});
+        // Spark still names it; the slot the user chose stays its category.
+        saved = await deps.store.saveCandidate({candidate, origin: 'shop', labelMode: 'describe', category: slot});
         signal?.throwIfAborted();
         if (disposed || version !== revision) throw new TryOnError('cancelled');
-        room(saved.id);
-        draft(state.draft.targetPieceId, [...state.draft.companionPieceIds, saved.id]);
+        // The same cut saved earlier comes back as-is and may need sorting.
+        saved = await sortInto(saved, slot);
+        if (disposed || version !== revision) throw new TryOnError('cancelled');
+        draft(withSlot(slot, saved.id));
       });
       return saved!;
     },
@@ -216,18 +246,25 @@ export function createTryOnController(deps: TryOnDependencies): TryOnController 
     cancel,
     async restoreResult(result) {
       await edit(async () => {
-        await piece(result.targetPieceId, true);
-        const remaining: string[] = [];
-        for (const id of result.companionPieceIds) {
-          if (await deps.store.get({entity: 'Piece', id})) remaining.push(id);
+        // Deleted or re-sorted pieces drop out; the rest go back in their current slot.
+        const outfit: Partial<Record<GarmentSlot, string>> = {};
+        for (const id of [result.targetPieceId, ...result.companionPieceIds]) {
+          const value = await deps.store.get({entity: 'Piece', id});
+          const slot = value && value.category === slotOf(value) ? slotOf(value) : null;
+          if (slot && !outfit[slot]) outfit[slot] = id;
         }
-        const restored = {targetPieceId: result.targetPieceId, companionPieceIds: remaining};
-        await validate(restored);
-        draft(restored.targetPieceId, remaining);
+        if (!Object.keys(outfit).length) throw new TryOnError('invalid_reference');
+        draft(outfit);
       });
       await refresh();
     },
-    async canChangePieces(result) { const target = await deps.store.get({entity: 'Piece', id: result.targetPieceId}); return target?.origin === 'shop'; },
+    async canChangePieces(result) {
+      for (const id of [result.targetPieceId, ...result.companionPieceIds]) {
+        const value = await deps.store.get({entity: 'Piece', id});
+        if (value && value.category === slotOf(value)) return true;
+      }
+      return false;
+    },
     exportResult: deps.exportResult,
     refresh,
     async dispose() { disposed = true; cancel(); listeners.clear(); await running; },

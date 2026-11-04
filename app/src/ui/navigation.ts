@@ -1,15 +1,18 @@
+import type {GarmentSlot} from '../category';
 import type {Asset, Candidate} from '../native/contracts';
 
 export type Route =
   | {name: 'home' | 'ask' | 'results' | 'wardrobe' | 'privacy'}
   | ({name: 'capture'} & ({purpose?: 'shopping' | 'wardrobe' | 'self'; shopId?: never} | {purpose: 'storefront'; shopId: string}))
-  | {name: 'trips'; forOutfit?: boolean}
-  | {name: 'trip'; tripId: string; shopId?: string; forOutfit?: boolean}
-  | {name: 'pick'; photoId?: string; asset?: Asset; mode: 'shop' | 'wardrobe' | 'outfit'; candidates?: Candidate[]; concept?: string}
+  // `forOutfit` / `slot`: the mannequin slot a trip-photo cut-out will fill.
+  | {name: 'trips'; forOutfit?: GarmentSlot}
+  | {name: 'trip'; tripId: string; shopId?: string; forOutfit?: GarmentSlot}
+  | {name: 'pick'; photoId?: string; asset?: Asset; mode: 'shop' | 'wardrobe' | 'outfit'; slot?: GarmentSlot; candidates?: Candidate[]; concept?: string}
   | {name: 'item'; pieceId: string}
   | {name: 'outfit'}
   | {name: 'result'; resultId: string}
-  | {name: 'walk'; source: 'item' | 'result'; id: string};
+  // From a result, `pieceId` picks which shop piece of the look to walk back to.
+  | {name: 'walk'; source: 'item' | 'result'; id: string; pieceId?: string};
 export const titles: Record<Route['name'], string> = {home: 'Ibo', capture: 'Camera', trips: 'All trips', trip: 'Trip', ask: 'Find it', pick: 'Pick the item', item: 'Item', outfit: 'Try on', result: 'Your look', results: 'Try-ons', walk: 'Walk back', wardrobe: 'Wardrobe', privacy: 'Privacy'};
 export function pushRoute(stack: Route[], route: Route): Route[] {
   if (route.name === 'home') return [{name: 'home'}];

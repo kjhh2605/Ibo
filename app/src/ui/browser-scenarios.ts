@@ -3,7 +3,7 @@ import type {Page} from '@playwright/test';
 import {writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 
-type Inspection = {route:string;sheet:string|null;ids:{trips:string[];photos:string[];pieces:string[];results:string[]};fitting:{phase:string;selfState:string;draft:{targetPieceId:string|null;companionPieceIds:string[]}};agent:{status:string;visibleCandidates:{id:string}[];candidates:{id:string}[]};walk:{mode:string;errorCode:string|null;destination:{lat:number;lng:number};fix:{lat:number;lng:number;t:number}|null}|null;transport:{counts:Record<string,number>;rawSelfReads:number;headMaskReads:number;resultExports:number;scope:string}|null};
+type Inspection = {route:string;sheet:string|null;ids:{trips:string[];photos:string[];pieces:string[];results:string[]};fitting:{phase:string;selfState:string;draft:{outfit:Partial<Record<'outer'|'top'|'bottom',string>>}};agent:{status:string;visibleCandidates:{id:string}[];candidates:{id:string}[]};walk:{mode:string;errorCode:string|null;destination:{lat:number;lng:number};fix:{lat:number;lng:number;t:number}|null}|null;transport:{counts:Record<string,number>;rawSelfReads:number;headMaskReads:number;resultExports:number;scope:string}|null};
 async function inspect(page:Page):Promise<Inspection>{
   return page.evaluate(async()=>{
     const observer=(window as Window&{__sfVerification?:{inspect():Promise<Inspection>}}).__sfVerification;
@@ -109,21 +109,24 @@ export async function runBrowserScenario(scenario:'full'|'states',url:string,out
     if((await inspect(page)).walk?.mode==='error')await click('Try again');
     await expect.poll(async()=>(await inspect(page)).walk?.mode).toBe('nearby');
     await click('I found this shop');await expect.poll(async()=>(await inspect(page)).walk?.mode).toBe('arrived');await shot('07-arrived');await click('Done');await route('item');
-    await click('Try it on');await route('outfit');
-    const target=(await inspect(page)).fitting.draft.targetPieceId;expect(target).toBe(pieceId);
-    await click('Add a companion');await click('From a trip photo');await route('trips');await shot('08-trips');
+    // A searched piece is named after the search and not sorted yet, so Try it on asks for its slot.
+    await click('Try it on');await expect(page.getByRole('dialog',{name:'What kind of piece is this?'})).toBeVisible();
+    await click('Wear as outer');await route('outfit');
+    const target=(await inspect(page)).fitting.draft.outfit.outer;expect(target).toBe(pieceId);
+    matrix.push({route:'outfit',state:'unsorted-piece-sorted-onto-mannequin',passed:true});
+    await click('Add top');await click('From a trip photo');await route('trips');await shot('08-trips');
     await button(/Oct 31/).click();await route('trip');await shot('09-trip');
     await expect(button('Walk back')).toHaveCount(0);
     await button(/Open photo/).first().click();await route('pick');
-    await click('Cancel and return to outfit');await route('outfit');expect((await inspect(page)).fitting.draft.targetPieceId).toBe(target);
-    matrix.push({route:'outfit',state:'companion-cancel-preserves-target',passed:true});
-    await click('Add a companion');await click('From a trip photo');await route('trips');
+    await click('Cancel and return to outfit');await route('outfit');expect((await inspect(page)).fitting.draft.outfit).toEqual({outer:target});
+    matrix.push({route:'outfit',state:'slot-cancel-preserves-outfit',passed:true});
+    await click('Add top');await click('From a trip photo');await route('trips');
     await button(/Oct 31/).click();await route('trip');await button(/Open photo/).first().click();await route('pick');
     await expect(page.getByRole('button',{name:/^Tap the item in the photo/})).toHaveAttribute('aria-disabled','false');
     await page.getByRole('button',{name:/^Tap the item in the photo/}).press('Enter');
     await expect(button('Add to outfit')).toBeEnabled();await click('Add to outfit');await route('outfit');
-    expect((await inspect(page)).fitting.draft.companionPieceIds).toHaveLength(1);
-    matrix.push({route:'outfit',state:'trip-cutout-saved-and-added',passed:true});
+    const outfit=(await inspect(page)).fitting.draft.outfit;expect(outfit.outer).toBe(target);expect(outfit.top).toBeDefined();
+    matrix.push({route:'outfit',state:'trip-cutout-saved-into-top-slot',passed:true});
     await home();await click('Wardrobe');await route('wardrobe');await shot('10-wardrobe');
     await click('Add a piece');await click('Choose from gallery');await route('pick');await click('Cancel');await route('wardrobe');
     const beforeWardrobe=(await inspect(page)).ids.pieces;
@@ -154,7 +157,7 @@ export async function runBrowserScenario(scenario:'full'|'states',url:string,out
     await expect(page.getByRole('dialog')).toHaveCount(0);
     await shot('13-outfit');
     const before=(await inspect(page)).transport?.counts['/v1/tryon']??0;
-    await click('Generate');await route('result');await shot('14-result');
+    await click('Fit');await route('result');await shot('14-result');
     expect((await inspect(page)).transport?.counts['/v1/tryon']).toBe(before+1);
     await click('Delete look');await confirm('Delete look');await route('results');
     await home();await openSaved('a blue jacket');await route('item');await click('Delete piece');await confirm('Delete piece');

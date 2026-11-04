@@ -321,8 +321,11 @@ export interface components {
     };
     /** PieceResponse */
     PieceResponse: {
-      /** Category */
-      category: string;
+      /**
+       * Category
+       * @enum {string}
+       */
+      category: "outer" | "top" | "bottom" | "other";
       /** Label */
       label: string;
     };
@@ -450,25 +453,25 @@ export interface components {
     };
     /** TryOnPiece */
     TryOnPiece: {
-      /** Category */
-      category: string;
+      /**
+       * Category
+       * @enum {string}
+       */
+      category: "outer" | "top" | "bottom";
       image: components["schemas"]["Image"];
       /** Label */
       label: string;
-      /**
-       * Origin
-       * @enum {string}
-       */
-      origin: "shop" | "wardrobe";
       /** Pieceref */
       pieceRef: string;
     };
-    /** TryOnRequest */
+    /**
+     * TryOnRequest
+     * @description One mannequin outfit: at most one garment per slot, rendered as one image.
+     */
     TryOnRequest: {
-      /** Companions */
-      companions: components["schemas"]["TryOnPiece"][];
+      /** Pieces */
+      pieces: components["schemas"]["TryOnPiece"][];
       selfPhoto: components["schemas"]["MaskedSelfPhoto"];
-      target: components["schemas"]["TryOnPiece"];
     };
     /** TryOnResponse */
     TryOnResponse: {
