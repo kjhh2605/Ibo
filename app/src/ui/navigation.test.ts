@@ -37,4 +37,9 @@ describe('home-rooted navigation',()=>{
     expect(pruneDeleted(results,'Piece','piece-1')).toBe(results);
     expect(pruneDeleted(results,'Result','result-1')).toEqual(results.slice(0,2));
   });
+  it('returns a newly generated and deleted look to history instead of the completed outfit',()=>{
+    const stack:Route[]=[{name:'home'},{name:'item',pieceId:'target'},{name:'outfit'},{name:'result',resultId:'new-look'},{name:'walk',source:'result',id:'new-look'}];
+    expect(pruneDeleted(stack,'Result','new-look')).toEqual([{name:'home'},{name:'results'}]);
+    expect(pruneDeleted(stack,'Result','another-look')).toBe(stack);
+  });
 });

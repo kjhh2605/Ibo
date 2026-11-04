@@ -27,7 +27,12 @@ export function returnTo(stack: Route[], name: Route['name'], next?: Route): Rou
 }
 export function pruneDeleted(stack: Route[], entity: 'Trip' | 'Photo' | 'Piece' | 'Result', id: string): Route[] {
   const index = stack.findIndex(route => (entity === 'Trip' && route.name === 'trip' && route.tripId === id) || (entity === 'Photo' && route.name === 'pick' && route.photoId === id) || (entity === 'Piece' && route.name === 'item' && route.pieceId === id) || (entity === 'Result' && route.name === 'result' && route.resultId === id));
-  return index < 0 ? stack : stack.slice(0, Math.max(1, index));
+  if (index < 0) return stack;
+  if (entity === 'Result') {
+    const history = stack.findLastIndex((route, at) => at < index && route.name === 'results');
+    return history < 0 ? [{name: 'home'}, {name: 'results'}] : stack.slice(0, history + 1);
+  }
+  return stack.slice(0, Math.max(1, index));
 }
 export function deepLink(stack: Route[], url: string, recording: boolean): Route[] {
   if (url === 'streetfitting://home') return [{name: 'home'}];

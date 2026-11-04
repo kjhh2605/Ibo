@@ -1,5 +1,5 @@
 {
-  "passed": false,
+  "passed": true,
   "scenario": "full",
   "routes": [
     "home",
@@ -13,7 +13,8 @@
     "trip",
     "wardrobe",
     "privacy",
-    "results"
+    "results",
+    "result"
   ],
   "matrix": [
     {
@@ -37,8 +38,18 @@
       "passed": true
     },
     {
+      "route": "ask",
+      "state": "voice-vad-transcribe-automatic-search",
+      "passed": true
+    },
+    {
       "route": "pick",
       "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "pick",
+      "state": "offline-show-all-without-inference",
       "passed": true
     },
     {
@@ -152,6 +163,21 @@
       "passed": true
     },
     {
+      "route": "pick",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "wardrobe",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "wardrobe",
+      "state": "actual-tap-save-and-name",
+      "passed": true
+    },
+    {
       "route": "home",
       "state": "normal",
       "passed": true
@@ -187,8 +213,53 @@
       "passed": true
     },
     {
-      "route": "outfit",
-      "state": "mask-failure-blocks-upload",
+      "route": "result",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "results",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "home",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "item",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "home",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "home",
+      "state": "deletion-persists",
+      "passed": true
+    },
+    {
+      "route": "wardrobe",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "item",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "wardrobe",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "wardrobe",
+      "state": "reload-preserves-cutout-and-delete-removes-it",
       "passed": true
     }
   ],
@@ -203,20 +274,21 @@
     "08-trips.png",
     "09-trip.png",
     "10-wardrobe.png",
+    "10b-wardrobe-saved.png",
     "11-privacy.png",
     "12-results-empty.png",
-    "failure.png"
+    "13-outfit.png",
+    "14-result.png"
   ],
-  "failure": "Self registration did not succeed through the real FaceMask plugin; missing/failed person fixtures cannot be replaced by UI success.",
+  "failure": null,
   "snapshot": {
     "mode": "mock",
     "relayBaseUrl": "http://127.0.0.1:8787",
     "resultDownload": false,
-    "route": "outfit",
+    "route": "wardrobe",
     "stack": [
       "home",
-      "item",
-      "outfit"
+      "wardrobe"
     ],
     "sheet": null,
     "online": true,
@@ -227,12 +299,12 @@
     },
     "ids": {
       "trips": [
-        "17f9bd0c-f28b-4dc5-b831-2a7443fbe40a",
-        "37185a2a-5a6b-4e1d-8d53-1dd12243e291"
+        "fa483675-1be6-4df2-9247-3dd9c84b4106",
+        "079e0470-5913-4dd3-92b0-38f5fbc7b733"
       ],
       "photos": [
-        "8a6f04a1-0707-488b-bc3b-7caafac39341",
-        "f1c6ca8d-0461-498b-bc57-9b5e3f7b0228",
+        "357d5c07-a6d6-4c31-8379-2791d242743b",
+        "6e03f7d8-b881-4f13-81b5-af1ac80b506f",
         "saturday-shop2-photo5",
         "saturday-shop2-photo4",
         "saturday-shop2-photo3",
@@ -242,19 +314,18 @@
         "saturday-shop1-photo1"
       ],
       "pieces": [
-        "piece:1801990a72f3f6a2f0d41d6a66e06734cc92a388f2fa4ac75dd95cb3cb1fe02d",
-        "piece:52f54062a38b8106adb59ba58b4b8aca3978d20a7ccf2411a41da4ffaf02e528"
+        "piece:1801990a72f3f6a2f0d41d6a66e06734cc92a388f2fa4ac75dd95cb3cb1fe02d"
       ],
       "results": []
     },
     "queue": [],
     "fitting": {
       "draft": {
-        "targetPieceId": "piece:52f54062a38b8106adb59ba58b4b8aca3978d20a7ccf2411a41da4ffaf02e528",
+        "targetPieceId": null,
         "companionPieceIds": []
       },
       "phase": "idle",
-      "selfState": "failed",
+      "selfState": "empty",
       "resultId": null
     },
     "agent": {
@@ -268,14 +339,11 @@
     },
     "walk": null,
     "transport": {
-      "counts": {
-        "/v1/route": 3,
-        "/v1/describe/piece": 1
-      },
+      "counts": {},
       "rawSelfReads": 0,
       "headMaskReads": 0,
       "resultExports": 0,
-      "knownSelfVersions": 0,
+      "knownSelfVersions": 1,
       "scope": "relay-attempts/shared-file-reads/media-export-attempts"
     }
   },

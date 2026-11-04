@@ -3,7 +3,7 @@ import type {Page} from '@playwright/test';
 import {writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 
-type Inspection = {route:string;sheet:string|null;ids:{trips:string[];photos:string[];pieces:string[];results:string[]};fitting:{phase:string;selfState:string;draft:{targetPieceId:string|null;companionPieceIds:string[]}};agent:{status:string;visibleCandidates:{id:string}[];candidates:{id:string}[]};walk:{mode:string;destination:{lat:number;lng:number};fix:{lat:number;lng:number;t:number}|null}|null;transport:{counts:Record<string,number>;rawSelfReads:number;headMaskReads:number;resultExports:number;scope:string}|null};
+type Inspection = {route:string;sheet:string|null;ids:{trips:string[];photos:string[];pieces:string[];results:string[]};fitting:{phase:string;selfState:string;draft:{targetPieceId:string|null;companionPieceIds:string[]}};agent:{status:string;visibleCandidates:{id:string}[];candidates:{id:string}[]};walk:{mode:string;errorCode:string|null;destination:{lat:number;lng:number};fix:{lat:number;lng:number;t:number}|null}|null;transport:{counts:Record<string,number>;rawSelfReads:number;headMaskReads:number;resultExports:number;scope:string}|null};
 async function inspect(page:Page):Promise<Inspection>{
   return page.evaluate(async()=>{
     const observer=(window as Window&{__sfVerification?:{inspect():Promise<Inspection>}}).__sfVerification;
@@ -15,25 +15,32 @@ async function inspect(page:Page):Promise<Inspection>{
 /** No route setters, service replacements, Store writes, or synthetic UI success controls. */
 export async function runBrowserScenario(scenario:'full'|'states',url:string,output:string) {
   const browser=await chromium.launch({headless:true});
-  const context=await browser.newContext({viewport:{width:412,height:892},permissions:['geolocation'],geolocation:{latitude:37.5454,longitude:127.0555,accuracy:5}});
+  const initialLocation={latitude:37.5454,longitude:127.0555,accuracy:5};
+  const context=await browser.newContext({viewport:{width:412,height:892},permissions:['geolocation'],geolocation:initialLocation});
   const page=await context.newPage();
   const routes=new Set<string>(),matrix:{route:string;state:string;passed:boolean;detail?:string}[]=[];
   const screenshots:string[]=[];
   let failure:string|null=null;
   const button=(name:string|RegExp)=>page.getByRole('button',{name,exact:typeof name==='string'}).first();
   async function click(name:string|RegExp){await button(name).click();}
-  async function route(name:string){
+  async function route(name:string,exerciseOffline=true){
     await expect(page.locator(`[data-route="${name}"]`)).toBeVisible();
     await expect.poll(async()=>(await inspect(page)).route).toBe(name);
     routes.add(name);matrix.push({route:name,state:'normal',passed:true});
     await expect(page.getByRole('button',{name:/^(Demo|Walk a step|Go off route|Download result)$/})).toHaveCount(0);
-    if(scenario==='states'){
+    if(scenario==='states'&&exerciseOffline){
       await context.setOffline(true);
       await expect(page.getByText('You’re offline. Saved photos and pieces are still available.')).toBeVisible();
       matrix.push({route:name,state:'offline',passed:true});
       await context.setOffline(false);
       await expect(page.getByText('You’re offline. Saved photos and pieces are still available.')).toHaveCount(0);
-      if(name==='walk'&&(await inspect(page)).walk?.mode==='offline')await click('Try again');
+      if(name==='walk'){
+        await context.setGeolocation(initialLocation);
+        await expect.poll(async()=>(await inspect(page)).walk?.mode).not.toBe('loading');
+        const walk=(await inspect(page)).walk;
+        if(walk?.mode==='error')expect(walk.errorCode).toBe('location_unavailable');
+        if(walk?.mode==='offline'||walk?.mode==='error')await click('Try again');
+      }
     }
   }
   async function shot(name:string){const file=`${name}.png`;await page.screenshot({path:resolve(output,file),fullPage:true});screenshots.push(file);}
@@ -100,15 +107,32 @@ export async function runBrowserScenario(scenario:'full'|'states',url:string,out
     matrix.push({route:'outfit',state:'trip-cutout-saved-and-added',passed:true});
     await home();await click('Wardrobe');await route('wardrobe');await shot('10-wardrobe');
     await click('Add a piece');await click('Choose from gallery');await route('pick');await click('Cancel');await route('wardrobe');
+    const beforeWardrobe=(await inspect(page)).ids.pieces;
+    await click('Add a piece');await click('Choose from gallery');await route('pick');
+    await expect(page.getByRole('button',{name:/^Tap the item in the photo/})).toHaveAttribute('aria-disabled','false');
+    // Wait for the departing picker sheet to stop intercepting input; Enter uses the exact recorded center prompt.
+    await page.getByRole('button',{name:/^Tap the item in the photo/}).click({trial:true});
+    await page.getByRole('button',{name:/^Tap the item in the photo/}).press('Enter');
+    if(scenario==='states'){
+      await context.setOffline(true);
+      await expect(page.getByText('You’re offline. Saved photos and pieces are still available.')).toBeVisible();
+    }
+    await expect(button('Add to wardrobe')).toBeEnabled();await click('Add to wardrobe');await route('wardrobe',false);
+    if(scenario==='states'){
+      await expect(page.getByText('Waiting for connection to name this piece.',{exact:true})).toBeVisible();
+      await context.setOffline(false);
+    }
+    await expect(button('Open Blue jacket')).toBeVisible();
+    const wardrobeId=(await inspect(page)).ids.pieces.find(id=>!beforeWardrobe.includes(id));
+    expect(wardrobeId).toBeDefined();await shot('10b-wardrobe-saved');
+    matrix.push({route:'wardrobe',state:scenario==='states'?'actual-tap-save-offline-naming-recovery':'actual-tap-save-and-name',passed:true});
     await home();await click('Privacy');await route('privacy');await shot('11-privacy');
     await home();await click('Try-ons');await route('results');await shot('12-results-empty');
     await home();await click('a blue jacket');await route('item');await click('Try it on');await route('outfit');
     await click('Add your photo');await click('Choose from gallery');
-    await expect.poll(async()=>(await inspect(page)).fitting.selfState,{timeout:30000}).not.toBe('registering');
-    if((await inspect(page)).fitting.selfState!=='ready'){
-      await expect(button('Generate')).toBeDisabled();matrix.push({route:'outfit',state:'mask-failure-blocks-upload',passed:true});
-      throw new Error('Self registration did not succeed through the real FaceMask plugin; missing/failed person fixtures cannot be replaced by UI success.');
-    }
+    // Media import starts asynchronously; the initial empty state is not a finished registration.
+    await expect.poll(async()=>(await inspect(page)).fitting.selfState,{timeout:30000}).toBe('ready');
+    await expect(page.getByRole('dialog')).toHaveCount(0);
     await shot('13-outfit');
     const before=(await inspect(page)).transport?.counts['/v1/tryon']??0;
     await click('Generate');await route('result');await shot('14-result');
@@ -118,6 +142,13 @@ export async function runBrowserScenario(scenario:'full'|'states',url:string,out
     await expect.poll(async()=>(await inspect(page)).ids.pieces).not.toContain(pieceId);
     await page.reload();await route('home');await expect.poll(async()=>(await inspect(page)).ids.pieces).not.toContain(pieceId);
     matrix.push({route:'home',state:'deletion-persists',passed:true});
+    expect((await inspect(page)).ids.pieces).toContain(wardrobeId);
+    await click('Wardrobe');await route('wardrobe');await click('Open Blue jacket');await route('item');
+    await expect(button('Walk back')).toHaveCount(0);
+    await click('Delete piece');await confirm('Delete piece');await route('wardrobe');
+    expect((await inspect(page)).ids.pieces).not.toContain(wardrobeId);
+    await expect(page.getByText('Your wardrobe is empty',{exact:true})).toBeVisible();
+    matrix.push({route:'wardrobe',state:'reload-preserves-cutout-and-delete-removes-it',passed:true});
     expect(routes.size).toBe(13);
   }catch(error){failure=error instanceof Error?error.message:String(error);await shot('failure').catch(()=>{});}
   finally{

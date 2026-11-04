@@ -1,0 +1,22 @@
+{
+  "scope": "Actual Chromium UI/native-web/IndexedDB with genuine Android wardrobe mask artifacts; naming response synthetic, no live model quality approval",
+  "nativeEvidenceCommit": "e68d9b3",
+  "prompt": [
+    0.5,
+    0.5
+  ],
+  "saved": {
+    "route": "wardrobe",
+    "pieces": [
+      "piece:03466bfe863d30145f2e0dedc3d63e110744b2d211aac8c0823a72f635e49b6a"
+    ],
+    "queue": [],
+    "describeCalls": 1
+  },
+  "reloaded": {
+    "route": "wardrobe",
+    "pieces": [
+      "piece:03466bfe863d30145f2e0dedc3d63e110744b2d211aac8c0823a72f635e49b6a"
+    ]
+  }
+}

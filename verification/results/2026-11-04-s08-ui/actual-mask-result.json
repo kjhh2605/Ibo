@@ -1,0 +1,21 @@
+{
+  "scope": "Real Chromium UI/native-web/IndexedDB and actual Android mask artifacts; synthetic provider response, not live Meta or human privacy approval",
+  "sourceCommit": "d6961bf",
+  "generated": {
+    "resultId": "c47bd6a5-874f-46d2-a3b9-0da068aca46a",
+    "phase": "complete",
+    "tryonCalls": 1,
+    "exports": 0
+  },
+  "persisted": {
+    "results": [
+      "c47bd6a5-874f-46d2-a3b9-0da068aca46a"
+    ],
+    "route": "result"
+  },
+  "deleted": {
+    "route": "results",
+    "results": [],
+    "pieces": 1
+  }
+}

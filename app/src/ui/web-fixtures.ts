@@ -8,6 +8,7 @@ import {installWebMockTransport} from '../relay/client';
 
 type Mask = {image:string; mask:string; bbox:BBox; score:number; tap:[number,number]};
 type Seed = {now:string; trips:{id:string;startedAt:string;endedAt:string}[]; shops:{id:string;tripId:string;startedAt:string;spot:{lat:number;lng:number};note?:string}[]; photos:{id:string;tripId:string;shopId:string;takenAt:string;image:string;location:{lat:number;lng:number};vector:number[]}[];captureManifest:string[]};
+type NativePersonExport = {point:[number,number];cases:{id:string;sourceSha256:string;w:number;h:number;masks:{binary:string;binarySha256:string;score:number}[]}[]};
 
 /** Explicit local verification only: fixtures feed the real native-web plugins and durable Store. */
 export async function installWebFixtures():Promise<()=>void> {
@@ -57,6 +58,27 @@ export async function installWebFixtures():Promise<()=>void> {
   context.setFixture('capture',captures);
   context.setFixture('media.self',await asset('images/self/positive/calibration-hat.png'));
   context.setFixture('media.wardrobe',await asset('images/wardrobe/jeans-original.png'));
+  if(import.meta.env.VITE_SF_WEB_NATIVE_MASKS==='1'){
+    const report=await json<NativePersonExport>('native-proof/person-mask-export-after.json');
+    if(report.point?.length!==2||report.point.some(value=>!Number.isFinite(value)||value<0||value>1))throw new Error('Invalid actual native prompt point.');
+    const digest=async(bytes:ArrayBuffer)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),value=>value.toString(16).padStart(2,'0')).join('');
+    for(const [id,image] of [
+      ['calibration-hat','images/self/positive/calibration-hat.png'],
+      ['synthetic-mock-provider','relay/normal/assets/synthetic-mock-output.png'],
+      ['wardrobe-jeans','images/wardrobe/jeans-original.png'],
+    ] as const){
+      const input=await asset(image),row=report.cases.find(value=>value.id===id);
+      if(!row||row.w!==input.w||row.h!==input.h||row.masks.length!==3||row.sourceSha256!==await digest(await(await repository.readBlob(input.file)).arrayBuffer()))throw new Error(`Native mask input mismatch: ${id}`);
+      const person=await Promise.all(row.masks.map(async mask=>{
+        const bytes=await(await fetchFixture(`native-proof/${mask.binary}`)).arrayBuffer(),pixels=new Uint8Array(bytes);
+        if(await digest(bytes)!==mask.binarySha256||pixels.length!==input.w*input.h||pixels.some(value=>value!==0&&value!==255)||!Number.isFinite(mask.score)||mask.score<0||mask.score>1)throw new Error(`Invalid actual native mask: ${id}`);
+        return {pixels,score:mask.score};
+      }));
+      const fixture={person,taps:[{x:report.point[0],y:report.point[1],masks:person}]} satisfies SegmenterFixture;
+      context.setFixture(`Segmenter.asset:${input.id}`,fixture);
+      context.setFixture(`Segmenter.provider:${row.sourceSha256}`,fixture);
+    }
+  }
   const wav=await(await fetchFixture('audio/tone-silence.wav')).arrayBuffer();
   const view=new DataView(wav);let samples:Int16Array|undefined;
   for(let at=12;at+8<=view.byteLength;){const size=view.getUint32(at+4,true);if(String.fromCharCode(...new Uint8Array(wav,at,4))==='data'){samples=new Int16Array(wav.slice(at+8,at+8+size));break;}at+=8+size+(size%2);}
