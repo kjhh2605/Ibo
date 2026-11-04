@@ -27,7 +27,7 @@
 
 - 입력 전 예시는 "the blue puffer at the outdoor stall", "red dress from the second shop", "gray blazer about 20 min ago"를 유지한다. 자리표시 "e.g. the jacket at the blue tarp stall", 입력창의 마이크·보내기 버튼을 유지한다(D-R1-03, D-R7-09).
 - 기존 오늘의 가게만 보낸다는 개인정보 안내는 모든 trip·메모 전송을 설명하도록 바꾼다. 최종 영어 문구는 **프로토타입 세션에서 확정**한다(D-R3-03, D-R3-04).
-- 단계 이벤트 문구는 "Read your trips", "Narrowed to Shop N", "Searched its photos", "Outlined the items"다. 단계별 상세 내용은 실제 도구 결과만 표시한다. 단계 접힘 요약의 배치·문구와 빈 상태·실패·오프라인 안내는 **프로토타입 세션에서 확정**한다(D-R3-06, D-R3-09).
+- 단계 목록 문구는 "Check your trips", "Focus on Shop N", "Search photos", "Outline items"이고, 진행 중 상태 줄은 "Checking your trips…", "Narrowing the search…", "Searching photos…", "Outlining items…"다. 단계별 상세 내용은 실제 도구 결과만 표시한다. 단계 접힘 요약의 배치·문구와 빈 상태·실패·오프라인 안내는 **프로토타입 세션에서 확정**한다(D-R3-06, D-R3-09).
 - 결과 카드의 "Best match" / "Match N", 가게·시각·후보 수와 최상위 후보 윤곽은 유지한다. 다른 trip에서 같은 "Shop N"이 반복될 때의 날짜 표시 배치는 **프로토타입 세션에서 확정**한다(D-R1-03, D-R3-03).
 - 직접 탐색은 [All trips](navigation.md) → [Trip의 가게별 사진](capture.md#f-05-trip-화면에-가게-정보-통합) → Pick이다. 다시 묻기·기록 탐색 진입 배치는 **프로토타입 세션에서 확정**한다(D-R3-06, D-R3-10, D-R9-04).
 - **프로토타입 초안:** 결과 후 "N photos found · Show steps"/"Hide steps", 상위 3개와 "Show all (N)", 미발견 "No matching photos"·"Ask again"·"Browse your trips", 오프라인 "You’re offline"·"Try again"·"Browse your trips"를 표시한다. 배치·문구는 **프로토타입 화면 세션에서 확정**한다(D-R3-02, D-R3-06, D-R3-09, D-R6-03).

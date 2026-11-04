@@ -58,7 +58,7 @@ interface ShoppingSession extends Events<{
 | idle + 앱 시작 버튼 | requesting_location, coarse+fine 함께 요청 | 설정에서 거부된 경우 재프롬프트 루프 없음 | D-R2-10 |
 | 위치 권한 거부 | idle로 복귀, Trip/FGS/카메라 생성 안 함 | `location_permission_denied`; UI 이유 시트 + `"Open settings"` | D-R2-10 |
 | 위치 허용 | requesting_notification, API 33+ POST_NOTIFICATIONS 요청. approximate도 허용하되 accuracyM 그대로 저장 | 위치가 켜져 있지 않으면 `location_disabled` | D-R2-10~11 |
-| 알림 허용/거부 | 모두 starting. 거부해도 반드시 startForeground 호출 | 시작 성공 시 거부 세션당 notice 1회→UI `"Shopping started without a notification card."` 토스트 | D-R2-11 |
+| 알림 허용/거부 | 모두 starting. 거부해도 반드시 startForeground 호출 | 시작 성공 시 거부 세션당 notice 1회→UI `"Shopping mode is on. Allow notifications to see it in your status bar."` 토스트 | D-R2-11 |
 | starting | visible Activity에서 location FGS 시작, 첫 fix 확보, Trip+Shop 1+첫 TrailPoint 원자 생성 후 recording | fix 15초 대기 초과 `location_unavailable`; 서비스 정리, Trip 생성 안 함 | D-R2-07, D-R2-10 |
 | recording + start | 현재 상태 반환(새 Trip 생성 안 함) | idempotent | D-R2-11 |
 | recording + newShop | 최신 유효 fix 확보 후 같은 trip n+1 Shop 생성, state·알림 갱신 | 위치 없으면 `location_unavailable`, 이전 가게 유지 | D-R2-07 |
@@ -393,7 +393,7 @@ interface Walk extends Events<{state:WalkState}> {
 | direction 표시 | haversine 직선 거리와 진북 기준 bearing 0~360을 표시. 방위 센서 사용 안 함, 지도 north-up·화살표 북쪽 기준. 불확실한 device heading으로 회전하지 않음 | D-R5-04 |
 | direction 유지/재시도 | 경로 없음이면 끝 구간 화살표 유지+수동 retry; 반경>65m로 벗어나고 유효 경로가 있으면 route 복귀 | D-R5-04 |
 | nearby | 원래 목적지≤20m, accuracy≤30m가 5초 지속(최소 2 fix). 도착 확인 카드에 외관 사진·메모 표시. 좌표만으로 도착 확정하지 않음 | D-R0-03, D-R5-04 |
-| arrived | 사용자가 외관 사진/주변을 보고 confirmArrival. 사진이 없거나 trip 삭제로 없어도 주소를 꾸미지 않고 `"Check the surroundings"`와 수동 확인 허용 | D-R0-03, D-R3-11 |
+| arrived | 사용자가 외관 사진/주변을 보고 confirmArrival. 사진이 없거나 trip 삭제로 없어도 주소를 꾸미지 않고 `"You’re close"`와 수동 확인 허용 | D-R0-03, D-R3-11 |
 | offline | 연결이 없으면 명시 offline+retry. route_unavailable와 구별하고 새 경로 요청/큐 등록 없음. 이미 보유한 거리·지도는 참고로만 표시, 온라인 안내 성공으로 표현하지 않음 | D-R6-03 |
 
 **Mock:** Location은 GPX/고정 fix를 가상 clock으로 공급, Route는 route/없음/offline fixture 반환, Map mock은 같은 mount/update API로 SVG 경로를 렌더링하여 S08이 WebGL·타일 네트워크 없이 개발 가능. Walk는 mock에서도 실제 거리/시간 임계값 로직을 실행한다. **오류:** `location_permission_denied`, `location_unavailable`, `route_unavailable`, `offline`, `map_unavailable`, `destination_unavailable`. **검증:** step 순서·이탈 9초/10초 경계·부정확 GPS 무시·중복 요청 억제·50/65m hysteresis·20m 수동 도착·Item의 사진 위치·원본 Piece/Trip 삭제 후 Result snapshot 길 안내·Item/Result 이외 진입 및 Shop.spot 목적지 경로 부재·핀 drag 불가·먼 거리 외부앱 미사용. (D-R1-04, D-R5-01~05, D-R9-03~04)

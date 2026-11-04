@@ -31,18 +31,18 @@ R9 추가 근거: D-R9-03(결과 목적지 스냅샷), D-R9-04(Item/Result 전�
 
 - 지도에는 경로선·지나온 구간(점선)·현재 위치·목적지 핀/반경을 유지한다. 상단은 방향 아이콘·다음 안내 거리·실제 경로의 안내 문장이다. 고정 예시 안내를 실시간 경로처럼 쓰지 않는다(D-R1-03, D-R5-04).
 - 하단의 외관 썸네일·"Shop N"·남은 거리/시간·"where you took the photo"·"End"는 유효한 정보가 있을 때 유지한다. 이탈 안내 "Off route. Finding a new way…"도 유지한다(D-R1-03, D-R5-01).
-- 외관 있는 도착 카드의 "You're at Shop N", "Look for this shop front. Stalls here sit close together, so trust the photo over the pin.", 외관 사진·설명·"Done"은 유지한다. GPS 오차를 이유로 핀 수정을 제공하지 않는다(D-R0-03, D-R5-02).
+- 외관 있는 도착 카드의 "You're at Shop N", "Look for this shop front. Shops can sit close together, so trust the photo over the pin.", 외관 사진·설명·"Done"은 유지한다. GPS 오차를 이유로 핀 수정을 제공하지 않는다(D-R0-03, D-R5-02).
 - 끝 구간 화살표·직선 거리, 외관 없는 가게의 메모/핀 반경 도착 카드 [추론], 오프라인·실패·위치 없음·원본/trip 삭제 후 목적지 카드의 배치·새 문구는 **프로토타입 세션에서 확정**한다(D-R3-11, D-R5-04, D-R6-03).
-- **프로토타입 초안:** 상단에 옷·가게·trip 날짜·사진 위치와 "Fixed pin", 끝 구간에 "18 m · Northeast"를 표시한다. 외관 없는 도착 카드는 "No storefront photo"와 메모를 보여 준다. 오프라인은 "The walking route can’t load. Your saved destination is still here."와 "Try again"이다. 배치·문구는 **프로토타입 화면 세션에서 확정**한다(D-R5-01~04, D-R6-03).
+- **프로토타입 초안:** 상단에 옷·가게·trip 날짜와 "Pinned where you took the photo", 끝 구간에 "↗ Northeast"와 "18 m · to the photo spot in a straight line"을 표시한다. 외관 없는 도착 카드는 "No storefront photo"와 메모를 보여 준다. 오프라인은 "You’re offline, so the route can’t load. Connect and try again."과 "Try again"이다. 배치·문구는 **프로토타입 화면 세션에서 확정**한다(D-R5-01~04, D-R6-03).
 
 ### 실제 구현
 
 - 지도는 WebView MapLibre GL JS + OpenFreeMap 직접 타일 요청이다. 앱은 출발·도착을 `/v1/route`에 보내고 로컬 Mac 릴레이가 FOSSGIS OSRM foot을 호출한다. Spark/Meta에는 경로 좌표를 보내지 않는다(D-R6-05, D-R7-03; research §8.2).
 - Item은 저장 시 사진 위치를 복사한 `Piece.walkTo`, Result는 생성 시 독립 복사한 대상 옷의 위치 스냅샷을 사용한다. 원래 Piece가 삭제됐다고 결과 안내를 차단하거나 다른 가게 좌표로 바꾸지 않는다. 스냅샷 필드는 [data-model](../contracts/data-model.md)을 따른다(D-R3-11, D-R5-01, D-R9-03).
 - JS가 경로·이탈 감지·끝 구간 방향/거리 계산을 맡고 Capacitor Geolocation으로 현재 위치를 받는다. 전환 임계값과 위치 정확도 처리는 [device-modules](../contracts/device-modules.md)을 따른다. 음성·백그라운드·실내 안내는 제외한다(D-R5-04, D-R7-03; research §9).
-- S08의 실제 오류 문구: `location_permission_denied`는 "Walking directions need your current location. Allow location access in your device settings, then try again.", `location_unavailable`은 "Your current location is unavailable. No turn, direction or distance can be calculated yet. Try again where location is available."이다. 둘 다 "Try again"을 제공하며 가짜 fix나 거리로 복구하지 않는다.
-- 오프라인 문구는 "The walking route can’t load while you’re offline. Your saved destination is still here. Connect, then try again."이다. 이전 경로는 참고값일 뿐 live 안내가 아님을 밝히고 offline 중 재시도는 비활성, reconnect 후 실제 재시도를 허용한다. 지도 타일 오류는 경로/위치 오류와 분리하고 이용 가능한 텍스트 안내를 보존한다.
-- 실제 `nearby` 화면은 "Check the surroundings"와 "I found this shop"을 제공한다. 사용자가 확인한 뒤에만 "You confirmed Shop N"(원래 shop이 삭제됐으면 "You confirmed Saved photo spot")와 "Done"을 표시한다. prototype의 "You're at Shop N" 문구를 GPS 자동 확정에 사용하지 않는다.
+- S08의 실제 오류 문구: `location_permission_denied`는 "Walking back needs your location. Allow location access in Settings, then try again.", `location_unavailable`은 "Ibo can’t find where you are yet. Try again somewhere with a clearer signal."이다. 둘 다 "Try again"을 제공하며 가짜 fix나 거리로 복구하지 않는다.
+- 오프라인 문구는 "You’re offline, so the route can’t load. Connect and try again."이다. 이전 경로는 참고값일 뿐 live 안내가 아님을 밝히고 offline 중 재시도는 비활성, reconnect 후 실제 재시도를 허용한다. 지도 타일 오류는 경로/위치 오류와 분리하고 이용 가능한 텍스트 안내를 보존한다.
+- 실제 `nearby` 화면은 "You’re close"와 "I found this shop"을 제공한다. 사용자가 확인한 뒤에만 "You’re back at Shop N"(원래 shop이 삭제됐으면 "You’re back at Saved photo spot"), "You found the shop. Enjoy!"와 "Done"을 표시한다. prototype의 "You're at Shop N" 문구를 GPS 자동 확정에 사용하지 않는다.
 - WebView 브라우저의 위치 권한은 `watchPosition`/`getCurrentPosition`에서 처리하고, native는 Capacitor의 명시적 권한 요청을 사용한다. 이것은 플랫폼 API 차이 처리이며 위치 제공자를 바꾸는 fallback이 아니다.
 - 위 문구는 실제 앱 구현 기록이며 인간 화면 세션 승인은 미확인이다.
 
