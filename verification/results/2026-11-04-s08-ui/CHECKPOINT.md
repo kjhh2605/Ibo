@@ -168,3 +168,12 @@ verification/results/2026-11-04-s08-ui/CHECKPOINT.md
 - 검증 harness는 picker sheet가 입력을 가로채지 않는지 확인한 뒤 정확한 기록 좌표의 키보드 prompt를 보낸다. native-web의 정확한 fixture 좌표 비교는 느슨하게 바꾸지 않았다. offline naming 검증 중 공통 route helper가 연결을 다시 켜던 문제도 제거했다.
 - 최종 `npm run lint && npm run build && npx astryx doctor --built dist && npx vitest run`: exit 0, 18 files/228 tests 통과(729ms). 기존 lint 24개·theme-fonts·bundle 경고 유지. 검사용 탭·서버 종료.
 - 남은 범위: native 전체 mock/live E2E, 사람 GT 기반 privacy·품질·provenance·인간 UI 승인. 13개 route 도달을 이 별도 gate들의 합격으로 확대하지 않는다.
+
+## Coordinator 후속: 화면 안의 Camera 셔터
+
+- M1 알림 경로 검증 중 화면 밖 셔터가 발견됐다. 실제 Chromium 390×844에서도 최초 셔터가 y=879.98–911.98로 화면 아래에 있었고, 본문 진입 애니메이션 뒤 native-underlay mock 이미지의 x≈29.98과 실제 preview element x=24가 어긋났다.
+- Camera에만 높이가 정해진 Shell/body와 별도 하단 controls를 사용한다. 상태·새 가게 배너는 preview 위, End shopping은 상태 행, 마지막 사진·셔터·New shop은 하단이다. 긴 본문은 controls와 독립적으로 스크롤하고 Camera 이동 애니메이션은 생략한다. 촬영·저장·native 호출 계약은 바꾸지 않았다.
+- 직접 browser 클릭으로 실제 Photo 저장/썸네일, 새 가게, 외관 모드를 실행했다. 390×844 셔터 y=800–832, 360×640 오프라인 외관 셔터 y=596–628로 스크롤 없이 화면에 있고 preview/underlay 좌표가 일치한다. `capture-viewport.json`과 before/after/offline PNG를 보존했다. 이는 web mock의 실제 UI 증거이지 Android나 실제 모델 품질 승인이 아니다.
+- 기존 browser runner에 일반·외관·사진 썸네일·오프라인 상태의 전체 셔터 viewport 회귀 검사를 넣었다. 412×892 및 360×640에서 검사하며 click 자동 스크롤로 문제를 숨기지 않는다. 최신 full **52개**, states **92개** 관측, 각각 13개 route가 exit 0이다.
+- `npm run lint && npm run build && npx astryx doctor --built dist` exit 0. 기존 lint 24개·theme-fonts·bundle 크기 경고 유지. 이번 UI 변경에 단위 검사를 재실행했다고 주장하지 않는다.
+- 사용자가 사람 입력 대기 작업을 이번 범위에서 제외했다. 이전 절의 사람 GT·승인 및 이에 의존하는 최종 품질/live gate는 미승인 상태로 보존하되 이번 재개의 완료 조건에는 포함하지 않는다. 실제 최신 APK의 viewport 검증은 M1에서 별도로 수행한다.

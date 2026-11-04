@@ -88,6 +88,7 @@
 - 그 밖의 preview 실패(`preview_not_open`, `fixture_empty`, `fixture_invalid` 포함): "The camera preview could not start. Try again or return to your saved photos." 권한 거부로 오인해 설정 변경을 요구하지 않는다.
 - 공통 액션은 "Try again". preview 준비 전/실패 중 셔터는 비활성이다. 실패한 촬영·파일 저장을 Photo 성공으로 세지 않고, 화면을 나가면 preview를 닫는다.
 - 문구는 실제 구현 기록이며 인간 화면 세션 승인은 미확인이다.
+- 실제 Camera는 화면 높이 안에서 preview 영역과 하단 촬영 controls를 나눈다. 새 가게 배너는 preview 위에 있고, 작은 화면/오프라인 배너에서 본문이 길어져도 셔터는 하단에 남는다. "End shopping"은 상태 행, 마지막 사진·셔터·"New shop"은 하단에 둔다. native preview 좌표와 WebView가 어긋나지 않도록 Camera 진입에는 본문 이동 애니메이션을 적용하지 않는다.
 
 ## F-03 가게 방문 구분과 외관 사진
 
