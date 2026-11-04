@@ -1,0 +1,26 @@
+{
+  "codingHarness": "OMP",
+  "imageGenerationTool": "Codex builtin image_gen.imagegen",
+  "cliVersion": "codex-cli 0.166.0",
+  "date": "2026-11-04",
+  "termsUrl": "https://openai.com/policies/row-terms-of-use/",
+  "termsCheckedAt": "2026-11-04",
+  "disclosure": "All generated people are fictional adults; no real user photographs were supplied. AI-generated; no human authorship or human review asserted.",
+  "invocation": "codex exec --ephemeral --ignore-user-config --ignore-rules --skip-git-repo-check -s workspace-write --json <prompt>",
+  "outputs": [
+    {
+      "path": "source/contact-sheet.png",
+      "sourceId": "01a1a6aa-e961-70a0-b262-707d85989410/exec-95309a9e-af8d-4e55-b4f5-cca5fb3776a4.png",
+      "width": 1254,
+      "height": 1254,
+      "prompt": "Use only your built-in image generation tool, not code drawing or web images. Generate one high-resolution photorealistic synthetic contact sheet arranged as exactly 4 columns by 4 rows with equal rectangular cells and no gutters, labels, borders, text or logos. Every cell must be a distinct complete photo, no objects cross cell boundaries. Row1: four small clothing-shop interiors featuring respectively a blue jacket with three other garments, a striped shirt with three other garments, a gray coat and red sweater with two other garments, jeans and brown shoes laid flat separately. Row2: three distinct fictional storefronts (blue awning, brick facade, green door, absolutely no writing) then brown shoes alone against white. Row3: full body front view synthetic adult woman with long hair plain fitted neutral clothing feet fully visible; full body front view synthetic adult man with hat plain fitted clothing feet fully visible; adult halfbody with legs outside photo; adult with scarf hiding neck. Row4: two adults together; adult with head cropped by image edge; empty clothes hanger against wall with no person; empty shop with a mannequin-like coat stand but no person. Each portrait must have its own plain background and entire cell framing. These are fabricated adults not real people and fixtures for privacy testing. Save the generated image file into verification/fixtures/source/contact-sheet.png under current directory. Do not edit any code or other files. Report the actual output path and image tool used."
+    },
+    {
+      "path": "source/self-four.png",
+      "sourceId": "01a1a6ac-c0d1-77a0-9704-f90d2ca5a0cd/exec-10431993-5bb2-40c9-bf1d-c79e069d3ffb.png",
+      "width": 1024,
+      "height": 1536,
+      "prompt": "Use only builtin image_gen.imagegen to generate a photorealistic 2-column 2-row contact sheet of four DIFFERENT fabricated adult people, each cell complete head-to-toe including feet, front-facing neutral standing pose, hands clear of body, fitted neutral casual top and trousers, plain light gray studio background. Top left adult woman long wavy hair visible down shoulders; top right adult man short hair wearing brimmed hat; bottom left adult woman long straight dark hair; bottom right adult man wearing a different brimmed hat. No real people, logos, text, labels or cell borders. Leave head and feet margin per cell. Maximum supported portrait-quality resolution; four distinct adults, not repeated. Save actual generated PNG to verification/fixtures/source/self-four.png. No code changes, no drawing with code, no other files. Report generation tool and actual source output path."
+    }
+  ]
+}

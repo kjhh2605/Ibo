@@ -1,0 +1,568 @@
+{
+  "images/shops/shop-1-items.png": {
+    "parents": [
+      "source/contact-sheet.png"
+    ],
+    "procedure": {
+      "cropXYXY": [
+        2,
+        2,
+        312,
+        312
+      ]
+    }
+  },
+  "images/shops/shop-2-items.png": {
+    "parents": [
+      "source/contact-sheet.png"
+    ],
+    "procedure": {
+      "cropXYXY": [
+        316,
+        2,
+        625,
+        312
+      ]
+    }
+  },
+  "images/shops/shop-3-items.png": {
+    "parents": [
+      "source/contact-sheet.png"
+    ],
+    "procedure": {
+      "cropXYXY": [
+        629,
+        2,
+        938,
+        312
+      ]
+    }
+  },
+  "images/wardrobe/jeans-original.png": {
+    "parents": [
+      "source/contact-sheet.png"
+    ],
+    "procedure": {
+      "cropXYXY": [
+        942,
+        2,
+        1252,
+        312
+      ]
+    }
+  },
+  "images/storefronts/shop-1.png": {
+    "parents": [
+      "source/contact-sheet.png"
+    ],
+    "procedure": {
+      "cropXYXY": [
+        2,
+        316,
+        312,
+        625
+      ]
+    }
+  },
+  "images/storefronts/shop-2.png": {
+    "parents": [
+      "source/contact-sheet.png"
+    ],
+    "procedure": {
+      "cropXYXY": [
+        316,
+        316,
+        625,
+        625
+      ]
+    }
+  },
+  "images/storefronts/shop-3.png": {
+    "parents": [
+      "source/contact-sheet.png"
+    ],
+    "procedure": {
+      "cropXYXY": [
+        629,
+        316,
+        938,
+        625
+      ]
+    }
+  },
+  "images/wardrobe/shoes-original.png": {
+    "parents": [
+      "source/contact-sheet.png"
+    ],
+    "procedure": {
+      "cropXYXY": [
+        942,
+        316,
+        1252,
+        625
+      ]
+    }
+  },
+  "images/self/positive/long-hair.png": {
+    "parents": [
+      "source/contact-sheet.png"
+    ],
+    "procedure": {
+      "cropXYXY": [
+        2,
+        629,
+        312,
+        938
+      ]
+    }
+  },
+  "images/self/positive/hat.png": {
+    "parents": [
+      "source/contact-sheet.png"
+    ],
+    "procedure": {
+      "cropXYXY": [
+        316,
+        629,
+        625,
+        938
+      ]
+    }
+  },
+  "images/self/negative/half-body.png": {
+    "parents": [
+      "source/contact-sheet.png"
+    ],
+    "procedure": {
+      "cropXYXY": [
+        629,
+        629,
+        938,
+        938
+      ]
+    }
+  },
+  "images/self/negative/neck-hidden.png": {
+    "parents": [
+      "source/contact-sheet.png"
+    ],
+    "procedure": {
+      "cropXYXY": [
+        942,
+        629,
+        1252,
+        938
+      ]
+    }
+  },
+  "images/self/negative/multiple-people.png": {
+    "parents": [
+      "source/contact-sheet.png"
+    ],
+    "procedure": {
+      "cropXYXY": [
+        2,
+        942,
+        312,
+        1252
+      ]
+    }
+  },
+  "images/self/negative/cropped-head.png": {
+    "parents": [
+      "source/contact-sheet.png"
+    ],
+    "procedure": {
+      "cropXYXY": [
+        316,
+        942,
+        625,
+        1252
+      ]
+    }
+  },
+  "images/self/no-person/hanger.png": {
+    "parents": [
+      "source/contact-sheet.png"
+    ],
+    "procedure": {
+      "cropXYXY": [
+        629,
+        942,
+        938,
+        1252
+      ]
+    }
+  },
+  "images/self/no-person/mannequin.png": {
+    "parents": [
+      "source/contact-sheet.png"
+    ],
+    "procedure": {
+      "cropXYXY": [
+        942,
+        942,
+        1252,
+        1252
+      ]
+    }
+  },
+  "images/self/positive/calibration-long-hair.png": {
+    "parents": [
+      "source/self-four.png"
+    ],
+    "procedure": {
+      "cropXYXY": [
+        2,
+        2,
+        510,
+        766
+      ]
+    }
+  },
+  "images/self/positive/calibration-hat.png": {
+    "parents": [
+      "source/self-four.png"
+    ],
+    "procedure": {
+      "cropXYXY": [
+        514,
+        2,
+        1022,
+        766
+      ]
+    }
+  },
+  "images/self/positive/heldout-long-hair.png": {
+    "parents": [
+      "source/self-four.png"
+    ],
+    "procedure": {
+      "cropXYXY": [
+        2,
+        770,
+        510,
+        1534
+      ]
+    }
+  },
+  "images/self/positive/heldout-hat.png": {
+    "parents": [
+      "source/self-four.png"
+    ],
+    "procedure": {
+      "cropXYXY": [
+        514,
+        770,
+        1022,
+        1534
+      ]
+    }
+  },
+  "masks/head-drafts/calibration-hat.png": {
+    "parents": [
+      "images/self/positive/calibration-hat.png"
+    ],
+    "procedure": "AI-authored conservative rectangle draft; not human annotated; not approved GT"
+  },
+  "images/derived/calibration-hat-masked.png": {
+    "parents": [
+      "images/self/positive/calibration-hat.png",
+      "masks/head-drafts/calibration-hat.png"
+    ],
+    "procedure": "Opaque RGB(127,127,127) paste using draft mask; local demonstration only, upload not approved"
+  },
+  "masks/head-drafts/calibration-long-hair.png": {
+    "parents": [
+      "images/self/positive/calibration-long-hair.png"
+    ],
+    "procedure": "AI-authored conservative rectangle draft; not human annotated; not approved GT"
+  },
+  "images/derived/calibration-long-hair-masked.png": {
+    "parents": [
+      "images/self/positive/calibration-long-hair.png",
+      "masks/head-drafts/calibration-long-hair.png"
+    ],
+    "procedure": "Opaque RGB(127,127,127) paste using draft mask; local demonstration only, upload not approved"
+  },
+  "masks/head-drafts/hat.png": {
+    "parents": [
+      "images/self/positive/hat.png"
+    ],
+    "procedure": "AI-authored conservative rectangle draft; not human annotated; not approved GT"
+  },
+  "images/derived/hat-masked.png": {
+    "parents": [
+      "images/self/positive/hat.png",
+      "masks/head-drafts/hat.png"
+    ],
+    "procedure": "Opaque RGB(127,127,127) paste using draft mask; local demonstration only, upload not approved"
+  },
+  "masks/head-drafts/heldout-hat.png": {
+    "parents": [
+      "images/self/positive/heldout-hat.png"
+    ],
+    "procedure": "AI-authored conservative rectangle draft; not human annotated; not approved GT"
+  },
+  "images/derived/heldout-hat-masked.png": {
+    "parents": [
+      "images/self/positive/heldout-hat.png",
+      "masks/head-drafts/heldout-hat.png"
+    ],
+    "procedure": "Opaque RGB(127,127,127) paste using draft mask; local demonstration only, upload not approved"
+  },
+  "masks/head-drafts/heldout-long-hair.png": {
+    "parents": [
+      "images/self/positive/heldout-long-hair.png"
+    ],
+    "procedure": "AI-authored conservative rectangle draft; not human annotated; not approved GT"
+  },
+  "images/derived/heldout-long-hair-masked.png": {
+    "parents": [
+      "images/self/positive/heldout-long-hair.png",
+      "masks/head-drafts/heldout-long-hair.png"
+    ],
+    "procedure": "Opaque RGB(127,127,127) paste using draft mask; local demonstration only, upload not approved"
+  },
+  "masks/head-drafts/long-hair.png": {
+    "parents": [
+      "images/self/positive/long-hair.png"
+    ],
+    "procedure": "AI-authored conservative rectangle draft; not human annotated; not approved GT"
+  },
+  "images/derived/long-hair-masked.png": {
+    "parents": [
+      "images/self/positive/long-hair.png",
+      "masks/head-drafts/long-hair.png"
+    ],
+    "procedure": "Opaque RGB(127,127,127) paste using draft mask; local demonstration only, upload not approved"
+  },
+  "masks/items/shop-1-candidate-1.png": {
+    "parents": [
+      "images/shops/shop-1-items.png"
+    ],
+    "procedure": "AI draft rectangular candidate mask; not SAM output or human GT"
+  },
+  "images/derived/shop-1-candidate-1.png": {
+    "parents": [
+      "images/shops/shop-1-items.png",
+      "masks/items/shop-1-candidate-1.png"
+    ],
+    "procedure": "RGBA alpha equals binary candidate mask; original upright dimensions"
+  },
+  "masks/items/shop-1-candidate-2.png": {
+    "parents": [
+      "images/shops/shop-1-items.png"
+    ],
+    "procedure": "AI draft rectangular candidate mask; not SAM output or human GT"
+  },
+  "images/derived/shop-1-candidate-2.png": {
+    "parents": [
+      "images/shops/shop-1-items.png",
+      "masks/items/shop-1-candidate-2.png"
+    ],
+    "procedure": "RGBA alpha equals binary candidate mask; original upright dimensions"
+  },
+  "masks/items/shop-1-candidate-3.png": {
+    "parents": [
+      "images/shops/shop-1-items.png"
+    ],
+    "procedure": "AI draft rectangular candidate mask; not SAM output or human GT"
+  },
+  "images/derived/shop-1-candidate-3.png": {
+    "parents": [
+      "images/shops/shop-1-items.png",
+      "masks/items/shop-1-candidate-3.png"
+    ],
+    "procedure": "RGBA alpha equals binary candidate mask; original upright dimensions"
+  },
+  "masks/items/shop-1-candidate-4.png": {
+    "parents": [
+      "images/shops/shop-1-items.png"
+    ],
+    "procedure": "AI draft rectangular candidate mask; not SAM output or human GT"
+  },
+  "images/derived/shop-1-candidate-4.png": {
+    "parents": [
+      "images/shops/shop-1-items.png",
+      "masks/items/shop-1-candidate-4.png"
+    ],
+    "procedure": "RGBA alpha equals binary candidate mask; original upright dimensions"
+  },
+  "masks/items/shop-2-candidate-1.png": {
+    "parents": [
+      "images/shops/shop-2-items.png"
+    ],
+    "procedure": "AI draft rectangular candidate mask; not SAM output or human GT"
+  },
+  "images/derived/shop-2-candidate-1.png": {
+    "parents": [
+      "images/shops/shop-2-items.png",
+      "masks/items/shop-2-candidate-1.png"
+    ],
+    "procedure": "RGBA alpha equals binary candidate mask; original upright dimensions"
+  },
+  "masks/items/shop-2-candidate-2.png": {
+    "parents": [
+      "images/shops/shop-2-items.png"
+    ],
+    "procedure": "AI draft rectangular candidate mask; not SAM output or human GT"
+  },
+  "images/derived/shop-2-candidate-2.png": {
+    "parents": [
+      "images/shops/shop-2-items.png",
+      "masks/items/shop-2-candidate-2.png"
+    ],
+    "procedure": "RGBA alpha equals binary candidate mask; original upright dimensions"
+  },
+  "masks/items/shop-2-candidate-3.png": {
+    "parents": [
+      "images/shops/shop-2-items.png"
+    ],
+    "procedure": "AI draft rectangular candidate mask; not SAM output or human GT"
+  },
+  "images/derived/shop-2-candidate-3.png": {
+    "parents": [
+      "images/shops/shop-2-items.png",
+      "masks/items/shop-2-candidate-3.png"
+    ],
+    "procedure": "RGBA alpha equals binary candidate mask; original upright dimensions"
+  },
+  "masks/items/shop-2-candidate-4.png": {
+    "parents": [
+      "images/shops/shop-2-items.png"
+    ],
+    "procedure": "AI draft rectangular candidate mask; not SAM output or human GT"
+  },
+  "images/derived/shop-2-candidate-4.png": {
+    "parents": [
+      "images/shops/shop-2-items.png",
+      "masks/items/shop-2-candidate-4.png"
+    ],
+    "procedure": "RGBA alpha equals binary candidate mask; original upright dimensions"
+  },
+  "masks/items/shop-3-candidate-1.png": {
+    "parents": [
+      "images/shops/shop-3-items.png"
+    ],
+    "procedure": "AI draft rectangular candidate mask; not SAM output or human GT"
+  },
+  "images/derived/shop-3-candidate-1.png": {
+    "parents": [
+      "images/shops/shop-3-items.png",
+      "masks/items/shop-3-candidate-1.png"
+    ],
+    "procedure": "RGBA alpha equals binary candidate mask; original upright dimensions"
+  },
+  "masks/items/shop-3-candidate-2.png": {
+    "parents": [
+      "images/shops/shop-3-items.png"
+    ],
+    "procedure": "AI draft rectangular candidate mask; not SAM output or human GT"
+  },
+  "images/derived/shop-3-candidate-2.png": {
+    "parents": [
+      "images/shops/shop-3-items.png",
+      "masks/items/shop-3-candidate-2.png"
+    ],
+    "procedure": "RGBA alpha equals binary candidate mask; original upright dimensions"
+  },
+  "masks/items/shop-3-candidate-3.png": {
+    "parents": [
+      "images/shops/shop-3-items.png"
+    ],
+    "procedure": "AI draft rectangular candidate mask; not SAM output or human GT"
+  },
+  "images/derived/shop-3-candidate-3.png": {
+    "parents": [
+      "images/shops/shop-3-items.png",
+      "masks/items/shop-3-candidate-3.png"
+    ],
+    "procedure": "RGBA alpha equals binary candidate mask; original upright dimensions"
+  },
+  "masks/items/shop-3-candidate-4.png": {
+    "parents": [
+      "images/shops/shop-3-items.png"
+    ],
+    "procedure": "AI draft rectangular candidate mask; not SAM output or human GT"
+  },
+  "images/derived/shop-3-candidate-4.png": {
+    "parents": [
+      "images/shops/shop-3-items.png",
+      "masks/items/shop-3-candidate-4.png"
+    ],
+    "procedure": "RGBA alpha equals binary candidate mask; original upright dimensions"
+  },
+  "masks/items/jeans-draft.png": {
+    "parents": [
+      "images/wardrobe/jeans-original.png"
+    ],
+    "procedure": "AI draft binary region; human review pending"
+  },
+  "images/wardrobe/jeans-cutout.png": {
+    "parents": [
+      "images/wardrobe/jeans-original.png",
+      "masks/items/jeans-draft.png"
+    ],
+    "procedure": "Binary alpha mask applied to original; not renamed opaque original"
+  },
+  "masks/items/shoes-draft.png": {
+    "parents": [
+      "images/wardrobe/shoes-original.png"
+    ],
+    "procedure": "AI draft binary region; human review pending"
+  },
+  "images/wardrobe/shoes-cutout.png": {
+    "parents": [
+      "images/wardrobe/shoes-original.png",
+      "masks/items/shoes-draft.png"
+    ],
+    "procedure": "Binary alpha mask applied to original; not renamed opaque original"
+  },
+  "capture/01-shop1-storefront.png": {
+    "parents": [
+      "images/storefronts/shop-1.png"
+    ],
+    "procedure": "Byte-identical sorted camera staging"
+  },
+  "capture/02-shop1-item.png": {
+    "parents": [
+      "images/shops/shop-1-items.png"
+    ],
+    "procedure": "Byte-identical sorted camera staging"
+  },
+  "capture/03-shop2-storefront.png": {
+    "parents": [
+      "images/storefronts/shop-2.png"
+    ],
+    "procedure": "Byte-identical sorted camera staging"
+  },
+  "capture/04-shop2-item.png": {
+    "parents": [
+      "images/shops/shop-2-items.png"
+    ],
+    "procedure": "Byte-identical sorted camera staging"
+  },
+  "capture/05-shop3-storefront.png": {
+    "parents": [
+      "images/storefronts/shop-3.png"
+    ],
+    "procedure": "Byte-identical sorted camera staging"
+  },
+  "capture/06-shop3-item.png": {
+    "parents": [
+      "images/shops/shop-3-items.png"
+    ],
+    "procedure": "Byte-identical sorted camera staging"
+  },
+  "capture-cases/exif/01-oriented-gps.jpg": {
+    "parents": [
+      "images/shops/shop-1-items.png"
+    ],
+    "procedure": "JPEG with EXIF Orientation=6, DateTime and synthetic GPS for export stripping test"
+  },
+  "capture-cases/corrupt/01-corrupt.png": {
+    "parents": [],
+    "procedure": "Intentionally undecodable negative input; decoder must reject"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "expected": {
+    "audio": {
+      "mimeType": "audio/wav",
+      "data": {
+        "asset": "assets/audio.wav"
+      }
+    }
+  },
+  "match": [
+    "/audio/mimeType"
+  ],
+  "ignore": [
+    "/audio/data"
+  ]
+}

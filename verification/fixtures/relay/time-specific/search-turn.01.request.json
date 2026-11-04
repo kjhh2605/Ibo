@@ -1,0 +1,16 @@
+{
+  "expected": {
+    "query": "The jacket I saw 20 min ago",
+    "context": {
+      "now": "2026-11-04T14:00:00+09:00",
+      "timeZone": "Asia/Seoul"
+    }
+  },
+  "match": [
+    "/query",
+    "/context"
+  ],
+  "ignore": [
+    "/context/now"
+  ]
+}

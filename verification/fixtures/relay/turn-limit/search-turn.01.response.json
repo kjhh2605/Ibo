@@ -1,0 +1,12 @@
+{
+  "status": 200,
+  "body": {
+    "toolCalls": [
+      {
+        "id": "visit-call",
+        "name": "list_visits",
+        "arguments": {}
+      }
+    ]
+  }
+}

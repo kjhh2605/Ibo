@@ -1,0 +1,21 @@
+{
+  "expected": {
+    "query": "Find the yellow raincoat",
+    "queryToken": "runtime-token",
+    "toolResults": [
+      {
+        "toolCallId": "find-call",
+        "name": "find_photos",
+        "result": []
+      }
+    ]
+  },
+  "match": [
+    "/query",
+    "/toolResults"
+  ],
+  "ignore": [
+    "/queryToken",
+    "/toolResults/0/toolCallId"
+  ]
+}

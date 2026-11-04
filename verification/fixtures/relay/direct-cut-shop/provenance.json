@@ -1,0 +1,6 @@
+{
+  "sourceType": "hand-authored",
+  "providerRecording": false,
+  "purpose": "strict deterministic synthetic wire fixture; not model quality evidence",
+  "requestAssetNotation": "data.asset expanded for offline schema validation; all data paths ignored for request matching"
+}

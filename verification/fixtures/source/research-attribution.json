@@ -1,0 +1,21 @@
+{
+  "checkedAt": "2026-11-04",
+  "tap": {
+    "rack": {
+      "author": "MAKY.OREL",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Inside_the_second_hand_shop,_clothing_racks.jpg",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "modifications": "Original downloaded bytes preserved; existing research resize/masks are separately identified derivatives. Derivatives remain CC BY-SA 4.0."
+    },
+    "shop": {
+      "author": "Nenad Stojković (Shixart1985)",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Man_examines_clothing_in_a_boutique_while_shopping_for_fashionable_attire_in_a_trendy_store_setting.jpg",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+      "modifications": "Original downloaded bytes preserved; existing research resize/masks are separately identified derivatives."
+    }
+  },
+  "retrieval": "Exact author/source/license records for all 22 original files remain in research/retrieval/manifest.json and commons_metadata.json; no recollection or substitution.",
+  "researchOutputs": "Historical model outputs and original experiment scripts supplied by this repository owner; model weights/code not redistributed in corpus. No assertion that historical M4 outputs establish M1 acceptance."
+}

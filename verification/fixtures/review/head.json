@@ -1,0 +1,144 @@
+{
+  "frozenAt": "2026-11-04",
+  "classificationAuthor": "AI draft; no human approval claimed",
+  "cases": [
+    {
+      "id": "calibration-hat",
+      "image": "images/self/positive/calibration-hat.png",
+      "sourceSha256": "8cae4180d99e2673231e06eae94375468ec7373906cec7b5a6bfce4592b5b2a4",
+      "draftMask": "masks/head-drafts/calibration-hat.png",
+      "groundTruthMask": null,
+      "annotator": null,
+      "annotatedAt": null,
+      "reviewer": null,
+      "reviewedAt": null,
+      "status": "awaiting-human-annotation",
+      "expectedPerson": true,
+      "expectedRegistration": true
+    },
+    {
+      "id": "calibration-long-hair",
+      "image": "images/self/positive/calibration-long-hair.png",
+      "sourceSha256": "29ec7dce6072db707c2aa37b727a2fd290c1daed836d04a9f0212ce5f7f7a958",
+      "draftMask": "masks/head-drafts/calibration-long-hair.png",
+      "groundTruthMask": null,
+      "annotator": null,
+      "annotatedAt": null,
+      "reviewer": null,
+      "reviewedAt": null,
+      "status": "awaiting-human-annotation",
+      "expectedPerson": true,
+      "expectedRegistration": true
+    },
+    {
+      "id": "hat",
+      "image": "images/self/positive/hat.png",
+      "sourceSha256": "d4448dc0cef1bbeaade1d0e455c39ddf95e0131f85f080048025d256355a271c",
+      "draftMask": "masks/head-drafts/hat.png",
+      "groundTruthMask": null,
+      "annotator": null,
+      "annotatedAt": null,
+      "reviewer": null,
+      "reviewedAt": null,
+      "status": "awaiting-human-annotation",
+      "expectedPerson": true,
+      "expectedRegistration": true
+    },
+    {
+      "id": "heldout-hat",
+      "image": "images/self/positive/heldout-hat.png",
+      "sourceSha256": "d9227821bc64a2459052aad583e4e4a0c741b83e0f98b4291c380ff453b9f732",
+      "draftMask": "masks/head-drafts/heldout-hat.png",
+      "groundTruthMask": null,
+      "annotator": null,
+      "annotatedAt": null,
+      "reviewer": null,
+      "reviewedAt": null,
+      "status": "awaiting-human-annotation",
+      "expectedPerson": true,
+      "expectedRegistration": true
+    },
+    {
+      "id": "heldout-long-hair",
+      "image": "images/self/positive/heldout-long-hair.png",
+      "sourceSha256": "3f1673b5e43d5ec9841f2eccc13e735401002f6f8c79ef72b3dd0eb62fd2fabd",
+      "draftMask": "masks/head-drafts/heldout-long-hair.png",
+      "groundTruthMask": null,
+      "annotator": null,
+      "annotatedAt": null,
+      "reviewer": null,
+      "reviewedAt": null,
+      "status": "awaiting-human-annotation",
+      "expectedPerson": true,
+      "expectedRegistration": true
+    },
+    {
+      "id": "long-hair",
+      "image": "images/self/positive/long-hair.png",
+      "sourceSha256": "3673e5094135a75c875102c732e8e35d78376ccf76e27bc517aa933f7209b1dc",
+      "draftMask": "masks/head-drafts/long-hair.png",
+      "groundTruthMask": null,
+      "annotator": null,
+      "annotatedAt": null,
+      "reviewer": null,
+      "reviewedAt": null,
+      "status": "awaiting-human-annotation",
+      "expectedPerson": true,
+      "expectedRegistration": true
+    },
+    {
+      "id": "cropped-head",
+      "image": "images/self/negative/cropped-head.png",
+      "sourceSha256": "dda1f884a1d1765ca8639d4c9a57f12aca23a2961ab01a1c46f9670d9cafdf32",
+      "groundTruthMask": null,
+      "expectedPerson": false,
+      "expectedRegistration": false,
+      "status": "classification-awaiting-human-review"
+    },
+    {
+      "id": "half-body",
+      "image": "images/self/negative/half-body.png",
+      "sourceSha256": "f8fb2e6791a9591c04753e1b6372c397a2399b139caa4a596b68faebe6926c30",
+      "groundTruthMask": null,
+      "expectedPerson": false,
+      "expectedRegistration": false,
+      "status": "classification-awaiting-human-review"
+    },
+    {
+      "id": "multiple-people",
+      "image": "images/self/negative/multiple-people.png",
+      "sourceSha256": "afa5bed13c109ab45bfd48acceb91864cf85df00499a9faf77720b4bbe1fe783",
+      "groundTruthMask": null,
+      "expectedPerson": false,
+      "expectedRegistration": false,
+      "status": "classification-awaiting-human-review"
+    },
+    {
+      "id": "neck-hidden",
+      "image": "images/self/negative/neck-hidden.png",
+      "sourceSha256": "644fcdd1ac02b624d63766ecbaa63e382c5d4495f03dc784de30539fed5e6b39",
+      "groundTruthMask": null,
+      "expectedPerson": false,
+      "expectedRegistration": false,
+      "status": "classification-awaiting-human-review"
+    },
+    {
+      "id": "hanger",
+      "image": "images/self/no-person/hanger.png",
+      "sourceSha256": "98a502b7f44771a19cb1dfb36d94e2b6fccdc3f7560ea04b9948768ad8d00fb3",
+      "groundTruthMask": null,
+      "expectedPerson": false,
+      "expectedRegistration": false,
+      "status": "classification-awaiting-human-review"
+    },
+    {
+      "id": "mannequin",
+      "image": "images/self/no-person/mannequin.png",
+      "sourceSha256": "1f112bbf46301a9b24dbe02d260347f8176b8592e5b34eaffb5b416954f4c5a1",
+      "groundTruthMask": null,
+      "expectedPerson": false,
+      "expectedRegistration": false,
+      "status": "classification-awaiting-human-review"
+    }
+  ]
+}

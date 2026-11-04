@@ -1,0 +1,7 @@
+{
+  "name": "street-fitting-emulator-verification",
+  "private": true,
+  "type": "module",
+  "engines": {"node": ">=22.13"},
+  "dependencies": {"playwright-core": "1.64.1"}
+}

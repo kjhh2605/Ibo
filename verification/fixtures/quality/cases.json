@@ -1,0 +1,30 @@
+{
+  "frozenAt": "2026-11-04",
+  "calibration": [
+    "calibration-long-hair",
+    "calibration-hat"
+  ],
+  "heldOut": [
+    "heldout-long-hair",
+    "heldout-hat"
+  ],
+  "pocPlan": {
+    "base": {
+      "self": 2,
+      "maskModes": [
+        "opaque",
+        "crop",
+        "background-removed"
+      ],
+      "reasoning": [
+        "low",
+        "high"
+      ],
+      "calls": 12
+    },
+    "bestRepeatCalls": 3,
+    "topOnlyCalls": 1,
+    "total": 16
+  },
+  "humanApprovalRequired": true
+}

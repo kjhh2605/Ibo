@@ -1,0 +1,10 @@
+{
+  "status": 409,
+  "body": {
+    "error": {
+      "code": "photo_limit_exceeded",
+      "message": "Photo limit reached",
+      "retryable": false
+    }
+  }
+}

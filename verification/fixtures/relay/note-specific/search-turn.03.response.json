@@ -1,0 +1,18 @@
+{
+  "status": 200,
+  "body": {
+    "toolCalls": [
+      {
+        "id": "extract-call",
+        "name": "extract_items",
+        "arguments": {
+          "photoRefs": [
+            "{{toolResults[0].result[0].photoRef}}",
+            "{{toolResults[0].result[1].photoRef}}"
+          ],
+          "concept": "a blue jacket"
+        }
+      }
+    ]
+  }
+}

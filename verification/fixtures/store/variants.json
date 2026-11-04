@@ -1,0 +1,21 @@
+{
+  "variants": [
+    "score-ties",
+    "empty-visits",
+    "all-trips",
+    "delete-during-search",
+    "pending-index",
+    "failed-index",
+    "sam-empty-tap",
+    "verbatim-transcript",
+    "voice-15s",
+    "offline-browsing",
+    "policy-error",
+    "label-queue",
+    "masking-failure",
+    "download-off",
+    "no-storefront"
+  ],
+  "resultDownload": false,
+  "compositionThresholds": null
+}
