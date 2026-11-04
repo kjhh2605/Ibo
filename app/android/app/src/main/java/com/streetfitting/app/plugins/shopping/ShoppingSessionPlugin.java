@@ -108,12 +108,14 @@ public class ShoppingSessionPlugin extends Plugin {
         String url = intent.getData().toString();
         if (!url.equals("streetfitting://home") && !url.equals("streetfitting://capture") && !url.equals("streetfitting://capture?newShop=1")) return;
         intent.setData(null);
+        ShoppingService service = ShoppingService.running;
+        if (service == null || !"recording".equals(service.state().optString("phase"))) {
+            emit("open", new JSObject().put("url", "streetfitting://home")); return;
+        }
         if (url.endsWith("?newShop=1")) {
-            ShoppingService service = ShoppingService.running;
-            if (service == null) return;
             service.newShop().whenComplete((shop, error) -> {
                 if (error == null) emit("open", new JSObject().put("url", url));
-                else emit("error", new JSObject().put("code", "location_disabled").put("retryable", true));
+                else emit("error", new JSObject().put("code", error.getMessage()).put("retryable", !"location_permission_denied".equals(error.getMessage())));
             });
         } else emit("open", new JSObject().put("url", url));
     }

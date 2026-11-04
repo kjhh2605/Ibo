@@ -33,19 +33,27 @@ public final class LocationFixes {
     public static CompletableFuture<JSObject> current(Context context) {
         CompletableFuture<JSObject> result = new CompletableFuture<>();
         if (!permitted(context)) { result.completeExceptionally(new IllegalStateException("location_permission_denied")); return result; }
+        if (!enabled(context)) { result.completeExceptionally(new IllegalStateException("location_disabled")); return result; }
         CancellationTokenSource cancellation = new CancellationTokenSource();
         Handler main = new Handler(Looper.getMainLooper());
-        Runnable timeout = () -> { result.completeExceptionally(new IllegalStateException("location_disabled")); cancellation.cancel(); };
+        Runnable timeout = () -> { result.completeExceptionally(new IllegalStateException(failureCode(context))); cancellation.cancel(); };
         main.postDelayed(timeout, 15000);
-        result.whenComplete((fix, error) -> main.removeCallbacks(timeout));
+        result.whenComplete((fix, error) -> { main.removeCallbacks(timeout); cancellation.cancel(); });
         try {
             CurrentLocationRequest request = new CurrentLocationRequest.Builder().setPriority(Priority.PRIORITY_HIGH_ACCURACY).setMaxUpdateAgeMillis(15000).setDurationMillis(15000).build();
             LocationServices.getFusedLocationProviderClient(context).getCurrentLocation(request, cancellation.getToken()).addOnSuccessListener(location -> {
                 JSObject fix = location == null ? null : from(location);
                 if (eligible(fix, System.currentTimeMillis())) result.complete(fix);
-                else result.completeExceptionally(new IllegalStateException("location_disabled"));
-            }).addOnFailureListener(error -> result.completeExceptionally(new IllegalStateException(permitted(context) ? "location_disabled" : "location_permission_denied")));
+                else result.completeExceptionally(new IllegalStateException(failureCode(context)));
+            }).addOnFailureListener(error -> result.completeExceptionally(new IllegalStateException(failureCode(context))));
         } catch (SecurityException error) { result.completeExceptionally(new IllegalStateException("location_permission_denied")); }
         return result;
+    }
+    private static boolean enabled(Context context) {
+        android.location.LocationManager manager = context.getSystemService(android.location.LocationManager.class);
+        return manager != null && androidx.core.location.LocationManagerCompat.isLocationEnabled(manager);
+    }
+    private static String failureCode(Context context) {
+        return !permitted(context) ? "location_permission_denied" : enabled(context) ? "location_unavailable" : "location_disabled";
     }
 }

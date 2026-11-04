@@ -1,0 +1,30 @@
+{
+  "runtime": "actual Android SfAuth plus Firebase Admin verification",
+  "globalDeviceLock": true,
+  "apkSha256": "943f7f3e5d3ce6ce0eb102145612ac09806c57ce9468252d651a7811bf81795a",
+  "presence": {
+    "MODEL_API_KEY": true,
+    "RELAY_HMAC_SECRET": true,
+    "GOOGLE_APPLICATION_CREDENTIALS": true,
+    "FIREBASE_PROJECT_ID": true,
+    "FIREBASE_APP_ID": true,
+    "googleServices": true,
+    "registeredHostDebugSecret": true
+  },
+  "failure": null,
+  "mockSkipAuth": false,
+  "osrm": "public foot endpoint; no credential required",
+  "nativeTokenSuccess": true,
+  "admin": {
+    "idTokenVerified": true,
+    "appCheckVerified": true,
+    "anonymous": true,
+    "projectMatches": true,
+    "appMatches": true
+  },
+  "logMatches": {
+    "idToken": false,
+    "appCheckToken": false,
+    "hostDebugSecret": false
+  }
+}

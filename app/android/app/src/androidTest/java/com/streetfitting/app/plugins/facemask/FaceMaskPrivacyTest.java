@@ -29,26 +29,41 @@ public class FaceMaskPrivacyTest {
             }
         } finally {original.recycle();gt.recycle();}
     }
+    @Test public void fixtureGroundTruthRejectsEmptyAndNonbinaryMasks()throws Exception {
+        Bitmap gt=Bitmap.createBitmap(2,2,Bitmap.Config.ARGB_8888);gt.eraseColor(0xff000000);
+        try {
+            try{FaceMaskCore.validateGroundTruth(gt,2,2);fail("Empty GT cannot prove privacy");}catch(IOException e){assertEquals("invalid_argument",e.getMessage());}
+            gt.setPixel(0,0,0xffffffff);assertEquals(1,FaceMaskCore.validateGroundTruth(gt,2,2));
+            gt.setPixel(1,0,0xff808080);
+            try{FaceMaskCore.validateGroundTruth(gt,2,2);fail("Nonbinary GT cannot prove privacy");}catch(IOException e){assertEquals("invalid_argument",e.getMessage());}
+            gt.setPixel(1,0,0x00ffffff);
+            try{FaceMaskCore.validateGroundTruth(gt,2,2);fail("Transparent GT cannot prove privacy");}catch(IOException e){assertEquals("invalid_argument",e.getMessage());}
+        } finally {gt.recycle();}
+    }
     @Test public void frozenSelfCorpusRequiresActualDetectionAndApprovedGroundTruth()throws Exception {
         JSONObject fixture=MlProof.json("self.json");JSONArray cases=fixture.getJSONArray("cases"),observed=new JSONArray();boolean detectionPassed=true,privacyPassed=true,allApproved=true;
+        int positives=0,negatives=0;JSONArray missingApproval=new JSONArray();
         for(int i=0;i<cases.length();i++) {
             JSONObject row=cases.getJSONObject(i);Bitmap image=MlProof.image(row.getString("image"));HeadGeometry geometry=null;String reason=null;long[] counts=null;
             try {
                 try{geometry=FaceMaskCore.detect(MlProof.context(),image,HeadGeometry.DEFAULT);}catch(HeadGeometry.Rejected e){reason=e.reason;}
                 boolean expected=row.getBoolean("expectedPerson");boolean detected=geometry!=null;detectionPassed&=detected==expected;
                 if(expected) {
-                    if(!row.optBoolean("approvedGT",false)){allApproved=false;}
+                    positives++;
+                    if(!row.optBoolean("approvedGT",false)){allApproved=false;privacyPassed=false;missingApproval.put(row.getString("id"));}
                     else if(geometry!=null) {
                         Bitmap gt=MlProof.image(row.getString("groundTruth")),masked=FaceMaskCore.mask(image,geometry,"a");File file=Images.temp(MlProof.context(),"fixture-");Bitmap wire=FaceMaskCore.wire(masked,file);
                         try{counts=FaceMaskCore.exposure(gt,geometry,"a",wire.getWidth(),wire.getHeight());privacyPassed&=counts[1]==0;}finally{gt.recycle();if(wire!=masked)wire.recycle();masked.recycle();file.delete();}
                     } else privacyPassed=false;
-                }
+                } else negatives++;
                 observed.put(new JSONObject().put("id",row.getString("id")).put("expectedPerson",expected).put("registrationOk",detected).put("reason",reason==null?JSONObject.NULL:reason).put("gtApproved",row.optBoolean("approvedGT",false)).put("exposedHeadPixels",counts==null?JSONObject.NULL:counts[1]));
             } finally {image.recycle();}
         }
-        MlProof.report("face-mask-privacy",new JSONObject().put("cases",observed).put("detectionPassed",detectionPassed).put("allGTApproved",allApproved).put("privacyPassed",allApproved&&privacyPassed));
+        MlProof.report("face-mask-privacy",new JSONObject().put("cases",observed).put("detectionPassed",detectionPassed).put("allGTApproved",allApproved).put("missingGTApproval",missingApproval).put("positiveCount",positives).put("negativeCount",negatives).put("privacyPassed",positives>0&&negatives>0&&detectionPassed&&allApproved&&privacyPassed));
+        assertTrue("Frozen corpus must include positive self fixtures",positives>0);
+        assertTrue("Frozen corpus must include negative/no-person fixtures",negatives>0);
+        assertTrue("BLOCKED: human-reviewed face+hair GT required for every positive; drafts and model masks are not approval: "+missingApproval,allApproved);
         assertTrue("Every frozen positive and negative must match intended registration outcome",detectionPassed);
-        Assume.assumeTrue("Human-reviewed face+hair GT required; drafts cannot prove privacy",allApproved);
         assertTrue("Every accepted fixture must expose zero GT pixels",privacyPassed);
     }
 }

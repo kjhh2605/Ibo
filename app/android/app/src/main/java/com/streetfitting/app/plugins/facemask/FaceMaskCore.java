@@ -48,22 +48,27 @@ public final class FaceMaskCore {
         for(int y=0;y<h;y++)for(int x=0;x<w;x++)pixels[y*w+x]=source.getPixel(Math.min(source.getWidth()-1,(int)((x+.5)*source.getWidth()/w)),Math.min(source.getHeight()-1,(int)((y+.5)*source.getHeight()/h)));
         return Bitmap.createBitmap(pixels,w,h,Bitmap.Config.ARGB_8888);
     }
-    /** Counts source contribution, not accidental equality to gray RGB. */
-    public static long[] exposure(Bitmap gt,HeadGeometry g,String mode,int wireW,int wireH) throws IOException {
-        if(gt.getWidth()!=g.w||gt.getHeight()!=g.h)throw new IOException("invalid_argument");
-        boolean[] head=new boolean[g.w*g.h],contributes=new boolean[g.w*g.h];long count=0;
-        for(int y=0;y<g.h;y++)for(int x=0;x<g.w;x++) {
-            int rgb=gt.getPixel(x,y);int r=(rgb>>16)&255,b=rgb&255,green=(rgb>>8)&255;
-            if((r!=0&&r!=255)||r!=b||r!=green||(rgb>>>24)!=255)throw new IOException("invalid_argument");
-            if(r==255){head[y*g.w+x]=true;count++;}
+    public static long validateGroundTruth(Bitmap gt,int w,int h) throws IOException {
+        if(gt.getWidth()!=w||gt.getHeight()!=h)throw new IOException("invalid_argument");
+        long count=0;
+        for(int y=0;y<h;y++)for(int x=0;x<w;x++) {
+            int rgb=gt.getPixel(x,y);
+            if(rgb!=0xff000000&&rgb!=0xffffffff)throw new IOException("invalid_argument");
+            if(rgb==0xffffffff)count++;
         }
         if(count==0)throw new IOException("invalid_argument");
+        return count;
+    }
+    /** Counts source contribution, not accidental equality to gray RGB. */
+    public static long[] exposure(Bitmap gt,HeadGeometry g,String mode,int wireW,int wireH) throws IOException {
+        long count=validateGroundTruth(gt,g.w,g.h);
+        boolean[] contributes=new boolean[g.w*g.h];
         int offset="b".equals(mode)?g.headBottom+1:0,sourceH=g.h-offset;
         for(int y=0;y<wireH;y++)for(int x=0;x<wireW;x++) {
             int sx=Math.min(g.w-1,(int)((x+.5)*g.w/wireW)),sy=offset+Math.min(sourceH-1,(int)((y+.5)*sourceH/wireH));
             if(!g.protectedPixel(sx,sy,mode))contributes[sy*g.w+sx]=true;
         }
-        long exposed=0;for(int i=0;i<head.length;i++)if(head[i]&&contributes[i])exposed++;
+        long exposed=0;for(int y=0;y<g.h;y++)for(int x=0;x<g.w;x++)if(contributes[y*g.w+x]&&gt.getPixel(x,y)==0xffffffff)exposed++;
         return new long[]{count,exposed};
     }
     public static Bitmap compose(Bitmap original,HeadGeometry source,Bitmap provider,int cropOffset) {

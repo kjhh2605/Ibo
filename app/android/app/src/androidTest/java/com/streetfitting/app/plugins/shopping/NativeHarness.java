@@ -7,8 +7,6 @@ import androidx.test.core.app.ActivityScenario;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.uiautomator.By;
 import androidx.test.uiautomator.UiDevice;
-import androidx.test.uiautomator.UiObject2;
-import androidx.test.uiautomator.Until;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -26,9 +24,27 @@ public final class NativeHarness implements AutoCloseable {
     public final ActivityScenario<MainActivity> activity;
     public NativeHarness() { this(null); }
     public NativeHarness(Intent extras) {
+        // Denial/revoke scenarios run externally: revocation can kill instrumentation.
+        grant(android.Manifest.permission.ACCESS_COARSE_LOCATION);
+        grant(android.Manifest.permission.ACCESS_FINE_LOCATION);
+        grant(android.Manifest.permission.CAMERA);
+        grant(android.Manifest.permission.RECORD_AUDIO);
+        if (android.os.Build.VERSION.SDK_INT >= 33) grant(android.Manifest.permission.POST_NOTIFICATIONS);
         Intent intent = new Intent(context, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         if (extras != null) intent.putExtras(extras);
         activity = ActivityScenario.launch(intent);
+    }
+    public static String fixturePath(String relative) {
+        File root = InstrumentationRegistry.getInstrumentation().getTargetContext().getFilesDir();
+        try { return new File(root, relative).getCanonicalPath(); }
+        catch (java.io.IOException error) { throw new AssertionError("fixture_path_setup_failed", error); }
+    }
+    private void grant(String permission) {
+        if (androidx.core.content.ContextCompat.checkSelfPermission(context, permission) == android.content.pm.PackageManager.PERMISSION_GRANTED) return;
+        try { device.executeShellCommand("pm grant " + context.getPackageName() + " " + permission); }
+        catch (java.io.IOException error) { throw new AssertionError("permission_setup_failed: " + permission, error); }
+        if (androidx.core.content.ContextCompat.checkSelfPermission(context, permission) != android.content.pm.PackageManager.PERMISSION_GRANTED)
+            throw new AssertionError("permission_setup_failed: " + permission);
     }
     public TestCall invoke(String plugin, String method, JSObject data) {
         TestCall call = new TestCall(plugin, method, data);
@@ -39,14 +55,11 @@ public final class NativeHarness implements AutoCloseable {
         return call;
     }
     public TestCall listen(String plugin, String name) { return invoke(plugin, "addListener", new JSObject().put("eventName", name)); }
-    public void dismissPermission(boolean allow) {
-        UiObject2 button = device.wait(Until.findObject(By.res("com.android.permissioncontroller", allow ? "permission_allow_foreground_only_button" : "permission_deny_button")), 4000);
-        if (button == null && allow) button = device.findObject(By.res("com.android.permissioncontroller", "permission_allow_button"));
-        if (button != null) button.click();
-    }
     public void evidence(String name) throws Exception {
-        File directory = new File(context.getExternalFilesDir(null), "s04-evidence"); directory.mkdirs();
-        device.takeScreenshot(new File(directory, name + ".png")); device.dumpWindowHierarchy(new File(directory, name + ".xml"));
+        File directory = new File(context.getFilesDir(), "s04-evidence");
+        if (!directory.isDirectory() && !directory.mkdirs()) throw new AssertionError("evidence_directory_failed");
+        if (!device.takeScreenshot(new File(directory, name + ".png"))) throw new AssertionError("evidence_screenshot_failed");
+        device.dumpWindowHierarchy(new File(directory, name + ".xml"));
     }
     public static void until(java.util.function.BooleanSupplier condition, long timeout) {
         long end = SystemClock.elapsedRealtime() + timeout;

@@ -41,8 +41,9 @@ public class PhotoIndexPlugin extends Plugin {
         CompletableFuture<JSObject> fresh=new CompletableFuture<>(), prior=FLIGHTS.putIfAbsent(id,fresh);
         if(prior!=null) return prior;
         INFERENCE.execute(()->{
-            NativeRepository repo=RepositoryProvider.get(context);
+            NativeRepository repo=null;
             try {
+                repo=RepositoryProvider.get(context);
                 JSObject photo=get(repo,"Photo",id);
                 if(photo==null) throw new IOException("not_found");
                 JSObject existing=get(repo,"PhotoEmbedding",id);
@@ -58,6 +59,7 @@ public class PhotoIndexPlugin extends Plugin {
                 for(PhotoIndexPlugin plugin:LISTENERS) if(!plugin.destroyed) plugin.notifyListeners("indexed",event);
             } catch(Exception e) {
                 try {
+                    if(repo==null)throw new IOException("index_unavailable");
                     repo.markIndexFailed(object("photoId",id));
                     JSObject event=object("photoId",id);event.put("state","failed");
                     for(PhotoIndexPlugin plugin:LISTENERS) if(!plugin.destroyed) plugin.notifyListeners("indexed",event);

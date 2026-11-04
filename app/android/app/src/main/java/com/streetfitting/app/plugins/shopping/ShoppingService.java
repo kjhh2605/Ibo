@@ -30,6 +30,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.json.JSONObject;
+import java.util.concurrent.RejectedExecutionException;
 
 public class ShoppingService extends Service {
     public static final String CHANNEL = "shopping_session";
@@ -49,17 +50,27 @@ public class ShoppingService extends Service {
     private int shutters;
     private CompletableFuture<JSObject> stopping;
     private boolean noticeSent;
+    private volatile boolean terminated;
+    private boolean startRequested;
+    private CompletableFuture<JSObject> initialFix;
+    private boolean execute(Runnable task) {
+        try { work.execute(task); return true; }
+        catch (RejectedExecutionException ignored) { return false; }
+    }
     private final LocationCallback updates = new LocationCallback() {
         @Override public void onLocationResult(LocationResult result) {
-            work.execute(() -> {
+            execute(() -> {
                 for (android.location.Location location : result.getLocations()) {
                     JSObject fix = LocationFixes.from(location);
                     synchronized (ShoppingService.this) {
-                        if (!"recording".equals(phase) || !LocationFixes.eligible(fix, System.currentTimeMillis())) continue;
-                        repository.appendTrail(new JSObject().put("tripId", trip.optString("id")).put("fix", fix));
-                        latestFix = fix;
-                        ShoppingSessionPlugin.emit("location", fix);
-                        publish();
+                        if (terminated || !"recording".equals(phase) || !LocationFixes.eligible(fix, System.currentTimeMillis())) continue;
+                        try {
+                            repository.appendTrail(new JSObject().put("tripId", trip.optString("id")).put("fix", fix));
+                            if (terminated) return;
+                            latestFix = fix;
+                            ShoppingSessionPlugin.emit("location", fix);
+                            publish();
+                        } catch (RuntimeException error) { stopRecording(); }
                     }
                 }
             });
@@ -67,12 +78,21 @@ public class ShoppingService extends Service {
     };
     private final Runnable tick = new Runnable() {
         @Override public void run() {
-            if (running != ShoppingService.this) return;
+            if (running != ShoppingService.this || terminated) return;
             if (!LocationFixes.permitted(ShoppingService.this)) {
                 stopRecording().whenComplete((value, error) -> ShoppingSessionPlugin.emit("error", new JSObject().put("code", "location_permission_denied").put("retryable", false)));
                 return;
             }
-            synchronized (ShoppingService.this) { if ("recording".equals(phase)) publish(); }
+            execute(() -> {
+                synchronized (ShoppingService.this) {
+                    if (terminated || !"recording".equals(phase)) return;
+                    JSObject saved = repository.getSession();
+                    if (terminated) return;
+                    shop = saved.getJSObject("shop");
+                    photos = currentShopPhotos(saved);
+                    publish();
+                }
+            });
             main.postDelayed(this, 1000);
         }
     };
@@ -82,7 +102,7 @@ public class ShoppingService extends Service {
         repository.setSessionStopper(this::repositoryStopping);
         locations = LocationServices.getFusedLocationProviderClient(this);
         if (Build.VERSION.SDK_INT >= 26) {
-            NotificationChannel channel = new NotificationChannel(CHANNEL, "Shopping session", NotificationManager.IMPORTANCE_LOW);
+            NotificationChannel channel = new NotificationChannel(CHANNEL, "Shopping mode", NotificationManager.IMPORTANCE_LOW);
             channel.setSound(null, null); channel.enableVibration(false);
             getSystemService(NotificationManager.class).createNotificationChannel(channel);
         }
@@ -90,41 +110,67 @@ public class ShoppingService extends Service {
     @Override public IBinder onBind(Intent intent) { return null; }
     @Override public int onStartCommand(Intent intent, int flags, int startId) {
         if (!LocationFixes.permitted(this)) { failStart("location_permission_denied"); return START_NOT_STICKY; }
-        if ("recording".equals(phase)) { completeStartup(); return START_STICKY; }
-        try { startForeground(NOTIFICATION_ID, notification()); }
-        catch (RuntimeException error) { failStart("service_unavailable"); return START_NOT_STICKY; }
-        work.execute(() -> {
-            try {
-                JSObject saved = repository.getSession();
-                JSObject savedTrip = saved.getJSObject("trip");
-                if (intent == null && savedTrip == null) { failStart("service_unavailable"); return; }
-                if (savedTrip != null) {
-                    synchronized (this) { trip = savedTrip; shop = saved.getJSObject("shop"); photos = saved.optJSONArray("photos") == null ? 0 : saved.optJSONArray("photos").length(); latestFix = saved.getJSObject("latestFix"); }
-                    beginRecording();
-                } else LocationFixes.current(this).whenComplete((fix, error) -> work.execute(() -> {
-                    if (error != null) { failStart(error.getMessage()); return; }
-                    try {
-                        JSObject session = repository.startSession(new JSObject().put("fix", fix));
-                        synchronized (this) { trip = session.getJSObject("trip"); shop = session.getJSObject("shop"); latestFix = fix; photos = 0; }
+        synchronized (this) {
+            if (terminated || "stopping".equals(phase)) return START_NOT_STICKY;
+            if ("recording".equals(phase)) { completeStartup(); return START_STICKY; }
+            if (startRequested) return START_STICKY;
+            startRequested = true;
+        }
+        try {
+            if (Build.VERSION.SDK_INT >= 29) startForeground(NOTIFICATION_ID, notification(), android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION);
+            else startForeground(NOTIFICATION_ID, notification());
+        } catch (RuntimeException error) { failStart("service_unavailable"); return START_NOT_STICKY; }
+        execute(() -> {
+            synchronized (this) {
+                if (terminated || !"starting".equals(phase)) return;
+                try {
+                    JSObject saved = repository.getSession();
+                    JSObject savedTrip = saved.getJSObject("trip");
+                    if (intent == null) {
+                        if (savedTrip == null) { failStart("service_unavailable"); return; }
+                        trip = savedTrip; shop = saved.getJSObject("shop");
+                        photos = currentShopPhotos(saved);
+                        latestFix = saved.getJSObject("latestFix");
                         beginRecording();
-                    } catch (RuntimeException failure) { failStart("service_unavailable"); }
-                }));
-            } catch (RuntimeException error) { failStart("service_unavailable"); }
+                        return;
+                    }
+                    // Only a system sticky restart may resume a persisted recording.
+                    if (savedTrip != null) repository.stopSession(new JSObject().put("tripId", savedTrip.optString("id")).put("endedAt", System.currentTimeMillis()));
+                    initialFix = LocationFixes.current(this);
+                    initialFix.whenComplete((fix, error) -> execute(() -> {
+                        synchronized (this) {
+                            if (terminated || !"starting".equals(phase)) return;
+                            if (error != null) { failStart(error.getMessage()); return; }
+                            try {
+                                JSObject session = repository.startSession(new JSObject().put("fix", fix));
+                                trip = session.getJSObject("trip"); shop = session.getJSObject("shop"); latestFix = fix; photos = 0;
+                                beginRecording();
+                            } catch (RuntimeException failure) { failStart("service_unavailable"); }
+                        }
+                    }));
+                } catch (RuntimeException error) { failStart("service_unavailable"); }
+            }
         });
         return START_STICKY;
     }
     private void beginRecording() {
-        synchronized (this) { phase = "recording"; }
+        if (terminated || !"starting".equals(phase)) return;
         main.post(() -> {
-            try {
-                LocationRequest request = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000).setMinUpdateIntervalMillis(5000).setMaxUpdateDelayMillis(10000).build();
-                locations.requestLocationUpdates(request, updates, Looper.getMainLooper());
-                synchronized (this) {
-                    publish(); completeStartup();
-                    if (!notificationAvailable() && !noticeSent) { noticeSent = true; ShoppingSessionPlugin.emit("notice", new JSObject().put("code", "notification_unavailable")); }
-                }
-                main.removeCallbacks(tick); main.post(tick);
-            } catch (SecurityException error) { stopRecording(); failStart("location_permission_denied"); }
+            synchronized (this) {
+                if (terminated || !"starting".equals(phase)) return;
+                try {
+                    LocationRequest request = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000).setMinUpdateIntervalMillis(5000).setMaxUpdateDelayMillis(10000).build();
+                    locations.requestLocationUpdates(request, updates, Looper.getMainLooper()).addOnCompleteListener(task -> {
+                        synchronized (this) {
+                            if (terminated || !"starting".equals(phase)) { locations.removeLocationUpdates(updates); return; }
+                            if (!task.isSuccessful()) { failStart(LocationFixes.permitted(this) ? "service_unavailable" : "location_permission_denied"); return; }
+                            phase = "recording"; publish(); completeStartup();
+                            if (!notificationAvailable() && !noticeSent) { noticeSent = true; ShoppingSessionPlugin.emit("notice", new JSObject().put("code", "notification_unavailable")); }
+                            main.removeCallbacks(tick); main.post(tick);
+                        }
+                    });
+                } catch (SecurityException error) { failStart("location_permission_denied"); }
+            }
         });
     }
     public synchronized JSObject state() {
@@ -133,58 +179,101 @@ public class ShoppingService extends Service {
             .put("photos", photos).put("elapsedMinutes", trip == null ? 0 : Math.max(0, (System.currentTimeMillis() - trip.optLong("startedAt")) / 60000))
             .put("latestFix", latestFix == null ? JSONObject.NULL : latestFix);
     }
+    private int currentShopPhotos(JSObject saved) {
+        org.json.JSONArray items = saved.optJSONArray("photos");
+        JSObject currentShop = saved.getJSObject("shop");
+        if (items == null || currentShop == null) return 0;
+        int count = 0;
+        for (int i = 0; i < items.length(); i++) {
+            JSONObject photo = items.optJSONObject(i);
+            if (photo != null && currentShop.optString("id").equals(photo.optString("shopId"))) count++;
+        }
+        return count;
+    }
     public synchronized CompletableFuture<JSObject> newShop() {
         CompletableFuture<JSObject> result = new CompletableFuture<>();
-        if (!"recording".equals(phase)) { result.completeExceptionally(new IllegalStateException("not_recording")); return result; }
+        if (terminated || !"recording".equals(phase)) { result.completeExceptionally(new IllegalStateException("not_recording")); return result; }
         String tripId = trip.optString("id");
-        LocationFixes.current(this).whenComplete((fix, error) -> work.execute(() -> {
-            synchronized (this) {
-                if (error != null) { result.completeExceptionally(error); return; }
-                if (!"recording".equals(phase) || !tripId.equals(trip.optString("id"))) { result.completeExceptionally(new IllegalStateException("not_recording")); return; }
-                try { shop = repository.newShop(new JSObject().put("tripId", tripId).put("fix", fix)); latestFix = fix; publish(); result.complete(shop); }
-                catch (RuntimeException failure) { result.completeExceptionally(failure); }
-            }
-        }));
+        LocationFixes.current(this).whenComplete((fix, error) -> {
+            if (!execute(() -> {
+                synchronized (this) {
+                    if (error != null) { result.completeExceptionally(error); return; }
+                    if (terminated || !"recording".equals(phase) || !tripId.equals(trip.optString("id"))) { result.completeExceptionally(new IllegalStateException("not_recording")); return; }
+                    try { shop = repository.newShop(new JSObject().put("tripId", tripId).put("fix", fix)); latestFix = fix; photos = 0; publish(); result.complete(shop); }
+                    catch (RuntimeException failure) { result.completeExceptionally(failure); }
+                }
+            })) result.completeExceptionally(new IllegalStateException("not_recording"));
+        });
         return result;
     }
     public synchronized JSObject beginShutter(long takenAt) {
-        if (!"recording".equals(phase)) throw new IllegalStateException("not_recording");
+        if (terminated || !"recording".equals(phase)) throw new IllegalStateException("not_recording");
         shutters++;
         return new JSObject().put("tripId", trip.optString("id")).put("shopId", shop.optString("id")).put("takenAt", takenAt);
     }
     public synchronized void endShutter(boolean committed) {
         if (shutters <= 0) throw new IllegalStateException("unbalanced_shutter");
-        shutters--; if (committed) photos++;
-        publish(); if (shutters == 0 && stopping != null) work.execute(this::finishStop);
+        shutters--;
+        if (committed && !terminated) execute(() -> {
+            synchronized (this) {
+                if (terminated) return;
+                try { photos = currentShopPhotos(repository.getSession()); publish(); }
+                catch (RuntimeException failure) { stopRecording(); }
+            }
+        });
+        if (!terminated) publish();
+        if (shutters == 0 && stopping != null) execute(this::finishStop);
     }
     public synchronized CompletableFuture<JSObject> stopRecording() {
         if (stopping != null) return stopping;
         stopping = new CompletableFuture<>(); phase = "stopping"; publish();
-        if (shutters == 0) work.execute(this::finishStop);
+        if (initialFix != null) initialFix.cancel(false);
+        if (shutters == 0) execute(this::finishStop);
         return stopping;
     }
     private synchronized void finishStop() {
-        if (stopping == null || stopping.isDone() || shutters != 0) return;
+        if (terminated || stopping == null || stopping.isDone() || shutters != 0) return;
         try {
             JSObject ended = trip == null ? null : repository.stopSession(new JSObject().put("tripId", trip.optString("id")).put("endedAt", System.currentTimeMillis()));
             phase = "idle"; trip = null; shop = null; latestFix = null; photos = 0;
-            repositoryStopping(); publish(); stopping.complete(ended);
-        } catch (RuntimeException error) { stopping.completeExceptionally(error); }
+            terminated = true; stopService(); publish(); stopping.complete(ended);
+            synchronized (ShoppingService.class) { if (startup != null && !startup.isDone()) startup.completeExceptionally(new IllegalStateException("cancelled")); }
+        } catch (RuntimeException error) { CompletableFuture<JSObject> failed = stopping; stopping = null; phase = "recording"; publish(); failed.completeExceptionally(error); }
     }
     private void repositoryStopping() {
+        // Called with the repository lock held: never acquire the service lock here.
+        terminated = true;
+        main.post(this::stopService);
+        execute(() -> {
+            synchronized (this) {
+                phase = "idle"; trip = null; shop = null; latestFix = null; photos = 0;
+                publish();
+                if (stopping != null) stopping.completeExceptionally(new IllegalStateException("not_recording"));
+            }
+        });
+    }
+    private void stopService() {
         locations.removeLocationUpdates(updates); main.removeCallbacks(tick);
         stopForeground(STOP_FOREGROUND_REMOVE); stopSelf();
     }
     private synchronized void failStart(String code) {
-        phase = "idle";
-        synchronized (ShoppingService.class) { if (startup != null) startup.completeExceptionally(new IllegalStateException(code)); }
-        ShoppingSessionPlugin.emit("error", new JSObject().put("code", code).put("retryable", !"location_permission_denied".equals(code)));
-        stopForeground(STOP_FOREGROUND_REMOVE); stopSelf();
+        if (terminated) return;
+        terminated = true; phase = "stopping";
+        execute(() -> {
+            try {
+                if (trip != null) repository.stopSession(new JSObject().put("tripId", trip.optString("id")).put("endedAt", System.currentTimeMillis()));
+                synchronized (this) { phase = "idle"; trip = null; shop = null; latestFix = null; photos = 0; publish(); }
+            } finally {
+                synchronized (ShoppingService.class) { if (startup != null) startup.completeExceptionally(new IllegalStateException(code)); }
+                ShoppingSessionPlugin.emit("error", new JSObject().put("code", code).put("retryable", !"location_permission_denied".equals(code)));
+                main.post(this::stopService);
+            }
+        });
     }
     private void completeStartup() { synchronized (ShoppingService.class) { if (startup != null) startup.complete(state()); } }
     private void publish() {
         ShoppingSessionPlugin.emit("state", state());
-        if ("recording".equals(phase)) main.post(() -> { if (running == this) getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notification()); });
+        if (!terminated && "recording".equals(phase)) main.post(() -> { synchronized (this) { if (running == this && !terminated && "recording".equals(phase)) getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notification()); } });
     }
     private boolean notificationAvailable() {
         if (Build.VERSION.SDK_INT >= 33 && ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) return false;
@@ -197,13 +286,16 @@ public class ShoppingService extends Service {
     }
     private synchronized Notification notification() {
         long minutes = trip == null ? 0 : Math.max(0, (System.currentTimeMillis() - trip.optLong("startedAt")) / 60000);
-        String text = "Shop " + (shop == null ? 1 : shop.optInt("n")) + " · " + photos + " photos · " + minutes + " min";
+        String text = shop == null ? "Starting shopping mode…" : "Shop " + shop.optInt("n") + " · " + photos + " photos · " + minutes + " min";
         return new NotificationCompat.Builder(this, CHANNEL).setSmallIcon(android.R.drawable.ic_menu_camera).setContentTitle("Shopping mode").setContentText(text)
             .setOngoing(true).setOnlyAlertOnce(true).setSilent(true).setCategory(NotificationCompat.CATEGORY_SERVICE).setContentIntent(link("streetfitting://home", 4100))
             .addAction(android.R.drawable.ic_menu_camera, "Take photo", link("streetfitting://capture", 4101))
             .addAction(android.R.drawable.ic_menu_add, "New shop", link("streetfitting://capture?newShop=1", 4102)).build();
     }
     @Override public void onDestroy() {
+        terminated = true;
+        if (initialFix != null) initialFix.cancel(false);
+        synchronized (ShoppingService.class) { if (startup != null && !startup.isDone()) startup.completeExceptionally(new IllegalStateException("service_unavailable")); }
         locations.removeLocationUpdates(updates); main.removeCallbacks(tick);
         repository.setSessionStopper(null); if (running == this) running = null;
         work.shutdown(); super.onDestroy();

@@ -22,9 +22,13 @@ import java.io.File;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.CompletableFuture;
 import org.json.JSONObject;
 
-@CapacitorPlugin(name = "Capture", permissions = {@Permission(alias = "camera", strings = {Manifest.permission.CAMERA})})
+@CapacitorPlugin(name = "Capture", permissions = {
+    @Permission(alias = "camera", strings = {Manifest.permission.CAMERA}),
+    @Permission(alias = "location", strings = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+})
 public class CapturePlugin extends Plugin {
     private final ExecutorService work = Executors.newSingleThreadExecutor();
     private CaptureSource source;
@@ -33,36 +37,56 @@ public class CapturePlugin extends Plugin {
     private boolean ready;
     private boolean capturing;
     private boolean paused;
+    private boolean opening;
+    private boolean destroyed;
+    private int generation;
+    private String shopId;
+    private PluginCall locationCall;
     private final float[] rect = new float[4];
     @PluginMethod public void openPreview(PluginCall call) {
-        String requested = call.getString("purpose"); String facing = call.getString("facing");
-        if (!("shopping".equals(requested) || "wardrobe".equals(requested) || "self".equals(requested)) || !("front".equals(facing) || "back".equals(facing))) { reject(call, "invalid_argument"); return; }
-        if ("shopping".equals(requested) && (ShoppingService.active() == null || !"recording".equals(ShoppingService.active().state().optString("phase")))) { reject(call, "not_recording"); return; }
-        purpose = requested; front = "front".equals(facing);
-        if (!CaptureSourceFactory.fixture(getActivity()) && getPermissionState("camera") != PermissionState.GRANTED) {
-            if (getPermissionState("camera") == PermissionState.DENIED) { reject(call, "permission_denied"); return; }
-            requestPermissionForAlias("camera", call, "cameraResult"); return;
-        }
-        open(call);
+        getActivity().runOnUiThread(() -> {
+            String requested = call.getString("purpose"); String facing = call.getString("facing");
+            String requestedShop = call.getString("shopId");
+            if (!("shopping".equals(requested) || "wardrobe".equals(requested) || "self".equals(requested) || "storefront".equals(requested)) || !("front".equals(facing) || "back".equals(facing)) ||
+                ("storefront".equals(requested) ? requestedShop == null || requestedShop.isEmpty() : call.getData().has("shopId"))) { reject(call, "invalid_argument"); return; }
+            if (capturing || opening || locationCall != null) { reject(call, "busy"); return; }
+            ShoppingService service = ShoppingService.active();
+            if ("shopping".equals(requested) && (service == null || !"recording".equals(service.state().optString("phase")))) { reject(call, "not_recording"); return; }
+            purpose = requested; shopId = requestedShop; front = "front".equals(facing); opening = true;
+            if (!CaptureSourceFactory.fixture(getActivity()) && getPermissionState("camera") != PermissionState.GRANTED) {
+                if (getPermissionState("camera") == PermissionState.DENIED) { opening = false; reject(call, "camera_permission_denied"); return; }
+                requestPermissionForAlias("camera", call, "cameraResult"); return;
+            }
+            open(call);
+        });
     }
     @PermissionCallback private void cameraResult(PluginCall call) {
-        if (getPermissionState("camera") != PermissionState.GRANTED) { reject(call, "permission_denied"); return; }
+        if (!opening || destroyed) { reject(call, "cancelled"); return; }
+        if (getPermissionState("camera") != PermissionState.GRANTED) { opening = false; reject(call, "camera_permission_denied"); return; }
         open(call);
     }
     private void open(PluginCall call) {
         getActivity().runOnUiThread(() -> {
             if (capturing) { reject(call, "busy"); return; }
             detach();
+            int attempt = generation;
             try {
                 source = CaptureSourceFactory.create(getActivity(), front);
+                CaptureSource current = source;
                 ViewGroup parent = (ViewGroup)getBridge().getWebView().getParent();
-                parent.addView(source.view(), parent.indexOfChild(getBridge().getWebView()), new ViewGroup.LayoutParams(1, 1));
+                parent.addView(current.view(), parent.indexOfChild(getBridge().getWebView()), new ViewGroup.LayoutParams(1, 1));
                 getBridge().getWebView().setBackgroundColor(Color.TRANSPARENT); applyRect();
-                source.start().whenComplete((value, error) -> {
+                current.start().whenComplete((value, error) -> getActivity().runOnUiThread(() -> {
+                    if (source != current || generation != attempt || destroyed) { reject(call, "cancelled"); return; }
+                    opening = false;
                     if (error != null) { detach(); reject(call, error.getMessage()); }
-                    else { ready = true; notifyListeners("preview", new JSObject().put("ready", true)); call.resolve(); }
-                });
-            } catch (RuntimeException error) { detach(); reject(call, "fixture_unavailable"); }
+                    else { ready = !paused; notifyListeners("preview", new JSObject().put("ready", ready)); call.resolve(); }
+                }));
+            } catch (RuntimeException error) {
+                opening = false; detach();
+                reject(call, CaptureSourceFactory.fixture(getActivity()) ?
+                    ("fixture_empty".equals(error.getMessage()) ? "fixture_empty" : "fixture_invalid") : "camera_unavailable");
+            }
         });
     }
     @PluginMethod public void setPreviewRect(PluginCall call) {
@@ -83,71 +107,135 @@ public class CapturePlugin extends Plugin {
         view.setVisibility(rect[2] > 0 && rect[3] > 0 ? View.VISIBLE : View.INVISIBLE);
     }
     @PluginMethod public void takePhoto(PluginCall call) {
-        String kind = call.getString("kind");
-        if (!("item".equals(kind) || "storefront".equals(kind)) || (!"shopping".equals(purpose) && !"item".equals(kind))) { reject(call, "invalid_argument"); return; }
         getActivity().runOnUiThread(() -> {
-            if (!ready || source == null || paused) { reject(call, "preview_not_ready"); return; }
-            if (capturing) { reject(call, "busy"); return; }
-            ShoppingService session = "shopping".equals(purpose) ? ShoppingService.active() : null;
-            JSObject snapshot;
-            try { snapshot = "shopping".equals(purpose) ? session == null ? null : session.beginShutter(System.currentTimeMillis()) : null; }
-            catch (RuntimeException error) { reject(call, "not_recording"); return; }
-            if ("shopping".equals(purpose) && snapshot == null) { reject(call, "not_recording"); return; }
-            capturing = true;
-            CaptureSource current = source;
-            String capturePurpose = purpose;
-            boolean mirror = front && !CaptureSourceFactory.fixture(getActivity());
-            File raw = new File(getContext().getCacheDir(), UUID.randomUUID() + ".capture");
-            current.capture(raw).whenComplete((file, error) -> work.execute(() -> {
-                JSObject asset = null; boolean committed = false;
-                try {
-                    if (error != null) throw new IllegalStateException(error.getMessage());
-                    asset = ImageFiles.normalize(getContext(), file, "captures", mirror);
-                    NativeRepository repository = RepositoryProvider.get(getContext());
-                    JSObject photo = null;
-                    if (snapshot != null) {
-                        JSObject fix = repository.nearestFix(new JSObject().put("tripId", snapshot.optString("tripId")).put("takenAt", snapshot.optLong("takenAt")));
-                        if (!LocationFixes.eligible(fix, snapshot.optLong("takenAt"))) fix = LocationFixes.current(getContext()).get();
-                        if (!LocationFixes.eligible(fix, snapshot.optLong("takenAt"))) throw new IllegalStateException("location_disabled");
-                        photo = new JSObject().put("id", asset.optString("id")).put("tripId", snapshot.optString("tripId")).put("shopId", snapshot.optString("shopId")).put("kind", kind)
-                            .put("takenAt", snapshot.optLong("takenAt")).put("location", LocationFixes.point(fix)).put("file", asset.optString("file")).put("w", asset.optInt("w")).put("h", asset.optInt("h")).put("indexState", "pending");
-                        photo = repository.commitPhoto(new JSObject().put("photo", photo));
-                        ImageFiles.local(asset.optString("file")).delete();
-                        asset.put("file", photo.optString("file"));
-                    } else {
-                        JSObject registered = repository.registerAsset(new JSObject().put("asset", asset).put("purpose", capturePurpose));
-                        ImageFiles.local(asset.optString("file")).delete();
-                        asset = registered;
-                    }
-                    committed = true;
-                    JSObject result = new JSObject().put("asset", asset).put("photo", photo == null ? JSONObject.NULL : photo);
-                    getActivity().runOnUiThread(() -> {
-                        try { current.committed(); }
-                        catch (RuntimeException failure) { ready = false; notifyListeners("preview", new JSObject().put("ready", false)); }
-                        notifyListeners("captured", result); call.resolve(result);
-                    });
-                    if (photo != null) PhotoIndexPlugin.dispatch(getContext(), photo.optString("id"));
-                } catch (Exception failure) {
-                    if (asset != null && !committed) try { ImageFiles.local(asset.optString("file")).delete(); } catch (Exception ignored) { }
-                    reject(call, failure.getMessage() != null && failure.getMessage().equals("location_disabled") ? "location_disabled" : "capture_failed");
-                } finally {
-                    raw.delete(); if (session != null && snapshot != null) session.endShutter(committed);
-                    getActivity().runOnUiThread(() -> capturing = false);
-                }
-            }));
+            String kind = call.getString("kind");
+            if (!("item".equals(kind) || "storefront".equals(kind)) ||
+                ("storefront".equals(purpose) ? !"storefront".equals(kind) : !"shopping".equals(purpose) && !"item".equals(kind))) { reject(call, "invalid_argument"); return; }
+            if (capturing || opening || locationCall != null) { reject(call, "busy"); return; }
+            if (!ready || source == null || paused || destroyed) { reject(call, "preview_not_open"); return; }
+            if ("storefront".equals(purpose) && !LocationFixes.permitted(getContext())) {
+                if (getPermissionState("location") == PermissionState.DENIED) { reject(call, "location_permission_denied"); return; }
+                locationCall = call;
+                requestPermissionForAlias("location", call, "locationResult");
+                return;
+            }
+            capture(call, kind);
         });
     }
-    @PluginMethod public void closePreview(PluginCall call) { getActivity().runOnUiThread(() -> { detach(); purpose = null; call.resolve(); }); }
+    @PermissionCallback private void locationResult(PluginCall call) {
+        getActivity().runOnUiThread(() -> {
+            if (locationCall != call || destroyed) { reject(call, "cancelled"); return; }
+            if (!LocationFixes.permitted(getContext())) { locationCall = null; reject(call, "location_permission_denied"); return; }
+            resumeShutter();
+        });
+    }
+    private void resumeShutter() {
+        if (locationCall == null || paused || !ready || !LocationFixes.permitted(getContext())) return;
+        PluginCall call = locationCall; locationCall = null;
+        capture(call, "storefront");
+    }
+    private void capture(PluginCall call, String kind) {
+        long takenAt = System.currentTimeMillis();
+        ShoppingService session = "shopping".equals(purpose) ? ShoppingService.active() : null;
+        JSObject snapshot;
+        try { snapshot = "shopping".equals(purpose) ? session == null ? null : session.beginShutter(takenAt) : null; }
+        catch (RuntimeException error) { reject(call, "not_recording"); return; }
+        if ("shopping".equals(purpose) && snapshot == null) { reject(call, "not_recording"); return; }
+        capturing = true;
+        CaptureSource current = source;
+        String capturePurpose = purpose;
+        String targetShop = shopId;
+        boolean mirror = front && !CaptureSourceFactory.fixture(getActivity());
+        File raw = new File(getContext().getCacheDir(), UUID.randomUUID() + ".capture");
+        // Acquire location at shutter, concurrently with pixels, never after normalization.
+        CompletableFuture<JSObject> fix = "storefront".equals(capturePurpose) ? LocationFixes.current(getContext()) : null;
+        work.execute(() -> {
+            JSObject target = snapshot;
+            JSObject asset = null; JSObject completed = null; String failureCode = null; boolean committed = false;
+            CompletableFuture<JSObject> location = fix;
+            try {
+                NativeRepository repository = RepositoryProvider.get(getContext());
+                if ("storefront".equals(capturePurpose)) {
+                    JSObject shop = repository.get(new JSObject().put("entity", "Shop").put("id", targetShop));
+                    if (shop == null) throw new IllegalStateException("not_found");
+                    target = new JSObject().put("tripId", shop.optString("tripId")).put("shopId", targetShop).put("takenAt", takenAt);
+                } else if (target != null) {
+                    JSObject nearest = repository.nearestFix(new JSObject().put("tripId", target.optString("tripId")).put("takenAt", takenAt));
+                    location = LocationFixes.eligible(nearest, takenAt) ? CompletableFuture.completedFuture(nearest) : LocationFixes.current(getContext());
+                }
+                CompletableFuture<File> pixels = new CompletableFuture<>();
+                getActivity().runOnUiThread(() -> {
+                    if (destroyed || paused || source != current || !ready) { pixels.completeExceptionally(new IllegalStateException("preview_not_open")); return; }
+                    try { current.capture(raw).whenComplete((file, error) -> { if (error != null) pixels.completeExceptionally(error); else pixels.complete(file); }); }
+                    catch (RuntimeException error) { pixels.completeExceptionally(new IllegalStateException("camera_unavailable")); }
+                });
+                File file = pixels.get();
+                JSObject selectedFix = location == null ? null : location.get();
+                if (target != null && !LocationFixes.eligible(selectedFix, takenAt)) throw new IllegalStateException("location_unavailable");
+                asset = ImageFiles.normalize(getContext(), file, "captures", mirror);
+                JSObject photo = null;
+                if (target != null) {
+                    photo = new JSObject().put("id", asset.optString("id")).put("tripId", target.optString("tripId")).put("shopId", target.optString("shopId")).put("kind", kind)
+                        .put("takenAt", takenAt).put("location", LocationFixes.point(selectedFix)).put("file", asset.optString("file")).put("w", asset.optInt("w")).put("h", asset.optInt("h")).put("indexState", "pending");
+                    photo = "storefront".equals(capturePurpose) ? repository.commitStorefront(new JSObject().put("photo", photo)) : repository.commitPhoto(new JSObject().put("photo", photo));
+                    ImageFiles.local(asset.optString("file")).delete();
+                    asset.put("file", photo.optString("file"));
+                } else {
+                    JSObject registered = repository.registerAsset(new JSObject().put("asset", asset).put("purpose", capturePurpose));
+                    ImageFiles.local(asset.optString("file")).delete(); asset = registered;
+                }
+                committed = true;
+                completed = new JSObject().put("asset", asset).put("photo", photo == null ? JSONObject.NULL : photo);
+                if (photo != null) PhotoIndexPlugin.dispatch(getContext(), photo.optString("id"));
+            } catch (Exception failure) {
+                if (asset != null && !committed) try { ImageFiles.local(asset.optString("file")).delete(); } catch (Exception ignored) { }
+                Throwable cause = failure;
+                while (cause.getCause() != null) cause = cause.getCause();
+                String code = cause.getMessage();
+                failureCode = "location_disabled".equals(code) ? "location_unavailable" :
+                    "location_unavailable".equals(code) || "location_permission_denied".equals(code) || "not_found".equals(code) ||
+                    "camera_unavailable".equals(code) || "preview_not_open".equals(code) || "fixture_invalid".equals(code) ? code : "io_error";
+            } finally {
+                if (location != null && !location.isDone()) location.cancel(false);
+                raw.delete(); if (session != null && snapshot != null) session.endShutter(committed);
+                JSObject result = completed; String error = failureCode;
+                getActivity().runOnUiThread(() -> {
+                    capturing = false;
+                    if (destroyed) work.shutdown();
+                    if (result != null) {
+                        try { current.committed(); }
+                        catch (RuntimeException failure) { if (source == current) { ready = false; notifyListeners("preview", new JSObject().put("ready", false)); } }
+                        notifyListeners("captured", result); call.resolve(result);
+                    } else reject(call, error);
+                });
+            }
+        });
+    }
+    @PluginMethod public void closePreview(PluginCall call) { getActivity().runOnUiThread(() -> {
+        opening = false;
+        if (locationCall != null) { reject(locationCall, "cancelled"); locationCall = null; }
+        detach(); purpose = null; shopId = null; call.resolve();
+    }); }
     private void detach() {
-        ready = false;
+        generation++; ready = false;
         if (source != null) { source.stop(); ViewGroup parent = (ViewGroup)source.view().getParent(); if (parent != null) parent.removeView(source.view()); source = null; }
         notifyListeners("preview", new JSObject().put("ready", false));
     }
     @Override protected void handleOnPause() { paused = true; ready = false; if (source != null) source.stop(); notifyListeners("preview", new JSObject().put("ready", false)); }
     @Override protected void handleOnResume() {
         paused = false;
-        if (source != null) source.start().whenComplete((value, error) -> { ready = error == null; notifyListeners("preview", new JSObject().put("ready", ready)); });
+        CaptureSource current = source; int attempt = generation;
+        if (current != null && !opening) current.start().whenComplete((value, error) -> getActivity().runOnUiThread(() -> {
+            if (source != current || generation != attempt || paused || destroyed) return;
+            ready = error == null; notifyListeners("preview", new JSObject().put("ready", ready));
+            if (error == null) resumeShutter();
+            else if (locationCall != null) { reject(locationCall, "preview_not_open"); locationCall = null; }
+        }));
     }
-    @Override protected void handleOnDestroy() { detach(); work.shutdown(); }
-    private void reject(PluginCall call, String code) { call.reject(code, code, new JSObject().put("retryable", !"permission_denied".equals(code))); }
+    @Override protected void handleOnDestroy() {
+        destroyed = true; opening = false;
+        if (locationCall != null) { reject(locationCall, "cancelled"); locationCall = null; }
+        detach(); if (!capturing) work.shutdown();
+    }
+    private void reject(PluginCall call, String code) { call.reject(code, code, new JSObject().put("retryable", !"camera_permission_denied".equals(code) && !"location_permission_denied".equals(code))); }
 }

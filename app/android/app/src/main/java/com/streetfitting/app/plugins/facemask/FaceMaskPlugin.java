@@ -82,7 +82,7 @@ public class FaceMaskPlugin extends Plugin {
         for(File file:entries) {
             String name=file.getName();if(!name.matches("[0-9]+\\.json"))continue;
             try {long version=Long.parseLong(name.substring(0,name.length()-5));JSObject key=object("updatedAt",version);repo.retainSelf(key);repo.releaseSelf(key);}
-            catch(Exception e){file.delete();}
+            catch(Exception e){if("invalid_reference".equals(e.getMessage()))file.delete();}
         }
     }
     @PluginMethod public void evaluateFixture(PluginCall call) {
@@ -91,7 +91,7 @@ public class FaceMaskPlugin extends Plugin {
             if(expected==null||expected&&gtRef==null||!expected&&gtRef!=null)throw new IOException("invalid_argument");
             Bitmap original=asset(call.getObject("asset")),gt=null,masked=null,wire=null;File temp=null;
             try {
-                if(expected){gt=Images.decode(getContext(),gtRef);if(gt.getWidth()!=original.getWidth()||gt.getHeight()!=original.getHeight())throw new IOException("invalid_argument");}
+                if(expected){gt=Images.decode(getContext(),gtRef);FaceMaskCore.validateGroundTruth(gt,original.getWidth(),original.getHeight());}
                 HeadGeometry geometry=null;String reason=null;
                 try {geometry=FaceMaskCore.detect(getContext(),original,config);}catch(HeadGeometry.Rejected e){reason=e.reason;}
                 long[] counts=null;

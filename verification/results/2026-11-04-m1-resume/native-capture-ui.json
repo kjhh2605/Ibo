@@ -1,0 +1,54 @@
+{
+  "runtime": "actual Android WebView plus CameraX, not browser mock",
+  "apkSha256": "943f7f3e5d3ce6ce0eb102145612ac09806c57ce9468252d651a7811bf81795a",
+  "globalDeviceLock": true,
+  "steps": [],
+  "screenshots": [
+    "native-home-current.png",
+    "native-capture-ui-failure.png"
+  ],
+  "failure": "expect(locator).toBeEnabled() failed\n\nLocator:  getByRole('button', { name: 'Take photo', exact: true })\nExpected: enabled\nReceived: disabled\nTimeout:  5000ms\n\nCall log:\n  - Expect \"toBeEnabled\" getByRole('button', { name: 'Take photo', exact: true }) with timeout 5000ms\n  - waiting for getByRole('button', { name: 'Take photo', exact: true })\n    14 × locator resolved to <button disabled type=\"button\" data-size=\"md\" data-elevation=\"none\" data-variant=\"primary\" data-astryx-pressable=\"\" class=\"astryx-button x1k57tk5 x1vidyx5 x1t137rt x1jhp3zv xx47ajj x16bblx1 x1wfwxd8 x13aywxo x1n2onr6 x3nfvp2 x6s0dn4 xl56j7k x1txdalj xce4md1 xrrkdod xc342km xng3xce x1jxw6zd xjb2p0i xcr08ib x1kq96og x1e4wzip xuxw1ft xeuugli x193iq5w xrafxwg xuedmi6 x12w9bfk xlr8y92 x1ueg155 x11z29ks xli5ek3 x14e4jsf x1heh2iz x1sgdaq5 xwkbtvz xziyay6 xz2mauf x1l7afqf xt0e3qv x18o3ruo xbyyjgo x3oybdh x8pp…>…</button>\n       - unexpected value \"disabled\"\n",
+  "before": {
+    "route": "home",
+    "ids": {
+      "trips": [
+        "618bfeba-4b2e-42c5-be3e-d342be2f4963",
+        "86900187-c84f-46d3-9e30-153c0706f15e",
+        "aa370907-9640-4e49-b700-d023e2dfd0ac",
+        "b42e1f00-5dab-44bd-8d82-6f68d3f989e6",
+        "5b45c998-c2d0-4941-993b-e16271bacc92",
+        "e2c7f460-f098-49e9-8ee1-1dfbd639d05c",
+        "3d9d9fe9-84c8-4c3b-bc41-74de37cf342f",
+        "eefd99cf-cc13-48cb-8eb4-c86a32567b42",
+        "421307e9-f9cd-4e43-83db-2374a89e9a74",
+        "9fb5d5a7-d4d4-44b6-a3d2-9853653e6033",
+        "bca42318-275f-499b-88c6-5898b5f0404a",
+        "d0eb9388-9897-482e-acae-4679ee698844",
+        "d2609095-5e0e-412c-9f68-f84d1d63c6c0",
+        "14c204d3-5a70-46c7-be56-0429af546f5d",
+        "3363e308-b3f3-45e9-b655-7b1c542927d7",
+        "42818c8d-0773-4139-8bb2-d7332d8bddb3",
+        "8773136e-76fc-416e-9695-07abbf59ad69"
+      ],
+      "photos": [
+        "ae5703f1-c19e-4048-b309-bcf3d026343d",
+        "974b7909-4cd8-4be0-a7ef-dd19a31a62e7",
+        "341b0d68-c38a-4fd8-b8d9-502bc961fe24",
+        "7cafdc60-9679-4e19-85ef-962231e146c4",
+        "f62b4d93-8714-4040-95a8-1bed71836f46",
+        "f966f02a-0428-4961-8f24-2951cf2ee7b7"
+      ],
+      "pieces": [],
+      "results": []
+    }
+  },
+  "headings": [
+    "Street Fitting",
+    "Keep what catches your eye",
+    "Latest trip",
+    "Saved pieces",
+    "No saved pieces"
+  ],
+  "startedOwnTrip": true,
+  "passed": false
+}

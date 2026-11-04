@@ -8,6 +8,7 @@ public interface NativeRepository {
     JSObject newShop(JSObject input);
     JSObject stopSession(JSObject input);
     JSObject commitPhoto(JSObject input);
+    JSObject commitStorefront(JSObject input);
     JSObject commitEmbedding(JSObject input);
     JSObject replaceSelfPhoto(JSObject input);
     JSObject get(JSObject input);

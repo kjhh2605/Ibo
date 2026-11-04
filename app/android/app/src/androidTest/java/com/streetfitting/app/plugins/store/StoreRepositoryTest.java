@@ -47,13 +47,144 @@ public class StoreRepositoryTest {
         File file=File.createTempFile("store-test-",".png",context.getCacheDir());inputs.add(file);
         try(FileOutputStream out=new FileOutputStream(file)){assertTrue(image.compress(Bitmap.CompressFormat.PNG,100,out));}image.recycle();return Uri.fromFile(file).toString();
     }
-    JSObject commit(String kind) throws Exception {return store.commitPhoto(o("photo",o("id",UUID.randomUUID().toString(),"tripId",trip,"shopId",shop,"kind",kind,"takenAt",1200,"location",o("lat",37.5,"lng",-122.2,"accuracyM",5),"file",png(false),"w",4,"h",4,"indexState","pending")));}
+    JSObject photoInput(String kind) throws Exception {return o("photo",o("id",UUID.randomUUID().toString(),"tripId",trip,"shopId",shop,"kind",kind,"takenAt",1200,"location",o("lat",37.5,"lng",-122.2,"accuracyM",5),"file",png(false),"w",4,"h",4,"indexState","pending"));}
+    JSObject commit(String kind) throws Exception {return store.commitPhoto(photoInput(kind));}
     JSObject candidate(String source) throws Exception {return o("id","untrusted-id","photoId",source,"source","edgetam","label","Red jacket","score",0.8,"mask",png(true),"bbox",new JSONArray(new int[]{1,1,2,2}));}
     JSObject piece(String source,String mode) throws Exception {return store.saveCandidate(o("candidate",candidate(source),"origin","shop","labelMode",mode));}
     JSObject get(String entity,String id){return store.get(o("entity",entity,"id",id));}
     JSONArray list(String entity) throws Exception{return store.list(o("entity",entity)).getJSONArray("items");}
     File file(String ref){return new File(Uri.parse(ref).getPath());}
     void rejects(String code,Runnable call){try{call.run();fail("expected "+code);}catch(IllegalArgumentException e){assertEquals(code,e.getMessage());}}
+    String relayMask() throws Exception {
+        File directory=new File(context.getCacheDir(),"relay/candidate-mask");
+        assertTrue(directory.isDirectory()||directory.mkdirs());
+        File mask=new File(directory,UUID.randomUUID()+".png");inputs.add(mask);
+        Files.copy(file(png(true)).toPath(),mask.toPath());return Uri.fromFile(mask).toString();
+    }
+    int ownedCount(String ref) throws Exception {
+        ref=Uri.fromFile(file(ref).getCanonicalFile()).toString();
+        StoreDatabase direct=new StoreDatabase(context,database);
+        try(Cursor cursor=direct.getReadableDatabase().rawQuery("SELECT count(*) FROM OwnedFile WHERE file=?",new String[]{ref})) {
+            assertTrue(cursor.moveToFirst());return cursor.getInt(0);
+        } finally {direct.close();}
+    }
+    @Test public void discardedCandidateReleasesOwnershipAndSurvivesLateCleanup() throws Exception {
+        String mask=relayMask();store.adoptCandidate(o("ownerId",photo,"file",file(mask).toURI().toString()));
+        assertEquals("Candidate lookup: "+mask+"; canonical="+file(mask).getCanonicalPath(),1,ownedCount(mask));
+        store.discardTemp(o("file",mask));
+        assertFalse(file(mask).exists());assertEquals(0,ownedCount(mask));
+        store.discardTemp(o("file",mask));
+        String another=relayMask();store.adoptCandidate(o("ownerId",photo,"file",another));
+        store.deletePhoto(o("id",photo));store.discardTemp(o("file",another));
+        assertFalse(file(another).exists());assertEquals(0,ownedCount(another));
+        String late=relayMask();
+        rejects("invalid_reference",()->store.adoptCandidate(o("ownerId",photo,"file",late)));
+        store.discardTemp(o("file",late));assertFalse(file(late).exists());
+    }
+    @Test public void temporaryCleanupCannotDeletePersistentPhotoOrResultDraft() throws Exception {
+        String original=get("Photo",photo).getString("file");
+        rejects("file_not_owned",()->store.discardTemp(o("file",original)));
+        assertTrue(file(original).isFile());
+        JSObject target=piece(photo,"concept");
+        JSObject draft=store.prepareResult(o("targetPieceId",target.getString("id"),"companionPieceIds",new JSONArray()));
+        String snapshot=draft.getJSObject("targetSnapshot").getString("cutoutFile");
+        rejects("file_not_owned",()->store.discardTemp(o("file",snapshot)));
+        assertTrue(file(snapshot).isFile());
+        rejects("file_not_owned",()->store.discardTemp(o("file","file:///outside/not-present")));
+    }
+    @Test public void legacyOwnershipMigrationPreservesFilesAndCancelsStaleGarbage() throws Exception {
+        String original=get("Photo",photo).getString("file");
+        File directoryRoot=new File(context.getFilesDir(),directory);
+        String relative=file(original).getCanonicalPath().substring(directoryRoot.getCanonicalPath().length()+1);
+        String legacy=new File(directoryRoot,relative).toURI().toString();
+        assertNotEquals(original,legacy);store.close();store=null;
+        StoreDatabase direct=new StoreDatabase(context,database);
+        try {
+            var db=direct.getWritableDatabase();
+            db.execSQL("UPDATE Photo SET file=? WHERE id=?",new Object[]{legacy,photo});
+            db.execSQL("UPDATE OwnedFile SET file=? WHERE file=?",new Object[]{legacy,original});
+            db.execSQL("INSERT INTO Garbage(file) VALUES(?)",new Object[]{legacy});
+            db.setVersion(1);
+        } finally {direct.close();}
+        store=new SqliteRepository(context,database,directory);
+        assertEquals(legacy,get("Photo",photo).getString("file"));
+        assertTrue(file(original).isFile());assertEquals(1,ownedCount(legacy));
+        store.deletePhoto(o("id",photo));assertFalse(file(original).exists());
+    }
+    @Test public void ambiguousLegacyOwnershipRollsBackWithoutDeletingFiles() throws Exception {
+        String original=get("Photo",photo).getString("file"),alias=file(original).toURI().toString();
+        assertNotEquals(original,alias);store.close();store=null;
+        StoreDatabase direct=new StoreDatabase(context,database);
+        try {
+            var db=direct.getWritableDatabase();
+            db.execSQL("INSERT INTO OwnedFile(file,ownerType,ownerId) VALUES(?,'Photo','conflicting-owner')",new Object[]{alias});
+            db.setVersion(1);
+        } finally {direct.close();}
+        try {store=new SqliteRepository(context,database,directory);fail("Ambiguous physical ownership must reject migration");}
+        catch(IllegalStateException expected) { }
+        try(var db=android.database.sqlite.SQLiteDatabase.openDatabase(context.getDatabasePath(database).getPath(),null,android.database.sqlite.SQLiteDatabase.OPEN_READONLY);
+            Cursor rows=db.rawQuery("SELECT count(*) FROM OwnedFile",null)) {
+            assertEquals(1,db.getVersion());assertTrue(rows.moveToFirst());assertEquals(2,rows.getInt(0));
+        }
+        assertTrue(file(original).isFile());
+    }
+    @Test public void deletingPhotoAndDiscardingCandidateSerializeSafely() throws Exception {
+        String mask=relayMask();store.adoptCandidate(o("ownerId",photo,"file",mask));
+        ExecutorService executor=Executors.newFixedThreadPool(2);
+        try {
+            List<Callable<JSObject>> calls=List.of(()->store.deletePhoto(o("id",photo)),()->store.discardTemp(o("file",mask)));
+            for(var result:executor.invokeAll(calls))result.get();
+        } finally {executor.shutdown();}
+        assertNull(get("Photo",photo));assertFalse(file(mask).exists());assertEquals(0,ownedCount(mask));
+    }
+    @Test public void preflightFailureEndsUnclaimedJobWithoutClaimingHttpAttempt() throws Exception {
+        JSObject storefront=commit("storefront");
+        JSObject job=store.nextJob(o("now",System.currentTimeMillis()));String id=job.getString("id");
+        assertEquals(0,job.getLong("attempts"));
+        rejects("constraint_violation",()->store.failJob(o("id",id,"preflight",true,"retryable",true)));
+        rejects("constraint_violation",()->store.failJob(o("id",id,"preflight",true,"retryable",false,"retryAfterMs",0)));
+        rejects("constraint_violation",()->store.failJob(o("id",id,"preflight","true","retryable",false)));
+        rejects("job_not_claimed",()->store.failJob(o("id",id,"retryable",false)));
+        assertEquals(0,get("QueueJob",id).getLong("attempts"));
+        store.failJob(o("id",id,"preflight",true,"retryable",false));
+        assertNull(get("QueueJob",id));assertEquals("failed",get("Shop",shop).getString("descriptionState"));
+        assertEquals(storefront.getString("id"),get("Shop",shop).getString("storefrontPhotoId"));
+        store.failJob(o("id",id,"preflight",true,"retryable",false));
+        JSObject retry=store.enqueue(o("kind","describe_storefront","refId",storefront.getString("id")));String retryId=retry.getString("id");
+        store.beginJob(o("id",retryId,"now",retry.getLong("nextAt")));
+        rejects("job_not_claimed",()->store.failJob(o("id",retryId,"preflight",true,"retryable",false)));
+        assertEquals(1,get("QueueJob",retryId).getLong("attempts"));
+        store.completeJob(o("id",retryId,"description","A brick storefront"));
+        assertEquals("done",get("Shop",shop).getString("descriptionState"));
+    }
+    @Test public void historicalStorefrontPreservesRecordingAndReplacesOnlyDescriptionPointer() throws Exception {
+        JSObject old=commit("storefront");String original=old.getString("file");
+        store.stopSession(o("tripId",trip,"endedAt",2000));
+        JSObject active=store.startSession(o("fix",fix(3000)));
+        String activeTrip=active.getJSObject("trip").getString("id");
+        JSObject input=photoInput("storefront");
+        JSObject captured=input.getJSObject("photo");captured.put("takenAt",4000);input.put("photo",captured);
+        JSObject replacement=store.commitStorefront(input);
+        assertEquals("ended",get("Trip",trip).getString("status"));
+        assertEquals(activeTrip,store.getSession().getJSObject("trip").getString("id"));
+        assertEquals(active.getJSObject("shop").getString("id"),store.getSession().getJSObject("shop").getString("id"));
+        assertEquals(0,store.list(o("entity","TrailPoint","tripId",trip)).getJSONArray("items").length());
+        JSONArray activeTrail=store.list(o("entity","TrailPoint","tripId",activeTrip)).getJSONArray("items");
+        assertEquals(1,activeTrail.length());assertEquals(3000,activeTrail.getJSONObject(0).getLong("t"));
+        assertEquals(replacement.getString("id"),get("Shop",shop).getString("storefrontPhotoId"));
+        assertEquals("pending",get("Shop",shop).getString("descriptionState"));
+        assertNotNull(get("Photo",old.getString("id")));assertTrue(file(original).isFile());
+        JSONArray jobs=list("QueueJob");assertEquals(1,jobs.length());assertEquals(replacement.getString("id"),jobs.getJSONObject(0).getString("refId"));
+        JSObject item=photoInput("item");
+        rejects("constraint_violation",()->store.commitStorefront(item));
+        rejects("constraint_violation",()->store.commitPhoto(item));
+    }
+    @Test public void historicalStorefrontCannotResurrectDeletedShop() throws Exception {
+        JSObject input=photoInput("storefront");
+        store.stopSession(o("tripId",trip,"endedAt",2000));store.deleteTrip(o("id",trip));
+        rejects("invalid_reference",()->store.commitStorefront(input));
+        assertEquals(0,list("Photo").length());assertEquals(0,list("QueueJob").length());assertNull(store.getSession().getJSObject("trip"));
+    }
 
     @Test public void saveRestartDeletionAndLateEmbedding() throws Exception {
         JSObject saved=piece(photo,"concept");String cutout=saved.getString("cutoutFile"),original=get("Photo",photo).getString("file");

@@ -1,12 +1,17 @@
 package com.streetfitting.app.plugins.store;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
+import android.net.Uri;
+import java.io.File;
+import java.io.IOException;
 
 /** Versioned device-only data. No migration may silently erase user data. */
 final class StoreDatabase extends SQLiteOpenHelper {
-    StoreDatabase(Context context, String databaseName) { super(context, databaseName, null, 1); }
+    StoreDatabase(Context context, String databaseName) { super(context, databaseName, null, 2); }
     @Override public void onConfigure(SQLiteDatabase db) { db.setForeignKeyConstraintsEnabled(true); }
     @Override public void onCreate(SQLiteDatabase db) {
         String id = " TEXT PRIMARY KEY NOT NULL CHECK(length(id) BETWEEN 1 AND 128)";
@@ -32,6 +37,38 @@ final class StoreDatabase extends SQLiteOpenHelper {
         db.execSQL("CREATE INDEX queue_due ON QueueJob(nextAt,id)");
     }
     @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        throw new IllegalStateException("Unsupported database migration");
+        if(oldVersion!=1||newVersion!=2) throw new IllegalStateException("Unsupported database migration");
+        // SQLiteOpenHelper wraps this replacement in a transaction. URI aliases must
+        // identify one physical owner before startup garbage collection can run.
+        db.execSQL("CREATE TABLE OwnedFile_canonical(file TEXT PRIMARY KEY,ownerType TEXT NOT NULL,ownerId TEXT NOT NULL)");
+        try(Cursor rows=db.query("OwnedFile",null,null,null,null,null,null);
+            SQLiteStatement insert=db.compileStatement("INSERT OR IGNORE INTO OwnedFile_canonical(file,ownerType,ownerId) VALUES(?,?,?)")) {
+            while(rows.moveToNext()) {
+                String file=canonicalRef(rows.getString(rows.getColumnIndexOrThrow("file")));
+                String type=rows.getString(rows.getColumnIndexOrThrow("ownerType")),owner=rows.getString(rows.getColumnIndexOrThrow("ownerId"));
+                insert.bindString(1,file);insert.bindString(2,type);insert.bindString(3,owner);
+                if(insert.executeInsert()==-1) {
+                    try(Cursor existing=db.query("OwnedFile_canonical",new String[]{"ownerType","ownerId"},"file=?",new String[]{file},null,null,null)) {
+                        if(!existing.moveToFirst()||!type.equals(existing.getString(0))||!owner.equals(existing.getString(1)))
+                            throw new IllegalStateException("Conflicting file ownership");
+                    }
+                }
+            }
+        }
+        db.execSQL("DROP TABLE OwnedFile");
+        db.execSQL("ALTER TABLE OwnedFile_canonical RENAME TO OwnedFile");
+        db.execSQL("CREATE TABLE Garbage_canonical(file TEXT PRIMARY KEY)");
+        try(Cursor rows=db.query("Garbage",new String[]{"file"},null,null,null,null,null);
+            SQLiteStatement insert=db.compileStatement("INSERT OR IGNORE INTO Garbage_canonical(file) VALUES(?)")) {
+            while(rows.moveToNext()) {insert.bindString(1,canonicalRef(rows.getString(0)));insert.executeInsert();}
+        }
+        db.execSQL("DROP TABLE Garbage");
+        db.execSQL("ALTER TABLE Garbage_canonical RENAME TO Garbage");
+    }
+    private static String canonicalRef(String ref) {
+        Uri uri=Uri.parse(ref);
+        if(!"file".equals(uri.getScheme())||uri.getPath()==null) throw new IllegalStateException("Invalid persisted file reference");
+        try {return Uri.fromFile(new File(uri.getPath()).getCanonicalFile()).toString();}
+        catch(IOException error) {throw new IllegalStateException("Cannot migrate file ownership",error);}
     }
 }

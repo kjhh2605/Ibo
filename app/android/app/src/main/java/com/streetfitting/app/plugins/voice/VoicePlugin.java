@@ -24,7 +24,7 @@ public class VoicePlugin extends Plugin {
         if (starting || recorder.active()) { reject(call, "busy"); return; }
         starting = true;
         if (!VoiceSourceFactory.fixture(getActivity()) && getPermissionState("microphone") != PermissionState.GRANTED) {
-            if (getPermissionState("microphone") == PermissionState.DENIED) { starting = false; reject(call, "permission_denied"); }
+            if (getPermissionState("microphone") == PermissionState.DENIED) { starting = false; reject(call, "microphone_permission_denied"); }
             else requestPermissionForAlias("microphone", call, "microphoneResult");
             return;
         }
@@ -33,29 +33,31 @@ public class VoicePlugin extends Plugin {
     @PermissionCallback private synchronized void microphoneResult(PluginCall call) {
         if (!starting) { reject(call, "cancelled"); return; }
         if (getPermissionState("microphone") != PermissionState.GRANTED) {
-            starting = false; reject(call, "permission_denied"); return;
+            starting = false; reject(call, "microphone_permission_denied"); return;
         }
         begin(call);
     }
     private void begin(PluginCall call) {
         try { recorder.start(VoiceSourceFactory.open(getActivity())); call.resolve(); }
-        catch (Exception error) { reject(call, error instanceof VoiceFailure ? ((VoiceFailure)error).code : "microphone_unavailable"); }
+        catch (Exception error) { reject(call, error instanceof VoiceFailure ? ((VoiceFailure)error).code : "audio_unavailable"); }
         finally { starting = false; }
     }
     @PluginMethod public void stop(PluginCall call) {
         recorder.stop().whenComplete((result, error) -> {
             if (error == null) call.resolve(result);
-            else reject(call, error instanceof VoiceFailure ? ((VoiceFailure)error).code : "recording_failed");
+            else reject(call, error instanceof VoiceFailure ? ((VoiceFailure)error).code : "io_error");
         });
     }
     @PluginMethod public synchronized void cancel(PluginCall call) {
         starting = false;
         recorder.cancel().whenComplete((result, error) -> call.resolve());
     }
-    @Override protected void handleOnPause() { starting = false; if (recorder != null) recorder.cancel(); }
-    @Override protected void handleOnDestroy() { starting = false; if (recorder != null) recorder.cancel(); }
+    // Permission dialogs pause the Activity; they must not cancel their own start.
+    @Override protected synchronized void handleOnPause() { if (recorder != null && recorder.active()) recorder.cancel(); }
+    @Override protected synchronized void handleOnStop() { starting = false; if (recorder != null && recorder.active()) recorder.cancel(); }
+    @Override protected synchronized void handleOnDestroy() { starting = false; if (recorder != null && recorder.active()) recorder.cancel(); }
     private void reject(PluginCall call, String code) {
-        JSObject details = new JSObject(); details.put("retryable", !"permission_denied".equals(code));
+        JSObject details = new JSObject(); details.put("retryable", !"microphone_permission_denied".equals(code));
         call.reject(code, code, details);
     }
 }

@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
 @RunWith(AndroidJUnit4.class)
 public class CaptureContractTest {
     private NativeHarness fixture(String directory) {
-        return new NativeHarness(new Intent().putExtra("sf_capture_source", "fixture").putExtra("sf_capture_fixture_dir", "/sdcard/Android/data/com.streetfitting.app/files/" + directory));
+        return new NativeHarness(new Intent().putExtra("sf_capture_source", "fixture").putExtra("sf_capture_fixture_dir", NativeHarness.fixturePath(directory)));
     }
     private void preview(NativeHarness harness, String purpose) throws Exception {
         harness.invoke("Capture", "setPreviewRect", new JSObject().put("x", 20).put("y", 80).put("width", 240).put("height", 320)).await();
@@ -28,7 +28,7 @@ public class CaptureContractTest {
     private JSObject shopping(NativeHarness harness) throws Exception {
         if (ShoppingService.active() != null) ShoppingService.active().stopRecording().get(20, TimeUnit.SECONDS);
         NativeHarness.until(() -> ShoppingService.active() == null, 5000);
-        NativeHarness.TestCall call = harness.invoke("ShoppingSession", "start", new JSObject()); harness.dismissPermission(true); return call.await();
+        return harness.invoke("ShoppingSession", "start", new JSObject()).await();
     }
     @Test public void fixtureCaptureUsesShutterFixAndAtomicStorefrontQueue() throws Exception {
         try (NativeHarness harness = fixture("capture-fixtures")) {
@@ -70,29 +70,67 @@ public class CaptureContractTest {
     }
     @Test public void corruptFixtureNeverFallsBackToCamera() throws Exception {
         try (NativeHarness harness = fixture("capture-cases/corrupt")) {
-            assertEquals("invalid_fixture", harness.invoke("Capture", "openPreview", new JSObject().put("purpose", "self").put("facing", "back")).failure());
+            assertEquals("fixture_invalid", harness.invoke("Capture", "openPreview", new JSObject().put("purpose", "self").put("facing", "back")).failure());
         }
         try (NativeHarness harness = fixture("capture-cases/empty")) {
-            assertEquals("fixture_unavailable", harness.invoke("Capture", "openPreview", new JSObject().put("purpose", "self").put("facing", "back")).failure());
-        }
-    }
-    @Test public void cameraPermissionDenialDoesNotUseFixture() throws Exception {
-        try (NativeHarness harness = new NativeHarness(new Intent().putExtra("sf_capture_source", "camera"))) {
-            org.junit.Assume.assumeTrue(androidx.core.content.ContextCompat.checkSelfPermission(harness.context, android.Manifest.permission.CAMERA) != android.content.pm.PackageManager.PERMISSION_GRANTED);
-            NativeHarness.TestCall call = harness.invoke("Capture", "openPreview", new JSObject().put("purpose", "self").put("facing", "back")); harness.dismissPermission(false);
-            assertEquals("permission_denied", call.failure()); assertEquals("preview_not_ready", harness.invoke("Capture", "takePhoto", new JSObject().put("kind", "item")).failure()); harness.evidence("camera-permission-denied");
+            assertEquals("fixture_empty", harness.invoke("Capture", "openPreview", new JSObject().put("purpose", "self").put("facing", "back")).failure());
         }
     }
     @Test public void cameraXPreviewAndShutterWithGrantedPermission() throws Exception {
         try (NativeHarness harness = new NativeHarness(new Intent().putExtra("sf_capture_source", "camera"))) {
-            org.junit.Assume.assumeTrue(androidx.core.content.ContextCompat.checkSelfPermission(harness.context, android.Manifest.permission.CAMERA) == android.content.pm.PackageManager.PERMISSION_GRANTED);
+            assertEquals("Setup: grant CAMERA", android.content.pm.PackageManager.PERMISSION_GRANTED, androidx.core.content.ContextCompat.checkSelfPermission(harness.context, android.Manifest.permission.CAMERA));
             preview(harness, "self"); SystemClock.sleep(1000); harness.evidence("camerax-preview");
             JSObject result = harness.invoke("Capture", "takePhoto", new JSObject().put("kind", "item")).await();
             File file = ImageFiles.local(result.getJSObject("asset").optString("file")); assertNotNull(BitmapFactory.decodeFile(file.getPath()));
             harness.activity.moveToState(androidx.lifecycle.Lifecycle.State.CREATED);
-            assertEquals("preview_not_ready", harness.invoke("Capture", "takePhoto", new JSObject().put("kind", "item")).failure());
+            assertEquals("preview_not_open", harness.invoke("Capture", "takePhoto", new JSObject().put("kind", "item")).failure());
             harness.activity.moveToState(androidx.lifecycle.Lifecycle.State.RESUMED); SystemClock.sleep(500);
             harness.invoke("Media", "discard", new JSObject().put("assetId", result.getJSObject("asset").optString("id"))).await();
+        }
+    }
+    @Test public void cameraOpeningCannotRebindAfterStopAndRestart() throws Exception {
+        try (NativeHarness harness = new NativeHarness(new Intent().putExtra("sf_capture_source", "camera"))) {
+            assertEquals("Setup: grant CAMERA", android.content.pm.PackageManager.PERMISSION_GRANTED, androidx.core.content.ContextCompat.checkSelfPermission(harness.context, android.Manifest.permission.CAMERA));
+            java.util.concurrent.CompletableFuture<Void> checked = new java.util.concurrent.CompletableFuture<>();
+            harness.activity.onActivity(activity -> {
+                CameraSource source = new CameraSource(activity, false);
+                java.util.concurrent.CompletableFuture<Void> stale = source.start();
+                source.stop();
+                source.start().whenComplete((value, error) -> {
+                    try {
+                        assertTrue("cancelled opening must not become ready", stale.isCompletedExceptionally());
+                        if (error != null) throw new AssertionError(error);
+                        checked.complete(null);
+                    } catch (Throwable failure) { checked.completeExceptionally(failure); }
+                    finally { source.stop(); }
+                });
+            });
+            checked.get(20, TimeUnit.SECONDS);
+        }
+    }
+    @Test public void historicalStorefrontDoesNotChangeUnrelatedRecording() throws Exception {
+        try (NativeHarness harness = fixture("capture-fixtures")) {
+            JSObject previous = shopping(harness);
+            String oldTrip = previous.getJSObject("trip").optString("id");
+            String oldShop = previous.getJSObject("shop").optString("id");
+            harness.invoke("ShoppingSession", "stop", new JSObject()).await();
+            NativeHarness.until(() -> ShoppingService.active() == null, 5000);
+            JSObject current = shopping(harness);
+            try {
+                harness.invoke("Capture", "openPreview", new JSObject().put("purpose", "storefront").put("shopId", oldShop).put("facing", "back")).await();
+                assertEquals("invalid_argument", harness.invoke("Capture", "takePhoto", new JSObject().put("kind", "item")).failure());
+                JSObject first = harness.invoke("Capture", "takePhoto", new JSObject().put("kind", "storefront")).await().getJSObject("photo");
+                JSObject second = harness.invoke("Capture", "takePhoto", new JSObject().put("kind", "storefront")).await().getJSObject("photo");
+                assertEquals(oldTrip, second.optString("tripId")); assertEquals(oldShop, second.optString("shopId"));
+                assertEquals(37.5, second.getJSObject("location").optDouble("lat"), 0.001);
+                assertEquals(127.0, second.getJSObject("location").optDouble("lng"), 0.001);
+                assertNotNull(RepositoryProvider.get(harness.context).getPhoto(new JSObject().put("id", first.optString("id"))));
+                assertEquals(second.optString("id"), RepositoryProvider.get(harness.context).get(new JSObject().put("entity", "Shop").put("id", oldShop)).optString("storefrontPhotoId"));
+                JSObject state = harness.invoke("ShoppingSession", "getState", new JSObject()).await();
+                assertEquals(current.getJSObject("trip").optString("id"), state.getJSObject("trip").optString("id"));
+                assertEquals(current.getJSObject("shop").optString("id"), state.getJSObject("shop").optString("id"));
+                assertEquals(0, RepositoryProvider.get(harness.context).list(new JSObject().put("entity", "TrailPoint").put("tripId", oldTrip)).optJSONArray("items").length());
+            } finally { harness.invoke("ShoppingSession", "stop", new JSObject()).await(); }
         }
     }
 }
