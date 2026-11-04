@@ -1,0 +1,488 @@
+{
+  "debug": {
+    "apk_sha256": "c18813965a9d3078c753e89df8511d9a588f2520daaa7e564bfbb3177d699cef",
+    "ort_aar_version": "1.22.0",
+    "abis": [
+      "arm64-v8a",
+      "x86_64"
+    ],
+    "zipalign_exit": 0,
+    "zipalign_command": "zipalign -c -P 16 -v 4 app-debug.apk",
+    "allPackagedElf16kb": true,
+    "elf_load_segments": [
+      {
+        "file": "lib/arm64-v8a/libdatastore_shared_counter.so",
+        "load_segments": [
+          {
+            "offset": 0,
+            "vaddr": 0,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 4544,
+            "vaddr": 20928,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 5160,
+            "vaddr": 37928,
+            "alignment": 16384,
+            "aligned_16kb": true
+          }
+        ],
+        "aligned_16kb": true
+      },
+      {
+        "file": "lib/arm64-v8a/libimage_processing_util_jni.so",
+        "load_segments": [
+          {
+            "offset": 0,
+            "vaddr": 0,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 29488,
+            "vaddr": 45872,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 30480,
+            "vaddr": 63248,
+            "alignment": 16384,
+            "aligned_16kb": true
+          }
+        ],
+        "aligned_16kb": true
+      },
+      {
+        "file": "lib/arm64-v8a/libonnxruntime.so",
+        "load_segments": [
+          {
+            "offset": 0,
+            "vaddr": 0,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 17789488,
+            "vaddr": 17805872,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 18204904,
+            "vaddr": 18237672,
+            "alignment": 16384,
+            "aligned_16kb": true
+          }
+        ],
+        "aligned_16kb": true
+      },
+      {
+        "file": "lib/arm64-v8a/libonnxruntime4j_jni.so",
+        "load_segments": [
+          {
+            "offset": 0,
+            "vaddr": 0,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 73056,
+            "vaddr": 89440,
+            "alignment": 16384,
+            "aligned_16kb": true
+          }
+        ],
+        "aligned_16kb": true
+      },
+      {
+        "file": "lib/arm64-v8a/libsurface_util_jni.so",
+        "load_segments": [
+          {
+            "offset": 0,
+            "vaddr": 0,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 2480,
+            "vaddr": 18864,
+            "alignment": 16384,
+            "aligned_16kb": true
+          }
+        ],
+        "aligned_16kb": true
+      },
+      {
+        "file": "lib/x86_64/libdatastore_shared_counter.so",
+        "load_segments": [
+          {
+            "offset": 0,
+            "vaddr": 0,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 3872,
+            "vaddr": 20256,
+            "alignment": 16384,
+            "aligned_16kb": true
+          }
+        ],
+        "aligned_16kb": true
+      },
+      {
+        "file": "lib/x86_64/libimage_processing_util_jni.so",
+        "load_segments": [
+          {
+            "offset": 0,
+            "vaddr": 0,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 46752,
+            "vaddr": 63136,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 47432,
+            "vaddr": 80200,
+            "alignment": 16384,
+            "aligned_16kb": true
+          }
+        ],
+        "aligned_16kb": true
+      },
+      {
+        "file": "lib/x86_64/libonnxruntime.so",
+        "load_segments": [
+          {
+            "offset": 0,
+            "vaddr": 0,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 21462048,
+            "vaddr": 21478432,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 21870560,
+            "vaddr": 21903328,
+            "alignment": 16384,
+            "aligned_16kb": true
+          }
+        ],
+        "aligned_16kb": true
+      },
+      {
+        "file": "lib/x86_64/libonnxruntime4j_jni.so",
+        "load_segments": [
+          {
+            "offset": 0,
+            "vaddr": 0,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 70848,
+            "vaddr": 87232,
+            "alignment": 16384,
+            "aligned_16kb": true
+          }
+        ],
+        "aligned_16kb": true
+      },
+      {
+        "file": "lib/x86_64/libsurface_util_jni.so",
+        "load_segments": [
+          {
+            "offset": 0,
+            "vaddr": 0,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 2496,
+            "vaddr": 18880,
+            "alignment": 16384,
+            "aligned_16kb": true
+          }
+        ],
+        "aligned_16kb": true
+      }
+    ],
+    "models": [
+      {
+        "file": "assets/models/edgetam_decoder.onnx",
+        "bytes": 16421792,
+        "sha256": "ceaa17668b6bd70fb7d1d79f8b78274d71101696e16ba31eef7ee5d8fef16978",
+        "matchesFrozenModel": true
+      },
+      {
+        "file": "assets/models/edgetam_encoder.onnx",
+        "bytes": 19753637,
+        "sha256": "b13dd3cc3a60996e9f2a1ef55cdc3b9e70366706bd108d65ed6ea615543c918e",
+        "matchesFrozenModel": true
+      },
+      {
+        "file": "assets/models/pe_image.onnx",
+        "bytes": 31994387,
+        "sha256": "10b2683490922a82a61ee108673fc94ea455c6ad3996b1f2dc86f93a935d114c",
+        "matchesFrozenModel": true
+      }
+    ]
+  },
+  "release": {
+    "apk_sha256": "ad62dea13af50eddcd719e47a6a7cd357fce34b5b03c803de6f6e5e15a68bb76",
+    "ort_aar_version": "1.22.0",
+    "abis": [
+      "arm64-v8a",
+      "x86_64"
+    ],
+    "zipalign_exit": 0,
+    "zipalign_command": "zipalign -c -P 16 -v 4 app-release-unsigned.apk",
+    "allPackagedElf16kb": true,
+    "elf_load_segments": [
+      {
+        "file": "lib/arm64-v8a/libdatastore_shared_counter.so",
+        "load_segments": [
+          {
+            "offset": 0,
+            "vaddr": 0,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 4544,
+            "vaddr": 20928,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 5160,
+            "vaddr": 37928,
+            "alignment": 16384,
+            "aligned_16kb": true
+          }
+        ],
+        "aligned_16kb": true
+      },
+      {
+        "file": "lib/arm64-v8a/libimage_processing_util_jni.so",
+        "load_segments": [
+          {
+            "offset": 0,
+            "vaddr": 0,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 29488,
+            "vaddr": 45872,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 30480,
+            "vaddr": 63248,
+            "alignment": 16384,
+            "aligned_16kb": true
+          }
+        ],
+        "aligned_16kb": true
+      },
+      {
+        "file": "lib/arm64-v8a/libonnxruntime.so",
+        "load_segments": [
+          {
+            "offset": 0,
+            "vaddr": 0,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 17789488,
+            "vaddr": 17805872,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 18204904,
+            "vaddr": 18237672,
+            "alignment": 16384,
+            "aligned_16kb": true
+          }
+        ],
+        "aligned_16kb": true
+      },
+      {
+        "file": "lib/arm64-v8a/libonnxruntime4j_jni.so",
+        "load_segments": [
+          {
+            "offset": 0,
+            "vaddr": 0,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 73056,
+            "vaddr": 89440,
+            "alignment": 16384,
+            "aligned_16kb": true
+          }
+        ],
+        "aligned_16kb": true
+      },
+      {
+        "file": "lib/arm64-v8a/libsurface_util_jni.so",
+        "load_segments": [
+          {
+            "offset": 0,
+            "vaddr": 0,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 2480,
+            "vaddr": 18864,
+            "alignment": 16384,
+            "aligned_16kb": true
+          }
+        ],
+        "aligned_16kb": true
+      },
+      {
+        "file": "lib/x86_64/libdatastore_shared_counter.so",
+        "load_segments": [
+          {
+            "offset": 0,
+            "vaddr": 0,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 3872,
+            "vaddr": 20256,
+            "alignment": 16384,
+            "aligned_16kb": true
+          }
+        ],
+        "aligned_16kb": true
+      },
+      {
+        "file": "lib/x86_64/libimage_processing_util_jni.so",
+        "load_segments": [
+          {
+            "offset": 0,
+            "vaddr": 0,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 46752,
+            "vaddr": 63136,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 47432,
+            "vaddr": 80200,
+            "alignment": 16384,
+            "aligned_16kb": true
+          }
+        ],
+        "aligned_16kb": true
+      },
+      {
+        "file": "lib/x86_64/libonnxruntime.so",
+        "load_segments": [
+          {
+            "offset": 0,
+            "vaddr": 0,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 21462048,
+            "vaddr": 21478432,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 21870560,
+            "vaddr": 21903328,
+            "alignment": 16384,
+            "aligned_16kb": true
+          }
+        ],
+        "aligned_16kb": true
+      },
+      {
+        "file": "lib/x86_64/libonnxruntime4j_jni.so",
+        "load_segments": [
+          {
+            "offset": 0,
+            "vaddr": 0,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 70848,
+            "vaddr": 87232,
+            "alignment": 16384,
+            "aligned_16kb": true
+          }
+        ],
+        "aligned_16kb": true
+      },
+      {
+        "file": "lib/x86_64/libsurface_util_jni.so",
+        "load_segments": [
+          {
+            "offset": 0,
+            "vaddr": 0,
+            "alignment": 16384,
+            "aligned_16kb": true
+          },
+          {
+            "offset": 2496,
+            "vaddr": 18880,
+            "alignment": 16384,
+            "aligned_16kb": true
+          }
+        ],
+        "aligned_16kb": true
+      }
+    ],
+    "models": [
+      {
+        "file": "assets/models/edgetam_decoder.onnx",
+        "bytes": 16421792,
+        "sha256": "ceaa17668b6bd70fb7d1d79f8b78274d71101696e16ba31eef7ee5d8fef16978",
+        "matchesFrozenModel": true
+      },
+      {
+        "file": "assets/models/edgetam_encoder.onnx",
+        "bytes": 19753637,
+        "sha256": "b13dd3cc3a60996e9f2a1ef55cdc3b9e70366706bd108d65ed6ea615543c918e",
+        "matchesFrozenModel": true
+      },
+      {
+        "file": "assets/models/pe_image.onnx",
+        "bytes": 31994387,
+        "sha256": "10b2683490922a82a61ee108673fc94ea455c6ad3996b1f2dc86f93a935d114c",
+        "matchesFrozenModel": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "sourceCommit": "6207b15",
+  "sharedWebCommit": "a3eb960",
+  "apkSha256": "c85265637c6110abb1089a5b58a48b4bff0b19f93a5366e7465d32fdcd1e024e",
+  "globalDeviceLock": true,
+  "fixtures": "existing app-private deterministic fixtures; not approved speech/quality fixtures",
+  "gps": "synthetic fixture only",
+  "gpsErrors": [],
+  "cases": [
+    {
+      "class": "shopping.ShoppingSessionContractTest",
+      "phase": null,
+      "passed": false,
+      "tests": null,
+      "elapsedSeconds": 117.958,
+      "instrumentationOutput": "\ncom.streetfitting.app.plugins.shopping.ShoppingSessionContractTest:..\nError in notificationActionsOpenAndNewShopExactlyOnce(com.streetfitting.app.plugins.shopping.ShoppingSessionContractTest):\njava.lang.AssertionError: Activity never becomes requested state \"[RESUMED]\" (last lifecycle transition = \"PAUSED\")\n\tat androidx.test.core.app.ActivityScenario.waitForActivityToBecomeAnyOf(ActivityScenario.java:454)\n\tat androidx.test.core.app.ActivityScenario.moveToState(ActivityScenario.java:689)\n\tat androidx.test.core.app.ActivityScenario.recreate(ActivityScenario.java:718)\n\tat com.streetfitting.app.plugins.shopping.ShoppingSessionContractTest.notificationActionsOpenAndNewShopExactlyOnce(ShoppingSessionContractTest.java:51)\n\tSuppressed: java.lang.AssertionError: Activity never becomes requested state \"[DESTROYED]\" (last lifecycle transition = \"PAUSED\")\n\t\tat androidx.test.core.app.ActivityScenario.waitForActivityToBecomeAnyOf(ActivityScenario.java:454)\n\t\tat androidx.test.core.app.ActivityScenario.moveToState(ActivityScenario.java:689)\n\t\tat androidx.test.core.app.ActivityScenario.close(ActivityScenario.java:421)\n\t\tat com.streetfitting.app.plugins.shopping.NativeHarness.close(NativeHarness.java:71)\n\t\tat com.streetfitting.app.plugins.shopping.ShoppingSessionContractTest.notificationActionsOpenAndNewShopExactlyOnce(ShoppingSessionContractTest.java:33)\n...\n\nTime: 117.056\nThere was 1 failure:\n1) notificationActionsOpenAndNewShopExactlyOnce(com.streetfitting.app.plugins.shopping.ShoppingSessionContractTest)\njava.lang.AssertionError: Activity never becomes requested state \"[RESUMED]\" (last lifecycle transition = \"PAUSED\")\n\tat androidx.test.core.app.ActivityScenario.waitForActivityToBecomeAnyOf(ActivityScenario.java:454)\n\tat androidx.test.core.app.ActivityScenario.moveToState(ActivityScenario.java:689)\n\tat androidx.test.core.app.ActivityScenario.recreate(ActivityScenario.java:718)\n\tat com.streetfitting.app.plugins.shopping.ShoppingSessionContractTest.notificationActionsOpenAndNewShopExactlyOnce(ShoppingSessionContractTest.java:51)\n\tSuppressed: java.lang.AssertionError: Activity never becomes requested state \"[DESTROYED]\" (last lifecycle transition = \"PAUSED\")\n\t\tat androidx.test.core.app.ActivityScenario.waitForActivityToBecomeAnyOf(ActivityScenario.java:454)\n\t\tat androidx.test.core.app.ActivityScenario.moveToState(ActivityScenario.java:689)\n\t\tat androidx.test.core.app.ActivityScenario.close(ActivityScenario.java:421)\n\t\tat com.streetfitting.app.plugins.shopping.NativeHarness.close(NativeHarness.java:71)\n\t\tat com.streetfitting.app.plugins.shopping.ShoppingSessionContractTest.notificationActionsOpenAndNewShopExactlyOnce(ShoppingSessionContractTest.java:33)\n\t\t... 33 more\n\nFAILURES!!!\nTests run: 6,  Failures: 1\n\n\n"
+    },
+    {
+      "class": "capture.CaptureContractTest",
+      "phase": null,
+      "passed": true,
+      "tests": 6,
+      "elapsedSeconds": 17.035,
+      "instrumentationOutput": "\ncom.streetfitting.app.plugins.capture.CaptureContractTest:......\n\nTime: 16.29\n\nOK (6 tests)\n\n\n"
+    },
+    {
+      "class": "media.MediaContractTest",
+      "phase": null,
+      "passed": true,
+      "tests": 4,
+      "elapsedSeconds": 16.091,
+      "instrumentationOutput": "\ncom.streetfitting.app.plugins.media.MediaContractTest:....\n\nTime: 15.311\n\nOK (4 tests)\n\n\n"
+    },
+    {
+      "class": "voice.VoiceContractTest",
+      "phase": null,
+      "passed": true,
+      "tests": 7,
+      "elapsedSeconds": 31.408,
+      "instrumentationOutput": "\ncom.streetfitting.app.plugins.voice.VoiceContractTest:.......\n\nTime: 30.704\n\nOK (7 tests)\n\n\n"
+    },
+    {
+      "class": "store.StoreRepositoryTest",
+      "phase": null,
+      "passed": true,
+      "tests": 14,
+      "elapsedSeconds": 1.727,
+      "instrumentationOutput": "\ncom.streetfitting.app.plugins.store.StoreRepositoryTest:..............\n\nTime: 0.965\n\nOK (14 tests)\n\n\n"
+    },
+    {
+      "class": "store.StoreProcessSmokeTest",
+      "phase": "save",
+      "passed": true,
+      "tests": 1,
+      "elapsedSeconds": 0.696,
+      "instrumentationOutput": "\ncom.streetfitting.app.plugins.store.StoreProcessSmokeTest:.\n\nTime: 0.081\n\nOK (1 test)\n\n\n"
+    },
+    {
+      "class": "store.StoreProcessSmokeTest",
+      "phase": "restart-delete",
+      "passed": true,
+      "tests": 1,
+      "elapsedSeconds": 0.683,
+      "instrumentationOutput": "\ncom.streetfitting.app.plugins.store.StoreProcessSmokeTest:.\n\nTime: 0.05\n\nOK (1 test)\n\n\n"
+    }
+  ]
+}
