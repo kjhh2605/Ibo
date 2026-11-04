@@ -1,3 +1,4 @@
+import {Capacitor} from '@capacitor/core';
 import type {paths} from '../generated/relay-api';
 import {config, validateRelayOrigin} from '../config';
 import {getAuthTokens} from './auth';
@@ -39,6 +40,14 @@ export interface RelayClientOptions {
   mockTransport?: typeof fetch;
 }
 
+let webMockTransport: typeof fetch | undefined;
+/** Explicit browser-fixture bootstrap only; this cannot bypass Android authentication. */
+export function installWebMockTransport(transport: typeof fetch): () => void {
+  if (config.runtime !== 'web-mock' || Capacitor.isNativePlatform()) throw new Error('Mock transport is restricted to browser fixtures.');
+  webMockTransport = transport;
+  return () => { if (webMockTransport === transport) webMockTransport = undefined; };
+}
+
 function retryAfterMs(value: string | null): number | null {
   if (value === null) return null;
   if (/^\d+$/.test(value)) {
@@ -52,17 +61,18 @@ function retryAfterMs(value: string | null): number | null {
 }
 
 export function createRelayClient(options: RelayClientOptions = {}) {
-  if (options.mockTransport && config.runtime !== 'web-mock') {
+  if (options.mockTransport && (config.runtime !== 'web-mock' || Capacitor.isNativePlatform())) {
     throw new Error('Mock transport requires the explicit web-mock runtime.');
   }
-  const transport = options.mockTransport ?? globalThis.fetch.bind(globalThis);
   const baseUrl = validateRelayOrigin(options.baseUrl ?? config.relayBaseUrl);
   const auth = options.auth ?? getAuthTokens;
   return {
     async request<P extends Endpoint>(path: P, body: RelayRequest<P>, request: RequestOptions = {}): Promise<RelayResponse<P>> {
       request.signal?.throwIfAborted();
+      const mockTransport = config.runtime === 'web-mock' && !Capacitor.isNativePlatform() ? options.mockTransport ?? webMockTransport : undefined;
+      const transport = mockTransport ?? globalThis.fetch.bind(globalThis);
       const headers: Record<string, string> = {'Content-Type': 'application/json; charset=utf-8'};
-      if (!options.mockTransport) {
+      if (!mockTransport) {
         let tokens: AuthTokens;
         try {
           tokens = await auth(request.forceRefreshAuth === true);
@@ -74,7 +84,8 @@ export function createRelayClient(options: RelayClientOptions = {}) {
         headers.Authorization = `Bearer ${tokens.idToken}`;
         headers['X-Firebase-AppCheck'] = tokens.appCheckToken;
       }
-      if (request.fixture) headers['X-SF-Fixture'] = request.fixture;
+      const fixture = request.fixture ?? config.relayFixture;
+      if (fixture) headers['X-SF-Fixture'] = fixture;
       request.signal?.throwIfAborted();
       const encodedBody = JSON.stringify(body);
       await request.beforeSend?.();

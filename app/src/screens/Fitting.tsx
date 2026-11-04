@@ -4,7 +4,7 @@ import {config} from '../config';
 import type {Asset, Piece, QueueJob, Result as SavedResult} from '../native/contracts';
 import type {Route} from '../ui/navigation';
 import type {FittingState} from '../ui/services';
-import {fileUrl} from '../ui/services';
+
 import {listAll, useData, useUi} from '../ui/state';
 import {Action, Button, Confirm, EditFields, Empty, HStack, Loading, PhotoView, Problem, Section, Text, Thumbnail, VStack} from '../ui/components';
 
@@ -81,7 +81,7 @@ function Naming({piece, jobs}: {piece: Piece; jobs: QueueJob[]}) {
   return <VStack gap={2}><Text type="supporting">No automatic name is available. You can rename this piece or ask Spark to name the cut-out.</Text><Action label="Try naming again" variant="ghost" run={() => services.store.enqueue({kind: 'label_piece', refId: piece.id})}/></VStack>;
 }
 function PieceRow({piece, jobs, action}: {piece: Piece; jobs: QueueJob[]; action?: ReactNode}) {
-  return <HStack gap={4} wrap="wrap" vAlign="center"><Thumbnail src={fileUrl(piece.cutoutFile)} label={piece.label} alt={piece.label}/><VStack gap={2}><Text type="label">{piece.label}</Text><Text type="supporting">{piece.origin === 'shop' ? 'Saved from a shop' : 'Your wardrobe'}{piece.category !== 'unknown' ? ` · ${piece.category}` : ''}</Text><Naming piece={piece} jobs={jobs}/></VStack>{action}</HStack>;
+  return <HStack gap={4} wrap="wrap" vAlign="center"><Thumbnail src={piece.cutoutFile} label={piece.label} alt={piece.label}/><VStack gap={2}><Text type="label">{piece.label}</Text><Text type="supporting">{piece.origin === 'shop' ? 'Saved from a shop' : 'Your wardrobe'}{piece.category !== 'unknown' ? ` · ${piece.category}` : ''}</Text><Naming piece={piece} jobs={jobs}/></VStack>{action}</HStack>;
 }
 
 export function Item({route}: {route: Extract<Route, {name: 'item'}>}) {
@@ -115,6 +115,7 @@ export function Item({route}: {route: Extract<Route, {name: 'item'}>}) {
       {!photo && <Text type="supporting">The original photo is no longer linked. Your cut-out and saved photo location stay available.</Text>}
       {!online && <Text type="supporting">You can browse and edit offline. Connect to generate a look or load walking directions.</Text>}
       <HStack gap={3} wrap="wrap"><Action label="Try it on" run={async () => {await services.fitting.start(piece.id); if (alive.current) push({name: 'outfit'});}}/><Button label="Walk back" variant="secondary" isDisabled={!piece.walkTo} onClick={() => push({name: 'walk', source: 'item', id: piece.id})}/></HStack>
+      <Button label="Find another" variant="ghost" onClick={()=>push({name:'ask'})}/>
       {!piece.walkTo && <Text type="supporting">There is no saved photo location for walking guidance.</Text>}
     </Section> : <Text>Wear this with a saved shop piece. Choose it as a companion on the Try on screen.</Text>}
     <Confirm title="Delete this piece?" description="It will be removed from your saved pieces. Existing try-ons keep their own copy and walking destination." action="Delete piece" onConfirm={async () => {await services.store.deletePiece({id: piece.id}); deleted('Piece', piece.id); say('Piece deleted');}}/>
@@ -260,7 +261,7 @@ export function Result({route}: {route: Extract<Route, {name: 'result'}>}) {
     <Section title="Your look"><Text>{snapshots.length} {snapshots.length === 1 ? 'piece' : 'pieces'} · {dateTime(result.createdAt)}</Text><PhotoView file={view.file} label={`Your generated look wearing ${view.target.label}`}/>{view.faceless && <Text>Your face couldn’t be put back cleanly, so this look is shown without it.</Text>}{targetDeleted && <Text>The target piece was deleted. Your look and walk-back location are still saved.</Text>}</Section>
     {links.error && <Problem message="Your look is available, but links to the original pieces could not be checked." retry={links.retry}/>}
     <Section title="Wearing">
-      {snapshots.map((piece, index) => <HStack key={piece.pieceId} gap={4} wrap="wrap" vAlign="center"><Thumbnail src={fileUrl(piece.cutoutFile)} label={piece.label} alt={piece.label}/><VStack gap={2}><Text type="label">{piece.label}</Text><Text type="supporting">{index === 0 ? 'Target · ' : 'Companion · '}{piece.origin === 'wardrobe' ? 'Your wardrobe' : piece.shop ? `Shop ${piece.shop.n}` : 'Saved from a shop'}{links.data && !links.data.pieceIds.has(piece.pieceId) ? ' · Saved snapshot' : ''}</Text></VStack>{links.data?.pieceIds.has(piece.pieceId) && !links.loading && <Button label={`Open ${piece.label}`} variant="ghost" onClick={() => push({name: 'item', pieceId: piece.pieceId})}/>}</HStack>)}
+      {snapshots.map((piece, index) => <HStack key={piece.pieceId} gap={4} wrap="wrap" vAlign="center"><Thumbnail src={piece.cutoutFile} label={piece.label} alt={piece.label}/><VStack gap={2}><Text type="label">{piece.label}</Text><Text type="supporting">{index === 0 ? 'Target · ' : 'Companion · '}{piece.origin === 'wardrobe' ? 'Your wardrobe' : piece.shop ? `Shop ${piece.shop.n}` : 'Saved from a shop'}{links.data && !links.data.pieceIds.has(piece.pieceId) ? ' · Saved snapshot' : ''}</Text></VStack>{links.data?.pieceIds.has(piece.pieceId) && !links.loading && <Button label={`Open ${piece.label}`} variant="ghost" onClick={() => push({name: 'item', pieceId: piece.pieceId})}/>}</HStack>)}
     </Section>
     {result.targetSnapshot.shop && <Section title={`Shop ${result.targetSnapshot.shop.n}`}>
       {result.targetSnapshot.shop.storefrontFile && <PhotoView file={result.targetSnapshot.shop.storefrontFile} label={`Saved storefront of Shop ${result.targetSnapshot.shop.n}`}/>}
@@ -281,7 +282,7 @@ export function Results() {
   if (results.loading) return <Loading/>;
   if (results.error) return <Problem message={results.error} retry={results.retry}/>;
   const saved = (results.data ?? []).toSorted((left, right) => right.createdAt - left.createdAt);
-  return <Section title="Try-ons"><Text>{saved.length} {saved.length === 1 ? 'look' : 'looks'} · kept on this phone</Text>{!online && <Text type="supporting">Your saved looks can be opened and deleted offline.</Text>}{!saved.length ? <Empty title="No looks yet"><Text>Open something you saved and tap Try it on.</Text><Button label="Open saved pieces" onClick={() => push({name: 'home'})}/></Empty> : saved.map(result => <VStack key={result.id} gap={3}><HStack gap={4} wrap="wrap" vAlign="center"><Thumbnail src={fileUrl(result.file)} alt={`Look with ${result.targetSnapshot.label}`} label={`Open look with ${result.targetSnapshot.label}`} onClick={() => push({name: 'result', resultId: result.id})}/><VStack gap={2}><Text type="label">{result.targetSnapshot.label}</Text><Text type="supporting">{result.companionSnapshots.length + 1} pieces · {dateTime(result.createdAt)}</Text>{result.faceless && <Text type="supporting">Shown without your face</Text>}</VStack><Button label={`Open look from ${dateTime(result.createdAt)}`} variant="secondary" onClick={() => push({name: 'result', resultId: result.id})}/></HStack><DeleteResult result={result}/></VStack>)}</Section>;
+  return <Section title="Try-ons"><Text>{saved.length} {saved.length === 1 ? 'look' : 'looks'} · kept on this phone</Text>{!online && <Text type="supporting">Your saved looks can be opened and deleted offline.</Text>}{!saved.length ? <Empty title="No looks yet"><Text>Open something you saved and tap Try it on.</Text><Button label="Open saved pieces" onClick={() => push({name: 'home'})}/></Empty> : saved.map(result => <VStack key={result.id} gap={3}><HStack gap={4} wrap="wrap" vAlign="center"><Thumbnail src={result.file} alt={`Look with ${result.targetSnapshot.label}`} label={`Open look with ${result.targetSnapshot.label}`} onClick={() => push({name: 'result', resultId: result.id})}/><VStack gap={2}><Text type="label">{result.targetSnapshot.label}</Text><Text type="supporting">{result.companionSnapshots.length + 1} pieces · {dateTime(result.createdAt)}</Text>{result.faceless && <Text type="supporting">Shown without your face</Text>}</VStack><Button label={`Open look from ${dateTime(result.createdAt)}`} variant="secondary" onClick={() => push({name: 'result', resultId: result.id})}/></HStack><DeleteResult result={result}/></VStack>)}</Section>;
 }
 
 function AddWardrobePiece() {

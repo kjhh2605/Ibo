@@ -74,7 +74,7 @@ export interface DeviceRepository {
   startSession(input: {fix: Fix}): Promise<{trip: Trip; shop: Shop}>;
   newShop(input: {tripId: Id; fix: Fix}): Promise<Shop>;
   stopSession(input: {tripId: Id; endedAt: Time}): Promise<Trip>;
-  commitPhoto(input: {photo: Photo}): Promise<Photo>;
+  commitPhoto(input: {photo: Photo; storefrontEdit?: boolean}): Promise<Photo>;
   commitEmbedding(input: {embedding: PhotoEmbedding}): Promise<PhotoEmbedding>;
   replaceSelfPhoto(input: {selfPhoto: SelfPhoto}): Promise<SelfPhoto>;
 }

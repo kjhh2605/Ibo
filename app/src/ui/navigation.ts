@@ -2,7 +2,7 @@ import type {Asset, Candidate} from '../native/contracts';
 
 export type Route =
   | {name: 'home' | 'ask' | 'results' | 'wardrobe' | 'privacy'}
-  | {name: 'capture'; purpose?: 'shopping' | 'wardrobe' | 'self'}
+  | ({name: 'capture'} & ({purpose?: 'shopping' | 'wardrobe' | 'self'; shopId?: never} | {purpose: 'storefront'; shopId: string}))
   | {name: 'trips'; forOutfit?: boolean}
   | {name: 'trip'; tripId: string; shopId?: string; forOutfit?: boolean}
   | {name: 'pick'; photoId?: string; asset?: Asset; mode: 'shop' | 'wardrobe' | 'outfit'; candidates?: Candidate[]; concept?: string}
@@ -10,10 +10,13 @@ export type Route =
   | {name: 'outfit'}
   | {name: 'result'; resultId: string}
   | {name: 'walk'; source: 'item' | 'result'; id: string};
-export const titles: Record<Route['name'], string> = {home: 'Street Fitting', capture: 'Camera', trips: 'All trips', trip: 'Trip', ask: 'Find it', pick: 'Pick an item', item: 'Saved piece', outfit: 'Try it on', result: 'Your try-on', results: 'Try-ons', walk: 'Walk there', wardrobe: 'Wardrobe', privacy: 'Privacy'};
+export const titles: Record<Route['name'], string> = {home: 'Street Fitting', capture: 'Camera', trips: 'All trips', trip: 'Trip', ask: 'Find it', pick: 'Pick the item', item: 'Item', outfit: 'Try on', result: 'Your look', results: 'Try-ons', walk: 'Walk back', wardrobe: 'Wardrobe', privacy: 'Privacy'};
 export function pushRoute(stack: Route[], route: Route): Route[] {
   if (route.name === 'home') return [{name: 'home'}];
-  if (route.name === 'capture' && stack.at(-1)?.name === 'capture') return stack;
+  if (route.name === 'capture' && stack.at(-1)?.name === 'capture') {
+    const current = stack.at(-1) as Extract<Route, {name: 'capture'}>;
+    return (current.purpose ?? 'shopping') === (route.purpose ?? 'shopping') && current.shopId === route.shopId ? stack : [...stack.slice(0, -1), route];
+  }
   return [...stack, route];
 }
 export function popRoute(stack: Route[]): Route[] { return stack.length > 1 ? stack.slice(0, -1) : stack; }

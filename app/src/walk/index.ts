@@ -1,5 +1,7 @@
 import {App} from '@capacitor/app';
 import {Network} from '@capacitor/network';
+import {config} from '../config';
+import {MockMap} from './mock';
 import {Store} from '../native/store';
 import {WalkController} from './controller';
 import {ForegroundLocation} from './location';
@@ -15,7 +17,7 @@ const environment: WalkEnvironment = {
 
 export const Location = new ForegroundLocation();
 export const Route = new RelayRoute(undefined, environment.online);
-export const Map = new WalkMap();
+export const Map = config.runtime === 'web-mock' ? new MockMap() : new WalkMap();
 export const Walk = new WalkController({store: Store, location: Location, route: Route, environment});
 export {createWalk, WalkController} from './controller';
 export {WalkMap} from './map';

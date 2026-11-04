@@ -1,7 +1,7 @@
 import {WebPlugin} from '@capacitor/core';
 import type {Asset, Media as MediaContract} from './contracts';
 import {registerDevicePlugin} from './registerDevicePlugin';
-import {getMockContext} from './web/context';
+import {copyAssetFixtures, getMockContext} from './web/context';
 import type {MockContext} from './web/context';
 import {getWebRepository} from '../data/web/repository';
 import {deviceFailure} from './shoppingSession';
@@ -45,10 +45,13 @@ export class MediaWeb extends WebPlugin implements MediaContract {
     if (!fixture) throw deviceFailure('cancelled', false);
     const repository = getWebRepository();
     const file = await repository.writeBlob(await repository.readBlob(fixture.file), 'import');
+    let transferred = false;
     try {
       const asset = await repository.registerAsset({asset: {...fixture, id: crypto.randomUUID(), file}, purpose: options.purpose});
+      transferred = true;
+      copyAssetFixtures(this.context, fixture, asset);
       return {asset};
-    } finally { await repository.discardTemp({file}); }
+    } finally { if (!transferred) await repository.discardTemp({file}); }
   }
   async exportPhoto({photoId}: {photoId: string}) {
     const repository = getWebRepository(); const photo = await repository.getPhoto({id: photoId});

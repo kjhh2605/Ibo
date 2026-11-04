@@ -14,16 +14,16 @@ function Screen() {
   const {route}=useUi();
   switch(route.name) {
     case 'home': return <Home/>;
-    case 'capture': return <Capture route={route}/>;
+    case 'capture': return <Capture key={`${route.purpose??'shopping'}:${route.shopId??''}`} route={route}/>;
     case 'trips': return <Trips route={route}/>;
-    case 'trip': return <Trip route={route}/>;
+    case 'trip': return <Trip key={route.tripId} route={route}/>;
     case 'ask': return <Ask/>;
-    case 'pick': return <Pick route={route}/>;
-    case 'item': return <Item route={route}/>;
+    case 'pick': return <Pick key={`${route.mode}:${route.photoId??route.asset?.id}`} route={route}/>;
+    case 'item': return <Item key={route.pieceId} route={route}/>;
     case 'outfit': return <Outfit/>;
-    case 'result': return <Result route={route}/>;
+    case 'result': return <Result key={route.resultId} route={route}/>;
     case 'results': return <Results/>;
-    case 'walk': return <Walk route={route}/>;
+    case 'walk': return <Walk key={`${route.source}:${route.id}`} route={route}/>;
     case 'wardrobe': return <Wardrobe/>;
     case 'privacy': return <Privacy/>;
   }

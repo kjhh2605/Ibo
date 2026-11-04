@@ -229,12 +229,13 @@ export class WebRepository implements Store, DeviceRepository {
       return ended;
     }, {entities: ['Trip', 'TrailPoint'], ids: [tripId]});
   }
-  async commitPhoto({photo}: {photo: Photo}): Promise<Photo> {
+  async commitPhoto({photo, storefrontEdit = false}: {photo: Photo; storefrontEdit?: boolean}): Promise<Photo> {
     validId(photo.id); validId(photo.tripId); validId(photo.shopId); dimensions(photo); location(photo.location); time(photo.takenAt);
-    if (!['item', 'storefront'].includes(photo.kind) || photo.indexState !== 'pending') failure('invalid_argument');
+    if (!['item', 'storefront'].includes(photo.kind) || photo.indexState !== 'pending' ||
+        typeof storefrontEdit !== 'boolean' || (storefrontEdit && photo.kind !== 'storefront')) failure('invalid_argument');
     return this.run(true, async tx => {
       const trip = await tx.get('Trip', photo.tripId), shop = await tx.get('Shop', photo.shopId);
-      if (!trip || trip.status !== 'recording' || !shop || shop.tripId !== photo.tripId || photo.takenAt < trip.startedAt) failure('invalid_reference');
+      if (!trip || (!storefrontEdit && trip.status !== 'recording') || !shop || shop.tripId !== photo.tripId || photo.takenAt < trip.startedAt) failure('invalid_reference');
       if (await tx.get('Photo', photo.id)) failure('constraint_violation');
       const file = await tx.file(photo.file); if (file.owner !== 'temp' || !['image/jpeg', 'image/png'].includes(file.blob.type)) failure('file_not_owned');
       await tx.put('files', file.file, {...file, owner: `photo:${photo.id}`});
@@ -482,11 +483,12 @@ export class WebRepository implements Store, DeviceRepository {
     }, {entities: ['QueueJob', 'Shop', 'Piece'], ids: [id]});
     this.runtime.claims.delete(id);
   }
-  async failJob({id, retryable, retryAfterMs}: {id: Id; retryable: boolean; retryAfterMs?: number}): Promise<void> {
-    if (typeof retryable !== 'boolean') failure('invalid_argument'); if (retryAfterMs !== undefined) time(retryAfterMs);
+  async failJob({id, retryable, retryAfterMs, preflight = false}: {id: Id; retryable: boolean; retryAfterMs?: number; preflight?: boolean}): Promise<void> {
+    if (typeof retryable !== 'boolean' || typeof preflight !== 'boolean' || (preflight && (retryable || retryAfterMs !== undefined))) failure('invalid_argument');
+    if (retryAfterMs !== undefined) time(retryAfterMs);
     await this.run(true, async tx => {
       const job = await tx.get('QueueJob', id); if (!job) return;
-      if (!this.runtime.claims.has(id)) failure('job_not_claimed');
+      if (preflight ? this.runtime.claims.has(id) : !this.runtime.claims.has(id)) failure('job_not_claimed');
       if (retryable) {
         const nextAt = Math.max(job.nextAt, retryAfterMs === undefined ? 0 : this.now() + retryAfterMs); time(nextAt);
         await tx.put('QueueJob', id, {...job, nextAt});

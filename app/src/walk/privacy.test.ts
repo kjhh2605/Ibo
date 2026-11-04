@@ -1,4 +1,4 @@
-import {deferred} from './deferred';
+import {deferred} from '../deferred';
 import {afterEach, describe, expect, it, vi} from 'vitest';
 import type {Result, Shop} from '../native/contracts';
 import {createWalk} from './controller';

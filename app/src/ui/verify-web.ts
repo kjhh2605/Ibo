@@ -9,9 +9,9 @@ import {browserScenario} from './browser-scenarios.ts';
 
 const args=process.argv.slice(2);
 const scenario=args[args.indexOf('--scenario')+1];
-if(!['full','states'].includes(scenario)||args[args.indexOf('--mode')+1]!=='mock')throw new Error('Expected --scenario full|states --mode mock');
-const root=resolve(dirname(fileURLToPath(import.meta.url)),'../../../..');
-const fixtureRoot=resolve(process.env.SF_UI_FIXTURE_ROOT??resolve(root,'../s11-verification/verification/fixtures'));
+if(!['full','states','serve'].includes(scenario)||args[args.indexOf('--mode')+1]!=='mock')throw new Error('Expected --scenario full|states|serve --mode mock');
+const root=resolve(dirname(fileURLToPath(import.meta.url)),'../../..');
+const fixtureRoot=resolve(process.env.SF_UI_FIXTURE_ROOT??resolve(root,'verification/fixtures'));
 const output=resolve(root,'verification/results/2026-11-04-s08-ui',scenario);
 await stat(resolve(fixtureRoot,'store/e2e.json'));
 await mkdir(output,{recursive:true});
@@ -30,7 +30,7 @@ if(!fixtureAddress||typeof fixtureAddress==='string')throw new Error('No fixture
 const reserve=createServer();reserve.listen(0,'127.0.0.1');await once(reserve,'listening');
 const address=reserve.address();if(!address||typeof address==='string')throw new Error('No browser server address');const port=address.port;
 const reservedClosed=once(reserve,'close');reserve.close();await reservedClosed;
-const server=spawn(process.execPath,['node_modules/vite/bin/vite.js','--host','127.0.0.1','--port',String(port),'--strictPort'],{cwd:resolve(root,'app'),env:{...process.env,VITE_SF_RUNTIME:'web-mock',VITE_SF_UI_ADAPTER:'1',VITE_SF_UI_FIXTURES:`http://127.0.0.1:${fixtureAddress.port}`},stdio:['ignore','pipe','pipe']});
+const server=spawn(process.execPath,['node_modules/vite/bin/vite.js','--host','127.0.0.1','--port',String(port),'--strictPort'],{cwd:resolve(root,'app'),env:{...process.env,VITE_SF_RUNTIME:'web-mock',VITE_SF_RELAY_MODE:'mock',VITE_SF_WEB_FIXTURES:`http://127.0.0.1:${fixtureAddress.port}`},stdio:['ignore','pipe','pipe']});
 let serverLog='';server.stdout.on('data',bytes=>{serverLog+=String(bytes);});server.stderr.on('data',bytes=>{serverLog+=String(bytes);});
 const url=`http://127.0.0.1:${port}`;
 try {
@@ -41,6 +41,8 @@ try {
     await delay(100);
   }
   if(!ready)throw new Error('Vite readiness deadline exceeded');
+  console.log(`WEB_MOCK_URL=${url}`);
+  if(scenario==='serve')await new Promise<void>(()=>{});
   const code=browserScenario(scenario as 'full'|'states',url);
   const run=spawn('aside',['repl',code],{cwd:root,stdio:['ignore','pipe','pipe']});let stdout='';let stderr='';
   run.stdout.on('data',bytes=>{stdout+=String(bytes);});run.stderr.on('data',bytes=>{stderr+=String(bytes);});

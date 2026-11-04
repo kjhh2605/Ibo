@@ -3,6 +3,7 @@ import {setImmediate} from 'node:timers';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import type {Photo, QueueJob} from '../native/contracts';
 import type {RelayRequest, RelayResponse} from '../relay/client';
+import {createRelayClient} from '../relay/client';
 import {DescribeQueue} from './queue';
 import type {DescribePath, DescribeTransport, QueueEnvironment} from './queue';
 import {WebRepository} from './web/repository';
@@ -33,12 +34,12 @@ let environment: QueueEnvironment;
 let photos: Photo[];
 let tripId: string;
 let shopId: string;
-const calls: {path: DescribePath; body: unknown; at: number; refreshed: boolean}[] = [];
+const calls: {path: DescribePath; body: unknown; at: number}[] = [];
 let respond: (path: DescribePath) => Promise<object>;
 const transport: DescribeTransport = {
-  async request<P extends DescribePath>(path: P, body: RelayRequest<P>, options: {beforeSend: () => Promise<void>; forceRefresh?: boolean; signal: AbortSignal}): Promise<RelayResponse<P>> {
+  async request<P extends DescribePath>(path: P, body: RelayRequest<P>, options: {beforeSend: () => Promise<void>; forceRefreshAuth?: boolean; signal: AbortSignal}): Promise<RelayResponse<P>> {
     await options.beforeSend();
-    calls.push({path, body, at: Date.now(), refreshed: options.forceRefresh === true});
+    calls.push({path, body, at: Date.now()});
     return await respond(path) as RelayResponse<P>;
   },
 };
@@ -65,7 +66,7 @@ beforeEach(async () => {
   respond = async path => path === '/v1/describe/storefront' ? {description: 'Red brick entrance'} : {label: 'Red wool jacket', category: 'jacket'};
   environment = {now: () => Date.now(), foreground: () => foreground, online: () => online, schedule: (fn, ms) => setTimeout(fn, ms), cancel: handle => clearTimeout(handle as number), image: async () => wire};
 });
-afterEach(async () => { await worker?.stop(); worker = undefined; await store.close(); vi.useRealTimers(); });
+afterEach(async () => { await worker?.stop(); worker = undefined; await store.close(); vi.useRealTimers(); vi.unstubAllGlobals(); });
 
 describe('queue foreground durable dispatcher', () => {
   it('keeps direct-cut-shop Picked item offline with zero attempts, then dispatches once on reconnect', async () => {
@@ -94,14 +95,72 @@ describe('queue foreground durable dispatcher', () => {
       expect(calls.at(-1)?.at).toBe(expectedAt);
     }
   });
-  it('honors Retry-After and refreshes auth on next due dispatch without a transport retry', async () => {
+  it('honors Retry-After without a transport retry', async () => {
     await saved(); let failures = 1;
     respond = async () => { if (failures--) throw {code: 'unauthorized', retryable: true, retryAfterMs: 90_000}; return {label: 'Authenticated jacket', category: 'jacket'}; };
     worker = new DescribeQueue(store, transport, environment); await worker.start();
     await until(async () => (await jobs())[0]?.nextAt === 190_000);
     await vi.advanceTimersByTimeAsync(89_999); expect(calls.length).toBe(1);
     await vi.advanceTimersByTimeAsync(1); await until(async () => (await jobs()).length === 0);
-    expect(calls.map(call => call.refreshed)).toEqual([false, true]);
+  });
+  it('retains unclaimed jobs through auth failure and sends only after forced credential refresh', async () => {
+    await commit('storefront');
+    let authentications = 0;
+    const authorization: string[] = [];
+    vi.stubGlobal('fetch', async (_input: unknown, init: RequestInit) => {
+      authorization.push(new Headers(init.headers).get('Authorization') ?? '');
+      return Response.json({description: 'Authenticated storefront'});
+    });
+    const client = createRelayClient({auth: async forceRefresh => {
+      authentications++;
+      if (!forceRefresh) throw new Error('Temporary token service failure');
+      return {idToken: 'fresh-id', appCheckToken: 'fresh-app-check'};
+    }});
+    worker = new DescribeQueue(store, client, environment); await worker.start();
+    await until(() => vi.getTimerCount() > 0);
+    expect((await jobs())[0].attempts).toBe(0);
+    expect(await store.get({entity: 'Shop', id: shopId})).toMatchObject({descriptionState: 'pending'});
+    expect(authorization).toEqual([]);
+    await vi.advanceTimersByTimeAsync(5000);
+    await until(async () => (await jobs()).length === 0);
+    expect(authentications).toBe(2);
+    expect(authorization).toEqual(['Bearer fresh-id']);
+    expect(await store.get({entity: 'Shop', id: shopId})).toMatchObject({descriptionState: 'done'});
+  });
+  it('drains work enqueued while the empty-queue snapshot is resolving', async () => {
+    const list = store.list.bind(store);
+    let inserted = false;
+    store.list = async options => {
+      const page = await list(options);
+      if (options.entity === 'QueueJob' && !page.items.length && !inserted) {
+        inserted = true;
+        await commit('storefront');
+      }
+      return page;
+    };
+    worker = new DescribeQueue(store, transport, environment); await worker.start();
+    await until(async () => (await store.get({entity: 'Shop', id: shopId}))?.descriptionState === 'done');
+    expect(calls.map(call => call.path)).toEqual(['/v1/describe/storefront']);
+    expect(await jobs()).toEqual([]);
+  });
+  it('finishes permanent image-preparation failures without HTTP attempts or deleting the photo', async () => {
+    const photo = await commit('storefront');
+    environment.image = async () => { throw {code: 'image_unavailable', retryable: false}; };
+    worker = new DescribeQueue(store, transport, environment); await worker.start();
+    await until(async () => (await jobs()).length === 0);
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(calls).toEqual([]);
+    expect(await store.get({entity: 'Shop', id: shopId})).toMatchObject({descriptionState: 'failed'});
+    expect(await store.get({entity: 'Photo', id: photo.id})).toEqual(photo);
+  });
+  it('rejects a preflight failure racing an already claimed job', async () => {
+    await commit('storefront');
+    const job = (await jobs())[0];
+    await store.beginJob({id: job.id, now: Date.now()});
+    await expect(store.failJob({id: job.id, retryable: false, preflight: true})).rejects.toMatchObject({code: 'job_not_claimed'});
+    expect((await jobs())[0]).toMatchObject({id: job.id, attempts: 1});
+    await store.completeJob({id: job.id, description: 'Still owned by the original request'});
+    expect(await store.get({entity: 'Shop', id: shopId})).toMatchObject({descriptionState: 'done'});
   });
   it('does not claim while authentication/image preprocessing is offline', async () => {
     await saved(); environment.image = async () => { online = false; return wire; };
@@ -143,7 +202,7 @@ describe('privacy queue upload boundary', () => {
   it('reads only saved cutouts and selected storefront originals; concept saves and private device data never dispatch', async () => {
     await saved('concept'); const direct = await saved('describe'); const front = await commit('storefront');
     const observed: string[] = []; environment.image = async file => { observed.push(file); return wire; };
-    const self = await store.writeBlob(rgba(), 'self'); const head = await store.writeBlob(rgba(true), 'head-mask'); const masked = await store.writeBlob(rgba(), 'masked-self');
+    const self = await store.writeBlob(rgba(), 'self-original'); const head = await store.writeBlob(rgba(true), 'self-head-mask'); const masked = await store.writeBlob(rgba(), 'self-masked');
     await store.replaceSelfPhoto({selfPhoto: {file: self, headMask: head, maskedFile: masked, updatedAt: Date.now()}});
     await store.commitEmbedding({embedding: {photoId: front.id, model: 'pe-core-t16-image', dim: 512, vector: Array.from({length: 512}, (_, i) => i === 0 ? 1 : 0)}});
     worker = new DescribeQueue(store, transport, environment); await worker.start(); await until(async () => (await jobs()).length === 0);

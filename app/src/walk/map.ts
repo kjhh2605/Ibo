@@ -1,4 +1,4 @@
-import {deferred} from './deferred';
+import {deferred} from '../deferred';
 import type {Feature, FeatureCollection, Geometry} from 'geojson';
 import {Map as GLMap, setWorkerUrl} from 'maplibre-gl';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';

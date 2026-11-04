@@ -3,6 +3,7 @@ import {Directory, Filesystem} from '@capacitor/filesystem';
 import type {FileRef} from './contracts';
 import {Store} from './store';
 import {getWebRepository} from '../data/web/repository';
+import {getMockContext} from './web/context';
 
 function failure(code: string): never {
   throw {code, message: 'The device file operation could not be completed.', retryable: code === 'io_error'};
@@ -62,13 +63,27 @@ export async function writeTemp({bytes, mime, purpose, ownerId}: {
   try {
     if (!Capacitor.isNativePlatform()) {
       // Blob storage and owner deletion are shared with Store; never keep production bytes in a second database.
-      return await webRepository().writeBlob(new Blob([bytes as Uint8Array<ArrayBuffer>], {type: mime}), purpose, ownerId);
+      const repository = webRepository();
+      const file = await repository.writeBlob(new Blob([bytes as Uint8Array<ArrayBuffer>], {type: mime}), purpose, ownerId);
+      try {
+        if (purpose === 'provider') {
+          const digest = await crypto.subtle.digest('SHA-256', bytes as Uint8Array<ArrayBuffer>);
+          const hash = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
+          const context = getMockContext();
+          const fixture = context.fixture<unknown>(`Segmenter.provider:${hash}`);
+          if (fixture !== undefined) context.setFixture(`Segmenter.asset:${file}`, fixture);
+        }
+        return file;
+      } catch (error) {
+        await repository.discardTemp({file});
+        throw error;
+      }
     }
     const path = `relay/${purpose}/${crypto.randomUUID()}.${mime === 'image/png' ? 'png' : 'jpg'}`;
     const {uri} = await Filesystem.getUri({directory: Directory.Cache, path});
     await requirePrivateFile(uri);
-    await Filesystem.writeFile({directory: Directory.Cache, path, data: encode(bytes), recursive: true});
     try {
+      await Filesystem.writeFile({directory: Directory.Cache, path, data: encode(bytes), recursive: true});
       if (purpose === 'candidate-mask') {
         // Private method on the existing Store plugin, not another public device plugin.
         const nativeStore = Store as typeof Store & {registerTemp(o: {file: FileRef; ownerId: string}): Promise<void>};
@@ -76,7 +91,7 @@ export async function writeTemp({bytes, mime, purpose, ownerId}: {
       }
       return uri;
     } catch (error) {
-      await Filesystem.deleteFile({directory: Directory.Cache, path});
+      await Filesystem.deleteFile({directory: Directory.Cache, path}).catch(() => undefined);
       throw error;
     }
   } catch (error) { return safeError(error); }

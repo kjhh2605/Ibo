@@ -41,4 +41,12 @@ describe('relay origin boundary', () => {
     vi.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true);
     expect(() => runtimeConfig({VITE_SF_RUNTIME: 'web-mock'})).toThrow('Web mock runtime is not available on Android.');
   });
+
+  it('rejects fixture selection in a live relay build', () => {
+    expect(() => runtimeConfig({VITE_SF_RELAY_MODE: 'live', VITE_SF_FIXTURE: 'e2e'})).toThrow();
+  });
+
+  it('rejects an unknown relay mode rather than silently selecting live', () => {
+    expect(() => runtimeConfig({VITE_SF_RELAY_MODE: 'staging'})).toThrow();
+  });
 });
