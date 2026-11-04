@@ -12,7 +12,11 @@
 - S01 M1 gate: 72 pytest + 실제 TCP 22 응답, 외부 호출/요청 파일 쓰기 0. M1 증거 `f237e2a`를 MacBook의 `5169aa8`로 가져왔다.
 - M1 native `6207b15`를 이 브랜치 `58cca12`로 통합했다. 실제 원본 JPEG/PNG 각각 22장 벡터와 6개 segmentation mask가 엄격 기준을 통과했고, 실제 relay text tower × Android 22장 검색은 top3 7/7이다. CameraX·Store v2·private fixture와 실제 masks 기반 web Result/wardrobe 연결은 각 `2026-11-04-m1-resume/checkpoint.md`, `2026-11-04-s08-ui/CHECKPOINT.md` 증거를 따른다. native 전체 E2E나 사람 privacy 승인을 뜻하지 않는다.
 - **2026-11-05 KST 사용자 범위 변경:** “맥미니에서 사람 입력 대기중인 작업은 이번 작업범위에서 제외”. 사람 head GT·item-mask/분류 검토·자산 공개 승인·사용 동의 영어 녹음 및 그 입력에 의존하는 전체 mock/live E2E·품질/threshold·privacy/provenance 최종 판정·live 데모는 이번 재개 범위에서 제외한다. 제외는 PASS/승인/제품 요구사항 삭제가 아니다. 기존 CLI의 사람 입력 gate와 fail-closed 동작을 유지하며 승인 자료를 만들어 넣지 않는다.
-- 남은 이번 범위는 사람 입력이 필요 없는 실제 native 알림/권한·1시간 FGS 위치 유지·촬영 viewport 검증과 발견된 결함 수정, 양쪽 branch의 명시 SHA 통합 및 증거 기록이다. main/PR 병합은 하지 않는다.
+- **이번 승인 범위 완료:** MacBook Camera viewport·S11 freshness/metric GPS 검증 수정과 M1 native 알림/권한/음수 preview 원점 수정을 통합했다. M1 `940d577` → MacBook `491e058`, 최종 취소/정리 증거 `a5db1ba` → `5bdb9a6`. main/PR 병합은 하지 않았다.
+- 최신 설치 APK `c18813965a9d3078c753e89df8511d9a588f2520daaa7e564bfbb3177d699cef`: native 39개(원 aggregate의 Capture fixture 오류는 별도 수정 실행 6개로 확인), 실제 권한 변형 5개, Camera UI 6상태·실제 3장 저장/재시작/오프라인 외관 검증 통과. Debug/Release 단위 각각 12개, 16 KB ZIP/ELF 정렬 및 release fixture 제외도 통과했다. [M1 검증 기록](../../verification/results/2026-11-04-m1-resume/checkpoint.md)의 각 APK·실행 경계를 따른다.
+- MacBook 실제 browser full 52개/state 92개 관측, 각각 13개 route 및 lint/build/doctor 통과. 실제 Android mask fixture를 쓰는 web mock이며 live API 품질 증거가 아니다. [UI 검증 기록](../../verification/results/2026-11-04-s08-ui/CHECKPOINT.md).
+- **1시간 FGS는 M1 세션의 사용자 지시로 중단했다.** 17개 실제 관측/595,965 ms까지만 보존했고 `passed:false`, `completedFullHour:false`다. 중단 후 자기 Trip 종료, raw trail 71→0, FGS 종료를 확인했다. 이를 1시간 합격으로 바꾸거나 다시 시작하지 않는다.
+- 사람 입력이 필요 없는 나머지 실행은 끝났고 M1의 소유 앱/에뮬레이터 종료·adb 연결 해제를 확인했다. MacBook의 검사용 탭/서버와 supervised worker는 정리했다. 기존 사용자 검토 서버 `http://127.0.0.1:8767/review/`는 이전 유지 요청대로 남겼으며 이번 범위 완료의 대기 조건이 아니다.
 
 ## 중단 당시 지시와 Git 상태
 

@@ -177,3 +177,9 @@ verification/results/2026-11-04-s08-ui/CHECKPOINT.md
 - 기존 browser runner에 일반·외관·사진 썸네일·오프라인 상태의 전체 셔터 viewport 회귀 검사를 넣었다. 412×892 및 360×640에서 검사하며 click 자동 스크롤로 문제를 숨기지 않는다. 최신 full **52개**, states **92개** 관측, 각각 13개 route가 exit 0이다.
 - `npm run lint && npm run build && npx astryx doctor --built dist` exit 0. 기존 lint 24개·theme-fonts·bundle 크기 경고 유지. 이번 UI 변경에 단위 검사를 재실행했다고 주장하지 않는다.
 - 사용자가 사람 입력 대기 작업을 이번 범위에서 제외했다. 이전 절의 사람 GT·승인 및 이에 의존하는 최종 품질/live gate는 미승인 상태로 보존하되 이번 재개의 완료 조건에는 포함하지 않는다. 실제 최신 APK의 viewport 검증은 M1에서 별도로 수행한다.
+
+## 최신 설치 Android 확인
+
+M1의 native `940d577`를 coordinator `491e058`로 통합했다. 최신 설치 APK `c18813965a9d3078c753e89df8511d9a588f2520daaa7e564bfbb3177d699cef`에서 411×866의 일반·썸네일·새 가게·쇼핑 외관·과거 외관·오프라인 외관 6상태를 실제 CameraX로 확인했다. 셔터는 스크롤 없이 화면 안에 있고 조상 transform이 없다. 실제 사진 3장 저장, 프로세스 재시작 후 보존, 과거 외관 촬영의 새 Trip/trail 0 및 오프라인 queue attempt 0을 확인했다. [실제 Android 관측](../2026-11-04-m1-resume/viewport-ui/viewport-ui.json), [정상 화면](../2026-11-04-m1-resume/viewport-ui/01-normal-camera.png).
+
+별도 1시간 FGS 검사는 M1의 사용자 지시로 중단되어 합격이 아니다. 취소 전 17개 관측/595,965 ms와 정상 종료·trail 삭제 증거만 보존한다. 사람 입력 의존 gate 제외와 이 중단을 실제 full E2E/live 품질 합격으로 확대하지 않는다.
