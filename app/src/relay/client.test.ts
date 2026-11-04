@@ -86,6 +86,63 @@ describe('relay boundaries', () => {
     expect(onQueryToken).toHaveBeenCalledWith('advanced-token');
   });
 
+  it('claims a job only after authentication and serialization, and never sends a rejected claim', async () => {
+    const fetch = vi.spyOn(globalThis, 'fetch');
+    const beforeSend = vi.fn(async () => { throw new Error('Job was deleted.'); });
+    const denied = createRelayClient({auth: async () => { throw new Error('Unavailable.'); }});
+    await expect(denied.request('/v1/route', route, {beforeSend})).rejects.toMatchObject({code: 'unauthenticated'});
+    expect(beforeSend).not.toHaveBeenCalled();
+    const client = createRelayClient({auth: async () => ({idToken: 'id', appCheckToken: 'app'})});
+    const cyclic = {...route};
+    Object.defineProperty(cyclic, 'toJSON', {value: () => cyclic.origin = cyclic as never});
+    await expect(client.request('/v1/route', cyclic, {beforeSend})).rejects.toThrow();
+    expect(beforeSend).not.toHaveBeenCalled();
+    await expect(client.request('/v1/route', route, {beforeSend})).rejects.toThrow('Job was deleted.');
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('does not dispatch a request cancelled while the durable claim is pending', async () => {
+    const fetch = vi.spyOn(globalThis, 'fetch');
+    const controller = new AbortController();
+    const client = createRelayClient({auth: async () => ({idToken: 'id', appCheckToken: 'app'})});
+    await expect(client.request('/v1/route', route, {
+      signal: controller.signal,
+      beforeSend: async () => { controller.abort(); },
+    })).rejects.toMatchObject({name: 'AbortError'});
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('preserves cancellation rather than reporting failed authentication after cancellation', async () => {
+    const controller = new AbortController();
+    const client = createRelayClient({auth: async () => {
+      controller.abort();
+      throw new Error('Authentication unavailable.');
+    }});
+    await expect(client.request('/v1/route', route, {signal: controller.signal})).rejects.toMatchObject({name: 'AbortError'});
+  });
+
+  it.each([
+    ['0', 0],
+    ['12', 12000],
+    ['Wed, 04 Nov 2026 12:00:05 GMT', 5000],
+    ['Wed, 04 Nov 2026 11:59:59 GMT', 0],
+    ['-1', null],
+    ['1.5', null],
+    ['9999999999999999999999', null],
+    ['not a date', null],
+    [null, null],
+  ])('exposes safe queue delay for Retry-After %s without retrying', async (value, delay) => {
+    vi.spyOn(Date, 'now').mockReturnValue(Date.parse('Wed, 04 Nov 2026 12:00:00 GMT'));
+    const headers = new Headers();
+    if (value !== null) headers.set('Retry-After', value);
+    const fetch = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(
+      JSON.stringify({error: {code: 'rate_limited', retryable: true}}), {status: 429, headers},
+    ));
+    const client = createRelayClient({auth: async () => ({idToken: 'id', appCheckToken: 'app'})});
+    await expect(client.request('/v1/route', route)).rejects.toMatchObject({status: 429, retryAfterMs: delay});
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
   it('noRawSelfPhotoUpload: reads only maskedFile and blocks missing, alias and cancelled inputs', async () => {
     const image = {data: 'opaque-image', width: 1, height: 1, mimeType: 'image/png' as const};
     const read = vi.fn().mockResolvedValue(image);

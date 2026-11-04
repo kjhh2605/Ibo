@@ -116,6 +116,13 @@ UI 기준은 프로토타입(`prototype/`)이다. 흐름, 문구, 상태, 인터
 - 계측 검증이나 앱 데이터 초기화 뒤에는 기존 등록 secret을 복원한다: 저장소 루트에서 `source scripts/worktree-env.sh && bash scripts/restore-app-check-debug.sh`. 이 명령은 전역 기기 잠금과 debug `run-as` 확인을 거친다. `~/.config/street-fitting/app-check-debug-token`은 권한 0600으로 유지하며 argv·로그·Git에 넣지 않는다. 재설치마다 새 토큰을 등록하지 않는다.
 - 릴레이 CORS는 Capacitor/local web의 localhost·loopback origin만 허용하고 `X-Query-Token`을 노출한다. debug Android의 평문 HTTP는 10.0.2.2·localhost·loopback 호스트만 허용하며 release는 평문을 금지한다.
 
+### 웨이브 1 공유 전송·인증 연결 (2026-11-04, M1)
+
+- 공유 relay client의 `beforeSend`는 인증·JSON 직렬화 성공 뒤, 실제 HTTP 직전에 실행된다. 큐 소유권 확인 실패나 취소는 전송하지 않으며, 인증 실패는 큐 시도를 소비하지 않는다.
+- `forceRefreshAuth`는 native Firebase ID/App Check 양쪽 강제 갱신에 연결된다. `RelayError.retryAfterMs`는 유효한 `Retry-After` 초/HTTP-date를 전달하며 client 자체 재시도는 하지 않는다.
+- [실행 증거](../../verification/results/2026-11-04-wave1-shared/README.md): 앱 테스트 47개, lint/build/doctor, 실제 TCP HTTP 전송·취소·429 경계, Android 빌드와 실제 WebView의 강제 인증 갱신을 확인했다. 새 ID 토큰 발급 시각 증가, Firebase ID/App Check 토큰 각각 2개 검증, 토큰 로그 일치 0개였다.
+- `@capacitor/filesystem` 8.1.5와 UIAutomator 2.3.0 의존성을 연결했다. 관리 파일 소유권·Blob 저장소·제품 화면과 전체 E2E 합격은 이 공유 변경의 증거가 아니며 S04~S11의 별도 검증 대상이다.
+
 ### 준비 점검 실측 (2026-11-04, M1)
 
 제품 구현 검증과 구분한다. 다음은 현재 빈 앱 shell과 개발 도구에 대한 관찰이다.

@@ -27,12 +27,13 @@ public class SfAuthPlugin extends Plugin {
             call.reject("Authentication failed", "auth_unavailable");
             return;
         }
-        auth.getCurrentUser().getIdToken(false).addOnSuccessListener(id -> {
+        boolean forceRefresh = Boolean.TRUE.equals(call.getBoolean("forceRefresh", false));
+        auth.getCurrentUser().getIdToken(forceRefresh).addOnSuccessListener(id -> {
             if (id.getToken() == null) {
                 call.reject("Authentication failed", "auth_unavailable");
                 return;
             }
-            FirebaseAppCheck.getInstance().getAppCheckToken(false).addOnSuccessListener(check -> {
+            FirebaseAppCheck.getInstance().getAppCheckToken(forceRefresh).addOnSuccessListener(check -> {
                 JSObject tokens = new JSObject();
                 tokens.put("idToken", id.getToken());
                 tokens.put("appCheckToken", check.getToken());

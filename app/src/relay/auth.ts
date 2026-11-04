@@ -6,17 +6,17 @@ export interface AuthTokens {
 }
 
 interface NativeAuth {
-  getTokens(): Promise<AuthTokens>;
+  getTokens(options: {forceRefresh: boolean}): Promise<AuthTokens>;
 }
 
 const nativeAuth = registerPlugin<NativeAuth>('SfAuth');
 
-export async function getAuthTokens(): Promise<AuthTokens> {
+export async function getAuthTokens(forceRefresh = false): Promise<AuthTokens> {
   if (!Capacitor.isNativePlatform()) {
     throw new Error('Authenticated relay access requires Android.');
   }
   try {
-    const tokens = await nativeAuth.getTokens();
+    const tokens = await nativeAuth.getTokens({forceRefresh});
     if (!tokens.idToken || !tokens.appCheckToken) throw new Error();
     return tokens;
   } catch {
