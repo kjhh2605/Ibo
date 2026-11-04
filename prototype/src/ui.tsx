@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties, type MouseEvent, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type MouseEvent, type PointerEvent, type ReactNode } from 'react'
 import { ArrowLeft, MapPin, type LucideIcon } from 'lucide-react'
 import { Button, Spinner } from './kit'
 import type { Box, Candidate, Img, Piece, Shop } from './data'
@@ -74,6 +74,53 @@ export function Sheet({ open, onClose, children, label }: { open: boolean; onClo
       <div className="sf-sheet__panel" role="dialog" aria-label={label}>
         <span className="sf-sheet__grip" aria-hidden />
         {children}
+      </div>
+    </div>
+  )
+}
+
+/**
+ * A tall bottom sheet (about three quarters of the screen) with its own scrolling body.
+ * Drag the top part down to put it away; a short drag springs back.
+ */
+export function Drawer({ open, onClose, label, title, meta, children }: { open: boolean; onClose: () => void; label: string; title: ReactNode; meta?: ReactNode; children: ReactNode }) {
+  const { hush } = useStore()
+  const [drag, setDrag] = useState<{ dy: number; height: number } | null>(null)
+  const grab = useRef<{ y: number; scale: number; height: number } | null>(null)
+  useEffect(() => {
+    if (open) hush()
+  }, [open, hush])
+
+  const down = (e: PointerEvent<HTMLDivElement>) => {
+    if (!open || e.button !== 0) return
+    const panel = e.currentTarget.parentElement
+    if (!panel) return
+    // The phone may be scaled on stage, so convert screen pixels to the panel's own.
+    grab.current = { y: e.clientY, scale: panel.getBoundingClientRect().height / panel.offsetHeight || 1, height: panel.offsetHeight }
+    e.currentTarget.setPointerCapture(e.pointerId)
+    setDrag({ dy: 0, height: panel.offsetHeight })
+  }
+  const move = (e: PointerEvent<HTMLDivElement>) => {
+    const g = grab.current
+    if (g) setDrag({ dy: Math.max(0, (e.clientY - g.y) / g.scale), height: g.height })
+  }
+  const up = () => {
+    grab.current = null
+    if (drag && drag.dy > Math.min(120, drag.height * 0.25)) onClose()
+    setDrag(null)
+  }
+
+  const dragging = drag !== null && drag.dy > 0
+  return (
+    <div className="sf-sheet sf-drawer" data-open={open || undefined} aria-hidden={!open}>
+      <div className="sf-sheet__scrim" onClick={onClose} style={drag && dragging ? { opacity: 1 - drag.dy / drag.height, transition: 'none' } : undefined} />
+      <div className="sf-sheet__panel" role="dialog" aria-label={label} style={drag && dragging ? { transform: `translateY(${drag.dy}px)`, transition: 'none' } : undefined}>
+        <div className="sf-drawer__head" onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
+          <span className="sf-sheet__grip" aria-hidden />
+          <div className="sf-sheet__title">{title}</div>
+          {meta && <div className="sf-drawer__meta">{meta}</div>}
+        </div>
+        <div className="sf-drawer__body">{children}</div>
       </div>
     </div>
   )

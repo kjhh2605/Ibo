@@ -22,7 +22,9 @@ R9 추가 근거: D-R9-01(자동 수치 판정), D-R9-02(바로 자른 옷 이�
 
 ### 화면 배치·문구
 
-- 홈의 잘라낸 타일·개수·"Find another", Item의 큰 옷 이미지·가게 카드·"Original photo"·"Walk back"·"Try it on"은 유효한 상태에서 유지한다. 옷장 상세 부제 "In your wardrobe"도 유지한다(D-R1-03, D-R7-08).
+- 홈 "Saved this trip"은 홈에 보이는 최근 trip(`Piece.trip`)에서 저장한 가게 옷만 1행 가로 스크롤 타일로 보여 주고, 끝에 "Find another"를 둔다. 제목 옆 개수는 이 trip의 개수다. 비었으면 "Nothing saved from this trip yet."(저장한 옷이 하나도 없으면 "Nothing saved yet.")를 보인다. 새 쇼핑을 시작하면 새 trip이 최근 trip이 되므로 목록이 비어 보인다. trip 삭제로 `Piece.trip`이 지워진 옷은 홈 줄에서 빠지고 전체 목록에만 남는다(사용자 요청, 2026-11-04).
+- 섹션 오른쪽 위 "See all"은 모든 trip의 저장한 옷을 아래에서 올라오는 시트(화면 높이 약 3/4)에 3열 그리드로 보여 준다. 제목 "Saved", 부제 "N pieces from all trips"이며 그리드는 세로 스크롤한다. 시트 위쪽(손잡이·제목)을 아래로 끌어 일정 거리를 넘기면 닫히고 홈이 보인다. 짧게 끌면 제자리로 돌아온다. 배경을 눌러도 닫힌다. 타일을 누르면 Item으로 간다(사용자 요청, 2026-11-04). 실제 앱의 Astryx 시트 구현 방식은 미확인이다.
+- Item의 큰 옷 이미지·가게 카드·"Original photo"·"Walk back"·"Try it on"은 유효한 상태에서 유지한다. 옷장 상세 부제 "In your wardrobe"도 유지한다(D-R1-03, D-R7-08).
 - 이름/종류 수정·삭제·옷장 상세의 변경된 액션·원본 삭제 후 가게 카드·빈 상태·오프라인 배치는 **프로토타입 세션에서 확정**한다. 원본이 없는 카드에 작동하지 않는 링크를 남기지 않는다(D-R3-11, D-R4-06, D-R4-09).
 - **프로토타입 초안:** "Rename" → "Rename piece"·"Save name", "Delete" → "Delete this piece?"를 제공한다. 이름 대기는 "Naming this piece…", 오프라인은 "Waiting for connection to name this piece."다. 배치·문구는 **프로토타입 화면 세션에서 확정**한다(D-R3-11, D-R4-06, D-R6-03, D-R9-02).
 
@@ -33,6 +35,7 @@ R9 추가 근거: D-R9-01(자동 수치 판정), D-R9-02(바로 자른 옷 이�
 
 ### 프로토타입
 
+- 홈은 `trips[0]`과 같은 `trip`을 가진 저장 옷만 줄에 보여 주고, "See all"은 `Drawer` 시트로 전체 `saved`를 연다. 예시 데이터는 Nov 1 저장 옷 4벌과 Oct 24 저장 옷 1벌(전체 목록에서만 보임)이다.
 - 가게 옷에는 "Walk back"과 "Try it on", 옷장 옷에는 피팅 시작 없이 이름 수정/삭제가 있다. 이름 대기·오프라인 대기와 원본 삭제 후 저장 스냅샷 가게 카드를 보여 준다. "Original photo"는 사진이 남아 있을 때만 제공한다. 모두 메모리 상태다(D-R3-11, D-R4-06, D-R4-09, D-R9-02).
 
 ## F-10 옷장

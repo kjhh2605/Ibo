@@ -11,7 +11,7 @@ export function IboMark({size=128,animated=false}:{size?:number;animated?:boolea
     <g>
       <path d="M264.2 217.4A24 24 0 0 1 266.1 261.8A24 24 0 0 1 233.4 231.8" fill="none" stroke={HANJI} strokeWidth={9} strokeLinecap="round"/>
       <path d="M236.5 223.3L241 239.9L222.4 233.1Z" fill={HANJI} stroke={HANJI} strokeWidth={5} strokeLinejoin="round"/>
-      {animated&&<animateTransform attributeName="transform" type="rotate" from="0 256 240" to="-360 256 240" dur="1s" begin="0.2s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1" keyTimes="0;1"/>}
+      {animated&&<animateTransform attributeName="transform" type="rotate" from="0 256 240" to="360 256 240" dur="1s" begin="0.2s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1" keyTimes="0;1"/>}
     </g>
   </svg>;
 }
