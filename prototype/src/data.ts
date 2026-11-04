@@ -286,7 +286,14 @@ const seedPiece = (photoId: string, candidateId: string) => {
   return pieceFrom(ph, ph.candidates.find((c) => c.id === candidateId)!, s, t)
 }
 
-export const SAVED_START: Piece[] = [seedPiece('i05', 'dress')]
+/** Newest first. The Oct 24 piece is only on "See all", since home shows the latest trip's pieces. */
+export const SAVED_START: Piece[] = [
+  seedPiece('i05', 'dress'),
+  seedPiece('i18', 'navy'),
+  seedPiece('i04', 'lilac'),
+  seedPiece('i03', 'check'),
+  seedPiece('i10-rail', 'cream'),
+]
 
 export const EXAMPLE_QUERIES = [
   'the blue puffer at the outdoor stall',

@@ -2,13 +2,16 @@ import { useState } from 'react'
 import { Camera, ChevronRight, Search, Shirt, ShieldCheck, Images, Store, Square } from 'lucide-react'
 import { Badge, Button, Card, Row } from '../kit'
 import { useNav, useStore } from '../state'
-import { I, IconButton, LocationPermission, PieceTile, Screen, Section, Sheet, ShopDescription, ShopImage, SystemPermission, TextLink } from '../ui'
+import { Drawer, I, IconButton, LocationPermission, PieceTile, Screen, Section, Sheet, ShopDescription, ShopImage, SystemPermission, TextLink } from '../ui'
 
 export function Home() {
   const { push } = useNav()
   const { shopping, startShopping, endShopping, trips, shopsOf, shop, photosOf, tripPhotos, saved, wardrobe, results, say, locationAllowed, setLocationAllowed, notificationsAllowed, setNotificationsAllowed } = useStore()
   const recent = trips[0]
   const recentShops = recent ? shopsOf(recent.id) : []
+  /** Home only shows what was saved on the trip above; "See all" opens every saved piece. */
+  const recentSaved = recent ? saved.filter((p) => p.trip === recent.id) : []
+  const [allSaved, setAllSaved] = useState(false)
   const current = shopping.shop ? shop(shopping.shop) : undefined
   const currentPhotos = shopping.trip ? tripPhotos(shopping.trip).length : 0
   const currentShops = shopping.trip ? shopsOf(shopping.trip).length : 0
@@ -103,9 +106,13 @@ export function Home() {
         </div>
       </Section>
 
-      <Section title="Saved" action={saved.length > 0 ? <span className="sf-count">{saved.length}</span> : undefined}>
+      <Section
+        title={recentSaved.length ? <>Saved this trip <span className="sf-count">{recentSaved.length}</span></> : 'Saved this trip'}
+        action={saved.length > 0 ? <TextLink onClick={() => setAllSaved(true)}>See all</TextLink> : undefined}
+      >
+        {!recentSaved.length && <div className="sf-hint sf-hint--strip">{saved.length ? 'Nothing saved from this trip yet.' : 'Nothing saved yet.'}</div>}
         <div className="sf-strip">
-          {saved.map((p) => (
+          {recentSaved.map((p) => (
             <PieceTile key={p.id} piece={p} size={124} onClick={() => push({ name: 'item', pieceId: p.id })} />
           ))}
           <button type="button" className="sf-strip__add" onClick={() => push({ name: 'ask' })}>
@@ -132,6 +139,13 @@ export function Home() {
         </Card>
       </div>
 
+      <Drawer open={allSaved} onClose={() => setAllSaved(false)} label="All saved pieces" title="Saved" meta={`${saved.length} ${saved.length === 1 ? 'piece' : 'pieces'} from all trips`}>
+        <div className="sf-grid sf-grid--last">
+          {saved.map((p) => (
+            <PieceTile key={p.id} piece={p} size={116} onClick={() => push({ name: 'item', pieceId: p.id })} />
+          ))}
+        </div>
+      </Drawer>
       <Sheet open={ending} onClose={() => setEnding(false)} label="End shopping mode">
         <div className="sf-sheet__title">End shopping mode?</div>
         <div className="sf-sheet__text">
