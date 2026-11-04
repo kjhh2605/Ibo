@@ -1,3 +1,4 @@
+import {Capacitor} from '@capacitor/core';
 import {Geolocation} from '@capacitor/geolocation';
 import type {GeolocationPlugin, Position} from '@capacitor/geolocation';
 import {EventSource} from './events';
@@ -35,9 +36,12 @@ export class ForegroundLocation extends EventSource<{fix: Fix; error: {code: str
     const generation = ++this.generation;
     const task = (async () => {
       try {
-        const permission = await this.plugin.requestPermissions({permissions: ['location']});
-        if (generation !== this.generation) return;
-        if (permission.location !== 'granted' && permission.coarseLocation !== 'granted') throw new WalkError('location_permission_denied');
+        // Browser watch/getCurrentPosition own the permission prompt; requestPermissions is native-only.
+        if (Capacitor.isNativePlatform()) {
+          const permission = await this.plugin.requestPermissions({permissions: ['location']});
+          if (generation !== this.generation) return;
+          if (permission.location !== 'granted' && permission.coarseLocation !== 'granted') throw new WalkError('location_permission_denied');
+        }
         const id = await this.plugin.watchPosition(options, (position, error) => {
           if (generation !== this.generation) return;
           if (error || !position) { this.emit('error', {code: locationError(error).code}); return; }

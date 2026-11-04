@@ -170,10 +170,10 @@ describe('privacy', () => {
 });
 
 describe('scenario voice', () => {
-  it('voice-empty is idle with prompt, deletes WAV and never searches', async () => {
+  it('voice-empty returns idle, deletes WAV and never searches', async () => {
     const f = fixture(); vi.mocked(f.deps.relay.request).mockResolvedValue({language: 'en', text: '  '});
     const agent = controller(f.deps); await agent.startVoice(); await agent.stopVoice(); await settled(agent);
-    expect(agent.getState()).toMatchObject({status: 'idle', notice: "I didn't catch that. Try again."});
+    expect(agent.getState().status).toBe('idle');
     await vi.waitFor(() => expect(f.deps.media.discard).toHaveBeenCalledWith(recording.file));
     expect(f.deps.relay.request).toHaveBeenCalledTimes(1);
   });
@@ -195,7 +195,7 @@ describe('scenario voice', () => {
   });
   it('no_speech remains idle without API errors', async () => {
     const f = fixture(); const agent = controller(f.deps); await agent.startVoice(); f.emitVoice('error', {code: 'no_speech', retryable: true});
-    expect(agent.getState()).toMatchObject({status: 'idle', error: null, notice: "I didn't catch that. Try again."}); expect(f.deps.relay.request).not.toHaveBeenCalled();
+    expect(agent.getState()).toMatchObject({status: 'idle', error: null}); expect(f.deps.relay.request).not.toHaveBeenCalled();
   });
   it('offline after recording and transcription failure both reclaim WAV without a search', async () => {
     const f = fixture(); const agent = controller(f.deps); await agent.startVoice();

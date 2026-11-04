@@ -1,0 +1,445 @@
+{
+  "passed": false,
+  "scenario": "states",
+  "routes": [
+    "home",
+    "capture",
+    "ask",
+    "pick",
+    "item",
+    "walk",
+    "outfit",
+    "trips",
+    "trip",
+    "wardrobe",
+    "privacy",
+    "results"
+  ],
+  "matrix": [
+    {
+      "route": "home",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "home",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "capture",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "capture",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "home",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "home",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "ask",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "ask",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "ask",
+      "state": "voice-vad-transcribe-automatic-search",
+      "passed": true
+    },
+    {
+      "route": "pick",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "pick",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "pick",
+      "state": "offline-show-all-without-inference",
+      "passed": true
+    },
+    {
+      "route": "item",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "item",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "home",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "home",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "home",
+      "state": "restart-persistence",
+      "passed": true
+    },
+    {
+      "route": "item",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "item",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "walk",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "walk",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "walk",
+      "state": "location-recovery-via-retry",
+      "passed": true
+    },
+    {
+      "route": "item",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "item",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "outfit",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "outfit",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "trips",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "trips",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "trip",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "trip",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "pick",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "pick",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "outfit",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "outfit",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "outfit",
+      "state": "companion-cancel-preserves-target",
+      "passed": true
+    },
+    {
+      "route": "trips",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "trips",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "trip",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "trip",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "pick",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "pick",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "outfit",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "outfit",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "outfit",
+      "state": "trip-cutout-saved-and-added",
+      "passed": true
+    },
+    {
+      "route": "home",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "home",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "wardrobe",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "wardrobe",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "pick",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "pick",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "wardrobe",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "wardrobe",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "home",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "home",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "privacy",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "privacy",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "home",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "home",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "results",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "results",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "home",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "home",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "item",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "item",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "outfit",
+      "state": "normal",
+      "passed": true
+    },
+    {
+      "route": "outfit",
+      "state": "offline",
+      "passed": true
+    },
+    {
+      "route": "outfit",
+      "state": "mask-failure-blocks-upload",
+      "passed": true
+    }
+  ],
+  "screenshots": [
+    "01-home.png",
+    "02-capture.png",
+    "03-search.png",
+    "04-pick.png",
+    "05-item.png",
+    "06-walk-route.png",
+    "07-arrived.png",
+    "08-trips.png",
+    "09-trip.png",
+    "10-wardrobe.png",
+    "11-privacy.png",
+    "12-results-empty.png",
+    "failure.png"
+  ],
+  "failure": "Self registration did not succeed through the real FaceMask plugin; missing/failed person fixtures cannot be replaced by UI success.",
+  "snapshot": {
+    "mode": "mock",
+    "relayBaseUrl": "http://127.0.0.1:8787",
+    "resultDownload": false,
+    "route": "outfit",
+    "stack": [
+      "home",
+      "item",
+      "outfit"
+    ],
+    "sheet": null,
+    "online": true,
+    "session": {
+      "phase": "idle",
+      "tripId": null,
+      "shopId": null
+    },
+    "ids": {
+      "trips": [
+        "19f9000b-b1f3-463e-bc15-701226cb41c4",
+        "59b6b8b8-d8a5-462a-89b0-5cf316b37a80"
+      ],
+      "photos": [
+        "302be8aa-36bc-43a0-bd78-1fd0371a8792",
+        "ad12dff6-5dc6-4a1a-b8cf-86f84ba1326d",
+        "saturday-shop2-photo5",
+        "saturday-shop2-photo4",
+        "saturday-shop2-photo3",
+        "saturday-shop2-photo2",
+        "saturday-shop2-photo1",
+        "saturday-shop1-photo2",
+        "saturday-shop1-photo1"
+      ],
+      "pieces": [
+        "piece:1801990a72f3f6a2f0d41d6a66e06734cc92a388f2fa4ac75dd95cb3cb1fe02d",
+        "piece:8881757de9663e89ad7b47607f4ffa20ebb2471fe69f9816f93361326fa1300a"
+      ],
+      "results": []
+    },
+    "queue": [],
+    "fitting": {
+      "draft": {
+        "targetPieceId": "piece:8881757de9663e89ad7b47607f4ffa20ebb2471fe69f9816f93361326fa1300a",
+        "companionPieceIds": []
+      },
+      "phase": "idle",
+      "selfState": "failed",
+      "resultId": null
+    },
+    "agent": {
+      "status": "idle",
+      "stage": null,
+      "events": [],
+      "photoIds": [],
+      "candidateIds": [],
+      "candidates": [],
+      "visibleCandidates": []
+    },
+    "walk": null,
+    "transport": {
+      "counts": {
+        "/v1/route": 3,
+        "/v1/describe/piece": 1
+      },
+      "rawSelfReads": 0,
+      "headMaskReads": 0,
+      "resultExports": 0,
+      "knownSelfVersions": 0,
+      "scope": "relay-attempts/shared-file-reads/media-export-attempts"
+    }
+  },
+  "engine": "Playwright Chromium",
+  "runtime": "web-mock with real durable Store and owner controllers",
+  "approval": "Prototype layout/copy session not performed; no native/model success claimed"
+}

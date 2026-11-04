@@ -1,4 +1,5 @@
 import {afterEach, describe, expect, it, vi} from 'vitest';
+import {Capacitor} from '@capacitor/core';
 import type {GeolocationPlugin, Position, WatchPositionCallback} from '@capacitor/geolocation';
 import {createRelayClient} from '../relay/client';
 import {ForegroundLocation} from './location';
@@ -45,6 +46,7 @@ describe('foreground geolocation', () => {
   });
 
   it('distinguishes denied permission from unavailable location and removes subscription', async () => {
+    vi.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true);
     const {plugin, push} = pluginFixture(); const location = new ForegroundLocation(plugin);
     const permission = vi.spyOn(plugin, 'requestPermissions').mockResolvedValue({location: 'denied', coarseLocation: 'denied'});
     await expect(location.start()).rejects.toMatchObject({code: 'location_permission_denied'});

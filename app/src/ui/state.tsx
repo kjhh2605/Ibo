@@ -27,7 +27,7 @@ export function UiProvider({services, children}:{services:Services; children:Rea
       services.shopping.addListener('state',value=>{if(live)setSession(value);}),
       services.store.addListener('changed',()=>{if(live){setRevision(value=>value+1);void sessionState();}}),
       services.shopping.addListener('notice',()=>{if(live)setToast('Shopping mode on · no notification card');}),
-      services.shopping.addListener('error',()=>{if(live)setToast('Shopping location is unavailable. Check location access in settings.');}),
+      services.shopping.addListener('error',({code})=>{if(live)setToast(code==='service_unavailable'?'Shopping location service is unavailable. Try again when it is ready.':'Shopping location is unavailable. Check location access in settings.');}),
       services.shopping.addListener('open',({url})=>{void services.shopping.getState().then(value=>{if(live){setSheet(null);setStack(current=>deepLink(current,url,value.phase==='recording'));}}).catch(()=>{if(live)setToast('Could not open the shopping notification.');});}),
       Network.addListener('networkStatusChange',status=>{if(live)setOnline(status.connected);}),
     ];

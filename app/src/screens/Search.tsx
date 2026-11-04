@@ -22,7 +22,6 @@ function errorCode(cause: unknown): string {
 function errorMessage(code: string): string {
   switch (code) {
     case 'offline': return 'You’re offline. Connect to search or use your saved trips.';
-    case 'microphone_permission':
     case 'microphone_permission_denied': return 'Microphone access is off. Allow access in device settings, or type your question.';
     case 'no_speech': return 'I didn’t catch that. Try speaking again or type your question.';
     case 'audio_unavailable': return 'The microphone is unavailable. Try again or type your question.';
@@ -44,6 +43,7 @@ function errorMessage(code: string): string {
     case 'too_many_companions': return 'Your outfit already has five companion pieces. Return to the outfit to remove one first.';
     case 'busy': return 'The previous operation is still finishing. Please try again.';
     case 'export_failed': return 'Could not save the photo to your gallery. Please try again.';
+    case 'cleanup_failed': return 'Temporary selection data could not be removed from this device. Try again.';
     case 'io_error': return 'Could not read or save the local photo. Please try again.';
     default: return 'That didn’t work. Please try again or browse your saved trips.';
   }
@@ -421,8 +421,13 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
   const chosen = choices.find(choice => choice.candidate.id === selected)?.candidate;
   const maskReady = Boolean(chosen && readyMasks.has(chosen.id));
   const onReady = useCallback((ids: Set<string>) => setReadyMasks(ids), []);
-  const discard = useCallback(async (files: Iterable<string>) => {
-    await Promise.all(Array.from(files, async file => {cache.forget(file); await services.store.discardTemp({file}).catch(() => {});}));
+  const discard = useCallback(async (files: Iterable<string>, owned: Set<string>) => {
+    const results = await Promise.allSettled(Array.from(files, async file => {
+      await services.store.discardTemp({file});
+      cache.forget(file);
+      owned.delete(file);
+    }));
+    if (results.some(result => result.status === 'rejected')) throw {code: 'cleanup_failed'};
   }, [cache, services]);
 
   useEffect(() => {
@@ -433,14 +438,15 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
       current.cancellation.abort();
       current.sequence++;
       void (async () => {
-        await current.release?.();
-        await current.tap?.catch(() => {});
-        await current.save?.catch(() => {});
-        await discard(current.files);
-        if (route.mode === 'wardrobe' && (lifecycle.current === current || !lifecycle.current.live)) await services.media.discard({assetId: asset.id}).catch(() => {});
+        const released = await Promise.allSettled([current.release?.(), current.tap, current.save]);
+        const cleaned = await Promise.allSettled([
+          discard(current.files, current.files),
+          route.mode === 'wardrobe' && (lifecycle.current === current || !lifecycle.current.live) ? services.media.discard({assetId: asset.id}) : Promise.resolve(),
+        ]);
+        if ([...released, ...cleaned].some(result => result.status === 'rejected')) say('Some temporary photo data could not be removed from this device.');
       })();
     };
-  }, [asset.id, discard, route.mode, services]);
+  }, [asset.id, discard, route.mode, services, say]);
 
   useEffect(() => {
     const current = lifecycle.current;
@@ -457,28 +463,29 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
     let releasing: Promise<void> | null = null;
     const release = () => releasing ??= (async () => {
       await prepared;
-      await current.tap?.catch(() => {});
-      await current.save?.catch(() => {});
-      if (handle) await services.segmenter.release({handle}).catch(() => {});
+      await Promise.allSettled([current.tap, current.save]);
+      if (handle) await services.segmenter.release({handle});
     })();
     current.release = release;
     return () => {
       active = false;
       if (current.handle === handle) current.handle = null;
-      void release();
+      void release().catch(() => say('On-device selection resources could not be released.'));
     };
-  }, [asset, services, prepareAttempt]);
+  }, [asset, services, prepareAttempt, say]);
 
   const clearTap = () => {
     const current = lifecycle.current;
     current.sequence++;
     const old = Array.from(current.files);
-    current.files.clear();
     setTapChoices([]);
     setPoint(null);
     setSelected(null);
     setSelectionError(null);
-    void discard(old);
+    void discard(old, current.files).catch(() => {
+      if (current.live) setSelectionError('cleanup_failed');
+      else say('Some temporary photo data could not be removed from this device.');
+    });
   };
 
   const tap = (position: ImagePoint) => {
@@ -487,8 +494,6 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
     const sequence = ++current.sequence;
     const handle = current.handle;
     const old = Array.from(current.files);
-    current.files.clear();
-    void discard(old);
     setPoint(position);
     setSelected(null);
     setTapChoices([]);
@@ -499,6 +504,7 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
       let returned: SegMask[] = [];
       let retained = false;
       try {
+        await discard(old, current.files);
         returned = (await services.segmenter.tap({handle, x: position.x, y: position.y})).masks;
         if (returned.length !== 3 || returned.some(mask => !Number.isFinite(mask.score) || mask.score < 0 || mask.score > 1)) throw {code: 'inference_failed'};
         const results = await Promise.all(returned.map(async (mask, decoderIndex) => {
@@ -519,9 +525,18 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
           if (errorCode(cause) === 'handle_expired') {current.handle = null; setPrepareError('handle_expired');}
         }
       } finally {
-        if (!retained) await discard(returned.map(mask => mask.mask));
-        current.tap = null;
-        if (current.live) setSegmenting(false);
+        try {
+          if (!retained) {
+            for (const mask of returned) current.files.add(mask.mask);
+            await discard(returned.map(mask => mask.mask), current.files);
+          }
+        } catch {
+          if (current.live) setSelectionError('cleanup_failed');
+          else say('Some temporary photo data could not be removed from this device.');
+        } finally {
+          current.tap = null;
+          if (current.live) setSegmenting(false);
+        }
       }
     })();
     current.tap = task;
@@ -565,7 +580,7 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
     {preparing && <Text role="status">Preparing on-device item selection…</Text>}
     {prepareError && <Problem message={errorMessage(prepareError)} retry={() => setPrepareAttempt(value => value + 1)} />}
     {segmenting && <Text role="status">Outlining this area on your device…</Text>}
-    {selectionError && <Problem message={errorMessage(selectionError)} retry={point && !prepareError ? () => tap(point) : undefined} />}
+    {selectionError && <Problem message={errorMessage(selectionError)} retry={selectionError === 'cleanup_failed' && !point ? clearTap : point && !prepareError ? () => tap(point) : undefined} />}
     {choices.length > 0 && <VStack gap={3}>
       <Heading level={3}>{tapping ? 'Which area?' : `Found ${choices.length} ${choices.length === 1 ? 'item' : 'items'}, best first`}</Heading>
       <Text type="supporting">Scores describe mask quality, not the probability that this is your item.</Text>

@@ -17,7 +17,7 @@ const environment: WalkEnvironment = {
 
 export const Location = new ForegroundLocation();
 export const Route = new RelayRoute(undefined, environment.online);
-export const Map = config.runtime === 'web-mock' ? new MockMap() : new WalkMap();
+export const Map = config.runtime === 'web-mock' || config.relayMode === 'mock' ? new MockMap() : new WalkMap();
 export const Walk = new WalkController({store: Store, location: Location, route: Route, environment});
 export {createWalk, WalkController} from './controller';
 export {WalkMap} from './map';

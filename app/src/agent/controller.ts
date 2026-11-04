@@ -66,7 +66,6 @@ export function createAgentController(deps: AgentDependencies): AgentController 
       const native = String(error.code);
       if (['index_unavailable', 'data_changed', 'microphone_permission_denied', 'audio_unavailable', 'io_error'].includes(native)) code = native;
     }
-    if (code === 'microphone_permission_denied') code = 'microphone_permission';
     if (code === 'turn_limit_exceeded') {
       emit({type: 'query_not_found', runId: run.id});
       publish({status: 'not_found', stage: null, stepsExpanded: false, summary: notFound});

@@ -4,6 +4,10 @@ import type {Photo,Shop} from '../native/contracts';
 import {useUi,useData,listAll} from '../ui/state';
 import {Action,Button,Confirm,EditFields,Empty,HStack,Loading,PhotoView,Problem,Section,Text,Thumbnail,VStack} from '../ui/components';
 
+function failureCode(error:unknown):string {
+  return typeof error==='object'&&error!==null&&'code'in error?String(error.code):'unknown';
+}
+
 // Serialize the shared camera across route unmount/remount and a pending shutter.
 let captureOperation: Promise<unknown> = Promise.resolve();
 function withCamera<T>(operation: () => Promise<T>): Promise<T> {
@@ -29,8 +33,9 @@ export function Home() {
         try {await services.shopping.start();if(active.current)push({name:'capture'});}
         catch(error){
           if(!active.current)return;
-          const code=typeof error==='object'&&error!==null&&'code'in error?error.code:null;
+          const code=failureCode(error);
           if(code==='location_permission_denied'||code==='location_disabled')showSheet({title:'Shopping mode needs your location',content:<VStack gap={4}><Text>It's how each shop gets pinned so you can walk back to it. Shopping mode can't start without it.</Text><Button label="Not now" variant="secondary" onClick={()=>showSheet(null)}/><Action label="Open settings" run={()=>services.shopping.openSettings()}/></VStack>});
+          else if(code==='location_unavailable')showSheet({title:'Your location is unavailable',content:<VStack gap={4}><Text>A current location fix is needed before shopping can start. Move somewhere with a clearer signal, then try again. No trip has been started.</Text><Button label="OK" onClick={()=>showSheet(null)}/></VStack>});
           else throw error;
         }
       }}/>}
@@ -84,7 +89,7 @@ export function Trip({route}:{route:Extract<Route,{name:'trip'}>}) {
 }
 export function Capture({route}:{route:Extract<Route,{name:'capture'}>}) {
   const {services,session,push,popTo,back,showSheet,say}=useUi();const purpose=route.purpose??'shopping';
-  const view=useRef<HTMLElement>(null);const [ready,setReady]=useState(false);const [error,setError]=useState(false);const [attempt,setAttempt]=useState(0);const [storefront,setStorefront]=useState(false);const [banner,setBanner]=useState(true);const [last,setLast]=useState<Photo|null>(null);
+  const view=useRef<HTMLElement>(null);const [ready,setReady]=useState(false);const [error,setError]=useState<string|null>(null);const [attempt,setAttempt]=useState(0);const [storefront,setStorefront]=useState(false);const [banner,setBanner]=useState(true);const [last,setLast]=useState<Photo|null>(null);
   const recording=session?.phase==='recording';
   const recent=useData(async()=>{
     if(!session?.shop)return null;
@@ -99,20 +104,20 @@ export function Capture({route}:{route:Extract<Route,{name:'capture'}>}) {
     if(purpose==='shopping'&&!recording)return;
     let active=true;let observer:ResizeObserver|undefined;
     const ancestors:HTMLElement[]=[];let parent=view.current?.parentElement;while(parent){ancestors.push(parent);parent=parent.parentElement;}const backgrounds=ancestors.map(element=>element.style.background);ancestors.forEach(element=>{element.style.background='transparent';});
-    const resize=()=>{const rect=view.current?.getBoundingClientRect();if(rect)void services.capture.setPreviewRect({x:rect.x,y:rect.y,width:rect.width,height:rect.height}).catch(()=>{if(active)setError(true);});};
-    setReady(false);setError(false);
+    const resize=()=>{const rect=view.current?.getBoundingClientRect();if(rect)void services.capture.setPreviewRect({x:rect.x,y:rect.y,width:rect.width,height:rect.height}).catch(cause=>{if(active)setError(failureCode(cause));});};
+    setReady(false);setError(null);
     const opened=withCamera(()=>services.capture.openPreview(route.purpose==='storefront'?{purpose:'storefront',shopId:route.shopId,facing:'back'}:{purpose:route.purpose??'shopping',facing:purpose==='self'?'front':'back'}));
-    void opened.then(()=>{if(!active)return;resize();observer=new ResizeObserver(resize);if(view.current)observer.observe(view.current);window.addEventListener('resize',resize);window.addEventListener('scroll',resize,true);setReady(true);}).catch(()=>{if(active)setError(true);});
+    void opened.then(()=>{if(!active)return;resize();observer=new ResizeObserver(resize);if(view.current)observer.observe(view.current);window.addEventListener('resize',resize);window.addEventListener('scroll',resize,true);setReady(true);}).catch(cause=>{if(active)setError(failureCode(cause));});
     return()=>{active=false;observer?.disconnect();window.removeEventListener('resize',resize);window.removeEventListener('scroll',resize,true);void withCamera(()=>services.capture.closePreview()).catch(()=>{});ancestors.forEach((element,index)=>{element.style.background=backgrounds[index];});};
-  },[services,purpose,route.shopId,attempt,recording]);
+  },[services,purpose,route.purpose,route.shopId,attempt,recording]);
   if(purpose==='shopping'&&session&&session.phase!=='recording')return <Empty title="Shopping mode is off"><Text>Start shopping from Home before taking shop photos.</Text><Button label="Home" onClick={()=>popTo('home')}/></Empty>;
   return <>
     <VStack gap={3}>{purpose==='shopping'?<><Text>Shop {session?.shop?.n??'—'} · {session?.photos??0} photos</Text><Text type="supporting">{session?.latestFix?`Location accuracy ${Math.round(session.latestFix.accuracyM)} m`:'Waiting for location…'}</Text></>:<Text>{purpose==='self'?'Stand back so your full body is visible. Your original photo stays on this device.':purpose==='storefront'?'Fit the whole shop front in the frame. Taking this photo uses your current location once; it does not start a shopping trail.':'Photograph one wardrobe piece.'}</Text>}</VStack>
     <VStack ref={view} role="img" aria-label="Camera preview" width="100%" minHeight="45dvh" style={{background:'transparent',aspectRatio:'3 / 4',position:'relative'}}/>
-    {error?<Problem message="Camera is unavailable. Check camera permission in device settings, then try again." retry={()=>setAttempt(value=>value+1)}/>:!ready?<Loading/>:null}
+    {error?<Problem message={error==='camera_permission_denied'?'Camera access is off. Allow access in device settings, then try again.':'The camera preview could not start. Try again or return to your saved photos.'} retry={()=>setAttempt(value=>value+1)}/>:!ready?<Loading/>:null}
     {purpose==='shopping'&&banner&&session?.shop&&<Section title={`Shop ${session.shop.n} started`}><Text>This spot is saved.</Text><HStack gap={3} wrap="wrap"><Button label="Storefront photo" variant="secondary" onClick={()=>setStorefront(true)}/><Button label="Add note" variant="secondary" onClick={()=>showSheet({title:`Note for Shop ${session.shop!.n}`,content:<EditFields label={session.shop?.note??''} onSave={note=>services.store.updateShop({id:session.shop!.id,note:note||null})}/>})}/><Button label="Dismiss" variant="ghost" onClick={()=>setBanner(false)}/></HStack></Section>}
     {storefront&&<Text>Fit the whole shop front in the frame</Text>}
-    <Action label={storefront||purpose==='storefront'?'Capture storefront':purpose==='self'?'Use this photo':'Take photo'} disabled={!ready||error} run={async()=>{
+    <Action label={storefront||purpose==='storefront'?'Capture storefront':purpose==='self'?'Use this photo':'Take photo'} disabled={!ready||Boolean(error)} run={async()=>{
       const {asset,photo}=await withCamera(()=>services.capture.takePhoto({kind:storefront||purpose==='storefront'?'storefront':'item'}));
       if(!active.current){if(purpose==='self'||purpose==='wardrobe')await services.media.discard({assetId:asset.id});return;}
       if(purpose==='self'){
