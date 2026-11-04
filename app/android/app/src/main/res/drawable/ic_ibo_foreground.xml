@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ibo logo mark in the 66dp adaptive-icon safe zone; also the Android 12+ splash icon. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:translateX="18.16"
+        android:translateY="18.16"
+        android:scaleX="0.14"
+        android:scaleY="0.14">
+        <path
+            android:fillColor="#F1EBDF"
+            android:pathData="M256,56C168,56 100,124 100,210C100,300 200,390 256,456C312,390 412,300 412,210C412,124 344,56 256,56Z" />
+        <path
+            android:strokeColor="#34507A"
+            android:strokeWidth="14"
+            android:strokeLineCap="round"
+            android:pathData="M226,182V166C226,136 286,136 286,166V182" />
+        <path
+            android:fillColor="#34507A"
+            android:pathData="M206,176H306A16,16 0 0 1 322,192V272A16,16 0 0 1 306,288H206A16,16 0 0 1 190,272V192A16,16 0 0 1 206,176Z" />
+        <path
+            android:strokeColor="#F1EBDF"
+            android:strokeWidth="9"
+            android:strokeLineCap="round"
+            android:pathData="M264.2,217.4A24,24 0 0 1 266.1,261.8A24,24 0 0 1 233.4,231.8" />
+        <path
+            android:fillColor="#F1EBDF"
+            android:strokeColor="#F1EBDF"
+            android:strokeWidth="5"
+            android:strokeLineJoin="round"
+            android:pathData="M236.5,223.3L241,239.9L222.4,233.1Z" />
+    </group>
+</vector>

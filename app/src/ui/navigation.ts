@@ -10,7 +10,7 @@ export type Route =
   | {name: 'outfit'}
   | {name: 'result'; resultId: string}
   | {name: 'walk'; source: 'item' | 'result'; id: string};
-export const titles: Record<Route['name'], string> = {home: 'Street Fitting', capture: 'Camera', trips: 'All trips', trip: 'Trip', ask: 'Find it', pick: 'Pick the item', item: 'Item', outfit: 'Try on', result: 'Your look', results: 'Try-ons', walk: 'Walk back', wardrobe: 'Wardrobe', privacy: 'Privacy'};
+export const titles: Record<Route['name'], string> = {home: 'Ibo', capture: 'Camera', trips: 'All trips', trip: 'Trip', ask: 'Find it', pick: 'Pick the item', item: 'Item', outfit: 'Try on', result: 'Your look', results: 'Try-ons', walk: 'Walk back', wardrobe: 'Wardrobe', privacy: 'Privacy'};
 export function pushRoute(stack: Route[], route: Route): Route[] {
   if (route.name === 'home') return [{name: 'home'}];
   if (route.name === 'capture' && stack.at(-1)?.name === 'capture') {
