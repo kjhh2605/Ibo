@@ -1,0 +1,125 @@
+{
+  "environment": "Darwin arm64; core-only ASGI app over loopback HTTP; synthetic verifier and MockTransport",
+  "scenarios": [
+    {
+      "scenario": "image-success",
+      "status": 200,
+      "code": null
+    },
+    {
+      "scenario": "audio-success",
+      "status": 200,
+      "code": null
+    },
+    {
+      "scenario": "route-success",
+      "status": 200,
+      "code": null
+    },
+    {
+      "scenario": "auth-before-json",
+      "status": 401,
+      "code": "unauthenticated"
+    },
+    {
+      "scenario": "app-check",
+      "status": 403,
+      "code": "app_check_failed"
+    },
+    {
+      "scenario": "validation-private-input",
+      "status": 400,
+      "code": "invalid_request"
+    },
+    {
+      "scenario": "jpeg-xmp",
+      "status": 400,
+      "code": "invalid_request"
+    },
+    {
+      "scenario": "jpeg-xmp-utf16",
+      "status": 400,
+      "code": "invalid_request"
+    },
+    {
+      "scenario": "jpeg-exif-xmp",
+      "status": 400,
+      "code": "invalid_request"
+    },
+    {
+      "scenario": "png-xmp",
+      "status": 400,
+      "code": "invalid_request"
+    },
+    {
+      "scenario": "png-xmp-compressed",
+      "status": 400,
+      "code": "invalid_request"
+    },
+    {
+      "scenario": "png-xmp-after-idat",
+      "status": 400,
+      "code": "invalid_request"
+    },
+    {
+      "scenario": "png-exif-xmp",
+      "status": 400,
+      "code": "invalid_request"
+    },
+    {
+      "scenario": "jpeg-xmp-duplicate",
+      "status": 400,
+      "code": "invalid_request"
+    },
+    {
+      "scenario": "png-xmp-duplicate",
+      "status": 400,
+      "code": "invalid_request"
+    },
+    {
+      "scenario": "chunked-body-limit",
+      "status": 413,
+      "code": "payload_too_large"
+    },
+    {
+      "scenario": "search-success",
+      "status": 200,
+      "code": null
+    },
+    {
+      "scenario": "search-failure",
+      "status": 502,
+      "code": "upstream_error"
+    },
+    {
+      "scenario": "search-rate",
+      "status": 429,
+      "code": "upstream_rate_limited"
+    },
+    {
+      "scenario": "search-coat",
+      "status": 200,
+      "code": null
+    },
+    {
+      "scenario": "tampered-token",
+      "status": 401,
+      "code": "invalid_query_token"
+    },
+    {
+      "scenario": "fifth-turn-before-closed",
+      "status": 409,
+      "code": "turn_limit_exceeded"
+    }
+  ],
+  "http_responses": 22,
+  "all_no_store": true,
+  "provider_mock_calls": 7,
+  "external_provider_calls": 0,
+  "file_temp_write_attempts": 0,
+  "privacy_sentinels_absent": true,
+  "loopback_connections": 1,
+  "log_records": 32,
+  "command": "source scripts/worktree-env.sh && uv --directory relay run python tests/core/http_smoke.py",
+  "source_commit": "f8dce64"
+}

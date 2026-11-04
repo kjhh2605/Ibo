@@ -1,0 +1,21 @@
+{
+  "surface": "preexisting installed Android Store plugin",
+  "source_revision": "unverified; not claimed to match current checkout",
+  "device": "Medium_Phone, single device under scripts/emulator-lock.sh",
+  "scenario": "repeat cleanup of generated app-cache temporary file",
+  "outcomes": [
+    {
+      "call": 1,
+      "success": true
+    },
+    {
+      "call": 2,
+      "success": false,
+      "code": "invalid_reference"
+    }
+  ],
+  "expected": "both calls succeed; repeated cleanup is idempotent",
+  "reproduction_js": "import {_android} from './app/node_modules/playwright/index.mjs';import{execFileSync}from'node:child_process';\nconst name='m1-discard-before-'+Date.now()+'.dat';execFileSync('adb',['shell','run-as','com.streetfitting.app','sh','-c',`'printf owned-smoke > cache/${name}'`],{stdio:'pipe'});\nconst devices=await _android.devices();if(devices.length!==1)throw Error('expected_one_device');const device=devices[0];\ntry{const page=await(await device.webView({pkg:'com.streetfitting.app'})).page();const outcomes=await page.evaluate(async name=>{const file='file:///data/user/0/com.streetfitting.app/cache/'+name;const outcomes=[];for(let i=0;i<2;i++){try{await window.Capacitor.nativePromise('Store','discardTemp',{file});outcomes.push({call:i+1,success:true});}catch(e){outcomes.push({call:i+1,success:false,code:e?.code??'unknown'});}}return outcomes;},name);console.log(JSON.stringify({surface:'installed native Store plugin',scenario:'repeat_temporary_cleanup',outcomes},null,2));if(!outcomes[0].success||outcomes[1].success||outcomes[1].code!=='invalid_reference')throw Error('baseline_mismatch');}finally{await device.close();execFileSync('adb',['shell','run-as','com.streetfitting.app','rm','-f','cache/'+name],{stdio:'ignore'});}",
+  "execution": "source scripts/worktree-env.sh && bash scripts/emulator-lock.sh node --input-type=module -e <reproduction_js>",
+  "cleanup": "generated fixture removed in finally; no existing user media removed"
+}
