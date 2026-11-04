@@ -101,7 +101,7 @@ UI 기준은 프로토타입(`prototype/`)이다. 흐름, 문구, 상태, 인터
 2026-11-04 준비 점검 이후 S00 bootstrap을 구현했다. 아래 준비 점검 기록은 당시 관찰이며, 현재 S00 실행 결과는 별도 증거와 구분한다.
 
 - 현재 OMP의 `goal.enabled=true`, `goal.continuationModes=["interactive"]`다. 터미널의 `/goal` 또는 `omp --goal "<목표>"`를 사용한다. RPC/chat에서 자동 지속을 원하면 해당 실행 모드 지원과 설정을 따로 확인한다. Goal은 API 권한·모델 파일을 대신 제공하지 않는다.
-- Orca 새 워크트리의 기준은 `origin/main`이다. S00 merge → 웨이브 1 → S01 merge 후 S02/S03 → 통합 순서를 따른다. 구현 워크트리마다 담당 슬라이스와 소유 경로를 명시하고, 검증한 PR만 통합 담당이 순차 merge한다.
+- 기존 웨이브 표의 merge 순서는 최초 계획이다. 두 Mac 재개에서는 사용자 지시에 따라 main/PR을 병합하지 않고, 담당 브랜치 사이에서 조정자가 승인한 정확한 commit만 전달한다. S01의 MacBook 코드 gate로 S02/S03 구현을 시작하되 최종 M1 gate를 별도로 통과한다(D-R11-02). 소유 경로와 검증 경계를 명시한다.
 - repo setup 명령은 `bash scripts/setup-worktree.sh`다. 이 스크립트는 `app`·`prototype`의 lockfile로 설치하고, 호스트의 `google-services.json`이 있으면 gitignored Android 경로에 권한 0600으로 복사한다. `relay/pyproject.toml`이 생긴 뒤에는 `uv sync --locked`도 실행한다. 릴레이가 없으면 그 사실을 출력하며 준비 완료로 위장하지 않는다.
 - 포트는 `~/.cache/street-fitting/ports.json`의 호스트 공통 잠금으로 워크트리마다 배정하고 `.sf-worktree.env`에 기록한다. 이는 프로세스 소켓 예약이 아니므로 실제 시작 시 포트 충돌을 오류로 처리해야 한다. 각 작업자 셸은 저장소 루트에서 `source scripts/worktree-env.sh`로 환경을 읽는다.
 - 호스트 도구 설정은 `~/.config/street-fitting/env.sh`, 자격 증명 로더는 같은 디렉터리의 `secrets.env`(권한 0600)에 둔다. Meta 키(`meta-api-key`), Firebase Admin 키(`firebase-admin.json`), Android 설정(`google-services.json`)도 저장소 밖에 보관한다. 키를 repo setup 명령이나 에이전트 프롬프트에 넣지 않는다. `RELAY_MODE`는 자동 지정하지 않는다.
@@ -110,7 +110,7 @@ UI 기준은 프로토타입(`prototype/`)이다. 흐름, 문구, 상태, 인터
 
 ### S00 구현·실행 결과 (2026-11-04, M1)
 
-- 공유 DTO/OpenAPI/TS 생성, 7개 명시적 501 경로, 8개 native/web 플러그인 등록, Firebase 인증 adapter, 모델 패키징과 실행 잠금을 구현했다. 아직 `App.tsx`는 빈 shell이며 제품 기능은 S01~S11 소유다.
+- S00 당시 공유 DTO/OpenAPI/TS 생성, 7개 명시적 501 경로, 8개 native/web 플러그인 등록, Firebase 인증 adapter, 모델 패키징과 실행 잠금을 구현했다. 당시 `App.tsx`는 빈 shell이었으며 이후 제품 구현·검증 상태는 각 슬라이스와 두 Mac 재개 증거를 따른다.
 - Orca 후속 작업자는 `--agent omp`로 실행한다. 에이전트 harness와 그 안의 모델 이름은 별개다. 초기 Codex 작업자는 종료했으며, OMP 작업자가 경계 수정과 실제 Android 검증을 수행했다.
 - [S00 실행 증거](../../verification/results/2026-11-04-s00-bootstrap/README.md)에 테스트·실행·실패 수정·남은 검증을 기록했다. 16 KB APK 패키징/정렬과 실제 ONNX 추론 합격은 구분한다.
 - Capacitor의 기본 debug 응답 로그가 인증 토큰을 출력하는 것을 실제로 확인하여 `loggingBehavior: 'none'`으로 껐다. 이후 native 인증 재실행에서 ID/App Check/debug 토큰 로그 일치가 0개였다. 이후에도 미디어·좌표를 포함하는 브리지 로그를 다시 켜지 않는다.
@@ -124,6 +124,15 @@ UI 기준은 프로토타입(`prototype/`)이다. 흐름, 문구, 상태, 인터
 - `forceRefreshAuth`는 native Firebase ID/App Check 양쪽 강제 갱신에 연결된다. `RelayError.retryAfterMs`는 유효한 `Retry-After` 초/HTTP-date를 전달하며 client 자체 재시도는 하지 않는다.
 - [실행 증거](../../verification/results/2026-11-04-wave1-shared/README.md): 앱 테스트 47개, lint/build/doctor, 실제 TCP HTTP 전송·취소·429 경계, Android 빌드와 실제 WebView의 강제 인증 갱신을 확인했다. 새 ID 토큰 발급 시각 증가, Firebase ID/App Check 토큰 각각 2개 검증, 토큰 로그 일치 0개였다.
 - `@capacitor/filesystem` 8.1.5와 UIAutomator 2.3.0 의존성을 연결했다. 관리 파일 소유권·Blob 저장소·제품 화면과 전체 E2E 합격은 이 공유 변경의 증거가 아니며 S04~S11의 별도 검증 대상이다.
+
+### 두 Mac 재개 runtime 선택
+
+- 앱 `VITE_SF_RUNTIME=web-mock`은 브라우저 fixture 전용이며 Android에서 거부한다. native는 실제 기기 plugin과 Firebase 인증을 유지한다.
+- `VITE_SF_RELAY_MODE=mock|live`는 relay 모드 선택이다(기본 live). mock의 `VITE_SF_FIXTURE`는 기본 normal이며 slug만 허용한다. live에 fixture를 지정하면 시작 시 실패한다. 호스트 `RELAY_MODE`와 앱 빌드 설정을 같은 시나리오로 맞춘다.
+- S11은 빌드에 `VITE_SF_VERIFICATION=1`을 명시한다. native 설치 앱의 실제 debuggable flag 또는 web-mock+DEV를 확인한 뒤에만 읽기 전용 snapshot을 노출한다. 미지원/실패/release는 null/비활성화이며 0으로 대체하지 않는다.
+- transport 수치는 실제 relay 시도, 공통 `readBytes`에서 등록된 self/headMask 읽기, Media.exportResult 호출 시도를 센다. 원본 파일·좌표·토큰·payload를 수집하지 않는다. 모든 native 파일 읽기/서버 보관을 증명하는 수치가 아니므로 S11 payload/privacy 관찰을 별도로 실행한다.
+- web 저장소는 한 DB에 활성 runtime 하나만 허용한다. 두 번째 탭은 busy이며 첫 탭을 닫은 뒤 재시도한다. 다른 탭을 열어 진행 중 파일을 회수하지 않는다.
+
 
 ### 준비 점검 실측 (2026-11-04, M1)
 

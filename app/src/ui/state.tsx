@@ -2,6 +2,7 @@ import {createContext, useContext, useEffect, useMemo, useState} from 'react';
 import type {ReactNode} from 'react';
 import {Network} from '@capacitor/network';
 import {config} from '../config';
+import {verificationSnapshot} from '../verification';
 import type {EntityMap, SessionState} from '../native/contracts';
 import type {Services} from './services';
 import {deepLink, popRoute, pruneDeleted, pushRoute, returnTo} from './navigation';
@@ -36,17 +37,17 @@ export function UiProvider({services, children}:{services:Services; children:Rea
     return ()=>{live=false;for(const handle of handles)void handle.then(value=>value.remove()).catch(()=>{});window.removeEventListener('online',connection);window.removeEventListener('offline',connection);};
   },[services]);
   useEffect(()=>{
-    if(config.runtime!=='web-mock'||!import.meta.env.DEV)return;
+    if(!verificationSnapshot())return;
     const inspect=async()=>{
       const [trips,photos,pieces,results,jobs]=await Promise.all([listAll(services,'Trip'),listAll(services,'Photo'),listAll(services,'Piece'),listAll(services,'Result'),listAll(services,'QueueJob')]);
       const fitting=services.fitting.getSnapshot(),agent=services.agent.getState();
-      return {route:stack.at(-1)?.name,stack:stack.map(entry=>entry.name),sheet:sheet?.title??null,online,
+      return {mode:config.relayMode,relayBaseUrl:config.relayBaseUrl,resultDownload:config.resultDownload,route:stack.at(-1)?.name,stack:stack.map(entry=>entry.name),sheet:sheet?.title??null,online,
         session:{phase:session?.phase??null,tripId:session?.trip?.id??null,shopId:session?.shop?.id??null},
         ids:{trips:trips.map(row=>row.id),photos:photos.map(row=>row.id),pieces:pieces.map(row=>row.id),results:results.map(row=>row.id)},
         queue:jobs.map(({id,kind,refId,attempts})=>({id,kind,refId,attempts})),
         fitting:{draft:fitting.draft,phase:fitting.phase,selfState:fitting.selfState,resultId:fitting.result?.id??null},
-        agent:{status:agent.status,stage:agent.stage,photoIds:agent.photos.map(row=>row.id),candidateIds:agent.candidates.map(row=>row.id)},
-        walk:services.walk.getState()?.mode??null};
+        agent:{status:agent.status,stage:agent.stage,events:agent.events,photoIds:agent.photos.map(row=>row.id),candidateIds:agent.candidates.map(row=>row.id),candidates:agent.candidates,visibleCandidates:agent.visibleCandidates},
+        walk:services.walk.getState(),transport:verificationSnapshot()};
     };
     const host=window as Window & {__sfVerification?:{inspect:typeof inspect}};
     host.__sfVerification=Object.freeze({inspect});

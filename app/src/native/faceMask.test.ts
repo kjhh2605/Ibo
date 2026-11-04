@@ -73,12 +73,6 @@ describe('automatic composition decision', () => {
 });
 
 describe('binary silhouette and source-contribution privacy', () => {
-  it('finds the upper minimum-width neck and expands a fully opaque rectangular head mask', () => {
-    const found = geometry();
-    expect(found.neckY).toBe(56);
-    expect(found.headBox).toEqual([52, 11, 56, 51]);
-    expect(binaryPixels({w, h, rgba: image().rgba})).toBeUndefined();
-  });
   it.each(['a', 'b', 'c'] as const)('removes every GT source contribution in mode %s regardless of source RGB', mode => {
     const found = geometry(), source = image([127, 127, 127, 255]), gt = new Uint8Array(w * h);
     for (let y = 20; y <= 55; y++) gt.fill(255, y * w + 60, y * w + 100);

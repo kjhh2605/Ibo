@@ -27,6 +27,14 @@ describe('web binary masks', () => {
     const bytes = new Uint8Array(await blob.arrayBuffer());
     expect(bytes[25]).toBe(0);
   });
+  it.each([
+    ['color', [70, 120, 170, 255]],
+    ['intermediate gray', [127, 127, 127, 255]],
+    ['transparent foreground', [255, 255, 255, 0]],
+  ] as const)('rejects %s rather than treating it as a privacy mask', (_name, pixel) => {
+    expect(() => binaryPixels({w: 1, h: 1, rgba: new Uint8ClampedArray(pixel)}))
+      .toThrowError(expect.objectContaining({code: 'inference_failed'}));
+  });
   it('keeps all three masks with stable decoder-order score ties', () => {
     expect(sortedFixtureMasks(fixture(9, 4), 9, 4).map(mask => mask.bbox)).toEqual([[8, 3, 1, 1], [0, 0, 1, 1], [1, 1, 2, 1]]);
     const invalid = fixture(9, 4); invalid[2].pixels.fill(0);

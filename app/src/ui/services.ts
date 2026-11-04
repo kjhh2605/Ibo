@@ -9,6 +9,7 @@ import {Walk, Map} from '../walk';
 import {startDataWorker, stopDataWorker} from '../data';
 import {config} from '../config';
 import {installWebFixtures} from './web-fixtures';
+import {enableVerification} from '../verification';
 
 export type {AgentSnapshot as AgentState} from '../agent';
 export type {TryOnState as FittingState} from '../tryon';
@@ -22,6 +23,7 @@ export function loadServices():Promise<Services> {
   return loaded;
 }
 async function initializeServices():Promise<Services> {
+  await enableVerification();
   const removeFixtures=config.runtime==='web-mock' ? await installWebFixtures() : ()=>{};
   await startDataWorker();
   return {store:Store, shopping:ShoppingSession, capture:Capture, media:Media, segmenter:Segmenter, agent, fitting:tryOn, walk:Walk, map:Map, async stop(){await stopDataWorker();removeFixtures();}};
