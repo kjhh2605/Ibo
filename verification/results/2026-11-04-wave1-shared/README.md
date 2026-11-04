@@ -29,3 +29,10 @@
 - Filesystem의 관리 경로/소유권 및 S06 Blob 저장소 연동은 후속 공통 파일 I/O와 해당 슬라이스에서 검증한다.
 - 앱 화면, 카메라/GPS/저장 수명, 실제 ONNX 추론, 검색·피팅·경로 성공, S11 mock/live full E2E는 이 검증으로 합격 처리하지 않는다.
 - 실제 Meta 추론 호출은 수행하지 않았다. 다운로드 feature flag는 계속 OFF다.
+
+## 두 Mac 재개: 파일 I/O 추가 확인 (MacBook, 2026-11-04)
+
+- `app/src/native/files.ts`에 `readBytes`/`writeTemp`를 추가했다. native는 Filesystem의 앱 files/cache URI만 사용하며 candidate-mask는 기존 Store의 private `registerTemp({file,ownerId})`로 등록한다. provider 바이트는 재인코딩하지 않는다. web은 명시 `VITE_SF_RUNTIME=web-mock`에서만 S06 IndexedDB/Blob 저장소를 재사용한다.
+- `VITE_SF_RUNTIME=web-mock npm run dev -- --host 127.0.0.1 --port 5191`로 실제 Vite를 실행하고 Chromium에서 해당 모듈을 로드했다. 실제 IndexedDB에 저장한 provider 바이트 왕복 동일성, discard 후 읽기 실패, owner 없는 candidate 거부, 삭제된 owner 거부를 확인했다.
+- 실제 2×2 PNG를 저장한 Photo의 mask owner로 등록한 뒤 mask 바이트 동일성, Photo 삭제의 mask 삭제 연쇄, 삭제 후 늦게 호출된 discard의 안전성을 확인했다. 임시 Photo/Trip 및 브라우저 탭은 정리했다.
+- 이 추가 확인은 MacBook web 저장소 범위다. native URI 검사·실기기 파일 소유권·M1 기기 검증을 대신하지 않는다.
