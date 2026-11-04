@@ -10,14 +10,14 @@ import {BottomSheet} from '@astryxdesign/core/BottomSheet';
 import {IconButton} from '@astryxdesign/core/IconButton';
 import {VisuallyHidden} from '@astryxdesign/core/VisuallyHidden';
 import {Button,VStack,HStack,Text,Heading,Icon} from './components';
-import {ArrowBackIcon,WifiOffIcon} from './icons';
+import {ArrowBackIcon,ShieldIcon,WifiOffIcon} from './icons';
 import {IboMark} from './IboMark';
 import {EASE_OUT,EASE_SPRING,reducedMotion} from './easing';
 import {titles} from './navigation';
 import {useUi} from './state';
 
 export function Shell({children}:{children:ReactNode}) {
-  const {route,stack,back,sheet,showSheet,toast,online,services}=useUi();
+  const {route,stack,back,push,sheet,showSheet,toast,online,services}=useUi();
   const capturing=route.name==='capture';
   const body=useRef<HTMLElement>(null);
   const backRef=useRef(back);backRef.current=back;
@@ -63,7 +63,8 @@ export function Shell({children}:{children:ReactNode}) {
   const home=route.name==='home';
   const brand=<TopNavHeading heading="Ibo" logo={<VStack aria-hidden align="center" justify="center" width="var(--spacing-8)" height="var(--spacing-8)" style={{background:'var(--color-hero)',borderRadius:'var(--radius-element)'}}><IboMark size={26}/></VStack>}/>;
   const heading=stack.length>1?<IconButton label="Back" variant="ghost" icon={<Icon icon={ArrowBackIcon}/>} onClick={back}/>:brand;
-  const nav=<TopNav label="Ibo navigation" heading={heading}/>;
+  // Home keeps Privacy in the top bar, as in the prototype.
+  const nav=<TopNav label="Ibo navigation" heading={heading} endContent={home?<IconButton label="Privacy" variant="ghost" icon={<Icon icon={ShieldIcon}/>} onClick={()=>push({name:'privacy'})}/>:undefined}/>;
   return <AppShell variant="surface" contentPadding={capturing?3:5} mobileNav={false} topNav={nav} banner={!online?<HStack gap={2} vAlign="center" hAlign="center" paddingBlock={2} paddingInline={4} style={{background:'var(--color-warning-muted)',color:'var(--color-on-warning-muted)'}}><Icon icon={WifiOffIcon} size="sm" color="inherit"/><Text type="label" size="sm" color="inherit">You’re offline. Saved photos and pieces are still available.</Text></HStack>:undefined}>
     <VStack gap={capturing?3:8} width="100%" height={capturing?'100%':undefined} minHeight={capturing?0:undefined} maxWidth="var(--layout-max-width, 40rem)" ref={body} data-route={route.name} style={{marginInline:'auto',paddingBottom:capturing?undefined:'var(--spacing-10)'}}>
       {home||capturing?<VisuallyHidden><Heading level={1}>{titles[route.name]}</Heading></VisuallyHidden>:<Heading level={1} style={{letterSpacing:'-0.02em'}}>{titles[route.name]}</Heading>}

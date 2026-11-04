@@ -61,7 +61,7 @@ export function Home() {
   const {services,push,session,showSheet,online}=useUi();
   const active=useRef(true);
   useEffect(()=>{active.current=true;return()=>{active.current=false;};},[]);
-  const data=useData(async()=>{const [trips,pieces,shops]=await Promise.all([listAll(services,'Trip'),listAll(services,'Piece',{origin:'shop'}),listAll(services,'Shop')]);trips.sort((a,b)=>b.startedAt-a.startedAt);const photos=trips[0]?await listAll(services,'Photo',{tripId:trips[0].id}):[];return {trips,pieces:pieces.sort((a,b)=>b.createdAt-a.createdAt),shops:shops.filter(shop=>shop.tripId===trips[0]?.id).sort((a,b)=>a.n-b.n),photos};},[services]);
+  const data=useData(async()=>{const [trips,pieces,shops,wardrobe,results]=await Promise.all([listAll(services,'Trip'),listAll(services,'Piece',{origin:'shop'}),listAll(services,'Shop'),listAll(services,'Piece',{origin:'wardrobe'}),listAll(services,'Result')]);trips.sort((a,b)=>b.startedAt-a.startedAt);const photos=trips[0]?await listAll(services,'Photo',{tripId:trips[0].id}):[];return {trips,wardrobe:wardrobe.length,results:results.length,pieces:pieces.sort((a,b)=>b.createdAt-a.createdAt),shops:shops.filter(shop=>shop.tripId===trips[0]?.id).sort((a,b)=>a.n-b.n),photos};},[services]);
   const recording=session?.phase==='recording';
   const start=async()=>{
     try {await services.shopping.start();if(active.current)push({name:'capture'});}
@@ -95,11 +95,6 @@ export function Home() {
         <Button label="Find it" variant="ghost" icon={<Icon icon="search"/>} width="100%" style={HERO_GHOST} onClick={()=>push({name:'ask'})}/>
       </VStack>
     </VStack>
-    <Grid columns={3} gap={3}>
-      <Reveal index={0} from="scale"><TileButton label="Wardrobe" onClick={()=>push({name:'wardrobe'})}><IconTile icon={HangerIcon}/><Text type="label" weight="semibold">Wardrobe</Text></TileButton></Reveal>
-      <Reveal index={1} from="scale"><TileButton label="Try-ons" onClick={()=>push({name:'results'})}><IconTile icon={SparkleIcon}/><Text type="label" weight="semibold">Try-ons</Text></TileButton></Reveal>
-      <Reveal index={2} from="scale"><TileButton label="Privacy" onClick={()=>push({name:'privacy'})}><IconTile icon={ShieldIcon}/><Text type="label" weight="semibold">Privacy</Text></TileButton></Reveal>
-    </Grid>
     <Section title="Latest trip" action={<Button label="All trips" variant="ghost" size="sm" endContent={<Icon icon="chevronRight" size="sm"/>} onClick={()=>push({name:'trips'})}/>}>
       {data.loading&&!data.data?<Panel gap={1} padding={3}><SkeletonRows flat count={3} label="Loading your latest trip"/></Panel>:data.error?<Problem message={data.error} retry={data.retry}/>:latest?<Reveal><Panel gap={1} padding={3}>
         <RowButton flat label={new Date(latest.startedAt).toLocaleDateString('en-US',{dateStyle:'medium'})} start={<IconTile icon="calendar" tone="hero"/>} meta={`${latest.status==='recording'?'Recording now':`Ended ${clock(latest.endedAt??latest.startedAt)}`} · ${data.data!.shops.length} ${data.data!.shops.length===1?'shop':'shops'} · ${itemPhotos()} photos`} onClick={()=>push({name:'trip',tripId:latest.id})}/>
@@ -111,6 +106,12 @@ export function Home() {
         {tripPieces.map((piece,index)=><VStack key={piece.id} role="listitem" style={{flex:'none',width:'calc((100% - var(--spacing-3) * 2) / 2.3)',scrollSnapAlign:'start'}}><Reveal index={index} from="scale"><PieceTile piece={piece} onOpen={()=>push({name:'item',pieceId:piece.id})}/></Reveal></VStack>)}
       </HStack>:pieces.length?<Text type="supporting">Nothing saved from this trip yet. Tap See all for pieces from earlier trips.</Text>:<Empty title="No saved pieces" icon={HangerIcon}><Text type="supporting">Find a garment in your trip photos to save it.</Text></Empty>}
     </Section>
+    {/* Same order as the prototype: Wardrobe and Try-ons as two rows under Saved; Privacy is the shield in the top bar. */}
+    <Panel gap={1} padding={3}>
+      <RowButton flat label="Wardrobe" start={<IconTile icon={HangerIcon}/>} meta={data.data?`${data.data.wardrobe} ${data.data.wardrobe===1?'piece':'pieces'} you own`:undefined} onClick={()=>push({name:'wardrobe'})}/>
+      <Divider/>
+      <RowButton flat label="Try-ons" start={<IconTile icon={ImageIcon}/>} meta={data.data?(data.data.results?`${data.data.results} ${data.data.results===1?'look':'looks'}, kept on this phone`:'No looks yet'):undefined} onClick={()=>push({name:'results'})}/>
+    </Panel>
     <Hint icon={ShieldIcon}>Your original self photo and route history never leave this phone.</Hint>
     <AllSaved pieces={pieces} open={allSaved} onClose={closeAllSaved} onOpenPiece={piece=>{setAllSaved(false);push({name:'item',pieceId:piece.id});}}/>
   </>;
