@@ -72,3 +72,9 @@ SF_MODELS_DIR="$HOME/.cache/street-fitting/models" SF_REAL_PE_TEST=1 \
 - coordinator가 S01/S02/S03을 함께 실행한 `uv --directory relay run pytest -q`: **266 passed**, warning 1개. core/media의 동일 test module 이름 충돌을 package 및 상대 helper import로 해결했다. 범위를 줄이거나 캐시 삭제로 숨기지 않았다.
 - 같은 현재 소스의 `tests/search/http_smoke.py`는 위 18개 TCP 응답과 privacy 경계를 다시 통과했다. `scripts/e2e/validate-fixtures.sh --relay`도 10개 chain/12개 production boundary 검사, provider 0회로 통과했다.
 - 사용되지 않는 501 bootstrap 함수를 삭제하고 OpenAPI/앱 TS를 다시 생성했다. 501은 이제 fixture not found만 설명하며 정상 제품 endpoint의 대안이 아니다. 실제 PE/Android/live gate는 위 별도 명령 그대로다.
+
+## M1 후속: 연구 query metadata 수정
+
+M1 coordinator는 실제 loader 검사 4개 통과(cold 16.388s, warm 14ms)를 보고했다. 연구 비교 두 검사는 추론 전에 잘못된 metadata equality에서 중단됐다. 두 고정 SHA가 맞는 원본에서도 manifest의 과거 query 목록은 6개이고, 최종 `results.json`에는 실제 평가 7개가 있다.
+
+그 두 목록이 같아야 한다는 부수적인 assertion만 제거했다. 고정 manifest/results SHA, 22개 원본 이미지·전처리·벡터 오차, 최종 results의 7문구·정답·top3 순서, 실제 Android 벡터의 독립 provenance gate는 그대로다. 기준 파일이나 허용 오차를 바꾸지 않았다. 수정 후 두 실제 연구 비교의 결과는 M1 실행 후 기록한다.
