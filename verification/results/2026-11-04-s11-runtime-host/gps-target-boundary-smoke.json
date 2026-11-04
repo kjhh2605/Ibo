@@ -1,0 +1,15 @@
+{
+  "scope": "Actual shoppingFix module in isolated host VM with synthetic native replies. Not Android or one-hour evidence.",
+  "targetIdentityToleranceMeters": 1,
+  "productLocationPolicyChanged": false,
+  "quantizationMechanismClaimed": false,
+  "checks": [
+    "Fresh observed submeter native offset accepted",
+    "Stale same-neighborhood timestamp rejected",
+    "Fresh target offset of 0.99m accepted",
+    "Fresh target offset of 1.01m rejected",
+    "Fresh different target rejected",
+    "Non-finite timestamp rejected",
+    "Non-finite previous timestamp cannot establish freshness"
+  ]
+}

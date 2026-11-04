@@ -55,3 +55,9 @@ M1 requested reuse of the existing one-hour helper while independent human prere
 The same integration exposed a deletion-helper mismatch: native schema-v2 canonical `file:///data/data/...` paths were rejected, although the existing private reader already accepts both canonical and user-0 app roots. The deletion check now follows that same boundary and still rejects foreign packages/traversal.
 
 Throwaway host VM execution reproduced the old acceptance of a stopped location stream and the canonical-path rejection, then exercised the corrected modules. `fgs-boundary-smoke.json` records stale/same-coordinate rejection, stopped/final-hour stream rejection, canonical path boundaries, per-observation growth and cleanup. Its clock/device responses are explicitly synthetic: **this is not one-hour Android evidence**. Node syntax checks passed; the throwaway runner was removed. The actual M1 hour remains a separate required execution.
+
+## Coordinator follow-up: metric injected-target identity
+
+M1 reported advancing native fix timestamps/trail rows but submeter offsets from the emulator-injected target, with accuracy 5 m. The old `1e-7` degree predicate imposed an undocumented roughly centimeter identity requirement and rejected those fresh fixes; the separate IEEE-float32 hypothesis did not match observed error and is not claimed.
+
+`shoppingFix` now uses haversine distance ≤1 m only for injected-target identity. Strict finite/increasing timestamps and every hour/trail/final-observation assertion remain unchanged; no product location-accuracy policy was relaxed. A throwaway VM reproduced the rejected observed offset before the fix. `gps-target-boundary-smoke.json` records seven host boundary checks, including stale/non-finite timestamps and 0.99 m acceptance versus 1.01 m rejection. Node syntax passed and the runner was removed. This is not Android/hour evidence; M1 runs that separately.
