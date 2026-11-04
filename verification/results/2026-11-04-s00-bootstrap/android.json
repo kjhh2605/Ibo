@@ -1,0 +1,257 @@
+{
+  "scope": "S00 Android bootstrap only; no product functionality or model inference claimed",
+  "startedAt": "2026-11-04T12:29:45Z",
+  "checks": {
+    "missingModels": {
+      "command": "assembleDebug -PSF_MODELS_DIR=<empty temporary directory>",
+      "exitCode": 1,
+      "missingModelsReported": 3,
+      "baselineUntouched": true,
+      "priorGeneratedAssetsDidNotBypassFailure": true
+    },
+    "packaging": {
+      "models": {
+        "edgetam_encoder.onnx": {
+          "uncompressed": true,
+          "sha256MatchesBaseline": true,
+          "bytes": 19753637
+        },
+        "edgetam_decoder.onnx": {
+          "uncompressed": true,
+          "sha256MatchesBaseline": true,
+          "bytes": 16421792
+        },
+        "pe_image.onnx": {
+          "uncompressed": true,
+          "sha256MatchesBaseline": true,
+          "bytes": 31994387
+        }
+      },
+      "arm64Libraries": {
+        "lib/arm64-v8a/libdatastore_shared_counter.so": {
+          "loadSegmentAlignments": [
+            16384,
+            16384,
+            16384
+          ],
+          "passes16KiB": true
+        },
+        "lib/arm64-v8a/libimage_processing_util_jni.so": {
+          "loadSegmentAlignments": [
+            16384,
+            16384,
+            16384
+          ],
+          "passes16KiB": true
+        },
+        "lib/arm64-v8a/libonnxruntime.so": {
+          "loadSegmentAlignments": [
+            16384,
+            16384,
+            16384
+          ],
+          "passes16KiB": true
+        },
+        "lib/arm64-v8a/libonnxruntime4j_jni.so": {
+          "loadSegmentAlignments": [
+            16384,
+            16384
+          ],
+          "passes16KiB": true
+        },
+        "lib/arm64-v8a/libsurface_util_jni.so": {
+          "loadSegmentAlignments": [
+            16384,
+            16384
+          ],
+          "passes16KiB": true
+        }
+      },
+      "zipalign16KiBExitCode": 0,
+      "apkSha256": "0f52d4e3e6e0af9e43a257086a7625d4feef82a77064361c0f3a8beb686c404f",
+      "capacitorLoggingBehavior": "none"
+    },
+    "releaseManifest": {
+      "cleartextPermitted": false,
+      "debugNetworkConfigPresent": false,
+      "processReleaseMainManifestExitCode": 0,
+      "shoppingServicePackage": "com.streetfitting.app.plugins.shopping.ShoppingService"
+    },
+    "gradle": {
+      "assembleDebug": "passed",
+      "testDebugUnitTest": "NO-SOURCE; removed arithmetic template, no unit coverage claimed",
+      "assembleDebugAndroidTest": "passed for :app target",
+      "connectedDebugAndroidTest": {
+        "exitCode": 0,
+        "tests": 1,
+        "failures": 0,
+        "test": "NetworkSecurityPolicyTest.debugCleartextIsLimitedToLocalRelayHosts",
+        "command": "scripts/emulator-lock.sh app/android/gradlew -p app/android connectedDebugAndroidTest --console=plain",
+        "aggregateAllModules": true
+      }
+    },
+    "helpers": {
+      "gpxReplay": {
+        "exitCode": 0,
+        "points": 2,
+        "elapsedSeconds": 1.761,
+        "nestedLock": true
+      },
+      "captureFixtures": {
+        "exitCode": 0,
+        "files": 0,
+        "nestedLock": true
+      },
+      "voiceFixtures": {
+        "exitCode": 0,
+        "files": 0,
+        "nestedLock": true
+      }
+    },
+    "authBeforeLoggingFix": {
+      "success": true,
+      "idTokenVerified": true,
+      "anonymousProvider": true,
+      "appCheckTokenVerified": true,
+      "appIdMatches": true,
+      "secretInLogs": false,
+      "idTokenInLogs": true,
+      "appCheckTokenInLogs": true
+    },
+    "credentialRecovery": {
+      "initialNativeSecretMatchedRegisteredHostFile": false,
+      "registeredHostSecretExchangeHttpStatus": 200,
+      "action": "Restored existing registered protected host credential into debug app private SharedPreferences over adb stdin; no registration or billing changes",
+      "reason": "Observed device secret mismatch after instrumentation installation lifecycle; lifecycle causation inferred"
+    },
+    "finalNativeSmoke": {
+      "serial": "emulator-5554",
+      "nativePlatform": true,
+      "webgl": {
+        "available": true,
+        "renderer": "Android Emulator OpenGL ES Translator (Apple M1)"
+      },
+      "pluginErrors": {
+        "ShoppingSession": {
+          "code": "unimplemented",
+          "message": "Not implemented",
+          "retryable": false
+        },
+        "Capture": {
+          "code": "unimplemented",
+          "message": "Not implemented",
+          "retryable": false
+        },
+        "PhotoIndex": {
+          "code": "unimplemented",
+          "message": "Not implemented",
+          "retryable": false
+        },
+        "Segmenter": {
+          "code": "unimplemented",
+          "message": "Not implemented",
+          "retryable": false
+        },
+        "FaceMask": {
+          "code": "unimplemented",
+          "message": "Not implemented",
+          "retryable": false
+        },
+        "Media": {
+          "code": "unimplemented",
+          "message": "Not implemented",
+          "retryable": false
+        },
+        "Voice": {
+          "code": "unimplemented",
+          "message": "Not implemented",
+          "retryable": false
+        },
+        "Store": {
+          "code": "unimplemented",
+          "message": "Not implemented",
+          "retryable": false
+        }
+      },
+      "auth": {
+        "success": true,
+        "idTokenVerified": true,
+        "anonymousProvider": true,
+        "appCheckTokenVerified": true,
+        "appIdMatches": true,
+        "secretInLogs": false,
+        "idTokenInLogs": false,
+        "appCheckTokenInLogs": false
+      }
+    },
+    "credentialRestoreHelper": {
+      "command": "source scripts/worktree-env.sh && scripts/emulator-lock.sh bash scripts/restore-app-check-debug.sh",
+      "exitCode": 0,
+      "nestedLockVerified": true,
+      "subsequentNativeTokenVerificationPassed": true
+    },
+    "networkPolicy": {
+      "instrumentedTests": 1,
+      "allowedDebugHosts": [
+        "10.0.2.2",
+        "localhost",
+        "127.0.0.1",
+        "::1"
+      ],
+      "blockedHosts": [
+        "example.com",
+        "192.168.1.1",
+        "10.0.2.3",
+        "child.localhost",
+        "localhost.example.com"
+      ],
+      "defaultCleartextPermitted": false
+    }
+  },
+  "knownLimitations": [
+    "No Android ONNX inference executed; packaging/alignment only.",
+    "No S01-S11 product feature or E2E validation claimed.",
+    "Unit task has no test sources after deleting arithmetic template; only actual device security regression is claimed."
+  ],
+  "device": {
+    "avd": "Medium_Phone",
+    "pageSize": 16384,
+    "gpu": "host",
+    "launchctlLabel": "com.streetfitting.s00-emulator",
+    "lifecycle": "Persists independently of verification command exit",
+    "lock": "scripts/emulator-lock.sh for every device action",
+    "singleEmulator": true
+  },
+  "filesModified": [
+    "app/android/app/src/main/AndroidManifest.xml",
+    "app/android/app/src/debug/AndroidManifest.xml",
+    "app/android/app/src/debug/res/xml/network_security_config.xml",
+    "app/android/app/src/androidTest/java/com/streetfitting/app/NetworkSecurityPolicyTest.java",
+    "app/android/app/src/test/java/com/getcapacitor/myapp/ExampleUnitTest.java (removed)",
+    "app/android/app/src/androidTest/java/com/getcapacitor/myapp/ExampleInstrumentedTest.java (removed)",
+    "app/android/app/src/main/java/com/streetfitting/app/MainActivity.java",
+    "app/android/app/src/main/java/com/streetfitting/app/plugins/shopping/ShoppingService.java (moved from app package)",
+    "app/android/app/src/main/java/com/streetfitting/app/plugins/shopping/ShoppingSessionPlugin.java (moved from shoppingsession package)"
+  ],
+  "resolvedFailures": [
+    "Generated Cordova module instrumentation Kotlin duplicate classes fixed by coordinator root Gradle BOM; full unqualified connectedDebugAndroidTest now passes.",
+    "Capacitor default debug bridge logs native token response; coordinator set loggingBehavior:none and synced configuration for final APK."
+  ],
+  "nativeSmokeProcedure": [
+    "Attach Playwright _android.webView to installed com.streetfitting.app; require Android platform and one emulator.",
+    "Call one method through nativePromise on each of eight registered plugins; require unimplemented / Not implemented / data.retryable=false.",
+    "Call SfAuth.getTokens and pass tokens only in memory/stdin to Firebase Admin verify_id_token and app_check.verify_token; require anonymous sign-in provider and expected app ID.",
+    "Capture logcat in host memory only; require no exact returned token or private debug-secret substring; do not persist raw logs.",
+    "Create WebGL canvas in real app WebView and record renderer."
+  ],
+  "commands": [
+    "source scripts/worktree-env.sh && app/android/gradlew -p app/android assembleDebug -PSF_MODELS_DIR=<empty-temporary-directory> --console=plain (expected exit 1)",
+    "source scripts/worktree-env.sh && app/android/gradlew -p app/android assembleDebug testDebugUnitTest :app:processReleaseMainManifest --console=plain (exit 0)",
+    "source scripts/worktree-env.sh && scripts/emulator-lock.sh app/android/gradlew -p app/android connectedDebugAndroidTest --console=plain (exit 0)",
+    "source scripts/worktree-env.sh && scripts/emulator-lock.sh adb install -r app/android/app/build/outputs/apk/debug/app-debug.apk (exit 0)",
+    "source scripts/worktree-env.sh && scripts/emulator-lock.sh bash scripts/restore-app-check-debug.sh (exit 0)",
+    "zipalign -c -P 16 4 app/android/app/build/outputs/apk/debug/app-debug.apk (exit 0)"
+  ],
+  "status": "passed",
+  "completedAt": "2026-11-04T12:46:42Z"
+}

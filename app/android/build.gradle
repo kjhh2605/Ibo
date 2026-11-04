@@ -24,6 +24,16 @@ allprojects {
     }
 }
 
+// Cordova's older coroutines pull pre-1.8 JDK jars alongside the merged stdlib.
+// Keep the generated module untouched and align its runtime/test classpaths.
+project(':capacitor-cordova-android-plugins') {
+    plugins.withId('com.android.library') {
+        dependencies {
+            implementation platform('org.jetbrains.kotlin:kotlin-bom:1.8.22')
+        }
+    }
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
