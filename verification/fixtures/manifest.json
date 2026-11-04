@@ -37,6 +37,43 @@
       ]
     },
     {
+      "path": "audio/leading-5s.wav",
+      "sha256": "4d0e73cb8f90340d13b7bef42a400ae5bc63842b014cd80230c756526b89d117",
+      "mimeType": "audio/x-wav",
+      "bytes": 172844,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "samples": 86400,
+      "sampleRate": 16000,
+      "channels": 1,
+      "sampleWidth": 2,
+      "durationS": 5.4
+    },
+    {
       "path": "audio/limit-15s.wav",
       "sha256": "6796635912528ce6be2c48825735504b8d12ccfe852afbf903106e8f53869f25",
       "mimeType": "audio/x-wav",
@@ -111,43 +148,6 @@
       "durationS": 15.0000625
     },
     {
-      "path": "audio/query.wav",
-      "sha256": "983b9fe48324548ffaacca26ca16b52f48817d21582cbfb5215f25577f487b05",
-      "mimeType": "audio/x-wav",
-      "bytes": 101564,
-      "sourceType": "macos-say",
-      "generator": {
-        "tool": "macOS say Samantha + afconvert",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
-      "terms": {
-        "url": "https://www.apple.com/legal/sla/docs/macOSTahoe.pdf",
-        "checkedAt": "2026-11-04",
-        "summary": "Section2F personal non-commercial only; public redistribution prohibited",
-        "publicUseApproved": false
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "samples": 50760,
-      "sampleRate": 16000,
-      "channels": 1,
-      "sampleWidth": 2,
-      "durationS": 3.1725
-    },
-    {
       "path": "audio/silence.wav",
       "sha256": "262d1f34f300560a4c82ba8127ddea9e1d72946f187fdbd3e8f70ee096077aec",
       "mimeType": "audio/x-wav",
@@ -217,6 +217,43 @@
       ]
     },
     {
+      "path": "audio/tone-silence.wav",
+      "sha256": "39973c7d4f33089f075810eb78ca9eb1b0f69f366de559591ca24394e4877e1a",
+      "mimeType": "audio/x-wav",
+      "bytes": 44844,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "samples": 22400,
+      "sampleRate": 16000,
+      "channels": 1,
+      "sampleWidth": 2,
+      "durationS": 1.4
+    },
+    {
       "path": "capture/01-shop1-storefront.png",
       "sha256": "ea5b3b06c61ef238637425fcccf516c051e739b04b6767c6126dea882b146231",
       "mimeType": "image/png",
@@ -233,7 +270,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -273,7 +310,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -313,7 +350,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -353,7 +390,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -393,7 +430,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -433,7 +470,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -506,7 +543,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -563,9 +600,9 @@
     },
     {
       "path": "gpx/shopping-three-shops.expected.json",
-      "sha256": "3980c8685fe7e5d6d54cba2e6b09fc8995c389333f6a27cd0230e9575b9bd613",
+      "sha256": "fbe9a657c22c677d1815aaeda6614ae38c50f86210638e2f6ae283717f5f823c",
       "mimeType": "application/json",
-      "bytes": 1969,
+      "bytes": 1968,
       "sourceType": "hand-authored",
       "generator": {
         "tool": "OMP fixture tooling",
@@ -595,7 +632,7 @@
     },
     {
       "path": "gpx/shopping-three-shops.gpx",
-      "sha256": "d8d5eb0c123d5d87e6810878b9caac728b21758789717d984b055abcac7bff02",
+      "sha256": "310f1dadaf2a7b152c225f7b443891b264ef5c0a5ea9e989c35282a07ee43059",
       "mimeType": "application/gpx+xml",
       "bytes": 1060,
       "sourceType": "hand-authored",
@@ -834,7 +871,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -878,7 +915,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -922,7 +959,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -966,7 +1003,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -1010,7 +1047,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -1054,7 +1091,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -1098,7 +1135,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -1142,7 +1179,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -1186,7 +1223,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -1230,7 +1267,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -1274,7 +1311,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -1318,7 +1355,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -1362,7 +1399,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -1406,7 +1443,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -1450,7 +1487,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -1494,7 +1531,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -1538,7 +1575,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -1582,7 +1619,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -1633,7 +1670,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -1674,7 +1711,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -1715,7 +1752,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -1756,7 +1793,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -1797,7 +1834,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -1838,7 +1875,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -1879,7 +1916,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -1920,7 +1957,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -1961,7 +1998,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -2002,7 +2039,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -2043,7 +2080,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -2084,7 +2121,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -2125,7 +2162,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -2172,7 +2209,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -2219,7 +2256,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -2266,7 +2303,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -2313,7 +2350,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -2360,7 +2397,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -2400,7 +2437,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -2451,7 +2488,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -2491,7 +2528,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -2542,7 +2579,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -2582,7 +2619,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -2616,7 +2653,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -2650,7 +2687,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -2684,7 +2721,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -2718,7 +2755,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -2752,7 +2789,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -2786,7 +2823,7 @@
         "url": "source/generation.json",
         "checkedAt": "2026-11-04",
         "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [],
       "consumers": [
@@ -2818,7 +2855,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -2858,7 +2895,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -2898,7 +2935,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -2938,7 +2975,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -2978,7 +3015,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -3018,7 +3055,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -3058,7 +3095,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -3098,7 +3135,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -3138,7 +3175,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -3178,7 +3215,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -3218,7 +3255,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -3258,7 +3295,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -3298,7 +3335,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -3338,7 +3375,7 @@
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
         "summary": "Inherits generated parent terms; AI draft masks not human-reviewed",
-        "publicUseApproved": true
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -3441,8 +3478,8 @@
       "terms": {
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Inherits synthetic generated parent terms",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -3562,10 +3599,452 @@
       ]
     },
     {
-      "path": "relay/normal/assets/audio.wav",
+      "path": "relay/e2e/assets/audio.wav",
       "sha256": "262d1f34f300560a4c82ba8127ddea9e1d72946f187fdbd3e8f70ee096077aec",
       "mimeType": "audio/x-wav",
       "bytes": 160044,
+      "sourceType": "derived",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
+      },
+      "parents": [
+        {
+          "path": "audio/silence.wav",
+          "sha256": "262d1f34f300560a4c82ba8127ddea9e1d72946f187fdbd3e8f70ee096077aec"
+        }
+      ],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "samples": 80000,
+      "sampleRate": 16000,
+      "channels": 1,
+      "sampleWidth": 2,
+      "durationS": 5.0
+    },
+    {
+      "path": "relay/e2e/assets/calibration-hat-masked.png",
+      "sha256": "9895c86dd714697ba5e342a8aec7f9a792a840be4534d1c52f3243c163fb9a16",
+      "mimeType": "image/png",
+      "bytes": 343475,
+      "sourceType": "derived",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
+      "terms": {
+        "url": "https://openai.com/policies/row-terms-of-use/",
+        "checkedAt": "2026-11-04",
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
+      },
+      "parents": [
+        {
+          "path": "images/derived/calibration-hat-masked.png",
+          "sha256": "9895c86dd714697ba5e342a8aec7f9a792a840be4534d1c52f3243c163fb9a16"
+        }
+      ],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "width": 508,
+      "height": 764,
+      "mode": "RGB"
+    },
+    {
+      "path": "relay/e2e/assets/jeans-cutout.png",
+      "sha256": "ac91657a6d658abb6a32d31fc65c1941bed19725f2e4134ee6094e23a933965c",
+      "mimeType": "image/png",
+      "bytes": 191227,
+      "sourceType": "derived",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
+      "terms": {
+        "url": "https://openai.com/policies/row-terms-of-use/",
+        "checkedAt": "2026-11-04",
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
+      },
+      "parents": [
+        {
+          "path": "images/wardrobe/jeans-cutout.png",
+          "sha256": "ac91657a6d658abb6a32d31fc65c1941bed19725f2e4134ee6094e23a933965c"
+        }
+      ],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "width": 310,
+      "height": 310,
+      "mode": "RGBA"
+    },
+    {
+      "path": "relay/e2e/assets/shop-1-candidate-1.png",
+      "sha256": "037256a587aa41ea6c3a44e4ebf2db761d5e6962f586bea8ba5fd4899553dd56",
+      "mimeType": "image/png",
+      "bytes": 167163,
+      "sourceType": "derived",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
+      "terms": {
+        "url": "https://openai.com/policies/row-terms-of-use/",
+        "checkedAt": "2026-11-04",
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
+      },
+      "parents": [
+        {
+          "path": "images/derived/shop-1-candidate-1.png",
+          "sha256": "037256a587aa41ea6c3a44e4ebf2db761d5e6962f586bea8ba5fd4899553dd56"
+        }
+      ],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "width": 310,
+      "height": 310,
+      "mode": "RGBA"
+    },
+    {
+      "path": "relay/e2e/assets/shop-1.png",
+      "sha256": "ea5b3b06c61ef238637425fcccf516c051e739b04b6767c6126dea882b146231",
+      "mimeType": "image/png",
+      "bytes": 161152,
+      "sourceType": "derived",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
+      "terms": {
+        "url": "https://openai.com/policies/row-terms-of-use/",
+        "checkedAt": "2026-11-04",
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
+      },
+      "parents": [
+        {
+          "path": "images/storefronts/shop-1.png",
+          "sha256": "ea5b3b06c61ef238637425fcccf516c051e739b04b6767c6126dea882b146231"
+        }
+      ],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "width": 310,
+      "height": 309,
+      "mode": "RGB"
+    },
+    {
+      "path": "relay/e2e/assets/shop-2-candidate-1.png",
+      "sha256": "ba139c55ce6400d7b74e810af342f72452cb012548031b02ad71fdc48d3c5422",
+      "mimeType": "image/png",
+      "bytes": 504,
+      "sourceType": "derived",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
+      "terms": {
+        "url": "https://openai.com/policies/row-terms-of-use/",
+        "checkedAt": "2026-11-04",
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
+      },
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-1.png",
+          "sha256": "ba139c55ce6400d7b74e810af342f72452cb012548031b02ad71fdc48d3c5422"
+        }
+      ],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "width": 309,
+      "height": 310,
+      "mode": "L"
+    },
+    {
+      "path": "relay/e2e/assets/shop-2-candidate-2.png",
+      "sha256": "f8cc1a86ef4cb7050494b6cb3fba81682902d6a1d3ccaaa93fc1e766e5a49a99",
+      "mimeType": "image/png",
+      "bytes": 503,
+      "sourceType": "derived",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
+      "terms": {
+        "url": "https://openai.com/policies/row-terms-of-use/",
+        "checkedAt": "2026-11-04",
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
+      },
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-2.png",
+          "sha256": "f8cc1a86ef4cb7050494b6cb3fba81682902d6a1d3ccaaa93fc1e766e5a49a99"
+        }
+      ],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "width": 309,
+      "height": 310,
+      "mode": "L"
+    },
+    {
+      "path": "relay/e2e/assets/shop-2-candidate-3.png",
+      "sha256": "e35744cd79df4b783a239ee30895bbfc0efdb09fd21a79a5896730c0d85b7275",
+      "mimeType": "image/png",
+      "bytes": 501,
+      "sourceType": "derived",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
+      "terms": {
+        "url": "https://openai.com/policies/row-terms-of-use/",
+        "checkedAt": "2026-11-04",
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
+      },
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-3.png",
+          "sha256": "e35744cd79df4b783a239ee30895bbfc0efdb09fd21a79a5896730c0d85b7275"
+        }
+      ],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "width": 309,
+      "height": 310,
+      "mode": "L"
+    },
+    {
+      "path": "relay/e2e/assets/shop-2-candidate-4.png",
+      "sha256": "eac070a7ff5cb798de1f992babb435177b017f9cbca046a644c91e3ca8fec54c",
+      "mimeType": "image/png",
+      "bytes": 501,
+      "sourceType": "derived",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
+      "terms": {
+        "url": "https://openai.com/policies/row-terms-of-use/",
+        "checkedAt": "2026-11-04",
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
+      },
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-4.png",
+          "sha256": "eac070a7ff5cb798de1f992babb435177b017f9cbca046a644c91e3ca8fec54c"
+        }
+      ],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "width": 309,
+      "height": 310,
+      "mode": "L"
+    },
+    {
+      "path": "relay/e2e/assets/shop-2-items.png",
+      "sha256": "7bf8c267f3f132e240eea8a782d3039061a031226e96e3d60aba9c3549e991d3",
+      "mimeType": "image/png",
+      "bytes": 146354,
+      "sourceType": "derived",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
+      "terms": {
+        "url": "https://openai.com/policies/row-terms-of-use/",
+        "checkedAt": "2026-11-04",
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
+      },
+      "parents": [
+        {
+          "path": "images/shops/shop-2-items.png",
+          "sha256": "7bf8c267f3f132e240eea8a782d3039061a031226e96e3d60aba9c3549e991d3"
+        }
+      ],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "width": 309,
+      "height": 310,
+      "mode": "RGB"
+    },
+    {
+      "path": "relay/e2e/assets/synthetic-mock-output.png",
+      "sha256": "9895c86dd714697ba5e342a8aec7f9a792a840be4534d1c52f3243c163fb9a16",
+      "mimeType": "image/png",
+      "bytes": 343475,
+      "sourceType": "derived",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
+      "terms": {
+        "url": "https://openai.com/policies/row-terms-of-use/",
+        "checkedAt": "2026-11-04",
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
+      },
+      "parents": [
+        {
+          "path": "images/derived/calibration-hat-masked.png",
+          "sha256": "9895c86dd714697ba5e342a8aec7f9a792a840be4534d1c52f3243c163fb9a16"
+        }
+      ],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "width": 508,
+      "height": 764,
+      "mode": "RGB"
+    },
+    {
+      "path": "relay/e2e/describe-piece.01.request.json",
+      "sha256": "92a98cae453259c3f181c559aeec14c35c0ddf3456dbc781fb9331b2de68a750",
+      "mimeType": "application/json",
+      "bytes": 267,
       "sourceType": "hand-authored",
       "generator": {
         "tool": "OMP fixture tooling",
@@ -3581,6 +4060,683 @@
         "publicUseApproved": true
       },
       "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e/describe-piece.01.response.json",
+      "sha256": "120d39d7d1fd60bb9565bbee31fff33985a5d0f98af90b067fe9a1155768ef38",
+      "mimeType": "application/json",
+      "bytes": 90,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e/describe-storefront.01.request.json",
+      "sha256": "3b004177822dd25e8e5d6bb592a254c301e08fd1abbb438b21fcbac5d23d5593",
+      "mimeType": "application/json",
+      "bytes": 255,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e/describe-storefront.01.response.json",
+      "sha256": "d52e1cd13d916fe0a4aff5a0cb7ddbe91c3e2a17da599807141f3b9f8db45128",
+      "mimeType": "application/json",
+      "bytes": 97,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e/provenance.json",
+      "sha256": "2c23e563865c31b51e182b7d350f782a0d7d74d3cd9bda60e15090f618922e57",
+      "mimeType": "application/json",
+      "bytes": 277,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e/route.01.request.json",
+      "sha256": "bc56e2b4a25f806dfb0f52cb0c366fb13281920d0712883cb6822a12484e4c0a",
+      "mimeType": "application/json",
+      "bytes": 230,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e/route.01.response.json",
+      "sha256": "a409ce267c706cb1789c8551a2d70a60d7c8873db49d340c0d5af0a377df7973",
+      "mimeType": "application/json",
+      "bytes": 856,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e/search-segment.01.request.json",
+      "sha256": "fd890e8f4ce6a987da99efa1b0007c93aa3741ae2ceae8433cad4c40ea28a5e9",
+      "mimeType": "application/json",
+      "bytes": 497,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e/search-segment.01.response.json",
+      "sha256": "e9d761734c909c29d3de6513f0b78c8d89794c9e1bbf65558712ab180f1395a4",
+      "mimeType": "application/json",
+      "bytes": 1995,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e/search-turn.01.request.json",
+      "sha256": "08513932613869b7c2743183ba3fbbe3d05d3e3251c812beb335afc8a3609255",
+      "mimeType": "application/json",
+      "bytes": 286,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e/search-turn.01.response.json",
+      "sha256": "d9a11c19f58bb38ed6621b748adb087765d390f2855186ab54a94cb5d4106f55",
+      "mimeType": "application/json",
+      "bytes": 161,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e/search-turn.02.request.json",
+      "sha256": "8316a2d537fd8ec43a4d352406b25c6813ea0c5caba5733e04783aa07ef41e01",
+      "mimeType": "application/json",
+      "bytes": 5088,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e/search-turn.02.response.json",
+      "sha256": "c9fb2196b911aeacc269feed3e39b6987a0d5380e6621b2fff3ace6c84ee8637",
+      "mimeType": "application/json",
+      "bytes": 8034,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e/search-turn.03.request.json",
+      "sha256": "dcb8d183bd06db3fc0d5677d7c1e1a7deb64dbe1c28282ac5993eccac3bbbfd7",
+      "mimeType": "application/json",
+      "bytes": 712,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e/search-turn.03.response.json",
+      "sha256": "e75b661723216d96cd0c407838ea26406da17b1aaca4d6c036f44409f4ee2658",
+      "mimeType": "application/json",
+      "bytes": 301,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e/search-turn.04.request.json",
+      "sha256": "49a83d666110d3089e5e8bbd03c5b5f43d7a89ff7d8463e2ebd5ac12ed5be53c",
+      "mimeType": "application/json",
+      "bytes": 546,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e/search-turn.04.response.json",
+      "sha256": "ba5a93dbdc311656b75ab946f26ce2ef3e9f8110f86e5f44c0f63da1ffc20475",
+      "mimeType": "application/json",
+      "bytes": 218,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e/transcribe.01.request.json",
+      "sha256": "4c4ff8451341f87fa50b9c353ba101b1288ceeee8d891a2d51fd8e795afa1143",
+      "mimeType": "application/json",
+      "bytes": 213,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e/transcribe.01.response.json",
+      "sha256": "386a032ade2da96b8d381f22479932c625815b9dd098e72c34a676cca5e0277b",
+      "mimeType": "application/json",
+      "bytes": 113,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e/tryon.01.request.json",
+      "sha256": "3f57501e0a06189613f24ca0098cd97429aa30c6844ab90bda0938b069bb521a",
+      "mimeType": "application/json",
+      "bytes": 1822,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/e2e/tryon.01.response.json",
+      "sha256": "c98ccfa61df76a3bba401503ba199931c8f301562c6a4371bbb306983b58c4c8",
+      "mimeType": "application/json",
+      "bytes": 206,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "relay/normal/assets/audio.wav",
+      "sha256": "262d1f34f300560a4c82ba8127ddea9e1d72946f187fdbd3e8f70ee096077aec",
+      "mimeType": "audio/x-wav",
+      "bytes": 160044,
+      "sourceType": "derived",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
+      },
+      "parents": [
+        {
+          "path": "audio/silence.wav",
+          "sha256": "262d1f34f300560a4c82ba8127ddea9e1d72946f187fdbd3e8f70ee096077aec"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -3614,8 +4770,8 @@
       "terms": {
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Inherits synthetic generated parent terms",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -3654,8 +4810,8 @@
       "terms": {
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Inherits synthetic generated parent terms",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -3694,8 +4850,8 @@
       "terms": {
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Inherits synthetic generated parent terms",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -3734,8 +4890,8 @@
       "terms": {
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Inherits synthetic generated parent terms",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -3763,21 +4919,26 @@
       "sha256": "ba139c55ce6400d7b74e810af342f72452cb012548031b02ad71fdc48d3c5422",
       "mimeType": "image/png",
       "bytes": 504,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-1.png",
+          "sha256": "ba139c55ce6400d7b74e810af342f72452cb012548031b02ad71fdc48d3c5422"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -3798,21 +4959,26 @@
       "sha256": "f8cc1a86ef4cb7050494b6cb3fba81682902d6a1d3ccaaa93fc1e766e5a49a99",
       "mimeType": "image/png",
       "bytes": 503,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-2.png",
+          "sha256": "f8cc1a86ef4cb7050494b6cb3fba81682902d6a1d3ccaaa93fc1e766e5a49a99"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -3833,21 +4999,26 @@
       "sha256": "e35744cd79df4b783a239ee30895bbfc0efdb09fd21a79a5896730c0d85b7275",
       "mimeType": "image/png",
       "bytes": 501,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-3.png",
+          "sha256": "e35744cd79df4b783a239ee30895bbfc0efdb09fd21a79a5896730c0d85b7275"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -3868,21 +5039,26 @@
       "sha256": "eac070a7ff5cb798de1f992babb435177b017f9cbca046a644c91e3ca8fec54c",
       "mimeType": "image/png",
       "bytes": 501,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-4.png",
+          "sha256": "eac070a7ff5cb798de1f992babb435177b017f9cbca046a644c91e3ca8fec54c"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -3914,8 +5090,8 @@
       "terms": {
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Inherits synthetic generated parent terms",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -3954,8 +5130,8 @@
       "terms": {
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Inherits synthetic generated parent terms",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -4236,9 +5412,9 @@
     },
     {
       "path": "relay/normal/search-segment.01.response.json",
-      "sha256": "98c2fe9373d0d7a62969bbbd3ff442f57c0186a2937322a7a0448ba53fe26806",
+      "sha256": "b1dd9bb075eeddfccc6c3fefce88290dad5bbc8df1b18650ee68bf9beedf5bae",
       "mimeType": "application/json",
-      "bytes": 2075,
+      "bytes": 2083,
       "sourceType": "hand-authored",
       "generator": {
         "tool": "OMP fixture tooling",
@@ -4879,21 +6055,26 @@
       "sha256": "ba139c55ce6400d7b74e810af342f72452cb012548031b02ad71fdc48d3c5422",
       "mimeType": "image/png",
       "bytes": 504,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-1.png",
+          "sha256": "ba139c55ce6400d7b74e810af342f72452cb012548031b02ad71fdc48d3c5422"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -4914,21 +6095,26 @@
       "sha256": "f8cc1a86ef4cb7050494b6cb3fba81682902d6a1d3ccaaa93fc1e766e5a49a99",
       "mimeType": "image/png",
       "bytes": 503,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-2.png",
+          "sha256": "f8cc1a86ef4cb7050494b6cb3fba81682902d6a1d3ccaaa93fc1e766e5a49a99"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -4949,21 +6135,26 @@
       "sha256": "e35744cd79df4b783a239ee30895bbfc0efdb09fd21a79a5896730c0d85b7275",
       "mimeType": "image/png",
       "bytes": 501,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-3.png",
+          "sha256": "e35744cd79df4b783a239ee30895bbfc0efdb09fd21a79a5896730c0d85b7275"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -4984,21 +6175,26 @@
       "sha256": "eac070a7ff5cb798de1f992babb435177b017f9cbca046a644c91e3ca8fec54c",
       "mimeType": "image/png",
       "bytes": 501,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-4.png",
+          "sha256": "eac070a7ff5cb798de1f992babb435177b017f9cbca046a644c91e3ca8fec54c"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -5030,8 +6226,8 @@
       "terms": {
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Inherits synthetic generated parent terms",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -5120,9 +6316,9 @@
     },
     {
       "path": "relay/note-specific/search-segment.01.response.json",
-      "sha256": "98c2fe9373d0d7a62969bbbd3ff442f57c0186a2937322a7a0448ba53fe26806",
+      "sha256": "b1dd9bb075eeddfccc6c3fefce88290dad5bbc8df1b18650ee68bf9beedf5bae",
       "mimeType": "application/json",
-      "bytes": 2075,
+      "bytes": 2083,
       "sourceType": "hand-authored",
       "generator": {
         "tool": "OMP fixture tooling",
@@ -5411,21 +6607,26 @@
       "sha256": "ba139c55ce6400d7b74e810af342f72452cb012548031b02ad71fdc48d3c5422",
       "mimeType": "image/png",
       "bytes": 504,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-1.png",
+          "sha256": "ba139c55ce6400d7b74e810af342f72452cb012548031b02ad71fdc48d3c5422"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -5446,21 +6647,26 @@
       "sha256": "f8cc1a86ef4cb7050494b6cb3fba81682902d6a1d3ccaaa93fc1e766e5a49a99",
       "mimeType": "image/png",
       "bytes": 503,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-2.png",
+          "sha256": "f8cc1a86ef4cb7050494b6cb3fba81682902d6a1d3ccaaa93fc1e766e5a49a99"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -5481,21 +6687,26 @@
       "sha256": "e35744cd79df4b783a239ee30895bbfc0efdb09fd21a79a5896730c0d85b7275",
       "mimeType": "image/png",
       "bytes": 501,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-3.png",
+          "sha256": "e35744cd79df4b783a239ee30895bbfc0efdb09fd21a79a5896730c0d85b7275"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -5516,21 +6727,26 @@
       "sha256": "eac070a7ff5cb798de1f992babb435177b017f9cbca046a644c91e3ca8fec54c",
       "mimeType": "image/png",
       "bytes": 501,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-4.png",
+          "sha256": "eac070a7ff5cb798de1f992babb435177b017f9cbca046a644c91e3ca8fec54c"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -5562,8 +6778,8 @@
       "terms": {
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Inherits synthetic generated parent terms",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -5652,9 +6868,9 @@
     },
     {
       "path": "relay/past-trip/search-segment.01.response.json",
-      "sha256": "98c2fe9373d0d7a62969bbbd3ff442f57c0186a2937322a7a0448ba53fe26806",
+      "sha256": "b1dd9bb075eeddfccc6c3fefce88290dad5bbc8df1b18650ee68bf9beedf5bae",
       "mimeType": "application/json",
-      "bytes": 2075,
+      "bytes": 2083,
       "sourceType": "hand-authored",
       "generator": {
         "tool": "OMP fixture tooling",
@@ -5943,21 +7159,26 @@
       "sha256": "ba139c55ce6400d7b74e810af342f72452cb012548031b02ad71fdc48d3c5422",
       "mimeType": "image/png",
       "bytes": 504,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-1.png",
+          "sha256": "ba139c55ce6400d7b74e810af342f72452cb012548031b02ad71fdc48d3c5422"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -5978,21 +7199,26 @@
       "sha256": "f8cc1a86ef4cb7050494b6cb3fba81682902d6a1d3ccaaa93fc1e766e5a49a99",
       "mimeType": "image/png",
       "bytes": 503,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-2.png",
+          "sha256": "f8cc1a86ef4cb7050494b6cb3fba81682902d6a1d3ccaaa93fc1e766e5a49a99"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -6013,21 +7239,26 @@
       "sha256": "e35744cd79df4b783a239ee30895bbfc0efdb09fd21a79a5896730c0d85b7275",
       "mimeType": "image/png",
       "bytes": 501,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-3.png",
+          "sha256": "e35744cd79df4b783a239ee30895bbfc0efdb09fd21a79a5896730c0d85b7275"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -6048,21 +7279,26 @@
       "sha256": "eac070a7ff5cb798de1f992babb435177b017f9cbca046a644c91e3ca8fec54c",
       "mimeType": "image/png",
       "bytes": 501,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-4.png",
+          "sha256": "eac070a7ff5cb798de1f992babb435177b017f9cbca046a644c91e3ca8fec54c"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -6094,8 +7330,8 @@
       "terms": {
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Inherits synthetic generated parent terms",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -6152,9 +7388,9 @@
     },
     {
       "path": "relay/photo-limit/search-segment.01.request.json",
-      "sha256": "eb594f46778f8ee571a739a88f38acc4f9236195ea471f6300d4b28c19470264",
+      "sha256": "3ad9a45fef05340360ab95e079be5cff1f9cc5be791348f82cf1b62011325179",
       "mimeType": "application/json",
-      "bytes": 807,
+      "bytes": 1112,
       "sourceType": "hand-authored",
       "generator": {
         "tool": "OMP fixture tooling",
@@ -6184,73 +7420,9 @@
     },
     {
       "path": "relay/photo-limit/search-segment.01.response.json",
-      "sha256": "98c2fe9373d0d7a62969bbbd3ff442f57c0186a2937322a7a0448ba53fe26806",
+      "sha256": "b362ee9591e4a65258eb40bf9b44144a51f536ffa5a732c433c7cc5b3d0468d2",
       "mimeType": "application/json",
-      "bytes": 2075,
-      "sourceType": "hand-authored",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
-      "terms": {
-        "url": "source/generation.json",
-        "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ]
-    },
-    {
-      "path": "relay/photo-limit/search-segment.03.request.json",
-      "sha256": "f59e1ed7cc8723f87155b471c1a615a9afa484594fdf46345bb9862c51585a4c",
-      "mimeType": "application/json",
-      "bytes": 502,
-      "sourceType": "hand-authored",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
-      "terms": {
-        "url": "source/generation.json",
-        "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ]
-    },
-    {
-      "path": "relay/photo-limit/search-segment.03.response.json",
-      "sha256": "a1fab0a4c484ee9d05be6f1433de5e83a068c75be7688784165a3d14b65e4ad0",
-      "mimeType": "application/json",
-      "bytes": 146,
+      "bytes": 2171,
       "sourceType": "hand-authored",
       "generator": {
         "tool": "OMP fixture tooling",
@@ -6280,7 +7452,7 @@
     },
     {
       "path": "relay/photo-limit/search-segment.04.request.json",
-      "sha256": "f59e1ed7cc8723f87155b471c1a615a9afa484594fdf46345bb9862c51585a4c",
+      "sha256": "f433df841e26df5464c87612eb705ecbb3fd94a92afd4e0c30ec69bad7299045",
       "mimeType": "application/json",
       "bytes": 502,
       "sourceType": "hand-authored",
@@ -6472,9 +7644,9 @@
     },
     {
       "path": "relay/photo-limit/search-turn.03.request.json",
-      "sha256": "b851f081aecd5329c0e9697fd0c23161f6e72a4ff35f179b83094a47744dc495",
+      "sha256": "6b6054ba0008814cdb081f03616ff2d6d9d59050116eea15c5bbad138d4175c1",
       "mimeType": "application/json",
-      "bytes": 965,
+      "bytes": 1270,
       "sourceType": "hand-authored",
       "generator": {
         "tool": "OMP fixture tooling",
@@ -6504,9 +7676,9 @@
     },
     {
       "path": "relay/photo-limit/search-turn.03.response.json",
-      "sha256": "8ce71491dc4448a44174e60cc93ef8c3f68485526cecfdb00606894af4662a3d",
+      "sha256": "5f2c113f85b74397c79691b88e2b3aba492b34ee9958860a2ab7d4a15ef98374",
       "mimeType": "application/json",
-      "bytes": 354,
+      "bytes": 407,
       "sourceType": "hand-authored",
       "generator": {
         "tool": "OMP fixture tooling",
@@ -6536,9 +7708,9 @@
     },
     {
       "path": "relay/photo-limit/search-turn.04.request.json",
-      "sha256": "9609ffd6d528dd0cd6b7268b033c8ef63324f34017ffb650cd2361650728fef0",
+      "sha256": "521c7df9ff4d780c31b80e87051bd016b45bd703018427305cd974973e237bfb",
       "mimeType": "application/json",
-      "bytes": 705,
+      "bytes": 878,
       "sourceType": "hand-authored",
       "generator": {
         "tool": "OMP fixture tooling",
@@ -6568,9 +7740,9 @@
     },
     {
       "path": "relay/photo-limit/search-turn.04.response.json",
-      "sha256": "5ecb5e7a3bf030b4f14de7ab59986d377cd57591b3008e0f4e5fdb1801e68994",
+      "sha256": "a01d1f7ce22534f528428be51d42a33b1e6b32452c21b7757dbb3b2adcaecb47",
       "mimeType": "application/json",
-      "bytes": 267,
+      "bytes": 316,
       "sourceType": "hand-authored",
       "generator": {
         "tool": "OMP fixture tooling",
@@ -6664,9 +7836,9 @@
     },
     {
       "path": "relay/route-unavailable/route.01.response.json",
-      "sha256": "b46d469b3ba694661925c2dbd66c8d5a78a0b64330b1585918c65e93acb4f6f7",
+      "sha256": "4e297a371981927589ee416dff9b8ded3fa233e2e236909a8346f2cff3483e44",
       "mimeType": "application/json",
-      "bytes": 164,
+      "bytes": 165,
       "sourceType": "hand-authored",
       "generator": {
         "tool": "OMP fixture tooling",
@@ -6699,21 +7871,26 @@
       "sha256": "ba139c55ce6400d7b74e810af342f72452cb012548031b02ad71fdc48d3c5422",
       "mimeType": "image/png",
       "bytes": 504,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-1.png",
+          "sha256": "ba139c55ce6400d7b74e810af342f72452cb012548031b02ad71fdc48d3c5422"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -6734,21 +7911,26 @@
       "sha256": "f8cc1a86ef4cb7050494b6cb3fba81682902d6a1d3ccaaa93fc1e766e5a49a99",
       "mimeType": "image/png",
       "bytes": 503,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-2.png",
+          "sha256": "f8cc1a86ef4cb7050494b6cb3fba81682902d6a1d3ccaaa93fc1e766e5a49a99"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -6769,21 +7951,26 @@
       "sha256": "e35744cd79df4b783a239ee30895bbfc0efdb09fd21a79a5896730c0d85b7275",
       "mimeType": "image/png",
       "bytes": 501,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-3.png",
+          "sha256": "e35744cd79df4b783a239ee30895bbfc0efdb09fd21a79a5896730c0d85b7275"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -6804,21 +7991,26 @@
       "sha256": "eac070a7ff5cb798de1f992babb435177b017f9cbca046a644c91e3ca8fec54c",
       "mimeType": "image/png",
       "bytes": 501,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-4.png",
+          "sha256": "eac070a7ff5cb798de1f992babb435177b017f9cbca046a644c91e3ca8fec54c"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -6850,8 +8042,8 @@
       "terms": {
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Inherits synthetic generated parent terms",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -6940,9 +8132,9 @@
     },
     {
       "path": "relay/shop-specific/search-segment.01.response.json",
-      "sha256": "98c2fe9373d0d7a62969bbbd3ff442f57c0186a2937322a7a0448ba53fe26806",
+      "sha256": "b1dd9bb075eeddfccc6c3fefce88290dad5bbc8df1b18650ee68bf9beedf5bae",
       "mimeType": "application/json",
-      "bytes": 2075,
+      "bytes": 2083,
       "sourceType": "hand-authored",
       "generator": {
         "tool": "OMP fixture tooling",
@@ -7231,21 +8423,26 @@
       "sha256": "ba139c55ce6400d7b74e810af342f72452cb012548031b02ad71fdc48d3c5422",
       "mimeType": "image/png",
       "bytes": 504,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-1.png",
+          "sha256": "ba139c55ce6400d7b74e810af342f72452cb012548031b02ad71fdc48d3c5422"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -7266,21 +8463,26 @@
       "sha256": "f8cc1a86ef4cb7050494b6cb3fba81682902d6a1d3ccaaa93fc1e766e5a49a99",
       "mimeType": "image/png",
       "bytes": 503,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-2.png",
+          "sha256": "f8cc1a86ef4cb7050494b6cb3fba81682902d6a1d3ccaaa93fc1e766e5a49a99"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -7301,21 +8503,26 @@
       "sha256": "e35744cd79df4b783a239ee30895bbfc0efdb09fd21a79a5896730c0d85b7275",
       "mimeType": "image/png",
       "bytes": 501,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-3.png",
+          "sha256": "e35744cd79df4b783a239ee30895bbfc0efdb09fd21a79a5896730c0d85b7275"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -7336,21 +8543,26 @@
       "sha256": "eac070a7ff5cb798de1f992babb435177b017f9cbca046a644c91e3ca8fec54c",
       "mimeType": "image/png",
       "bytes": 501,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-4.png",
+          "sha256": "eac070a7ff5cb798de1f992babb435177b017f9cbca046a644c91e3ca8fec54c"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -7382,8 +8594,8 @@
       "terms": {
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Inherits synthetic generated parent terms",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -7472,9 +8684,9 @@
     },
     {
       "path": "relay/time-specific/search-segment.01.response.json",
-      "sha256": "98c2fe9373d0d7a62969bbbd3ff442f57c0186a2937322a7a0448ba53fe26806",
+      "sha256": "b1dd9bb075eeddfccc6c3fefce88290dad5bbc8df1b18650ee68bf9beedf5bae",
       "mimeType": "application/json",
-      "bytes": 2075,
+      "bytes": 2083,
       "sourceType": "hand-authored",
       "generator": {
         "tool": "OMP fixture tooling",
@@ -7774,8 +8986,8 @@
       "terms": {
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Inherits synthetic generated parent terms",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -7814,8 +9026,8 @@
       "terms": {
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Inherits synthetic generated parent terms",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -7854,8 +9066,8 @@
       "terms": {
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Inherits synthetic generated parent terms",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -7944,7 +9156,7 @@
     },
     {
       "path": "relay/tryon-policy/tryon.01.response.json",
-      "sha256": "c7f0a644eaf65ddfc4cb70cae502396bfe109d76801b1d526a314685c77f1ef4",
+      "sha256": "8941a37766acf377766ef460343ba3fe9583d0c88e448741124d20ff6ae85ff0",
       "mimeType": "application/json",
       "bytes": 172,
       "sourceType": "hand-authored",
@@ -7979,21 +9191,26 @@
       "sha256": "ba139c55ce6400d7b74e810af342f72452cb012548031b02ad71fdc48d3c5422",
       "mimeType": "image/png",
       "bytes": 504,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-1.png",
+          "sha256": "ba139c55ce6400d7b74e810af342f72452cb012548031b02ad71fdc48d3c5422"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -8014,21 +9231,26 @@
       "sha256": "f8cc1a86ef4cb7050494b6cb3fba81682902d6a1d3ccaaa93fc1e766e5a49a99",
       "mimeType": "image/png",
       "bytes": 503,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-2.png",
+          "sha256": "f8cc1a86ef4cb7050494b6cb3fba81682902d6a1d3ccaaa93fc1e766e5a49a99"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -8049,21 +9271,26 @@
       "sha256": "e35744cd79df4b783a239ee30895bbfc0efdb09fd21a79a5896730c0d85b7275",
       "mimeType": "image/png",
       "bytes": 501,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-3.png",
+          "sha256": "e35744cd79df4b783a239ee30895bbfc0efdb09fd21a79a5896730c0d85b7275"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -8084,21 +9311,26 @@
       "sha256": "eac070a7ff5cb798de1f992babb435177b017f9cbca046a644c91e3ca8fec54c",
       "mimeType": "image/png",
       "bytes": 501,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-4.png",
+          "sha256": "eac070a7ff5cb798de1f992babb435177b017f9cbca046a644c91e3ca8fec54c"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -8130,8 +9362,8 @@
       "terms": {
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Inherits synthetic generated parent terms",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -8220,9 +9452,9 @@
     },
     {
       "path": "relay/turn-limit/search-segment.01.response.json",
-      "sha256": "98c2fe9373d0d7a62969bbbd3ff442f57c0186a2937322a7a0448ba53fe26806",
+      "sha256": "101b8193d3b5346285d65c7ead53e8a53885082fadc4fa7fe4c361d8a0725d0d",
       "mimeType": "application/json",
-      "bytes": 2075,
+      "bytes": 2087,
       "sourceType": "hand-authored",
       "generator": {
         "tool": "OMP fixture tooling",
@@ -8540,9 +9772,9 @@
     },
     {
       "path": "relay/turn-limit/search-turn.05.response.json",
-      "sha256": "d946d6e6c8970a4e9d700d61059ab524d1416abb7f3048f28798c3dd17a69c68",
+      "sha256": "7511d3aa78c4b58f3f5c47bdeb799f64f2e05a5abc243fd73d210e515abe71d4",
       "mimeType": "application/json",
-      "bytes": 162,
+      "bytes": 161,
       "sourceType": "hand-authored",
       "generator": {
         "tool": "OMP fixture tooling",
@@ -8575,21 +9807,26 @@
       "sha256": "ba139c55ce6400d7b74e810af342f72452cb012548031b02ad71fdc48d3c5422",
       "mimeType": "image/png",
       "bytes": 504,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-1.png",
+          "sha256": "ba139c55ce6400d7b74e810af342f72452cb012548031b02ad71fdc48d3c5422"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -8610,21 +9847,26 @@
       "sha256": "f8cc1a86ef4cb7050494b6cb3fba81682902d6a1d3ccaaa93fc1e766e5a49a99",
       "mimeType": "image/png",
       "bytes": 503,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-2.png",
+          "sha256": "f8cc1a86ef4cb7050494b6cb3fba81682902d6a1d3ccaaa93fc1e766e5a49a99"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -8645,21 +9887,26 @@
       "sha256": "e35744cd79df4b783a239ee30895bbfc0efdb09fd21a79a5896730c0d85b7275",
       "mimeType": "image/png",
       "bytes": 501,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-3.png",
+          "sha256": "e35744cd79df4b783a239ee30895bbfc0efdb09fd21a79a5896730c0d85b7275"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -8680,21 +9927,26 @@
       "sha256": "eac070a7ff5cb798de1f992babb435177b017f9cbca046a644c91e3ca8fec54c",
       "mimeType": "image/png",
       "bytes": 501,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
-        "url": "source/generation.json",
+        "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "masks/items/shop-3-candidate-4.png",
+          "sha256": "eac070a7ff5cb798de1f992babb435177b017f9cbca046a644c91e3ca8fec54c"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -8726,8 +9978,8 @@
       "terms": {
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "Inherits synthetic generated parent terms",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
       "parents": [
         {
@@ -9039,89 +10291,30 @@
       ]
     },
     {
-      "path": "relay/upstream-timeout/search-turn.04.request.json",
-      "sha256": "9609ffd6d528dd0cd6b7268b033c8ef63324f34017ffb650cd2361650728fef0",
-      "mimeType": "application/json",
-      "bytes": 705,
-      "sourceType": "hand-authored",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
-      "terms": {
-        "url": "source/generation.json",
-        "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ]
-    },
-    {
-      "path": "relay/upstream-timeout/search-turn.04.response.json",
-      "sha256": "5ecb5e7a3bf030b4f14de7ab59986d377cd57591b3008e0f4e5fdb1801e68994",
-      "mimeType": "application/json",
-      "bytes": 267,
-      "sourceType": "hand-authored",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
-      "terms": {
-        "url": "source/generation.json",
-        "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ]
-    },
-    {
       "path": "relay/voice-empty/assets/audio.wav",
       "sha256": "262d1f34f300560a4c82ba8127ddea9e1d72946f187fdbd3e8f70ee096077aec",
       "mimeType": "audio/x-wav",
       "bytes": 160044,
-      "sourceType": "hand-authored",
+      "sourceType": "derived",
       "generator": {
         "tool": "OMP fixture tooling",
         "version": "1",
         "date": "2026-11-04"
       },
       "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "procedure": "Byte-identical synthetic fixture asset, not provider recording",
       "terms": {
         "url": "source/generation.json",
         "checkedAt": "2026-11-04",
-        "summary": "Repository author contribution; no third-party or public-domain license asserted",
-        "publicUseApproved": true
+        "summary": "Inherits fixture parent terms",
+        "publicUseApproved": false
       },
-      "parents": [],
+      "parents": [
+        {
+          "path": "audio/silence.wav",
+          "sha256": "262d1f34f300560a4c82ba8127ddea9e1d72946f187fdbd3e8f70ee096077aec"
+        }
+      ],
       "consumers": [
         "S11",
         "S01",
@@ -9236,1506 +10429,10 @@
       ]
     },
     {
-      "path": "research/preprocessing.json",
-      "sha256": "7d981c81a6642813eeab8e051f639666aadf4587da2a3d59f6cce5dddfe583b4",
-      "mimeType": "application/json",
-      "bytes": 744,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "preserved /tmp/edgetam-poc",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
-      "terms": {
-        "url": "source/research-attribution.json",
-        "checkedAt": "2026-11-04",
-        "summary": "Repository-owner historical experiment outputs/scripts; not OpenAI-generated and not model/GT acceptance evidence. Source image attribution inherited where applicable.",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ]
-    },
-    {
-      "path": "research/preservation.json",
-      "sha256": "1406b4300b8f8140e41004a591bd55a7b23f3c24bb2cd784c8a2f9eb47e3a2fa",
-      "mimeType": "application/json",
-      "bytes": 9042,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "preserved /tmp/edgetam-poc",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
-      "terms": {
-        "url": "source/research-attribution.json",
-        "checkedAt": "2026-11-04",
-        "summary": "Repository-owner historical experiment outputs/scripts; not OpenAI-generated and not model/GT acceptance evidence. Source image attribution inherited where applicable.",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ]
-    },
-    {
-      "path": "research/retrieval/commons_metadata.json",
-      "sha256": "640d0869318013ca7e8c6bcd1c7ca330cf91a76d2e7cdab08bb22c521e71d0b4",
-      "mimeType": "application/json",
-      "bytes": 188667,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "preserved /tmp/edgetam-poc",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
-      "terms": {
-        "url": "source/research-attribution.json",
-        "checkedAt": "2026-11-04",
-        "summary": "Repository-owner historical experiment outputs/scripts; not OpenAI-generated and not model/GT acceptance evidence. Source image attribution inherited where applicable.",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ]
-    },
-    {
-      "path": "research/retrieval/i02.jpg",
-      "sha256": "213c025f64a58c966c2ac623dfb342ea51591dcae33b2ae4ba85e0fcf395d191",
-      "mimeType": "image/jpeg",
-      "bytes": 216259,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:01_Centre_de_Documentaci%C3%B3_i_Museu_T%C3%A8xtil,_c._Salmer%C3%B3n_25_(Terrassa),_reserva.jpg",
-      "procedure": {
-        "authorHtml": "<a href=\"//commons.wikimedia.org/wiki/User:Enric\" title=\"User:Enric\">Enric</a>",
-        "originalTitle": "File:01 Centre de Documentació i Museu Tèxtil, c. Salmerón 25 (Terrassa), reserva.jpg",
-        "transformation": "byte-identical copy"
-      },
-      "terms": {
-        "url": "https://creativecommons.org/licenses/by-sa/4.0",
-        "checkedAt": "2026-11-04",
-        "summary": "CC BY-SA 4.0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 960,
-      "height": 720,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/retrieval/i03.jpg",
-      "sha256": "818d96a8a8a9b66cfa4a5f4108ab98cb6304f9404c411a0cacadc9641a4a08c8",
-      "mimeType": "image/jpeg",
-      "bytes": 194389,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:02123jfClothes_shirts_pants_in_Philippinesfvf_03.jpg",
-      "procedure": {
-        "authorHtml": "<a href=\"//commons.wikimedia.org/wiki/User:Judgefloro\" title=\"User:Judgefloro\">Judgefloro</a>",
-        "originalTitle": "File:02123jfClothes shirts pants in Philippinesfvf 03.jpg",
-        "transformation": "byte-identical copy"
-      },
-      "terms": {
-        "url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
-        "checkedAt": "2026-11-04",
-        "summary": "CC0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 960,
-      "height": 720,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/retrieval/i04.jpg",
-      "sha256": "3dfb62488cbb4d95b4d8e798d83b3bce460100b49a132920be76547cfb11209d",
-      "mimeType": "image/jpeg",
-      "bytes": 214720,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:02123jfClothes_shirts_pants_in_Philippinesfvf_07.jpg",
-      "procedure": {
-        "authorHtml": "<a href=\"//commons.wikimedia.org/wiki/User:Judgefloro\" title=\"User:Judgefloro\">Judgefloro</a>",
-        "originalTitle": "File:02123jfClothes shirts pants in Philippinesfvf 07.jpg",
-        "transformation": "byte-identical copy"
-      },
-      "terms": {
-        "url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
-        "checkedAt": "2026-11-04",
-        "summary": "CC0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 960,
-      "height": 720,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/retrieval/i05.jpg",
-      "sha256": "337e172ad67d2f5edc09582723b13651132c139d91a00f792f4f9f5c250304f9",
-      "mimeType": "image/jpeg",
-      "bytes": 60296,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:1949_Norman_Norell_red_silk_dress_with_cartridge_pleated_skirt_01.jpg",
-      "procedure": {
-        "authorHtml": "Photographer for the Rhode Island School of Design - Museum of Art",
-        "originalTitle": "File:1949 Norman Norell red silk dress with cartridge pleated skirt 01.jpg",
-        "transformation": "byte-identical copy"
-      },
-      "terms": {
-        "url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
-        "checkedAt": "2026-11-04",
-        "summary": "CC0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 689,
-      "height": 900,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/retrieval/i06.jpg",
-      "sha256": "3693963fb9bc4a3bf2e8ea5279b19768da82ca61a4a59680884b2b447b48d34c",
-      "mimeType": "image/jpeg",
-      "bytes": 70849,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:1949_Norman_Norell_red_silk_dress_with_cartridge_pleated_skirt_03.jpg",
-      "procedure": {
-        "authorHtml": "Photographer for the Rhode Island School of Design - Museum of Art",
-        "originalTitle": "File:1949 Norman Norell red silk dress with cartridge pleated skirt 03.jpg",
-        "transformation": "byte-identical copy"
-      },
-      "terms": {
-        "url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
-        "checkedAt": "2026-11-04",
-        "summary": "CC0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 689,
-      "height": 900,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/retrieval/i07.jpg",
-      "sha256": "36bdb07e0b975dca6b96c0744c2516cdbd13f31f59e3db6e765a380e918f09db",
-      "mimeType": "image/jpeg",
-      "bytes": 121670,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:1960s_clothing_styles_---_another_view_(1322616486).jpg",
-      "procedure": {
-        "authorHtml": "<a rel=\"nofollow\" class=\"external text\" href=\"https://www.flickr.com/people/72105154@N00\">John Atherton</a>",
-        "originalTitle": "File:1960s clothing styles --- another view (1322616486).jpg",
-        "transformation": "byte-identical copy"
-      },
-      "terms": {
-        "url": "https://creativecommons.org/licenses/by-sa/2.0",
-        "checkedAt": "2026-11-04",
-        "summary": "CC BY-SA 2.0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 960,
-      "height": 644,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/retrieval/i10.jpg",
-      "sha256": "f88ae28b1889c9bdb5ad5af0c4811c85abfcb7850a48be84eb407876556cfa65",
-      "mimeType": "image/jpeg",
-      "bytes": 190124,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:2008_Taipei_In_Style_Outdoor_Fashion_Show_Clothes_Racks.jpg",
-      "procedure": {
-        "authorHtml": "<a href=\"//commons.wikimedia.org/wiki/User:BrockF5\" title=\"User:BrockF5\">Rico Shen</a>",
-        "originalTitle": "File:2008 Taipei In Style Outdoor Fashion Show Clothes Racks.jpg",
-        "transformation": "byte-identical copy"
-      },
-      "terms": {
-        "url": "https://creativecommons.org/licenses/by-sa/4.0",
-        "checkedAt": "2026-11-04",
-        "summary": "CC BY-SA 4.0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 960,
-      "height": 720,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/retrieval/i11.jpg",
-      "sha256": "406c77cf269ebb62c83e50d9f3730b195892e1b225afc708577daafbb9446e14",
-      "mimeType": "image/jpeg",
-      "bytes": 201987,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:2010TIBE_Day1_Hall2_Opening_Kazuo_Umezu.jpg",
-      "procedure": {
-        "authorHtml": "<a href=\"//commons.wikimedia.org/wiki/User:BrockF5\" title=\"User:BrockF5\">Rico Shen</a>",
-        "originalTitle": "File:2010TIBE Day1 Hall2 Opening Kazuo Umezu.jpg",
-        "transformation": "byte-identical copy"
-      },
-      "terms": {
-        "url": "https://creativecommons.org/licenses/by-sa/4.0",
-        "checkedAt": "2026-11-04",
-        "summary": "CC BY-SA 4.0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 960,
-      "height": 1280,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/retrieval/i13.jpg",
-      "sha256": "910c019c2535cf78bceb82e771ad6e6084b40eb9fe6d1c7eb33e60968ae5435c",
-      "mimeType": "image/jpeg",
-      "bytes": 321872,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:202405131513_IMG_6582.jpg",
-      "procedure": {
-        "authorHtml": "<a href=\"//commons.wikimedia.org/wiki/User:%E3%82%A6%E3%82%A3%E8%B2%B4%E5%85%AC%E5%AD%90\" title=\"User:ウィ貴公子\">ウィ貴公子</a>",
-        "originalTitle": "File:202405131513 IMG 6582.jpg",
-        "transformation": "byte-identical copy"
-      },
-      "terms": {
-        "url": "https://creativecommons.org/licenses/by-sa/4.0",
-        "checkedAt": "2026-11-04",
-        "summary": "CC BY-SA 4.0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 960,
-      "height": 1280,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/retrieval/i14.jpg",
-      "sha256": "e0ff056023a41cef8eb7ef5686b87ca2981f4eba1731779de899925b1f4cde08",
-      "mimeType": "image/jpeg",
-      "bytes": 292753,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:Abubakr_Ali_at_TIFF_2026.jpg",
-      "procedure": {
-        "authorHtml": "<a href=\"//commons.wikimedia.org/wiki/User:Gabriel_Hutchinson\" title=\"User:Gabriel Hutchinson\">Gabriel Hutchinson</a>",
-        "originalTitle": "File:Abubakr Ali at TIFF 2026.jpg",
-        "transformation": "byte-identical copy"
-      },
-      "terms": {
-        "url": "https://creativecommons.org/licenses/by-sa/4.0",
-        "checkedAt": "2026-11-04",
-        "summary": "CC BY-SA 4.0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 960,
-      "height": 1344,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/retrieval/i15.jpg",
-      "sha256": "dce7e6ef5bf13d613c2cc41782b988565617b736ddc169fe11856073b89437e7",
-      "mimeType": "image/jpeg",
-      "bytes": 104430,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:Adrianna_Nicole_at_AVN_Adult_Entertainment_Expo_2009.jpg",
-      "procedure": {
-        "authorHtml": "<a rel=\"nofollow\" class=\"external text\" href=\"https://www.flickr.com/photos/92752576@N00\">J Chang</a> from USA",
-        "originalTitle": "File:Adrianna Nicole at AVN Adult Entertainment Expo 2009.jpg",
-        "transformation": "byte-identical copy"
-      },
-      "terms": {
-        "url": "https://creativecommons.org/licenses/by-sa/2.0",
-        "checkedAt": "2026-11-04",
-        "summary": "CC BY-SA 2.0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 960,
-      "height": 643,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/retrieval/i16.jpg",
-      "sha256": "e6d50817b85e497f45dbf7d11b6fca30e262a516828fdb5ba54b04224e366523",
-      "mimeType": "image/jpeg",
-      "bytes": 131703,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:Akira_Nagatsuma_2025-07-19(1).jpg",
-      "procedure": {
-        "authorHtml": "<a href=\"//commons.wikimedia.org/wiki/User:Noukei314\" title=\"User:Noukei314\">Noukei314</a>",
-        "originalTitle": "File:Akira Nagatsuma 2025-07-19(1).jpg",
-        "transformation": "byte-identical copy"
-      },
-      "terms": {
-        "url": "https://creativecommons.org/licenses/by/4.0",
-        "checkedAt": "2026-11-04",
-        "summary": "CC BY 4.0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 960,
-      "height": 640,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/retrieval/i17.jpg",
-      "sha256": "ec25c4b6e1671841783d76eb33487c7143856cd6e9f7b26498ec48252ed3827f",
-      "mimeType": "image/jpeg",
-      "bytes": 116829,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:Arcteryx_blue_CeriumLT_Hoody_men.jpg",
-      "procedure": {
-        "authorHtml": "<a href=\"//commons.wikimedia.org/wiki/User:Jjanhone\" title=\"User:Jjanhone\">Jjanhone</a>",
-        "originalTitle": "File:Arcteryx blue CeriumLT Hoody men.jpg",
-        "transformation": "byte-identical copy"
-      },
-      "terms": {
-        "url": "https://creativecommons.org/licenses/by-sa/4.0",
-        "checkedAt": "2026-11-04",
-        "summary": "CC BY-SA 4.0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 960,
-      "height": 1063,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/retrieval/i18.jpg",
-      "sha256": "da3ced38544dd05e4c4909222b4732eb2005b408fa275de32a6115ebcab5da7f",
-      "mimeType": "image/jpeg",
-      "bytes": 174499,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:Blauw_jak_met_dubbele_rij_knopen_voor_historische_optocht_1913,_objectnr_27379.JPG",
-      "procedure": {
-        "authorHtml": "Museum Rotterdam",
-        "originalTitle": "File:Blauw jak met dubbele rij knopen voor historische optocht 1913, objectnr 27379.JPG",
-        "transformation": "byte-identical copy"
-      },
-      "terms": {
-        "url": "https://creativecommons.org/licenses/by-sa/3.0",
-        "checkedAt": "2026-11-04",
-        "summary": "CC BY-SA 3.0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 960,
-      "height": 1280,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/retrieval/i19.jpg",
-      "sha256": "91c7f3478e7429c9edeceb9294d9377d581c68660a5c6787b725d598b44396b2",
-      "mimeType": "image/jpeg",
-      "bytes": 144088,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:Blue_jacket.jpg",
-      "procedure": {
-        "authorHtml": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:Mitanimoto&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:Mitanimoto (page does not exist)\">Mitanimoto</a>",
-        "originalTitle": "File:Blue jacket.jpg",
-        "transformation": "byte-identical copy"
-      },
-      "terms": {
-        "url": "https://creativecommons.org/licenses/by-sa/4.0",
-        "checkedAt": "2026-11-04",
-        "summary": "CC BY-SA 4.0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 960,
-      "height": 720,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/retrieval/i20.jpg",
-      "sha256": "5c13c535441ae226e3bf6c4bc0543508450cef4afd1d58f2d855b26e131239a0",
-      "mimeType": "image/jpeg",
-      "bytes": 88592,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:Blue_wet-look_Polo_Ralph_Lauren_Jacket.jpg",
-      "procedure": {
-        "authorHtml": "Menswear Market",
-        "originalTitle": "File:Blue wet-look Polo Ralph Lauren Jacket.jpg",
-        "transformation": "byte-identical copy"
-      },
-      "terms": {
-        "url": "https://creativecommons.org/licenses/by/2.0",
-        "checkedAt": "2026-11-04",
-        "summary": "CC BY 2.0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 960,
-      "height": 960,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/retrieval/i21.jpg",
-      "sha256": "735f4a9893dd0d62a12b96b2d67d84d3c2c9961c5a7b6b1a7d768c2ca85e18bf",
-      "mimeType": "image/jpeg",
-      "bytes": 154068,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:Broek_en_jas_van_uniform_ROTEB,_objectnr_62773-B-C(3).JPG",
-      "procedure": {
-        "authorHtml": "R. Determeyer",
-        "originalTitle": "File:Broek en jas van uniform ROTEB, objectnr 62773-B-C(3).JPG",
-        "transformation": "byte-identical copy"
-      },
-      "terms": {
-        "url": "https://creativecommons.org/licenses/by-sa/3.0",
-        "checkedAt": "2026-11-04",
-        "summary": "CC BY-SA 3.0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 960,
-      "height": 1434,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/retrieval/i22.jpg",
-      "sha256": "dc1127693aab4b663bec8be3f40782b4f3f1e09a502bbefa405be61ca012e7b1",
-      "mimeType": "image/jpeg",
-      "bytes": 312557,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:Palais_Ro%C5%BEmberk_-_Schlafzimmer_Kost%C3%BCm.jpg",
-      "procedure": {
-        "authorHtml": "Wolfgang Sauber",
-        "originalTitle": "File:Palais Rožmberk - Schlafzimmer Kostüm.jpg",
-        "transformation": "byte-identical copy"
-      },
-      "terms": {
-        "url": "https://creativecommons.org/licenses/by-sa/3.0",
-        "checkedAt": "2026-11-04",
-        "summary": "CC BY-SA 3.0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 960,
-      "height": 1436,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/retrieval/i23.jpg",
-      "sha256": "dc87f863886f0d2b793469dafe103098da9d85fa868887d6f4c0fdec5ea29f65",
-      "mimeType": "image/jpeg",
-      "bytes": 203638,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:2_Tone_HOUSE_(25117816387).jpg",
-      "procedure": {
-        "authorHtml": "<a rel=\"nofollow\" class=\"external text\" href=\"https://www.flickr.com/people/32413914@N00\">m-louis .®</a> from Osaka, Japan",
-        "originalTitle": "File:2 Tone HOUSE (25117816387).jpg",
-        "transformation": "byte-identical copy"
-      },
-      "terms": {
-        "url": "https://creativecommons.org/licenses/by-sa/2.0",
-        "checkedAt": "2026-11-04",
-        "summary": "CC BY-SA 2.0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 960,
-      "height": 640,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/retrieval/i24.jpg",
-      "sha256": "7aa0393760963c2016a2fc6bded63541964466f8c08830dbab83291eac119489",
-      "mimeType": "image/jpeg",
-      "bytes": 168776,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:2023-06-07_BUGA_Mannheim_107.jpg",
-      "procedure": {
-        "authorHtml": "<a href=\"//commons.wikimedia.org/wiki/User:Ahmet_D%C3%BCz\" title=\"User:Ahmet Düz\">Ahmet Düz, Dreiländer- &amp; Oberrheinfotograf</a>",
-        "originalTitle": "File:2023-06-07 BUGA Mannheim 107.jpg",
-        "transformation": "byte-identical copy"
-      },
-      "terms": {
-        "url": "https://creativecommons.org/licenses/by-sa/4.0",
-        "checkedAt": "2026-11-04",
-        "summary": "CC BY-SA 4.0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 960,
-      "height": 640,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/retrieval/i25.jpg",
-      "sha256": "43113d61be4031b989d0972cc2e48a293169af055c65f050115c1d97efd56ac6",
-      "mimeType": "image/jpeg",
-      "bytes": 52905,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:070_Basic_weiss,_schwarz,_rosa,_pink,_dunkelblau.jpg",
-      "procedure": {
-        "authorHtml": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:Roben123&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:Roben123 (page does not exist)\">Roben123</a>",
-        "originalTitle": "File:070 Basic weiss, schwarz, rosa, pink, dunkelblau.jpg",
-        "transformation": "byte-identical copy"
-      },
-      "terms": {
-        "url": "https://creativecommons.org/licenses/by-sa/3.0",
-        "checkedAt": "2026-11-04",
-        "summary": "CC BY-SA 3.0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 960,
-      "height": 441,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/retrieval/i26.jpg",
-      "sha256": "644073eb3757229020be610ed7c82543b3c8c5ad85ad51f3fe91d16f2fe851c6",
-      "mimeType": "image/jpeg",
-      "bytes": 138858,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:161.CPF.WDC.11jun06_(485889787).jpg",
-      "procedure": {
-        "authorHtml": "<bdi><a href=\"https://www.wikidata.org/wiki/Q104713920\" class=\"extiw\" title=\"d:Q104713920\"><span title=\"photographer\">Elvert Barnes</span></a></bdi>",
-        "originalTitle": "File:161.CPF.WDC.11jun06 (485889787).jpg",
-        "transformation": "byte-identical copy"
-      },
-      "terms": {
-        "url": "https://creativecommons.org/licenses/by/2.0",
-        "checkedAt": "2026-11-04",
-        "summary": "CC BY 2.0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 960,
-      "height": 640,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/retrieval/image_embeddings.npy",
-      "sha256": "424360ce217b0b78bfce03b314c32181aa6b7323c756ed08b21e9b03817de412",
-      "mimeType": "application/octet-stream",
-      "bytes": 45184,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "preserved /tmp/edgetam-poc",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
-      "terms": {
-        "url": "source/research-attribution.json",
-        "checkedAt": "2026-11-04",
-        "summary": "Repository-owner historical experiment outputs/scripts; not OpenAI-generated and not model/GT acceptance evidence. Source image attribution inherited where applicable.",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ]
-    },
-    {
-      "path": "research/retrieval/manifest.json",
-      "sha256": "db6a42b61f9f111e29525d4123f8038d2856aa7a028f775afa36b43a6d663d8e",
-      "mimeType": "application/json",
-      "bytes": 19456,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "preserved /tmp/edgetam-poc",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
-      "terms": {
-        "url": "source/research-attribution.json",
-        "checkedAt": "2026-11-04",
-        "summary": "Repository-owner historical experiment outputs/scripts; not OpenAI-generated and not model/GT acceptance evidence. Source image attribution inherited where applicable.",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ]
-    },
-    {
-      "path": "research/retrieval/results.json",
-      "sha256": "039d4247eb1db1b9b639066aa076f1dcaecfda45564df6c5aafcfc32fba490ba",
-      "mimeType": "application/json",
-      "bytes": 6166,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "preserved /tmp/edgetam-poc",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
-      "terms": {
-        "url": "source/research-attribution.json",
-        "checkedAt": "2026-11-04",
-        "summary": "Repository-owner historical experiment outputs/scripts; not OpenAI-generated and not model/GT acceptance evidence. Source image attribution inherited where applicable.",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ]
-    },
-    {
-      "path": "research/retrieval/run_retrieval.py",
-      "sha256": "55e920cf5349092712abefcfb6502cbca7ade92344359b38f4fb6b6f566ce3a0",
-      "mimeType": "text/x-python",
-      "bytes": 3363,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "preserved /tmp/edgetam-poc",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
-      "terms": {
-        "url": "source/research-attribution.json",
-        "checkedAt": "2026-11-04",
-        "summary": "Repository-owner historical experiment outputs/scripts; not OpenAI-generated and not model/GT acceptance evidence. Source image attribution inherited where applicable.",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ]
-    },
-    {
-      "path": "research/tap/edge_results.json",
-      "sha256": "646fd6a7e998832d01eed766b68611b5365f07e092a70d8eee7ec3f22c87c725",
-      "mimeType": "application/json",
-      "bytes": 5082,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "preserved /tmp/edgetam-poc",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
-      "terms": {
-        "url": "source/research-attribution.json",
-        "checkedAt": "2026-11-04",
-        "summary": "Repository-owner historical experiment outputs/scripts; not OpenAI-generated and not model/GT acceptance evidence. Source image attribution inherited where applicable.",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ]
-    },
-    {
-      "path": "research/tap/expected_masks.bin",
-      "sha256": "6b2c15785f13d9fcdcb8fba39a28296660ffe7def6cacb5ae3902a0f18339ffe",
-      "mimeType": "application/octet-stream",
-      "bytes": 786432,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "preserved /tmp/edgetam-poc",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
-      "terms": {
-        "url": "source/research-attribution.json",
-        "checkedAt": "2026-11-04",
-        "summary": "Repository-owner historical experiment outputs/scripts; not OpenAI-generated and not model/GT acceptance evidence. Source image attribution inherited where applicable.",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ]
-    },
-    {
-      "path": "research/tap/expected_pe.bin",
-      "sha256": "9ca968e60d61a149e03ca61209f4f30b2d99be1ced48c2f436a7c66feabb631a",
-      "mimeType": "application/octet-stream",
-      "bytes": 2048,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "preserved /tmp/edgetam-poc",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
-      "terms": {
-        "url": "source/research-attribution.json",
-        "checkedAt": "2026-11-04",
-        "summary": "Repository-owner historical experiment outputs/scripts; not OpenAI-generated and not model/GT acceptance evidence. Source image attribution inherited where applicable.",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ]
-    },
-    {
-      "path": "research/tap/expected_scores.bin",
-      "sha256": "df8b2a4303d3f401bbc9084288691166c31e960e99ff9eafebc20e811eaf20e0",
-      "mimeType": "application/octet-stream",
-      "bytes": 12,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "preserved /tmp/edgetam-poc",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
-      "terms": {
-        "url": "source/research-attribution.json",
-        "checkedAt": "2026-11-04",
-        "summary": "Repository-owner historical experiment outputs/scripts; not OpenAI-generated and not model/GT acceptance evidence. Source image attribution inherited where applicable.",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ]
-    },
-    {
-      "path": "research/tap/pe_results.json",
-      "sha256": "75687a9d5258aacd265a401b0a7c3d0543227b363504a32bc8e1113b21c5f626",
-      "mimeType": "application/json",
-      "bytes": 9834,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "preserved /tmp/edgetam-poc",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
-      "terms": {
-        "url": "source/research-attribution.json",
-        "checkedAt": "2026-11-04",
-        "summary": "Repository-owner historical experiment outputs/scripts; not OpenAI-generated and not model/GT acceptance evidence. Source image attribution inherited where applicable.",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ]
-    },
-    {
-      "path": "research/tap/pe_text_features.npy",
-      "sha256": "3f14f6ec2bbfc2298e901d68b63e8eeb802bbf09323eccbb1691d9908f7e38f8",
-      "mimeType": "application/octet-stream",
-      "bytes": 28800,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "preserved /tmp/edgetam-poc",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
-      "terms": {
-        "url": "source/research-attribution.json",
-        "checkedAt": "2026-11-04",
-        "summary": "Repository-owner historical experiment outputs/scripts; not OpenAI-generated and not model/GT acceptance evidence. Source image attribution inherited where applicable.",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ]
-    },
-    {
-      "path": "research/tap/rack.jpg",
-      "sha256": "899775f47ffaf12c378e186c99884a7b271568dbe3fed0999d3a846e21223911",
-      "mimeType": "image/jpeg",
-      "bytes": 1790516,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:Inside_the_second_hand_shop,_clothing_racks.jpg",
-      "procedure": {
-        "author": "MAKY.OREL",
-        "transformation": "Preserved original research asset; derivative status recorded in research/preservation.json"
-      },
-      "terms": {
-        "url": "https://creativecommons.org/licenses/by-sa/4.0/",
-        "checkedAt": "2026-11-04",
-        "summary": "CC BY-SA 4.0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 2560,
-      "height": 1920,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/tap/rack_input.png",
-      "sha256": "785918cb7762eb722830564761532086103a0d0047272d8c5dee187bfa1f35a6",
-      "mimeType": "image/png",
-      "bytes": 1838383,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:Inside_the_second_hand_shop,_clothing_racks.jpg",
-      "procedure": {
-        "author": "MAKY.OREL",
-        "transformation": "Preserved original research asset; derivative status recorded in research/preservation.json"
-      },
-      "terms": {
-        "url": "https://creativecommons.org/licenses/by-sa/4.0/",
-        "checkedAt": "2026-11-04",
-        "summary": "CC BY-SA 4.0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 1280,
-      "height": 960,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/tap/rack_masks.npz",
-      "sha256": "38b3b7d82ad4d21f55c80ef54979a0185ce0d38a0e30e0a65fb36cc4290bf921",
-      "mimeType": "application/octet-stream",
-      "bytes": 4473840,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:Inside_the_second_hand_shop,_clothing_racks.jpg",
-      "procedure": {
-        "author": "MAKY.OREL",
-        "transformation": "Preserved original research asset; derivative status recorded in research/preservation.json"
-      },
-      "terms": {
-        "url": "https://creativecommons.org/licenses/by-sa/4.0/",
-        "checkedAt": "2026-11-04",
-        "summary": "CC BY-SA 4.0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ]
-    },
-    {
-      "path": "research/tap/shop.jpg",
-      "sha256": "7cbdb41306236c7af63b7403bc0df4997812667b062fe1b9e5ec0d540db5b146",
-      "mimeType": "image/jpeg",
-      "bytes": 7747749,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:Man_examines_clothing_in_a_boutique_while_shopping_for_fashionable_attire_in_a_trendy_store_setting.jpg",
-      "procedure": {
-        "author": "Nenad Stojković (Shixart1985)",
-        "transformation": "Preserved original research asset; derivative status recorded in research/preservation.json"
-      },
-      "terms": {
-        "url": "https://creativecommons.org/licenses/by/2.0/",
-        "checkedAt": "2026-11-04",
-        "summary": "CC BY 2.0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 5665,
-      "height": 3769,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/tap/shop_input.png",
-      "sha256": "82fac36e43dd7a033ea3385a9e4c58d1cf70b9978b1a270b1cf8bb42cf8ee9b4",
-      "mimeType": "image/png",
-      "bytes": 1223658,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:Man_examines_clothing_in_a_boutique_while_shopping_for_fashionable_attire_in_a_trendy_store_setting.jpg",
-      "procedure": {
-        "author": "Nenad Stojković (Shixart1985)",
-        "transformation": "Preserved original research asset; derivative status recorded in research/preservation.json"
-      },
-      "terms": {
-        "url": "https://creativecommons.org/licenses/by/2.0/",
-        "checkedAt": "2026-11-04",
-        "summary": "CC BY 2.0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "width": 1280,
-      "height": 852,
-      "mode": "RGB"
-    },
-    {
-      "path": "research/tap/shop_masks.npz",
-      "sha256": "9dc5a41e0f7194794451ccf5f4553ba7b28365ced5b61a3f2df80926ee998c51",
-      "mimeType": "application/octet-stream",
-      "bytes": 4059120,
-      "sourceType": "original-research",
-      "generator": {
-        "tool": "OMP fixture tooling",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "https://commons.wikimedia.org/wiki/File:Man_examines_clothing_in_a_boutique_while_shopping_for_fashionable_attire_in_a_trendy_store_setting.jpg",
-      "procedure": {
-        "author": "Nenad Stojković (Shixart1985)",
-        "transformation": "Preserved original research asset; derivative status recorded in research/preservation.json"
-      },
-      "terms": {
-        "url": "https://creativecommons.org/licenses/by/2.0/",
-        "checkedAt": "2026-11-04",
-        "summary": "CC BY 2.0",
-        "publicUseApproved": true
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ]
-    },
-    {
       "path": "review/head.json",
-      "sha256": "39df4d763ad302e54905510cb750e50227f8907a7d09c96c2b408d3c49041a33",
+      "sha256": "da013d9b4d70d5a0a14229fdee90c08bbb5844163d05213ca7dddaf0f0ace247",
       "mimeType": "application/json",
-      "bytes": 5075,
+      "bytes": 5101,
       "sourceType": "hand-authored",
       "generator": {
         "tool": "OMP fixture tooling",
@@ -10758,6 +10455,70 @@
       ]
     },
     {
+      "path": "review/index.html",
+      "sha256": "b7fbf5cbfd6c5df908587ce4eb147de78672df66d85e33d6cfafb18b0c6d1f15",
+      "mimeType": "text/html",
+      "bytes": 5020,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "review/items.html",
+      "sha256": "a2b07ed63ca11aa47108f6e637cd13db4ab0d9450c5f4d63d889cfd5aaf688d5",
+      "mimeType": "text/html",
+      "bytes": 3562,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
       "path": "source/contact-sheet.png",
       "sha256": "16d01ba2c2c4af6dcbc48b3524793a827e6046d4702135961de778ffec1b3244",
       "mimeType": "image/png",
@@ -10765,16 +10526,16 @@
       "sourceType": "codex-generated",
       "generator": {
         "tool": "Codex builtin image_gen.imagegen",
-        "version": "0.166.0",
+        "version": "codex-cli 0.166.0",
         "date": "2026-11-04"
       },
-      "sourceId": "codex:01a1a6aa-e961-70a0-b262-707d85989410/exec-95309a9e-af8d-4e55-b4f5-cca5fb3776a4",
-      "procedure": "Photorealistic synthetic 4x4 contact sheet: three multiple-garment shop interiors (blue jacket, stripes, gray/red), jeans/shoes, three fictional no-writing storefronts, shoes, adult front fullbody long hair and hat, halfbody, obscured neck, multiple adults, cropped head, empty hanger, mannequin. No real people, addresses or logos. Full verbatim command in source/generation.json.",
+      "sourceId": "01a1a6aa-e961-70a0-b262-707d85989410/exec-95309a9e-af8d-4e55-b4f5-cca5fb3776a4.png",
+      "procedure": "Use only your built-in image generation tool, not code drawing or web images. Generate one high-resolution photorealistic synthetic contact sheet arranged as exactly 4 columns by 4 rows with equal rectangular cells and no gutters, labels, borders, text or logos. Every cell must be a distinct complete photo, no objects cross cell boundaries. Row1: four small clothing-shop interiors featuring respectively a blue jacket with three other garments, a striped shirt with three other garments, a gray coat and red sweater with two other garments, jeans and brown shoes laid flat separately. Row2: three distinct fictional storefronts (blue awning, brick facade, green door, absolutely no writing) then brown shoes alone against white. Row3: full body front view synthetic adult woman with long hair plain fitted neutral clothing feet fully visible; full body front view synthetic adult man with hat plain fitted clothing feet fully visible; adult halfbody with legs outside photo; adult with scarf hiding neck. Row4: two adults together; adult with head cropped by image edge; empty clothes hanger against wall with no person; empty shop with a mannequin-like coat stand but no person. Each portrait must have its own plain background and entire cell framing. These are fabricated adults not real people and fixtures for privacy testing. Save the generated image file into verification/fixtures/source/contact-sheet.png under current directory. Do not edit any code or other files. Report the actual output path and image tool used.",
       "terms": {
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "OpenAI Terms Content: output rights assigned as between user and OpenAI; not CC0/MIT; AI-generated disclosure required",
-        "publicUseApproved": true
+        "summary": "OpenAI-generated output; no CC0/MIT or human review asserted",
+        "publicUseApproved": false
       },
       "parents": [],
       "consumers": [
@@ -10826,9 +10587,9 @@
     },
     {
       "path": "source/generation.json",
-      "sha256": "c9dd38f9f71fa835e331da884dfc009b49d481202aaa28469def6b7adbb7131a",
+      "sha256": "e911bdd764bbd6b34cb2e19c9ecd1e0d26780651d866dee4bda31df82b72c2c5",
       "mimeType": "application/json",
-      "bytes": 3419,
+      "bytes": 3587,
       "sourceType": "hand-authored",
       "generator": {
         "tool": "OMP fixture tooling",
@@ -10896,16 +10657,16 @@
       "sourceType": "codex-generated",
       "generator": {
         "tool": "Codex builtin image_gen.imagegen",
-        "version": "0.166.0",
+        "version": "codex-cli 0.166.0",
         "date": "2026-11-04"
       },
-      "sourceId": "codex:01a1a6ac-c0d1-77a0-9704-f90d2ca5a0cd/exec-10431993-5bb2-40c9-bf1d-c79e069d3ffb",
-      "procedure": "Photorealistic 2x2 four DIFFERENT fabricated adults head-to-toe front-facing, fitted neutral top/trousers, hands clear, plain gray studio; top left long wavy hair woman, top right brimmed hat man, bottom left long straight hair woman, bottom right different brimmed hat man. No real people/logos/text/borders.",
+      "sourceId": "01a1a6ac-c0d1-77a0-9704-f90d2ca5a0cd/exec-10431993-5bb2-40c9-bf1d-c79e069d3ffb.png",
+      "procedure": "Use only builtin image_gen.imagegen to generate a photorealistic 2-column 2-row contact sheet of four DIFFERENT fabricated adult people, each cell complete head-to-toe including feet, front-facing neutral standing pose, hands clear of body, fitted neutral casual top and trousers, plain light gray studio background. Top left adult woman long wavy hair visible down shoulders; top right adult man short hair wearing brimmed hat; bottom left adult woman long straight dark hair; bottom right adult man wearing a different brimmed hat. No real people, logos, text, labels or cell borders. Leave head and feet margin per cell. Maximum supported portrait-quality resolution; four distinct adults, not repeated. Save actual generated PNG to verification/fixtures/source/self-four.png. No code changes, no drawing with code, no other files. Report generation tool and actual source output path.",
       "terms": {
         "url": "https://openai.com/policies/row-terms-of-use/",
         "checkedAt": "2026-11-04",
-        "summary": "OpenAI Terms Content: output rights assigned as between user and OpenAI; not CC0/MIT; AI-generated disclosure required",
-        "publicUseApproved": true
+        "summary": "OpenAI-generated output; no CC0/MIT or human review asserted",
+        "publicUseApproved": false
       },
       "parents": [],
       "consumers": [
@@ -10989,9 +10750,9 @@
     },
     {
       "path": "store/variants.json",
-      "sha256": "9683a3a7b9c51bb3601d1fda49d81a48b737e2a8024d7afef6d4f06ef6038882",
+      "sha256": "9c52c9f856ff5a01703316d70d899f804541dd952040e80735cee3f4cba33f6c",
       "mimeType": "application/json",
-      "bytes": 399,
+      "bytes": 461905,
       "sourceType": "hand-authored",
       "generator": {
         "tool": "OMP fixture tooling",
@@ -11018,6 +10779,76 @@
         "S08",
         "S09"
       ]
+    },
+    {
+      "path": "voice/corrupt/01-corrupt.wav",
+      "sha256": "b65a0066661b1392a64f3c6d15638c1bfec08a5b661ba9651951e8ecabf39f9b",
+      "mimeType": "audio/x-wav",
+      "bytes": 8,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "expectedDecodeFailure": true
+    },
+    {
+      "path": "voice/leading-5s/01-leading-5s.wav",
+      "sha256": "4d0e73cb8f90340d13b7bef42a400ae5bc63842b014cd80230c756526b89d117",
+      "mimeType": "audio/x-wav",
+      "bytes": 172844,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "samples": 86400,
+      "sampleRate": 16000,
+      "channels": 1,
+      "sampleWidth": 2,
+      "durationS": 5.4
     },
     {
       "path": "voice/limit-15s/01-limit-15s.wav",
@@ -11055,43 +10886,6 @@
       "channels": 1,
       "sampleWidth": 2,
       "durationS": 15.0
-    },
-    {
-      "path": "voice/normal/01-query.wav",
-      "sha256": "983b9fe48324548ffaacca26ca16b52f48817d21582cbfb5215f25577f487b05",
-      "mimeType": "audio/x-wav",
-      "bytes": 101564,
-      "sourceType": "macos-say",
-      "generator": {
-        "tool": "macOS say Samantha + afconvert",
-        "version": "1",
-        "date": "2026-11-04"
-      },
-      "sourceId": "scripts/e2e/build_fixtures.py",
-      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
-      "terms": {
-        "url": "https://www.apple.com/legal/sla/docs/macOSTahoe.pdf",
-        "checkedAt": "2026-11-04",
-        "summary": "Section2F personal non-commercial only; public redistribution prohibited",
-        "publicUseApproved": false
-      },
-      "parents": [],
-      "consumers": [
-        "S11",
-        "S01",
-        "S02",
-        "S03",
-        "S04",
-        "S06",
-        "S07",
-        "S08",
-        "S09"
-      ],
-      "samples": 50760,
-      "sampleRate": 16000,
-      "channels": 1,
-      "sampleWidth": 2,
-      "durationS": 3.1725
     },
     {
       "path": "voice/over-15s/01-over-15s.wav",
@@ -11166,6 +10960,75 @@
       "channels": 1,
       "sampleWidth": 2,
       "durationS": 5.0
+    },
+    {
+      "path": "voice/staging.json",
+      "sha256": "8c590a5b3e79b5edc1830fcea2da82fe02b72e8191238bfdc5680bec9338c1de",
+      "mimeType": "application/json",
+      "bytes": 664,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "path": "voice/tone-silence/01-tone-silence.wav",
+      "sha256": "39973c7d4f33089f075810eb78ca9eb1b0f69f366de559591ca24394e4877e1a",
+      "mimeType": "audio/x-wav",
+      "bytes": 44844,
+      "sourceType": "hand-authored",
+      "generator": {
+        "tool": "OMP fixture tooling",
+        "version": "1",
+        "date": "2026-11-04"
+      },
+      "sourceId": "scripts/e2e/build_fixtures.py",
+      "procedure": "Deterministic synthetic fixture authored by OMP; not provider output or model quality evidence",
+      "terms": {
+        "url": "source/generation.json",
+        "checkedAt": "2026-11-04",
+        "summary": "Repository author contribution; no third-party or public-domain license asserted",
+        "publicUseApproved": true
+      },
+      "parents": [],
+      "consumers": [
+        "S11",
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "samples": 22400,
+      "sampleRate": 16000,
+      "channels": 1,
+      "sampleWidth": 2,
+      "durationS": 1.4
     }
   ]
 }

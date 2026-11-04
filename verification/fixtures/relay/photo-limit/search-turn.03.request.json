@@ -8,16 +8,22 @@
         "name": "find_photos",
         "result": [
           {
+            "photoRef": "today-shop2-photo1",
+            "shopRef": "today-shop2",
+            "takenAt": "2026-11-04T13:34:00+09:00",
+            "score": 0.95
+          },
+          {
             "photoRef": "today-shop2-photo2",
             "shopRef": "today-shop2",
             "takenAt": "2026-11-04T13:35:00+09:00",
-            "score": 0.95
+            "score": 0.85
           },
           {
             "photoRef": "today-shop2-photo3",
             "shopRef": "today-shop2",
             "takenAt": "2026-11-04T13:40:00+09:00",
-            "score": 0.85
+            "score": 0.75
           }
         ]
       }
@@ -35,6 +41,9 @@
     "/toolResults/0/result/0/takenAt",
     "/toolResults/0/result/1/photoRef",
     "/toolResults/0/result/1/shopRef",
-    "/toolResults/0/result/1/takenAt"
+    "/toolResults/0/result/1/takenAt",
+    "/toolResults/0/result/2/photoRef",
+    "/toolResults/0/result/2/shopRef",
+    "/toolResults/0/result/2/takenAt"
   ]
 }

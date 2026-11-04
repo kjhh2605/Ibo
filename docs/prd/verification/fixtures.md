@@ -1,5 +1,5 @@
 # 검증 fixture 명세
-상태: 확정(R10까지) · S11 웨이브 1 산출물 · 현재 문서는 제작/검증 지시이며 파일 생성·API 녹화 완료를 뜻하지 않는다.
+상태: 계약 확정(R10까지) · 2026-11-04 보존된 생성 원본으로 portable corpus 재생성·host CLI 검증 완료 · 사람 GT/공개 승인/영어 음성/M1 연구 자료 미충족으로 전체 gate는 **blocked(exit 2)**. 아래 실행 관측은 앱 E2E 합격이 아니다.
 
 ## 목표
 다른 슬라이스가 실제 개인정보 없이 같은 사진·시각·GPS·음성·응답으로 재현 가능하게 만든다. 합성 검증 자산과 실제 사용자 데이터, provider 원본과 앱 파생 파일의 경계를 유지한다(D-R1-04, D-R7-06, D-R9-01).
@@ -12,7 +12,7 @@
 - [S11](../slices/S11-verification.md), [통합 합격 기준](acceptance.md).
 
 ## 소유 경로
-S11만 `verification/**`, `docs/prd/verification/*`, `scripts/e2e/**`를 변경한다. 앱/릴레이/shared script와 계약은 변경하지 않는다. 아래 경로는 **만들 산출물 이름 계약**이다. 기존 파일의 존재나 검증 완료를 주장하지 않는다.
+S11만 `verification/**`, `docs/prd/verification/*`, `scripts/e2e/**`를 변경한다. 앱/릴레이/shared script와 계약은 변경하지 않는다. 아래 경로는 산출물 이름 계약이며, 현재 생성 여부·미충족 항목은 마지막 실행 관측 절을 따른다.
 
 ## 구현 항목
 ### 1. 공통 manifest와 목록
@@ -33,7 +33,7 @@ S11만 `verification/**`, `docs/prd/verification/*`, `scripts/e2e/**`를 변경�
 | `verification/fixtures/store/e2e.json` | 지난 trip seed와 새 촬영용 manifest. 현재 3가게 trip은 UI로 만들어 seed로 완료를 가장하지 않음 | S04/S06/S08/S11 | 수기 seed, 앱 데이터 DTO 준수 |
 | `verification/fixtures/gpx/shopping-three-shops.gpx` | 촬영 중 3곳 이동, shop 시작/셔터 위치가 다른 구간, `<time>` 포함 WGS84 track | S04/S06/S11 | 수기 합성 GPS, 실제 사용자 이동 기록 아님 |
 | `verification/fixtures/gpx/walk.gpx`, `walk-off-route.gpx`, `walk-boundaries.gpx` | 정상/이탈/재탐색/50·65m/20m·도착/정확도 변형 | S09/S11 | 수기 GPX, accuracy/기대 이벤트는 `*.expected.json` sidecar |
-| `verification/fixtures/audio/query.wav`, `silence.wav`, `limit-15s.wav`, `over-15s.wav` | macOS say와 PCM 생성으로 16 kHz mono PCM16 WAV. 마지막 파일은 거부 테스트 전용 | S03/S04/S07/S11 | say 음성 이름/OS 버전/텍스트·이용조건 확인 |
+| `verification/fixtures/audio/query.wav`, `silence.wav`, `limit-15s.wav`, `over-15s.wav` | query는 동의·재배포 허가를 받은 실제 사람의 영어 녹음, 나머지는 결정적 PCM 신호. 16 kHz mono PCM16, 마지막 파일은 거부 전용 | S03/S04/S07/S11 | 사람 녹음 hash·발화·동의·권한; Apple System Voice 출력은 배포하지 않음 |
 | `verification/fixtures/relay/<scenario>/**` | 아래 키 선택·명시 match/ignore·ref echo 녹화, 응답 assets 포함 | S01/S02/S03/S06/S07/S09/S10/S11 | 수기 오류인지 provider recording인지 명시, 실제 출력 provenance 보존 |
 | `verification/fixtures/quality/thresholds.json`, `cases.json` | PoC로 정한 thresholdVersion·색 차이/어긋남 임계값·보정/고정 검증 세트; 미보정은 null | S05/S10/S11 | PoC run ID·산정 근거, 임의 숫자 금지 |
 | `verification/fixtures/capture/` | 위 생성 이미지의 파일명순 촬영 staging 사본. S04 push-fixtures 입력과 일치 | S04/S11 | 원본 manifest hash 연결, 별도 생성 출처로 꾸미지 않음 |
@@ -41,7 +41,7 @@ S11만 `verification/**`, `docs/prd/verification/*`, `scripts/e2e/**`를 변경�
 | `verification/fixtures/research/**` | 사용자 준비 연구 자산의 22장/7문구·두 tap 이미지·Mac mask/vector·모델 revision/전처리 manifest를 수집 | S02/S05/S11 | 기존 연구의 원출처/이용조건과 hash 유지. 누락 자료를 새 합성 그림으로 바꾸어 연구 재현이라고 하지 않음 |
 
 ### 2. Codex 이미지 생성 절차
-근거: D-R7-06. codex 0.166의 image_generation stable은 준비 사실이나 **비대화 파일 저장 방식은 미확인**이다.
+근거: D-R7-06. 보존된 Codex 0.166 비대화 생성 원본 2개와 당시 invocation/prompt/sourceId는 `source/generation.json`에 있다. 이번 작업에서는 새 image generation을 호출하지 않았고, 기존 원본 hash를 고정해 재사용했다. 다음은 새 원본이 필요한 경우의 절차다.
 1. `codex --version`, `codex --help`, `codex exec --help`로 설치 버전과 출력/이미지 저장 지원을 먼저 읽는다. 문서화된 image_generation 사용법으로 작은 합성 테스트 이미지를 만들고 실제 이미지 파일이 저장되는지 확인한다. 텍스트 `--output-last-message`가 이미지 저장을 보장한다고 가정하거나 지원하지 않는 flag를 발명하지 않는다.
 2. 비대화 저장이 지원되면 확인한 명령·실제 출력 경로를 provenance에 기록하고 위 목록을 생성한다. 지원하지 않으면 `codex` 대화형에서 같은 prompt로 생성 후 실제 생성 파일을 지정 fixture 경로로 옮긴다. 화면 캡처를 생성 원본이라고 기록하지 않는다.
 3. 인물은 성인 합성·가상의 인물임을 prompt에 명시한다. 실제 사용자의 얼굴/사진·상표·주소·촬영 GPS를 입력하지 않는다. 원하는 장발/모자/다인/사람 없음 속성이 실제 출력에 있는지 사람이 확인한다.
@@ -54,13 +54,12 @@ S11만 `verification/**`, `docs/prd/verification/*`, `scripts/e2e/**`를 변경�
 - replay는 S00 `scripts/gpx-replay.sh`를 사용하고 내부적으로 `adb -s "$ANDROID_SERIAL" emu geo fix <lng> <lat>`를 호출한다(에뮬레이터 콘솔 `geo fix`, D-R10-01). 다른 GPS·카메라 주입 도구를 가정하지 않는다. accuracyM은 GPX 표준 필드로 속이지 않고 unit mock sidecar에 주입하며, AVD 실제 accuracy는 관측값을 보고한다.
 - 촬영 폴더는 UTF-8 파일명 순서이므로 `01-shop1-storefront.png`, `02-shop1-item.png`처럼 셔터 일정에 맞게 배열한다. debug extra `sf_capture_source=fixture`, `sf_capture_fixture_dir=/sdcard/Android/data/com.streetfitting.app/files/capture-fixtures/`를 사용한다. EXIF 시간이 아닌 셔터 시각과 주입 GPS가 DB에 들어가야 한다.
 
-### 4. WAV 제작
-근거: D-R3-07, D-R7-06. 아래는 S11이 실행할 제작 명령 예다.
-```sh
-say -v Samantha -o verification/fixtures/audio/query.aiff "Find the blue jacket in the second shop"
-afconvert -f WAVE -d LEI16@16000 -c 1 verification/fixtures/audio/query.aiff verification/fixtures/audio/query.wav
-```
-설치된 영어 voice는 `say -v '?'`로 확인해 provenance에 남긴다. 중간 AIFF는 제작 후 제거하고 배포 fixture는 WAV로 둔다. S11 validator가 RIFF PCM format=1, 16bit/16000Hz/1ch, 실제 samples≤240000을 검사한다. say 발화 뒤 1초 무음을 **샘플로** 붙여 VAD 종료를 시험하고 전체 길이를 다시 검사한다. silence/15초/15초 초과는 같은 PCM 형식으로 제작 스크립트에서 명시 샘플 수를 생성한다. 단위 변형은 외부 TTS/API를 쓰지 않는다.
+### 4. WAV 제작과 배포 경계
+Apple `say` 출력은 공개 fixture로 배포하지 않는다. 기존 say 예제는 배포 절차에서 제거했으며 `build_fixtures.py`도 say/afconvert를 호출하지 않는다. `query.wav`와 `voice/normal/01-query.wav`는 실제 사람의 영어 녹음·명시 동의·재배포 권한을 받은 뒤 `import_review.py --kind speech`로만 등록한다. 아직 두 경로 모두 배포용 입력이 없으며 `--all`은 이를 nonzero로 보고한다.
+
+형식은 RIFF PCM format=1, 16bit/16000Hz/1ch, 실제 samples≤240000이다. 발화 뒤 1초 무음을 **샘플로** 붙인다. importer는 유효 wire WAV, 발화 구간의 비영(非零) samples, 마지막 16000 samples의 무음을 검사한다. 이는 영어 발화나 사람 출처를 자동 판정하는 모델이 아니므로 실제 reviewer의 발화·출처 확인도 필요하다.
+
+`build_fixtures.py`는 silence=80000, limit-15s=240000, over-15s=240001 samples를 만들고 staging에 byte-identical 복사한다. `tone-silence`는 400ms 220Hz + 1초 무음, `leading-5s`는 5초 무음 뒤 400ms 신호다. 이 신호는 amplitude VAD/경계 시험용이며 영어 음성·전사 품질의 대체물이 아니다. mock transcribe의 silent WAV→수기 문장은 wire replay일 뿐 실제 전사 증거가 아니다.
 
 음성 E2E는 [device §8](../contracts/device-modules.md#8-voice--s04)의 debug 전용 `sf_voice_source=fixture`, `sf_voice_fixture_dir=/sdcard/Android/data/com.streetfitting.app/files/voice-fixtures/`를 사용한다. WAV를 adb push한 뒤 Find it 마이크를 누르면 start마다 파일명순 PCM을 실시간 속도로 **실제와 동일한 VAD**에 공급한다. 무음 자동 종료→completed 1회→실제 전사 endpoint 연결까지 검증한다. 직접 WAV를 HTTP로 보내는 시험만으로 native VAD 검증을 대체하지 않는다. 호스트 마이크/사람 발화는 합격 기준이 아니다. release에서는 extra/fixture 코드가 없고 화면 표시도 없어야 한다(D-R7-10 원칙 확장의 계약상 [추론·기술 결정], D-R7-07).
 
@@ -102,10 +101,72 @@ afconvert -f WAVE -d LEI16@16000 -c 1 verification/fixtures/audio/query.aiff ver
 - `scripts/e2e/validate-fixtures.sh --all`: manifest 누락/조건 미확인 공개 자산/잘못된 hash·GT 크기·WAV/GPX/JSON schema를 실패 처리. 모든 필수 scenario를 검사한다.
 - `scripts/e2e/validate-fixtures.sh --relay`: 항상 OpenAPI 검증, 키 선택·명시 match/ignore·ref echo·token 재발급을 검사한다. 의미 필드 변경은 409+첫 pointer, 휘발값 변경은 정상 재생, 미등록 키501, 잘못된 echo500, ignore 필드도 잘못된 미디어/토큰은 거부해야 한다.
 - `scripts/emulator-lock.sh scripts/e2e/head-mask.sh --all`: 실제 S05 evaluateFixture로 positive 노출0/등록성공, no-person 실패, negative 기대 결과를 자동 확인한다.
-- 제작 명령과 검증 명령은 아직 실행하지 않았다. 스크립트 구현 책임은 S11이다.
+- 현재 host 실행 결과는 아래 절에 기록한다. 전체 corpus가 사람 검토 없이 통과하도록 승인 flag를 채우거나 GT를 합성하지 않는다.
 
 ## 완료 보고 형식
 파일/manifest 항목, 생성·녹화 명령과 출처, 검사 명령과 결과, 미확인 이용조건·모델 품질, 계약 모순을 보고한다. clock/ID seed hook 추가 요청은 하지 않는다.
 
 ## 미확인·위험
-Codex 비대화 저장, say 생성 오디오의 공개 이용조건, 실제 Meta 출력 provenance는 확인 전이다. 합성 fixture만으로 실제 매장 검색·배터리·현장 도착 품질을 일반화하지 않는다. 개인정보가 들어 있는 HTTP 캡처를 fixture 디렉터리에 복사하지 않는다.
+공개 asset 이용조건·사람 분류/머리 GT/item mask·배포 가능한 영어 음성은 미충족이다. 실제 Meta 출력 provenance와 M1 앱/모델 품질은 미확인이다. 합성 fixture만으로 실제 매장 검색·배터리·현장 도착 품질을 일반화하지 않는다. 개인정보가 들어 있는 HTTP 캡처를 fixture 디렉터리에 복사하지 않는다.
+
+## 2026-11-04 host 실행 관측
+
+이번 Mac host에서 아래 명령을 실제 실행했다. M1 native/device, Firebase HTTP 인증, Meta/OSRM live 호출, 앱 mock/live E2E는 실행하지 않았다.
+
+```sh
+uv --directory relay run python ../scripts/e2e/build_fixtures.py
+uv --directory relay run python ../scripts/e2e/relay_fixtures.py --build
+uv --directory relay run python ../scripts/e2e/fixture_manifest.py
+bash scripts/e2e/validate-fixtures.sh --relay
+uv --directory relay run python ../scripts/e2e/validate_fixtures.py --all --output /tmp/s11-fixtures-all.json
+```
+
+`--output`은 Python validator의 선택 인수다. shell dispatcher에는 이 인수를 전달하지 않는다. 출력 경로는 실행자가 정하며 기본 validator 보고서는 `verification/results/s11-fixtures-*/`에 생긴다. 생성기·manifest·importer·validator·직접 production replay probe는 `SF_FIXTURES_DIR`로 별도 corpus root를 지정할 수 있고, 코드/OpenAPI 원본은 계속 저장소에서 읽는다.
+
+| 실제 검사 | 관측 |
+| --- | --- |
+| 임시 corpus에서 생성기→relay 생성기→manifest 두 번 실행 | inventory bytes 동일 |
+| 현재 portable manifest | 307 assets, 생성 원본 2개의 고정 hash/sourceId/prompt 연결 |
+| `--relay` | exit 0, 14 scenarios, 10 search token chains, production loader/token boundary 검사 12개, 외부 provider 호출 0 |
+| Python `--all` | exit 2 / blocked, 구조 오류 0, 선행 조건 148개 |
+| 선행 조건 구성 | 공개 승인 132개 + head 분류/GT 12개 + item review 1개 + 영어 speech 경로 2개 + M1 원본 연구 corpus 1개 |
+| 불승인 importer 입력 | head/items/assets/speech 4종 모두 exit 1 |
+| 손상·틀린 입력 | stale hash, 최신 manifest여도 잘못된 cutout alpha, match ancestor ignore, 잘못된 error retryability, 출처 없는 relay binary, 불완전한 연구 corpus 모두 exit 1 |
+| 실제 사람 승인 생성 | 0; 성공 human-import 경로는 실제 승인 입력이 없어 미실행 |
+
+production replay 근거: [`validate-relay.json`](../../../verification/results/s11-fixtures-20261104T234017-bd7b3d0c/validate-relay.json). OpenAPI/생성 TS drift 검사도 같은 CLI에서 실행했다. fixture 이름 `e2e`는 relay scenario 이름이며 실제 Android E2E 성공을 의미하지 않는다.
+
+### 고정된 generator/runtime 인터페이스
+- `source/generation.json`의 원본 hash가 다르면 crop 재생성을 거부한다. sourceId/prompt는 보존된 generation evidence에서 읽고, 다른 표현을 임의로 만들어 쓰지 않는다.
+- GT 또는 item review가 승인된 corpus에는 `build_fixtures.py`가 쓰기 전에 실패한다. 재생성으로 사람 검토를 AI draft로 덮어쓰지 않는다. 승인 후에는 필요하면 relay/manifest만 재생성한다.
+- manifest의 공개 승인과 사람 GT 승인은 별개다. head review만으로 이미지 공개·모델 품질을 승인하지 않는다. 공개 승인은 정확한 경로/hash/실제 reviewer/시각/권한에 연결되며, 알 수 없는 relay binary를 수기 생성물이나 provider recording으로 가장하지 않는다.
+- `relay/e2e`: 현재 ended trip의 3가게(각 storefront+item, Shop1 note=`blue tarp, near the entrance`)와 UI로 만든 이전 ended trip 2가게(각 item 1장, descriptionState=`none`, 메모/외관 없음). query=`Find the blue jacket in the second shop`, target 1 + companions 2.
+- 모든 toolResults/companions 배열 길이·순서·의미 필드를 비교한다. 실제 refs/timestamps/media data, native PE score, try-on 입력 이미지 width/height는 정확한 pointer로 ignore한다. 날짜 표현이 없는 `e2e`만 device-dependent `context.timeZone`도 명시 ignore하며, 다른 semantic scenario의 timeZone 비교는 유지한다.
+- Shop2 셔터의 GPX 목적지는 `walk` destination과 같다. Shop.spot과 route waypoint는 별도 좌표다. token/auth/media 검증을 ignore로 생략하지 않는다.
+- item validator는 source/mask/cutout 크기, 0/255 mask, 실제 bbox, mask 내부 정수 tap, cutout RGB 원본 일치·alpha mask 일치, score 범위와 review hash를 검사한다.
+
+### 사람이 제공할 구체 입력
+로컬 review 화면은 `python3 -m http.server --bind 127.0.0.1 --directory verification/fixtures 8767`로 열고 `http://127.0.0.1:8767/review/`를 사용한다. 화면은 업로드하지 않는다. agent가 사람 이름이나 attestation을 대신 작성하지 않는다.
+
+1. **Head/classification:** positive 6개와 negative/no-person 6개를 확인한다. positive는 원본 해상도에서 얼굴·귀·머리카락·모자 경계를 직접 그린다. 페이지가 내보내는 bundle에는 `id`, `sourceSha256`, `expectedPerson`, `expectedRegistration`, `annotator`, `annotatedAt`, `reviewer`, `reviewedAt`, `humanAttestation:true`, positive의 opaque PNG `maskDataUrl`이 필요하다. negative는 `maskDataUrl:null`이다. 현재 분류가 틀리면 승인하지 말고 frozen case를 명시 수정한 뒤 다시 검토한다.
+   Canvas polygon의 anti-alias 경계는 Fill 직후 보수적으로 이진화한다(coverage>0인 픽셀을 255, 나머지 0, alpha 255). 사람의 polygon 선택을 재해석하거나 AI GT로 채우지 않는다. 실제 review UI에서 기울어진 검사용 polygon의 중간값 123개가 수정 뒤 0개가 됨을 확인했다. annotator/reviewer/attestation은 입력하지 않았고 검사용 polygon을 지웠으며 승인 bundle을 만들지 않았다.
+2. **Items:** `review/items.html`에서 12개 source/mask/bbox/tap을 실제 확인한다. AI 사각형이 부정확하면 승인하지 않는다. 외부 편집기로 mask와 일치하는 cutout/bbox/tap을 수정한 뒤 페이지를 다시 열어 새로운 hash로 검토한다. export는 공통 reviewer/시각/attestation과 후보별 `mask`, `sourceSha256`, `maskSha256`, `approved:true`를 포함한다. 승인 mask가 자동 SAM/EdgeTAM 품질 증거로 바뀌지는 않는다.
+3. **Publication assets:** 별도 JSON bundle의 `assets` 배열에 직접 검토한 각 `path`, `sha256`, `publicUseApproved:true`, `termsUrl`, `permission`을 넣고, 최상위에 실제 `reviewer`, `reviewedAt`, `humanAttestation:true`를 넣는다. 생성물에 CC0/MIT를 임의 부여하지 않는다. 복사된 relay/capture 파일도 각각의 manifest 경로/hash로 승인한다.
+4. **Speech:** 사람이 녹음한 실제 영어 WAV와 bundle을 제공한다. 공통 reviewer/시각/attestation 외에 `sourceType:"human-recording"`, `sourceId`, WAV `sha256`, `permission`, `termsUrl`, `speakerConsent:true`, `redistributionApproved:true`, `language:"en"`, 실제 발화 `text`가 필요하다. 일반 human recording 권한을 Apple 음성 출력 권한으로 바꾸지 않는다.
+
+```sh
+uv --directory relay run python ../scripts/e2e/import_review.py /absolute/path/head.review.json --kind head
+uv --directory relay run python ../scripts/e2e/import_review.py /absolute/path/items.review.json --kind items
+uv --directory relay run python ../scripts/e2e/import_review.py /absolute/path/assets.review.json --kind assets
+uv --directory relay run python ../scripts/e2e/import_review.py /absolute/path/speech.review.json --kind speech --speech-file /absolute/path/query.wav
+uv --directory relay run python ../scripts/e2e/fixture_manifest.py
+bash scripts/e2e/validate-fixtures.sh --all
+```
+
+검토 시각은 timezone이 있는 실제 과거/현재 ISO timestamp여야 한다. importer는 형식·hash·geometry를 검사할 뿐 서명된 신원 증명이나 사람의 판단 정확성을 자동 보증하지 않는다. 실제 승인 bundle이 없으므로 이번 smoke에서는 불승인 bundle만 importer에 전달했고, 성공을 만들기 위해 가짜 GT/승인을 생성하지 않았다.
+
+### M1 연구 corpus 외부 입력
+coordinator가 전달한 원본 위치는 `/Users/user/.cache/street-fitting/models/retrieval_r4/`다. `manifest.json` 22개 image rows/원출처, `results.json` 7 query/relevant_ids/top3, `image_embeddings.npy` 22×512를 보존하고, 오래된 `/tmp/edgetam-poc/...` path는 실행 시 메모리에서만 remap한다. 원본 `run_retrieval.py`를 실행해 historical 결과를 덮어쓰지 않는다.
+
+전달된 PE checkpoint revision은 `8b4722741a516c18e7d311f158f13c600fea6c78`; image preprocessing은 RGB squash384 bilinear→ToTensor→mean/std 0.5, center crop 없음; text context32, normalized512다. 이는 coordinator 제공 metadata이며 이 host에서 모델/파일 hash를 직접 확인한 결과가 아니다. 실제 복사본과 파일별 원본 hash/unaltered 기록(`research/preservation.json`), 모델 revision/전처리 기록(`research/preprocessing.json`), 두 tap 이미지·기존 mask/vector·라이선스를 M1 owner가 제공해야 한다. 누락 자료를 새 합성 그림이나 임의 revision으로 대체하지 않는다.
+

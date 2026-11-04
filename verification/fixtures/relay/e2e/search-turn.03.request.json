@@ -1,0 +1,32 @@
+{
+  "expected": {
+    "query": "Find the blue jacket in the second shop",
+    "queryToken": "runtime-token",
+    "toolResults": [
+      {
+        "toolCallId": "find-call",
+        "name": "find_photos",
+        "result": [
+          {
+            "photoRef": "current-item2",
+            "shopRef": "current-shop2",
+            "takenAt": "2026-11-04T14:00:00+09:00",
+            "score": 0.5
+          }
+        ]
+      }
+    ]
+  },
+  "match": [
+    "/query",
+    "/toolResults"
+  ],
+  "ignore": [
+    "/queryToken",
+    "/toolResults/0/toolCallId",
+    "/toolResults/0/result/0/photoRef",
+    "/toolResults/0/result/0/shopRef",
+    "/toolResults/0/result/0/takenAt",
+    "/toolResults/0/result/0/score"
+  ]
+}

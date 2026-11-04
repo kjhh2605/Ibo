@@ -1,10 +1,10 @@
 {
-  "status": 503,
+  "status": 404,
   "body": {
     "error": {
       "code": "route_unavailable",
       "message": "No walking route available",
-      "retryable": true
+      "retryable": false
     }
   }
 }

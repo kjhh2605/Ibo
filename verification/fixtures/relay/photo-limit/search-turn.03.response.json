@@ -8,7 +8,8 @@
         "arguments": {
           "photoRefs": [
             "{{toolResults[0].result[0].photoRef}}",
-            "{{toolResults[0].result[1].photoRef}}"
+            "{{toolResults[0].result[1].photoRef}}",
+            "{{toolResults[0].result[2].photoRef}}"
           ],
           "concept": "a blue jacket"
         }

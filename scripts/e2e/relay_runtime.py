@@ -16,7 +16,7 @@ import tempfile
 
 ROOT=Path(__file__).resolve().parents[2]
 SOURCE=Path(os.environ.get('SF_RELAY_SOURCE',ROOT/'relay')).resolve()
-FIX=ROOT/'verification/fixtures/relay'
+FIX=Path(os.environ.get('SF_FIXTURES_DIR',ROOT/'verification/fixtures')).resolve()/'relay'
 sys.path.insert(0,str(SOURCE))
 
 def main():
@@ -52,6 +52,7 @@ def main():
   if (directory/'search-turn.01.request.json').exists():
    sequence=[('search-turn',1),('search-turn',2),('search-turn',3)]
    if (directory/'search-segment.01.request.json').exists():sequence.append(('search-segment',1))
+   # Budget rejection is probed while extract_items is still pending.
    if scenario=='photo-limit':sequence.append(('search-segment',4))
    if (directory/'search-turn.04.request.json').exists():sequence.append(('search-turn',4))
    if scenario=='turn-limit':sequence.append(('search-turn',5))

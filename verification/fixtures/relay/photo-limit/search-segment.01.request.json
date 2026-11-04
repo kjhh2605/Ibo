@@ -3,6 +3,17 @@
     "queryToken": "runtime-token",
     "photos": [
       {
+        "photoRef": "today-shop2-photo1",
+        "image": {
+          "mimeType": "image/png",
+          "data": {
+            "asset": "assets/shop-2-items.png"
+          },
+          "width": 309,
+          "height": 310
+        }
+      },
+      {
         "photoRef": "today-shop2-photo2",
         "image": {
           "mimeType": "image/png",
@@ -36,6 +47,8 @@
     "/photos/0/photoRef",
     "/photos/0/image/data",
     "/photos/1/photoRef",
-    "/photos/1/image/data"
+    "/photos/1/image/data",
+    "/photos/2/photoRef",
+    "/photos/2/image/data"
   ]
 }

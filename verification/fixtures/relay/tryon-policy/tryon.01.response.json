@@ -1,5 +1,5 @@
 {
-  "status": 422,
+  "status": 400,
   "body": {
     "error": {
       "code": "content_policy_violation",

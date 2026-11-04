@@ -1,6 +1,6 @@
 {
   "expected": {
-    "query": "Find the blue jacket",
+    "query": "Find the blue jacket in the second shop",
     "queryToken": "runtime-token",
     "toolResults": [
       {
@@ -8,14 +8,9 @@
         "name": "extract_items",
         "result": [
           {
-            "photoRef": "today-shop2-photo2",
+            "photoRef": "current-item2",
             "candidateCount": 4,
             "topScore": 1.0
-          },
-          {
-            "photoRef": "today-shop2-photo3",
-            "candidateCount": 0,
-            "topScore": null
           }
         ]
       }
@@ -28,7 +23,6 @@
   "ignore": [
     "/queryToken",
     "/toolResults/0/toolCallId",
-    "/toolResults/0/result/0/photoRef",
-    "/toolResults/0/result/1/photoRef"
+    "/toolResults/0/result/0/photoRef"
   ]
 }

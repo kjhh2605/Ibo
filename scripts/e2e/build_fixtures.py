@@ -6,16 +6,15 @@ import hashlib
 import json
 import math
 import copy
+import os
 import shutil
 import struct
-import subprocess
-import tempfile
 import wave
 from datetime import datetime, timedelta, timezone
 from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[2]
-FIX = ROOT / 'verification/fixtures'
+FIX = Path(os.environ.get('SF_FIXTURES_DIR', ROOT / 'verification/fixtures')).resolve()
 DATE = '2026-11-04'
 
 def save_json(path, value):
@@ -38,6 +37,18 @@ def pcm(path, samples):
         out.writeframes(samples)
 
 def images():
+    for source in json.loads((FIX/'source/generation.json').read_text())['outputs']:
+        path = FIX / source['path']
+        if not path.resolve().is_relative_to(FIX) or digest(path) != source['sha256']:
+            raise ValueError('Generated source identity differs from preserved evidence')
+    # Rebuilding frozen, reviewed pixels would invalidate genuine annotations.
+    # Refuse before any writes rather than silently reverting them to AI drafts.
+    for relative,key in [('review/head.json','cases'),('masks/items/cases.json',None)]:
+        existing=FIX/relative
+        if existing.exists():
+            value=json.loads(existing.read_text())
+            if (key and any(case.get('status')=='human-approved' for case in value[key])) or (not key and value.get('reviewer')):
+                raise ValueError('Reviewed corpus is frozen; explicitly revise source and review together before rebuilding images')
     sheet = Image.open(FIX / 'source/contact-sheet.png').convert('RGB')
     names = ['shops/shop-1-items','shops/shop-2-items','shops/shop-3-items','wardrobe/jeans-original',
              'storefronts/shop-1','storefronts/shop-2','storefronts/shop-3','wardrobe/shoes-original',
@@ -125,25 +136,15 @@ def audio():
         pcm(FIX/f'audio/{name}.wav',samples);pcm(FIX/f'voice/{name}/01-{name}.wav',samples)
     path=FIX/'voice/corrupt/01-corrupt.wav';path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(b'RIFFbad!')
     save_json(FIX/'voice/staging.json',{'tone-silence':{'directory':'tone-silence','expected':'completed once, silence reason, >=400ms voiced energy plus1000ms silence'},'leading-5s':{'directory':'leading-5s','expected':'no_speech before subsequent tone'},'limit':{'directory':'limit-15s','expected':'completed once, limit,240000samples'},'empty':{'files':[],'expected':'audio_unavailable or io_error; no fake recording'},'corrupt':{'directory':'corrupt','expected':'reject invalid canonical44 WAV'},'disclosure':'220Hz signals test amplitude VAD only, not speech recognition or transcription quality'})
-    save_json(FIX/'audio/speech-source.json',{'text':'Find the blue jacket in the second shop','voice':'Samantha','format':'PCM16 LE mono 16000Hz','trailingSilenceSamples':16000,'sourceType':'macos-say','termsUrl':'https://www.apple.com/legal/sla/docs/macOSTahoe.pdf','termsCheckedAt':DATE,'publicUseApproved':False,'reason':'Section 2F prohibits public sharing/redistribution of System Voice output; local generation only pending rights or approved replacement.'})
+    if not (FIX/'audio/speech-source.json').exists():
+        save_json(FIX/'audio/speech-source.json',{'text':'Find the blue jacket in the second shop','format':'PCM16 LE mono 16000Hz','trailingSilenceSamples':16000,'sourceType':'awaiting-licensed-human-recording','publicUseApproved':False,'reason':'Consenting human recording and explicit redistribution permission required; Apple System Voice is not distributable.'})
 
-def local_speech():
-    with tempfile.TemporaryDirectory() as temp:
-        aiff=Path(temp)/'query.aiff'; raw=Path(temp)/'query.wav'
-        subprocess.run(['say','-v','Samantha','-o',str(aiff),'Find the blue jacket in the second shop'],check=True)
-        subprocess.run(['afconvert','-f','WAVE','-d','LEI16@16000','-c','1',str(aiff),str(raw)],check=True)
-        with wave.open(str(raw),'rb') as src:
-            assert src.getparams()[:3]==(1,2,16000)
-            samples=src.readframes(src.getnframes())+b'\0\0'*16000
-        assert len(samples)//2<=240000
-        pcm(FIX/'audio/query.wav',samples)
-        pcm(FIX/'voice/normal/01-query.wav',samples)
 
 def traces():
     destination={'lat':37.5445,'lng':127.0555}
     def point(distance): return {'lat':destination['lat']+distance/111195,'lng':destination['lng']}
     sets={
-      'shopping-three-shops':[(0,120,'start-shopping'),(5,115,'shop1-storefront'),(10,105,'shop1-item'),(20,85,'new-shop2'),(25,80,'shop2-storefront'),(30,65,'shop2-item'),(40,25,'new-shop3'),(45,20,'shop3-storefront'),(50,0,'shop3-item'),(55,0,'end-shopping')],
+      'shopping-three-shops':[(0,120,'start-shopping'),(5,115,'shop1-storefront'),(10,105,'shop1-item'),(20,85,'new-shop2'),(25,80,'shop2-storefront'),(30,0,'shop2-item'),(40,25,'new-shop3'),(45,20,'shop3-storefront'),(50,0,'shop3-item'),(55,0,'end-shopping')],
       'walk':[(0,100,'route'),(5,66,'route'),(10,50,'direction'),(15,21,'direction'),(20,20,'nearby-start'),(25,19,'nearby'),(30,19,'manual-confirm-arrival')],
       'walk-off-route':[(0,120,'route'),(5,115,'off-route-fix1'),(10,110,'off-route-fix2'),(15,105,'reroute'),(20,95,'cooldown'),(25,80,'route')],
       'walk-boundaries':[(0,66,'route'),(5,50,'direction'),(10,65,'direction'),(15,65.1,'route'),(20,50,'direction'),(25,20.1,'direction'),(30,20,'nearby-start'),(35,19.9,'nearby'),(40,19.9,'manual-confirm-arrival')]
@@ -190,18 +191,19 @@ def store():
         cases[name]={'nativeSeed':state,'expect':{'score-ties':'takenAt descending, then id ascending','empty-visits':'not found, no photo tool data','all-trips':'today and Saturday searchable','pending-index':'eligible photos remain available without vector','failed-index':'eligible photos remain available without vector','no-storefront':'note vintage and manual visit order remain usable'}[name]}
     cases['delete-during-search']={'base':'search.json','deletePhotoId':photos[0]['id'],'releaseLateToolResponseAfterDeletion':True,'expect':'deleted photo absent; no row/job resurrection'}
     cases['sam-empty-tap']={'base':'search.json','segmentResponse':{'photos':[]},'tapImage':'images/shops/shop-1-items.png','tapMasks':'masks/items/cases.json','expect':'user fallback tap offers three masks'}
-    cases['verbatim-transcript']={'responseText':'  Find the blue jacket, please.  ','expectInput':'  Find the blue jacket, please.  ','automaticSearch':False}
+    cases['verbatim-transcript']={'responseText':'  Find the blue jacket, please.  ','expectInput':'  Find the blue jacket, please.  ','automaticSearch':True}
     cases['voice-15s']={'audio':'audio/limit-15s.wav','samples':240000,'expectCompletedEvents':1,'stopReason':'limit'}
-    cases['offline-browsing']={'base':'e2e.json','network':'offline','expectHTTPCalls':0,'allowedScreens':['trip','visit','saved','wardrobe','results']}
+    cases['offline-browsing']={'base':'e2e.json','network':'offline','expectHTTPCalls':0,'allowedScreens':['trip','item','wardrobe','results']}
     cases['policy-error']={'relayScenario':'tryon-policy','expectResultRowsAdded':0,'expectTemporaryFilesAfter':0}
     cases['label-queue']={'origin':'shop','cutout':'images/derived/shop-1-candidate-1.png','networkTransitions':['offline','online'],'expectedKind':'label_piece','expectedSuccessCalls':1}
     cases['masking-failure']={'reviewCases':['half-body','neck-hidden','multiple-people','cropped-head','hanger','mannequin'],'expectUploadCalls':0,'preserveExistingSelf':True}
     cases['download-off']={'flag':False,'expectExportCalls':0,'expectMediaStoreRowsAdded':0}
     save_json(FIX/'store/variants.json',{'cases':cases,'resultDownload':False,'compositionThresholds':None})
-    save_json(FIX/'quality/thresholds.json',{'thresholdVersion':None,'neckShoulderDeltaE95':None,'offsetRatio95':None,'calibrationRun':None,'decision':'faceless-not-calibrated'})
-    save_json(FIX/'quality/cases.json',{'frozenAt':DATE,'calibration':['calibration-long-hair','calibration-hat'],'heldOut':['heldout-long-hair','heldout-hat'],'pocPlan':{'base':{'self':2,'maskModes':['opaque','crop','background-removed'],'reasoning':['low','high'],'calls':12},'bestRepeatCalls':3,'topOnlyCalls':1,'total':16},'humanApprovalRequired':True})
+    if not (FIX/'quality/thresholds.json').exists():
+        save_json(FIX/'quality/thresholds.json',{'thresholdVersion':None,'neckShoulderDeltaE95':None,'offsetRatio95':None,'calibrationRun':None,'decision':'faceless-not-calibrated'})
+    if not (FIX/'quality/cases.json').exists():
+        save_json(FIX/'quality/cases.json',{'frozenAt':DATE,'calibration':['calibration-long-hair','calibration-hat'],'heldOut':['heldout-long-hair','heldout-hat'],'pocPlan':{'base':{'self':2,'maskModes':['opaque','crop','background-removed'],'reasoning':['low','high'],'calls':12},'bestRepeatCalls':3,'topOnlyCalls':1,'total':16},'humanApprovalRequired':True})
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('--local-speech',action='store_true');args=parser.parse_args()
-    if args.local_speech:local_speech()
-    else:images();audio();traces();store()
+    argparse.ArgumentParser(description=__doc__).parse_args()
+    images();audio();traces();store()

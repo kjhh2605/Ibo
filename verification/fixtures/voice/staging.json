@@ -1,0 +1,23 @@
+{
+  "tone-silence": {
+    "directory": "tone-silence",
+    "expected": "completed once, silence reason, >=400ms voiced energy plus1000ms silence"
+  },
+  "leading-5s": {
+    "directory": "leading-5s",
+    "expected": "no_speech before subsequent tone"
+  },
+  "limit": {
+    "directory": "limit-15s",
+    "expected": "completed once, limit,240000samples"
+  },
+  "empty": {
+    "files": [],
+    "expected": "audio_unavailable or io_error; no fake recording"
+  },
+  "corrupt": {
+    "directory": "corrupt",
+    "expected": "reject invalid canonical44 WAV"
+  },
+  "disclosure": "220Hz signals test amplitude VAD only, not speech recognition or transcription quality"
+}

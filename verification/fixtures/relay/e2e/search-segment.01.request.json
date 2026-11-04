@@ -1,10 +1,9 @@
 {
   "expected": {
     "queryToken": "runtime-token",
-    "concept": "a blue jacket",
     "photos": [
       {
-        "photoRef": "today-shop2-photo2",
+        "photoRef": "current-item2",
         "image": {
           "mimeType": "image/png",
           "data": {
@@ -14,11 +13,12 @@
           "height": 310
         }
       }
-    ]
+    ],
+    "concept": "a blue jacket"
   },
   "match": [
-    "/concept",
-    "/photos"
+    "/photos",
+    "/concept"
   ],
   "ignore": [
     "/queryToken",

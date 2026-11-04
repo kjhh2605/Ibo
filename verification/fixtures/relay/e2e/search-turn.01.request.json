@@ -1,0 +1,17 @@
+{
+  "expected": {
+    "query": "Find the blue jacket in the second shop",
+    "context": {
+      "now": "2026-11-04T14:00:00+09:00",
+      "timeZone": "Asia/Seoul"
+    }
+  },
+  "match": [
+    "/query",
+    "/context"
+  ],
+  "ignore": [
+    "/context/now",
+    "/context/timeZone"
+  ]
+}
