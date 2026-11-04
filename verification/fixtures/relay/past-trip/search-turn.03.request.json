@@ -1,0 +1,40 @@
+{
+  "expected": {
+    "query": "The jacket from Saturday",
+    "queryToken": "runtime-token",
+    "toolResults": [
+      {
+        "toolCallId": "find-call",
+        "name": "find_photos",
+        "result": [
+          {
+            "photoRef": "saturday-shop2-photo2",
+            "shopRef": "saturday-shop2",
+            "takenAt": "2026-10-31T13:35:00+09:00",
+            "score": 0.95
+          },
+          {
+            "photoRef": "saturday-shop2-photo3",
+            "shopRef": "saturday-shop2",
+            "takenAt": "2026-10-31T13:40:00+09:00",
+            "score": 0.85
+          }
+        ]
+      }
+    ]
+  },
+  "match": [
+    "/query",
+    "/toolResults"
+  ],
+  "ignore": [
+    "/queryToken",
+    "/toolResults/0/toolCallId",
+    "/toolResults/0/result/0/photoRef",
+    "/toolResults/0/result/0/shopRef",
+    "/toolResults/0/result/0/takenAt",
+    "/toolResults/0/result/1/photoRef",
+    "/toolResults/0/result/1/shopRef",
+    "/toolResults/0/result/1/takenAt"
+  ]
+}

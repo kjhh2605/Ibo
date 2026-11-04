@@ -1,0 +1,8 @@
+{
+  "status": 200,
+  "body": {
+    "not_found": {
+      "reason": "No matching yellow raincoat was found."
+    }
+  }
+}

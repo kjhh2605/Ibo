@@ -1,0 +1,10 @@
+{
+  "status": 504,
+  "body": {
+    "error": {
+      "code": "upstream_timeout",
+      "message": "Upstream timed out",
+      "retryable": true
+    }
+  }
+}

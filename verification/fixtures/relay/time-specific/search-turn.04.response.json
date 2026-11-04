@@ -1,0 +1,13 @@
+{
+  "status": 200,
+  "body": {
+    "final": {
+      "photoRefs": [
+        "{{toolResults[0].result[0].photoRef}}",
+        "{{toolResults[0].result[1].photoRef}}"
+      ],
+      "concept": "a blue jacket",
+      "summary": "Select the matching garment."
+    }
+  }
+}

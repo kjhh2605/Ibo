@@ -1,0 +1,10 @@
+{
+  "status": 422,
+  "body": {
+    "error": {
+      "code": "content_policy_violation",
+      "message": "Request rejected by policy",
+      "retryable": false
+    }
+  }
+}

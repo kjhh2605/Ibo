@@ -1,0 +1,92 @@
+{
+  "status": 200,
+  "body": {
+    "photos": [
+      {
+        "photoRef": "{{photos[0].photoRef}}",
+        "candidates": [
+          {
+            "id": "candidate-1",
+            "label": "blue jacket",
+            "score": 1.0,
+            "mask": {
+              "mimeType": "image/png",
+              "data": {
+                "asset": "assets/shop-2-candidate-1.png"
+              },
+              "width": 309,
+              "height": 310
+            },
+            "bbox": [
+              5,
+              87,
+              68,
+              184
+            ]
+          },
+          {
+            "id": "candidate-2",
+            "label": "striped shirt",
+            "score": 0.9,
+            "mask": {
+              "mimeType": "image/png",
+              "data": {
+                "asset": "assets/shop-2-candidate-2.png"
+              },
+              "width": 309,
+              "height": 310
+            },
+            "bbox": [
+              82,
+              87,
+              68,
+              184
+            ]
+          },
+          {
+            "id": "candidate-3",
+            "label": "gray coat",
+            "score": 0.8,
+            "mask": {
+              "mimeType": "image/png",
+              "data": {
+                "asset": "assets/shop-2-candidate-3.png"
+              },
+              "width": 309,
+              "height": 310
+            },
+            "bbox": [
+              159,
+              87,
+              69,
+              184
+            ]
+          },
+          {
+            "id": "candidate-4",
+            "label": "red sweater",
+            "score": 0.7,
+            "mask": {
+              "mimeType": "image/png",
+              "data": {
+                "asset": "assets/shop-2-candidate-4.png"
+              },
+              "width": 309,
+              "height": 310
+            },
+            "bbox": [
+              237,
+              87,
+              68,
+              184
+            ]
+          }
+        ]
+      },
+      {
+        "photoRef": "{{photos[1].photoRef}}",
+        "candidates": []
+      }
+    ]
+  }
+}

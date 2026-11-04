@@ -1,0 +1,11 @@
+{
+  "text": "Find the blue jacket in the second shop",
+  "voice": "Samantha",
+  "format": "PCM16 LE mono 16000Hz",
+  "trailingSilenceSamples": 16000,
+  "sourceType": "macos-say",
+  "termsUrl": "https://www.apple.com/legal/sla/docs/macOSTahoe.pdf",
+  "termsCheckedAt": "2026-11-04",
+  "publicUseApproved": false,
+  "reason": "Section 2F prohibits public sharing/redistribution of System Voice output; local generation only pending rights or approved replacement."
+}

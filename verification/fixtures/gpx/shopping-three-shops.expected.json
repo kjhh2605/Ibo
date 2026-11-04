@@ -1,0 +1,98 @@
+{
+  "source": "hand-authored synthetic; not actual location history",
+  "destination": {
+    "lat": 37.5445,
+    "lng": 127.0555
+  },
+  "shopSpot": {
+    "lat": 37.54526442286074,
+    "lng": 127.0555
+  },
+  "routeWaypoint": {
+    "lat": 37.54472483025316,
+    "lng": 127.0555
+  },
+  "accuracySource": "unit sidecar only; AVD reports observed accuracy",
+  "checkpoints": [
+    {
+      "index": 0,
+      "elapsedS": 0,
+      "event": "start-shopping",
+      "accuracyM": 5,
+      "distanceToDestinationM": 120
+    },
+    {
+      "index": 1,
+      "elapsedS": 5,
+      "event": "shop1-storefront",
+      "accuracyM": 5,
+      "distanceToDestinationM": 115
+    },
+    {
+      "index": 2,
+      "elapsedS": 10,
+      "event": "shop1-item",
+      "accuracyM": 5,
+      "distanceToDestinationM": 105
+    },
+    {
+      "index": 3,
+      "elapsedS": 20,
+      "event": "new-shop2",
+      "accuracyM": 5,
+      "distanceToDestinationM": 85
+    },
+    {
+      "index": 4,
+      "elapsedS": 25,
+      "event": "shop2-storefront",
+      "accuracyM": 5,
+      "distanceToDestinationM": 80
+    },
+    {
+      "index": 5,
+      "elapsedS": 30,
+      "event": "shop2-item",
+      "accuracyM": 5,
+      "distanceToDestinationM": 65
+    },
+    {
+      "index": 6,
+      "elapsedS": 40,
+      "event": "new-shop3",
+      "accuracyM": 5,
+      "distanceToDestinationM": 25
+    },
+    {
+      "index": 7,
+      "elapsedS": 45,
+      "event": "shop3-storefront",
+      "accuracyM": 5,
+      "distanceToDestinationM": 20
+    },
+    {
+      "index": 8,
+      "elapsedS": 50,
+      "event": "shop3-item",
+      "accuracyM": 5,
+      "distanceToDestinationM": 0
+    },
+    {
+      "index": 9,
+      "elapsedS": 55,
+      "event": "end-shopping",
+      "accuracyM": 5,
+      "distanceToDestinationM": 0
+    }
+  ],
+  "accuracyVariants": [
+    {
+      "accuracyM": 31,
+      "expected": "ignore-for-arrival-and-offroute"
+    },
+    {
+      "accuracyM": 30,
+      "expected": "eligible"
+    }
+  ]
+}

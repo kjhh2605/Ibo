@@ -1,0 +1,10 @@
+{
+  "status": 409,
+  "body": {
+    "error": {
+      "code": "query_limit_exceeded",
+      "message": "Search limit reached",
+      "retryable": false
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "expected": {
+    "query": "Find the striped coat",
+    "queryToken": "runtime-token",
+    "toolResults": [
+      {
+        "toolCallId": "extract-call",
+        "name": "extract_items",
+        "result": [
+          {
+            "photoRef": "today-shop2-photo2",
+            "candidateCount": 4,
+            "topScore": 1.0
+          },
+          {
+            "photoRef": "today-shop2-photo3",
+            "candidateCount": 0,
+            "topScore": null
+          }
+        ]
+      }
+    ]
+  },
+  "match": [
+    "/query",
+    "/toolResults"
+  ],
+  "ignore": [
+    "/queryToken",
+    "/toolResults/0/toolCallId",
+    "/toolResults/0/result/0/photoRef",
+    "/toolResults/0/result/1/photoRef"
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "source": "hand-authored synthetic; not actual location history",
+  "destination": {
+    "lat": 37.5445,
+    "lng": 127.0555
+  },
+  "shopSpot": {
+    "lat": 37.54526442286074,
+    "lng": 127.0555
+  },
+  "routeWaypoint": {
+    "lat": 37.54472483025316,
+    "lng": 127.0555
+  },
+  "accuracySource": "unit sidecar only; AVD reports observed accuracy",
+  "checkpoints": [
+    {
+      "index": 0,
+      "elapsedS": 0,
+      "event": "route",
+      "accuracyM": 5,
+      "distanceToDestinationM": 100
+    },
+    {
+      "index": 1,
+      "elapsedS": 5,
+      "event": "route",
+      "accuracyM": 5,
+      "distanceToDestinationM": 66
+    },
+    {
+      "index": 2,
+      "elapsedS": 10,
+      "event": "direction",
+      "accuracyM": 5,
+      "distanceToDestinationM": 50
+    },
+    {
+      "index": 3,
+      "elapsedS": 15,
+      "event": "direction",
+      "accuracyM": 5,
+      "distanceToDestinationM": 21
+    },
+    {
+      "index": 4,
+      "elapsedS": 20,
+      "event": "nearby-start",
+      "accuracyM": 5,
+      "distanceToDestinationM": 20
+    },
+    {
+      "index": 5,
+      "elapsedS": 25,
+      "event": "nearby",
+      "accuracyM": 5,
+      "distanceToDestinationM": 19
+    },
+    {
+      "index": 6,
+      "elapsedS": 30,
+      "event": "manual-confirm-arrival",
+      "accuracyM": 5,
+      "distanceToDestinationM": 19
+    }
+  ],
+  "accuracyVariants": [
+    {
+      "accuracyM": 31,
+      "expected": "ignore-for-arrival-and-offroute"
+    },
+    {
+      "accuracyM": 30,
+      "expected": "eligible"
+    }
+  ]
+}

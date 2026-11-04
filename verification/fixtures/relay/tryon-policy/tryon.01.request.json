@@ -1,0 +1,57 @@
+{
+  "expected": {
+    "selfPhoto": {
+      "image": {
+        "mimeType": "image/png",
+        "data": {
+          "asset": "assets/calibration-hat-masked.png"
+        },
+        "width": 508,
+        "height": 764
+      },
+      "headMasked": true
+    },
+    "target": {
+      "pieceRef": "target-shop",
+      "image": {
+        "mimeType": "image/png",
+        "data": {
+          "asset": "assets/shop-1-candidate-1.png"
+        },
+        "width": 310,
+        "height": 310
+      },
+      "label": "Blue jacket",
+      "category": "jacket",
+      "origin": "shop"
+    },
+    "companions": [
+      {
+        "pieceRef": "wardrobe-jeans",
+        "image": {
+          "mimeType": "image/png",
+          "data": {
+            "asset": "assets/jeans-cutout.png"
+          },
+          "width": 310,
+          "height": 310
+        },
+        "label": "Jeans",
+        "category": "pants",
+        "origin": "wardrobe"
+      }
+    ]
+  },
+  "match": [
+    "/selfPhoto",
+    "/target",
+    "/companions"
+  ],
+  "ignore": [
+    "/selfPhoto/image/data",
+    "/target/pieceRef",
+    "/target/image/data",
+    "/companions/0/pieceRef",
+    "/companions/0/image/data"
+  ]
+}

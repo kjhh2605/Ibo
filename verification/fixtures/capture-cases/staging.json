@@ -1,0 +1,18 @@
+{
+  "empty": {
+    "files": [],
+    "expected": "capture failure, no fake image"
+  },
+  "corrupt": {
+    "files": [
+      "corrupt/01-corrupt.png"
+    ],
+    "expected": "decoder failure, no partial Store row"
+  },
+  "exif": {
+    "files": [
+      "exif/01-oriented-gps.jpg"
+    ],
+    "expected": "upright decoded output; exported GPS absent; in-app coordinates unchanged"
+  }
+}

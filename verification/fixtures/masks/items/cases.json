@@ -1,0 +1,227 @@
+{
+  "candidates": [
+    {
+      "image": "images/shops/shop-1-items.png",
+      "mask": "masks/items/shop-1-candidate-1.png",
+      "cutout": "images/derived/shop-1-candidate-1.png",
+      "bbox": [
+        5,
+        87,
+        69,
+        184
+      ],
+      "score": 1.0,
+      "sourceType": "hand-authored",
+      "annotationStatus": "ai-draft-unreviewed",
+      "tap": [
+        39,
+        178
+      ]
+    },
+    {
+      "image": "images/shops/shop-1-items.png",
+      "mask": "masks/items/shop-1-candidate-2.png",
+      "cutout": "images/derived/shop-1-candidate-2.png",
+      "bbox": [
+        83,
+        87,
+        68,
+        184
+      ],
+      "score": 0.9,
+      "sourceType": "hand-authored",
+      "annotationStatus": "ai-draft-unreviewed",
+      "tap": [
+        116,
+        178
+      ]
+    },
+    {
+      "image": "images/shops/shop-1-items.png",
+      "mask": "masks/items/shop-1-candidate-3.png",
+      "cutout": "images/derived/shop-1-candidate-3.png",
+      "bbox": [
+        160,
+        87,
+        68,
+        184
+      ],
+      "score": 0.8,
+      "sourceType": "hand-authored",
+      "annotationStatus": "ai-draft-unreviewed",
+      "tap": [
+        193,
+        178
+      ]
+    },
+    {
+      "image": "images/shops/shop-1-items.png",
+      "mask": "masks/items/shop-1-candidate-4.png",
+      "cutout": "images/derived/shop-1-candidate-4.png",
+      "bbox": [
+        237,
+        87,
+        69,
+        184
+      ],
+      "score": 0.7,
+      "sourceType": "hand-authored",
+      "annotationStatus": "ai-draft-unreviewed",
+      "tap": [
+        271,
+        178
+      ]
+    },
+    {
+      "image": "images/shops/shop-2-items.png",
+      "mask": "masks/items/shop-2-candidate-1.png",
+      "cutout": "images/derived/shop-2-candidate-1.png",
+      "bbox": [
+        5,
+        87,
+        68,
+        184
+      ],
+      "score": 1.0,
+      "sourceType": "hand-authored",
+      "annotationStatus": "ai-draft-unreviewed",
+      "tap": [
+        38,
+        178
+      ]
+    },
+    {
+      "image": "images/shops/shop-2-items.png",
+      "mask": "masks/items/shop-2-candidate-2.png",
+      "cutout": "images/derived/shop-2-candidate-2.png",
+      "bbox": [
+        82,
+        87,
+        68,
+        184
+      ],
+      "score": 0.9,
+      "sourceType": "hand-authored",
+      "annotationStatus": "ai-draft-unreviewed",
+      "tap": [
+        115,
+        178
+      ]
+    },
+    {
+      "image": "images/shops/shop-2-items.png",
+      "mask": "masks/items/shop-2-candidate-3.png",
+      "cutout": "images/derived/shop-2-candidate-3.png",
+      "bbox": [
+        159,
+        87,
+        69,
+        184
+      ],
+      "score": 0.8,
+      "sourceType": "hand-authored",
+      "annotationStatus": "ai-draft-unreviewed",
+      "tap": [
+        193,
+        178
+      ]
+    },
+    {
+      "image": "images/shops/shop-2-items.png",
+      "mask": "masks/items/shop-2-candidate-4.png",
+      "cutout": "images/derived/shop-2-candidate-4.png",
+      "bbox": [
+        237,
+        87,
+        68,
+        184
+      ],
+      "score": 0.7,
+      "sourceType": "hand-authored",
+      "annotationStatus": "ai-draft-unreviewed",
+      "tap": [
+        270,
+        178
+      ]
+    },
+    {
+      "image": "images/shops/shop-3-items.png",
+      "mask": "masks/items/shop-3-candidate-1.png",
+      "cutout": "images/derived/shop-3-candidate-1.png",
+      "bbox": [
+        5,
+        87,
+        68,
+        184
+      ],
+      "score": 1.0,
+      "sourceType": "hand-authored",
+      "annotationStatus": "ai-draft-unreviewed",
+      "tap": [
+        38,
+        178
+      ]
+    },
+    {
+      "image": "images/shops/shop-3-items.png",
+      "mask": "masks/items/shop-3-candidate-2.png",
+      "cutout": "images/derived/shop-3-candidate-2.png",
+      "bbox": [
+        82,
+        87,
+        68,
+        184
+      ],
+      "score": 0.9,
+      "sourceType": "hand-authored",
+      "annotationStatus": "ai-draft-unreviewed",
+      "tap": [
+        115,
+        178
+      ]
+    },
+    {
+      "image": "images/shops/shop-3-items.png",
+      "mask": "masks/items/shop-3-candidate-3.png",
+      "cutout": "images/derived/shop-3-candidate-3.png",
+      "bbox": [
+        159,
+        87,
+        69,
+        184
+      ],
+      "score": 0.8,
+      "sourceType": "hand-authored",
+      "annotationStatus": "ai-draft-unreviewed",
+      "tap": [
+        193,
+        178
+      ]
+    },
+    {
+      "image": "images/shops/shop-3-items.png",
+      "mask": "masks/items/shop-3-candidate-4.png",
+      "cutout": "images/derived/shop-3-candidate-4.png",
+      "bbox": [
+        237,
+        87,
+        68,
+        184
+      ],
+      "score": 0.7,
+      "sourceType": "hand-authored",
+      "annotationStatus": "ai-draft-unreviewed",
+      "tap": [
+        270,
+        178
+      ]
+    }
+  ],
+  "tapMasks": [
+    "masks/items/shop-1-candidate-1.png",
+    "masks/items/shop-1-candidate-2.png",
+    "masks/items/shop-1-candidate-3.png"
+  ],
+  "reviewer": null,
+  "reviewedAt": null
+}
