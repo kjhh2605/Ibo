@@ -1,0 +1,11 @@
+# Credentials and machine/worktree-local configuration.
+.env
+.env.*
+!.env.example
+.sf-worktree.env
+**/google-services.json
+**/*service-account*.json
+
+# Models remain outside Git; S00 packages them from SF_MODELS_DIR.
+*.onnx
+*.onnx.data
