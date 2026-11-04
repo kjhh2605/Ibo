@@ -12,7 +12,7 @@ from app.auth import Authenticator, pseudonym
 from app.config import Settings
 from app.errors import RelayError
 from app.meta_client import MetaClient, Operation
-from conftest import make_app
+from .conftest import make_app
 
 
 def test_invalid_signature_audience_issuer_uid_provider_rejected(firebase, image):

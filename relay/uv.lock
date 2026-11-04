@@ -240,6 +240,14 @@ wheels = [
 ]
 
 [[package]]
+name = "flatbuffers"
+version = "25.12.19"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e8/2d/d2a548598be01649e2d46231d151a6c56d10b964d94043a335ae56ea2d92/flatbuffers-25.12.19-py2.py3-none-any.whl", hash = "sha256:7634f50c427838bb021c2d66a3d1168e9d199b0607e6329399f04846d42e20b4", size = 26661, upload-time = "2025-12-19T23:16:13.622Z" },
+]
+
+[[package]]
 name = "fsspec"
 version = "2026.9.0"
 source = { registry = "https://pypi.org/simple" }
@@ -577,6 +585,15 @@ wheels = [
 ]
 
 [[package]]
+name = "meta-sam-parser"
+version = "0.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/2b/bc/af93a1fa4834124816b3fa0165aa9a6c35eb90d11a1dfe7c257992381f44/meta_sam_parser-0.1.0.tar.gz", hash = "sha256:d59ca55993c5975fc8910f29b76e33499bc2870f79e9afcc30c916f17ef3bb40", size = 33694, upload-time = "2026-10-06T18:37:45.432Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/29/6b/4f079abae8fbef65d08a5f315444ca96a3e267ad017576a97264ee17b26b/meta_sam_parser-0.1.0-py3-none-any.whl", hash = "sha256:eca156907911c56cef3a350ffc81c34b7e70655e5fa3ccdddb77042c541a0152", size = 40810, upload-time = "2026-10-06T18:37:44.229Z" },
+]
+
+[[package]]
 name = "mpmath"
 version = "1.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -679,9 +696,6 @@ wheels = [
 name = "nvidia-cufft-cu12"
 version = "11.2.1.3"
 source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "nvidia-nvjitlink-cu12" },
-]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/27/94/3266821f65b92b3138631e9c8e7fe1fb513804ac934485a8d05776e1dd43/nvidia_cufft_cu12-11.2.1.3-py3-none-manylinux2014_x86_64.whl", hash = "sha256:f083fc24912aa410be21fa16d157fed2055dab1cc4b6934a0e03cba69eb242b9", size = 211459117, upload-time = "2024-04-03T20:57:40.402Z" },
 ]
@@ -740,6 +754,24 @@ version = "12.4.127"
 source = { registry = "https://pypi.org/simple" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/87/20/199b8713428322a2f22b722c62b8cc278cc53dffa9705d744484b5035ee9/nvidia_nvtx_cu12-12.4.127-py3-none-manylinux2014_x86_64.whl", hash = "sha256:781e950d9b9f60d8241ccea575b32f5105a5baf4c2351cab5256a24869f12a1a", size = 99144, upload-time = "2024-04-03T20:56:12.406Z" },
+]
+
+[[package]]
+name = "onnxruntime"
+version = "1.31.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "flatbuffers" },
+    { name = "numpy" },
+    { name = "packaging" },
+    { name = "protobuf" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0e/f7/cecc0efeeea83bff2f7789ae1b80f27fa0f0210d6d9d66d1f0031a6b5e47/onnxruntime-1.31.1-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:96dd2564b10ea7153ad9c207e7cd8e5917cb3ba521e0e0a62ac03486fdc8d56c", size = 20882125, upload-time = "2026-10-26T19:26:16.256Z" },
+    { url = "https://files.pythonhosted.org/packages/ba/e4/1ed1a7a5f4702d899091fa2b976d377995250c307326ec8dc9ae6378aa13/onnxruntime-1.31.1-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:0b9a492176886992e0e875f06bc0367e333f5fff11711a2d642e18b02f3009cc", size = 21420803, upload-time = "2026-10-26T19:26:19.487Z" },
+    { url = "https://files.pythonhosted.org/packages/eb/27/c6a823bac55b2977bea2027c3ec9393a2c1002cb9a09eb40354563e02730/onnxruntime-1.31.1-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:1f3dea47f2f0e5117c2404cea7d21fd253ae7836a3bf167a501cdfbb2600d536", size = 23760988, upload-time = "2026-10-26T19:26:23.153Z" },
+    { url = "https://files.pythonhosted.org/packages/45/b2/793b4051d8dc6acb379ead9b72050f0ffa283ca49a6904add2e218b83e2e/onnxruntime-1.31.1-cp312-cp312-win_amd64.whl", hash = "sha256:ae8a9a351efda685cc59a66226cdefaa37a126c1d66872ca23a2de9425326130", size = 14888466, upload-time = "2026-10-26T19:26:25.816Z" },
+    { url = "https://files.pythonhosted.org/packages/ed/72/09d635ab4b6137d8ac63d4911a37dad8b1ef15a77d20b65d7ed40fdca012/onnxruntime-1.31.1-cp312-cp312-win_arm64.whl", hash = "sha256:fe8b9ac1ae8e894e12c47ee82e4f6dfc1835768133687257866469fda80d0bf1", size = 14740724, upload-time = "2026-10-26T19:26:28.682Z" },
 ]
 
 [[package]]
@@ -1046,6 +1078,7 @@ dependencies = [
     { name = "ftfy" },
     { name = "httpx" },
     { name = "huggingface-hub" },
+    { name = "meta-sam-parser" },
     { name = "numpy" },
     { name = "pillow" },
     { name = "pydantic" },
@@ -1055,6 +1088,11 @@ dependencies = [
     { name = "torch" },
     { name = "torchvision" },
     { name = "uvicorn" },
+]
+
+[package.optional-dependencies]
+research = [
+    { name = "onnxruntime" },
 ]
 
 [package.dev-dependencies]
@@ -1070,7 +1108,9 @@ requires-dist = [
     { name = "ftfy", specifier = ">=6,<7" },
     { name = "httpx", specifier = ">=0.27,<1" },
     { name = "huggingface-hub", specifier = ">=0.26,<1" },
+    { name = "meta-sam-parser", specifier = ">=0.1.0,<1" },
     { name = "numpy", specifier = ">=2,<3" },
+    { name = "onnxruntime", marker = "extra == 'research'", specifier = ">=1.20,<2" },
     { name = "pillow", specifier = ">=11,<12" },
     { name = "pydantic", specifier = ">=2.10,<3" },
     { name = "regex", specifier = ">=2024.0" },
@@ -1080,6 +1120,7 @@ requires-dist = [
     { name = "torchvision", specifier = "==0.20.1" },
     { name = "uvicorn", specifier = ">=0.30,<1" },
 ]
+provides-extras = ["research"]
 
 [package.metadata.requires-dev]
 dev = [{ name = "pytest", specifier = ">=8,<9" }]

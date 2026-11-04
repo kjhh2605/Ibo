@@ -69,7 +69,10 @@ class MetaClient:
     def _responses_payload(self, operation, payload, sub):
         if not isinstance(sub, str) or not re.fullmatch('[0-9a-f]{64}', sub):
             raise ValueError('A pseudonymous safety identifier is required')
-        if set(payload) - {'input', 'instructions', 'tools', 'tool_choice', 'parallel_tool_calls', 'text', 'reasoning', 'max_output_tokens'}:
+        allowed = {'input', 'instructions', 'tools', 'tool_choice', 'parallel_tool_calls', 'text', 'reasoning', 'max_output_tokens'}
+        if operation == Operation.SAM:
+            allowed.add('metadata')
+        if set(payload) - allowed:
             raise ValueError('Unsupported Responses fields')
         tools = payload.get('tools', [])
         if operation == Operation.SPARK:
@@ -84,6 +87,10 @@ class MetaClient:
         elif operation == Operation.SAM:
             if tools:
                 raise ValueError('SAM has no tools')
+            metadata = {'include_confidence': 'true', 'mask_encoding': 'one_bit'}
+            if 'metadata' in payload and payload['metadata'] != metadata:
+                raise ValueError('Unsupported SAM metadata')
+            payload = {**payload, 'metadata': metadata}
         elif operation == Operation.IMAGE:
             if len(tools) > 1 or any(t.get('type') != 'image_generation' or
                                     set(t) - {'type', 'size', 'output_format', 'reasoning_strength', 'enable_image_search', 'enable_web_search', 'enable_shell'} for t in tools):
@@ -122,6 +129,8 @@ class MetaClient:
         headers = {'Accept': 'application/json'}
         if operation != Operation.OSRM:
             headers['Authorization'] = 'Bearer ' + self.settings.model_api_key
+        else:
+            headers['User-Agent'] = 'StreetFitting/0.1 (+https://github.com/kjhh2605/Meta-Hackathon)'
         buffer = bytearray()
         try:
             async with deadline(operation):
@@ -137,6 +146,8 @@ class MetaClient:
                         body = strict_json(buffer)
                     except (ValueError, UnicodeError, RecursionError):
                         body = None
+                    if operation == Operation.OSRM and response.status_code in (200, 400) and isinstance(body, dict) and body.get('code') in ('NoRoute', 'NoSegment'):
+                        raise RelayError('route_unavailable')
                     if not 200 <= response.status_code < 300:
                         raise provider_error(response.status_code, body, response.headers.get('retry-after'))
                     if not isinstance(body, dict):

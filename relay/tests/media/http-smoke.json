@@ -1,0 +1,186 @@
+{
+  "runtime": "create_app + Uvicorn loopback HTTP",
+  "provider": "httpx.MockTransport only",
+  "pe": "test-only loader isolation; no PE readiness claim",
+  "responses": [
+    {
+      "scenario": "voice-verbatim",
+      "status": 200,
+      "providerAttempts": 1
+    },
+    {
+      "scenario": "voice-empty",
+      "status": 200,
+      "providerAttempts": 1
+    },
+    {
+      "scenario": "voice-16s",
+      "status": 400,
+      "providerAttempts": 0
+    },
+    {
+      "scenario": "voice-format",
+      "status": 400,
+      "providerAttempts": 0
+    },
+    {
+      "scenario": "voice-size",
+      "status": 413,
+      "providerAttempts": 0
+    },
+    {
+      "scenario": "describe/storefront-success",
+      "status": 200,
+      "providerAttempts": 1
+    },
+    {
+      "scenario": "describe/storefront-extra-field",
+      "status": 400,
+      "providerAttempts": 0
+    },
+    {
+      "scenario": "describe/storefront-timeout",
+      "status": 504,
+      "providerAttempts": 1
+    },
+    {
+      "scenario": "describe/piece-success",
+      "status": 200,
+      "providerAttempts": 1
+    },
+    {
+      "scenario": "describe/piece-extra-field",
+      "status": 400,
+      "providerAttempts": 0
+    },
+    {
+      "scenario": "describe/piece-timeout",
+      "status": 504,
+      "providerAttempts": 1
+    },
+    {
+      "scenario": "tryon-2-images",
+      "status": 200,
+      "providerAttempts": 1
+    },
+    {
+      "scenario": "tryon-7-images",
+      "status": 200,
+      "providerAttempts": 1
+    },
+    {
+      "scenario": "tryon-sixth-companion",
+      "status": 400,
+      "providerAttempts": 0
+    },
+    {
+      "scenario": "tryon-unmasked",
+      "status": 400,
+      "providerAttempts": 0
+    },
+    {
+      "scenario": "tryon-wardrobe",
+      "status": 400,
+      "providerAttempts": 0
+    },
+    {
+      "scenario": "tryon-duplicate",
+      "status": 400,
+      "providerAttempts": 0
+    },
+    {
+      "scenario": "tryon-second-self",
+      "status": 400,
+      "providerAttempts": 0
+    },
+    {
+      "scenario": "tryon-policy",
+      "status": 400,
+      "providerAttempts": 1
+    },
+    {
+      "scenario": "tryon-url-no-fetch",
+      "status": 502,
+      "providerAttempts": 1
+    },
+    {
+      "scenario": "tryon-missing-image",
+      "status": 502,
+      "providerAttempts": 1
+    },
+    {
+      "scenario": "tryon-timeout",
+      "status": 504,
+      "providerAttempts": 1
+    },
+    {
+      "scenario": "tryon-upstream-error",
+      "status": 502,
+      "providerAttempts": 1
+    },
+    {
+      "scenario": "route-success",
+      "status": 200,
+      "providerAttempts": 1
+    },
+    {
+      "scenario": "route-second-start",
+      "status": 200,
+      "providerAttempts": 1
+    },
+    {
+      "scenario": "route-unavailable",
+      "status": 404,
+      "providerAttempts": 1
+    },
+    {
+      "scenario": "route-rate-limit",
+      "status": 429,
+      "providerAttempts": 1
+    },
+    {
+      "scenario": "route-upstream-error",
+      "status": 502,
+      "providerAttempts": 1
+    },
+    {
+      "scenario": "route-timeout",
+      "status": 504,
+      "providerAttempts": 1
+    },
+    {
+      "scenario": "route-queue-deadline",
+      "status": 504,
+      "providerAttempts": 0
+    },
+    {
+      "scenario": "auth-before-validation",
+      "status": 401,
+      "providerAttempts": 0
+    },
+    {
+      "scenario": "appcheck-before-validation",
+      "status": 403,
+      "providerAttempts": 0
+    },
+    {
+      "scenario": "gps-rejected",
+      "status": 400,
+      "providerAttempts": 0
+    }
+  ],
+  "providerAttempts": 19,
+  "externalConnections": 0,
+  "requestFileWrites": 0,
+  "allResponsesNoStore": true,
+  "routeStartIntervalsSeconds": [
+    1.003332,
+    1.003109,
+    1.002651,
+    1.002787,
+    1.002254
+  ],
+  "providerFileSha256": "2ca9dbd97e71c10e1a322ade60d41bc7b2c5ae84b7ae229fad801fae85864530",
+  "privacySentinelsAbsent": true,
+  "serverStopped": true
+}

@@ -626,7 +626,7 @@ export interface operations {
           "application/json": components["schemas"]["Error"];
         };
       };
-      /** @description Not implemented or fixture not found */
+      /** @description Fixture not found */
       501: {
         content: {
           "application/json": components["schemas"]["Error"];
@@ -720,7 +720,7 @@ export interface operations {
           "application/json": components["schemas"]["Error"];
         };
       };
-      /** @description Not implemented or fixture not found */
+      /** @description Fixture not found */
       501: {
         content: {
           "application/json": components["schemas"]["Error"];
@@ -814,7 +814,7 @@ export interface operations {
           "application/json": components["schemas"]["Error"];
         };
       };
-      /** @description Not implemented or fixture not found */
+      /** @description Fixture not found */
       501: {
         content: {
           "application/json": components["schemas"]["Error"];
@@ -908,7 +908,7 @@ export interface operations {
           "application/json": components["schemas"]["Error"];
         };
       };
-      /** @description Not implemented or fixture not found */
+      /** @description Fixture not found */
       501: {
         content: {
           "application/json": components["schemas"]["Error"];
@@ -1002,7 +1002,7 @@ export interface operations {
           "application/json": components["schemas"]["Error"];
         };
       };
-      /** @description Not implemented or fixture not found */
+      /** @description Fixture not found */
       501: {
         content: {
           "application/json": components["schemas"]["Error"];
@@ -1096,7 +1096,7 @@ export interface operations {
           "application/json": components["schemas"]["Error"];
         };
       };
-      /** @description Not implemented or fixture not found */
+      /** @description Fixture not found */
       501: {
         content: {
           "application/json": components["schemas"]["Error"];
@@ -1190,7 +1190,7 @@ export interface operations {
           "application/json": components["schemas"]["Error"];
         };
       };
-      /** @description Not implemented or fixture not found */
+      /** @description Fixture not found */
       501: {
         content: {
           "application/json": components["schemas"]["Error"];
