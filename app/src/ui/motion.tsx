@@ -2,7 +2,7 @@
 // is needed, and every effect is skipped when the person asks for reduced motion.
 import {useEffect, useRef, useState} from 'react';
 import type {CSSProperties, ReactNode} from 'react';
-import {EASE_OUT, EASE_SPRING, reducedMotion} from './easing';
+import {EASE_OUT, EASE_SPRING, reducedMotion, returning} from './easing';
 import {VStack} from '@astryxdesign/core/VStack';
 
 
@@ -10,7 +10,7 @@ import {VStack} from '@astryxdesign/core/VStack';
 export function Reveal({children, index = 0, gap, from = 'below', style}: {children: ReactNode; index?: number; gap?: 0 | 1 | 2 | 3 | 4; from?: 'below' | 'scale'; style?: CSSProperties}) {
   const element = useRef<HTMLElement>(null);
   useEffect(() => {
-    if (reducedMotion()) return;
+    if (reducedMotion() || returning()) return;
     const start = from === 'scale' ? 'scale(0.96)' : 'translateY(0.75rem)';
     const animation = element.current?.animate([{opacity: 0, transform: start}, {opacity: 1, transform: 'none'}], {duration: 320, delay: Math.min(index, 8) * 45, easing: EASE_OUT, fill: 'backwards'});
     return () => animation?.cancel();
@@ -26,7 +26,7 @@ export function Pop({children}: {children: ReactNode}) {
     const animation = element.current?.animate([{transform: 'scale(0.4)', opacity: 0}, {transform: 'scale(1)', opacity: 1}], {duration: 280, easing: EASE_SPRING});
     return () => animation?.cancel();
   }, []);
-  return <VStack as="span" ref={element} align="center" justify="center">{children}</VStack>;
+  return <VStack as="span" ref={element} align="center" justify="center" style={{display: 'inline-flex', verticalAlign: 'middle'}}>{children}</VStack>;
 }
 
 /** Endless soft opacity breathing, for "in progress" segments. */

@@ -6,6 +6,7 @@ import type {CSSProperties} from 'react';
 import {Grid} from '@astryxdesign/core/Grid';
 import {Divider} from '@astryxdesign/core/Divider';
 import {Thumbnail,Action,Button,Chip,Confirm,EditFields,Empty,Eyebrow,Heading,Hint,HStack,Icon,IconTile,Loading,Media,Panel,PhotoView,Problem,Reveal,RowButton,Section,SkeletonGrid,SkeletonPhoto,SkeletonRows,SkeletonText,Stat,Text,TileButton,VStack} from '../ui/components';
+import {reducedMotion,returning} from '../ui/easing';
 import {BagIcon,CameraIcon,HangerIcon,NoteIcon,PinIcon,ShieldIcon,SparkleIcon,StoreIcon,TrashIcon,PencilIcon,ImageIcon} from '../ui/icons';
 
 function failureCode(error:unknown):string {
@@ -122,7 +123,9 @@ function ShopSection({shop,forOutfit}:{shop:Shop;forOutfit?:boolean}) {
 }
 export function Trip({route}:{route:Extract<Route,{name:'trip'}>}) {
   const {services,deleted,popTo,push}=useUi();const data=useData(async()=>({trip:await services.store.get({entity:'Trip',id:route.tripId}),shops:await listAll(services,'Shop',{tripId:route.tripId})}),[services,route.tripId]);
-  useEffect(()=>{if(data.data&&route.shopId)document.getElementById(`shop-${route.shopId}`)?.scrollIntoView({block:'start'});},[data.data,route.shopId]);
+  // Land on the chosen shop once. Later refreshes (a note saved, a description arriving) and coming Back must not jump the page.
+  const landed=useRef(returning());
+  useEffect(()=>{if(landed.current||!data.data||!route.shopId)return;landed.current=true;document.getElementById(`shop-${route.shopId}`)?.scrollIntoView({block:'start',behavior:reducedMotion()?'auto':'smooth'});},[data.data,route.shopId]);
   if(data.loading&&!data.data)return <><VStack gap={3}><SkeletonText lines={1} width="60%"/><SkeletonText lines={2} width="90%" index={1}/></VStack><SkeletonPhoto height="40dvh" label="Loading trip"/><SkeletonRows count={1}/></>;if(data.error)return <Problem message={data.error} retry={data.retry}/>;
   if(!data.data?.trip)return <Empty title="This trip is no longer available"><Button label="All trips" onClick={()=>popTo('home',{name:'trips'})}/></Empty>;
   const live=data.data.trip.status==='recording';

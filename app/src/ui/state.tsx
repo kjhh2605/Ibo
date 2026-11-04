@@ -1,4 +1,5 @@
-import {createContext, useContext, useEffect, useMemo, useState} from 'react';
+import {createContext, useContext, useEffect, useMemo, useRef, useState} from 'react';
+import {markNavigation} from './easing';
 import type {ReactNode} from 'react';
 import {Network} from '@capacitor/network';
 import {config} from '../config';
@@ -18,6 +19,7 @@ export function UiProvider({services, children}:{services:Services; children:Rea
   const [session,setSession] = useState<SessionState|null>(null);
   const [online,setOnline] = useState(navigator.onLine);
   const [revision,setRevision] = useState(0);
+  const lastBack = useRef(0);
   useEffect(()=>{if (!toast) return; const timer=window.setTimeout(()=>setToast(null),2600); return ()=>window.clearTimeout(timer);},[toast]);
   useEffect(()=>{
     let live=true;
@@ -54,12 +56,18 @@ export function UiProvider({services, children}:{services:Services; children:Rea
     return()=>{delete host.__sfVerification;};
   },[services,stack,sheet,session,online]);
   const value=useMemo<State>(()=>({services,stack,route:stack[stack.length-1],sheet,toast,session,online,revision,
-    push:route=>{setSheet(null);setStack(current=>pushRoute(current,route));},
-    back:()=>{if(sheet)setSheet(null);else setStack(popRoute);},
-    popTo:(name,next)=>{setSheet(null);setStack(current=>returnTo(current,name,next));},
+    // A second tap on the same target while the screen is changing must not stack a duplicate page.
+    push:route=>{setSheet(null);markNavigation(route.name==='home'?'back':'push');setStack(current=>sameRoute(current[current.length-1],route)?current:pushRoute(current,route));},
+    // Back closes an open sheet first; a fast double tap pops one page, not two.
+    back:()=>{if(sheet){setSheet(null);return;}const now=performance.now();if(now-lastBack.current<250)return;lastBack.current=now;markNavigation('back');setStack(popRoute);},
+    popTo:(name,next)=>{setSheet(null);markNavigation(next?'push':'back');setStack(current=>returnTo(current,name,next));},
     deleted:(entity,id)=>{setSheet(null);setStack(current=>pruneDeleted(current,entity,id));},
     showSheet:next=>{setToast(null);setSheet(next);},say:setToast}),[services,stack,sheet,toast,session,online,revision]);
   return <Context.Provider value={value}>{children}</Context.Provider>;
+}
+function sameRoute(left:Route|undefined,right:Route):boolean {
+  if(!left||left.name!==right.name)return false;
+  try {return JSON.stringify(left)===JSON.stringify(right);} catch {return false;}
 }
 export function useUi():State {const value=useContext(Context);if(!value)throw new Error('UI provider missing');return value;}
 export function useData<T>(read:()=>Promise<T>,keys:readonly unknown[]) {

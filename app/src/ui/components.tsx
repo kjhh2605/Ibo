@@ -185,6 +185,11 @@ export function EditFields({label, category, onSave}: {label: string; category?:
   return <VStack gap={4}>{category === undefined && <Text type="supporting">Anything that helps you find it again.</Text>}<TextInput label={category === undefined ? 'Note' : 'Name'} placeholder={category === undefined ? 'e.g. cash only, army jackets at the back' : undefined} value={name} onChange={setName}/>{category !== undefined && <TextInput label="Category" value={kind} onChange={setKind}/>}<Action label="Save" disabled={!name.trim()} run={async () => {await onSave(name.trim(), kind.trim()); showSheet(null); say(category === undefined ? 'Note saved' : 'Changes saved');}}/><Button label="Cancel" variant="secondary" onClick={() => showSheet(null)}/></VStack>;
 }
 
+/** Keeps a screen's main action within thumb reach at the bottom while the page scrolls. */
+export function StickyBar({children}: {children: ReactNode}) {
+  return <VStack gap={2} paddingBlock={3} style={{position: 'sticky', bottom: 'calc(-1 * var(--spacing-5))', zIndex: 5, marginInline: 'calc(-1 * var(--spacing-5))', marginBottom: 'calc(-1 * var(--spacing-10))', paddingInline: 'var(--spacing-5)', paddingBottom: 'calc(var(--spacing-5) + var(--spacing-3))', background: 'var(--color-background-surface)', borderTop: 'thin solid var(--color-border)'}}>{children}</VStack>;
+}
+
 /* ---------- Skeletons: same footprint as the content they stand in for ---------- */
 
 /** Screen-reader announcement for a skeleton block (the shapes themselves are decorative). */

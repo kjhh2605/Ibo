@@ -7,7 +7,8 @@ import {candidateId} from '../data';
 import {imageUrl} from '../ui/images';
 import {useData, useUi} from '../ui/state';
 import {Spinner} from '@astryxdesign/core/Spinner';
-import {Action, Button, Chip, Confirm, Empty, Eyebrow, Heading, Hint, HStack, Icon, IconTile, Panel, Pop, Problem, Reveal, RowButton, SkeletonCard, SkeletonPhoto, SkeletonRows, SkeletonText, Text, TextInput, VStack} from '../ui/components';
+import {Action, Button, Chip, Confirm, Empty, Eyebrow, Heading, Hint, HStack, Icon, IconTile, Panel, Pop, Problem, Reveal, RowButton, SkeletonCard, StickyBar, SkeletonPhoto, SkeletonRows, SkeletonText, Text, TextInput, VStack} from '../ui/components';
+import {reducedMotion, returning} from '../ui/easing';
 import {ImageIcon, SendIcon, ShieldIcon, SparkleIcon, StoreIcon, TrashIcon} from '../ui/icons';
 
 type PickRoute = Extract<Route, {name: 'pick'}>;
@@ -338,6 +339,8 @@ export function Ask() {
     if (!query.trim()) return;
     setText(query);
     lastAttempt.current = {kind: 'text', query};
+    // Close the on-screen keyboard so the search progress and results are visible.
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     if (!online) {setOperationError('offline'); return;}
     perform(() => agent.submit(query));
   };
@@ -346,7 +349,23 @@ export function Ask() {
     if (!online) {setOperationError('offline'); return;}
     perform(() => agent.startVoice());
   };
-  const askAgain = () => perform(async () => {await agent.cancel(); if (live.current) setText('');});
+  const searchBox = useRef<HTMLElement>(null);
+  const resultsTop = useRef<HTMLElement>(null);
+  const askAgain = () => perform(async () => {
+    await agent.cancel();
+    if (!live.current) return;
+    setText('');
+    // Bring the person back to the empty search box, ready to type.
+    searchBox.current?.scrollIntoView({block: 'center', behavior: reducedMotion() ? 'auto' : 'smooth'});
+    searchBox.current?.querySelector('input')?.focus({preventScroll: true});
+  });
+  // When a search finishes, glide to the answer once instead of leaving it below the fold.
+  const shownResults = useRef<string | null>(null);
+  useEffect(() => {
+    if (state.status !== 'results' || !state.query || shownResults.current === state.query || returning()) {if (state.status === 'results') shownResults.current = state.query; return;}
+    shownResults.current = state.query;
+    resultsTop.current?.scrollIntoView({block: 'start', behavior: reducedMotion() ? 'auto' : 'smooth'});
+  }, [state.status, state.query]);
   const status = operationError ? 'error' : state.status;
   const steps = operationError ? [] : searchSteps(state);
   const finished = status === 'results' || status === 'not_found' || status === 'error';
@@ -358,7 +377,9 @@ export function Ask() {
   return <VStack gap={5}>
     <Panel gap={3}>
       <HStack gap={2} vAlign="center"><Icon icon={SparkleIcon} size="sm" color="accent"/><Text type="supporting">Search across all your trips</Text></HStack>
+      <VStack ref={searchBox}>
       <TextInput type="search" label="Describe the item" value={text} onChange={setText} onEnter={() => submit()} placeholder="e.g. the jacket at the blue tarp stall" isDisabled={listening || transcribing} hasClear />
+      </VStack>
       <HStack gap={3} wrap="wrap">
         <Button label={listening ? 'Stop listening' : 'Speak'} variant={listening ? 'primary' : 'secondary'} icon={<Icon icon={listening ? 'stop' : 'microphone'}/>} isDisabled={transcribing || (status === 'running' && !listening)} onClick={() => {if (listening) perform(() => agent.stopVoice()); else startVoice();}} />
         <Button label="Find" variant={listening ? 'secondary' : 'primary'} icon={<Icon icon="search"/>} style={{flex: 1}} isDisabled={!text.trim() || listening || transcribing} onClick={() => submit()} />
@@ -382,7 +403,7 @@ export function Ask() {
       <Eyebrow>Try one of these</Eyebrow>
       {examples.map((example, index) => <Reveal key={example} index={index}><RowButton label={example} start={<Icon icon="search" size="sm" color="secondary"/>} end={<Icon icon={SendIcon} size="sm" color="secondary"/>} onClick={() => submit(example)} /></Reveal>)}
     </VStack>}
-    {status === 'results' && <VStack gap={4}>
+    {status === 'results' && <VStack gap={4} ref={resultsTop} style={{scrollMarginTop: 'var(--spacing-4)'}}>
       {state.summary && <Reveal from="scale"><HStack gap={3} vAlign="start" padding={4} style={{background: 'var(--color-hero)', color: 'var(--color-on-hero)', borderRadius: 'var(--radius-container)'}}><Icon icon={SparkleIcon} size="md" color="inherit"/><Text type="large" weight="semibold" color="inherit">{state.summary}</Text></HStack></Reveal>}
       {state.photos.map((photo, index) => <SearchResult key={photo.id} photo={photo} index={index} concept={state.concept} candidates={state.visibleCandidates.filter(candidate => candidate.photoId === photo.id)} allCandidates={state.candidates.filter(candidate => candidate.photoId === photo.id)} />)}
       {!state.photos.length && <Empty title="These photos are no longer available"><Text>Browse your trips or ask another question.</Text></Empty>}
@@ -398,6 +419,7 @@ export function Ask() {
 
 function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
   const {services, online, push, back, popTo, deleted, say} = useUi();
+  const photoArea = useRef<HTMLElement>(null);
   const {photo, shop, trip} = source;
   const {id, file, w, h} = source.asset;
   const asset = useMemo(() => ({id, file, w, h}), [id, file, w, h]);
@@ -582,7 +604,7 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
       }} />
       <Confirm title="Delete photo?" description="This photo will be removed from your trip. Saved items and their walking directions will stay." action="Delete photo" icon={<Icon icon={TrashIcon}/>} onConfirm={async () => {await lifecycle.current.tap; await services.store.deletePhoto({id: photo.id}); deleted('Photo', photo.id); say('Photo deleted');}} />
     </HStack>}
-    <PhotoSurface asset={asset} candidates={visibleCandidates} selected={selected} cache={cache} point={tapping ? point : null} disabled={saving || (tapping && (preparing || segmenting || Boolean(prepareError)))} onTap={tapping ? tap : undefined} onSelect={tapping ? undefined : setSelected} onReady={onReady} />
+    <VStack ref={photoArea} style={{scrollMarginTop: 'var(--spacing-4)'}}><PhotoSurface asset={asset} candidates={visibleCandidates} selected={selected} cache={cache} point={tapping ? point : null} disabled={saving || (tapping && (preparing || segmenting || Boolean(prepareError)))} onTap={tapping ? tap : undefined} onSelect={tapping ? undefined : setSelected} onReady={onReady} /></VStack>
     {tapping && !point && <Chip tone="accent">Tap the item in the photo</Chip>}
     {preparing && <HStack gap={2} vAlign="center"><Spinner size="sm" aria-label="Preparing"/><Text role="status" type="supporting">Preparing on-device item selection…</Text></HStack>}
     {prepareError && <Problem message={errorMessage(prepareError)} retry={() => setPrepareAttempt(value => value + 1)} />}
@@ -599,13 +621,15 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
       /></Reveal>)}
       {choices.length > 3 && <Button label={showAll ? 'Show first 3' : `Show all (${choices.length})`} variant="secondary" isDisabled={saving} onClick={() => {setShowAll(value => !value); if (showAll && selected && !choices.slice(0, 3).some(choice => choice.candidate.id === selected)) setSelected(null);}} />}
     </VStack>}
-    {matches.length > 0 && <Button label={tapping ? 'Show matches' : 'Not here? Tap it'} variant="ghost" isDisabled={saving} onClick={() => {clearTap(); setTapping(value => !value); setShowAll(false); if (tapping) setSelected(matches[0]?.id ?? null);}} />}
+    {matches.length > 0 && <Button label={tapping ? 'Show matches' : 'Not here? Tap it'} variant="ghost" isDisabled={saving} onClick={() => {clearTap(); setTapping(value => !value); setShowAll(false); if (tapping) setSelected(matches[0]?.id ?? null); else requestAnimationFrame(() => photoArea.current?.scrollIntoView({block: 'start', behavior: reducedMotion() ? 'auto' : 'smooth'}));}} />}
     {tapping && (tapChoices.length > 0 || segmenting) && <Button label="Cancel area selection" variant="ghost" isDisabled={saving} onClick={clearTap} />}
+    <StickyBar>
     {atLimit && <Problem message="Your outfit already has five companion pieces. Return to the outfit to remove one first." />}
     {saveError && <Problem message={errorMessage(saveError)} retry={maskReady && !atLimit ? complete : undefined} />}
     {chosen && !route.concept && <Text type="supporting">This will be saved as “Picked item” while its name and category are prepared. You can edit them after saving.</Text>}
     <Button label={route.mode === 'wardrobe' ? 'Add to wardrobe' : route.mode === 'outfit' ? 'Add to outfit' : 'Use this item'} variant="primary" size="lg" isLoading={saving} isDisabled={!chosen || !maskReady || segmenting || atLimit} onClick={complete} />
     <Button label={route.mode === 'outfit' ? 'Cancel and return to outfit' : 'Cancel'} variant="ghost" onClick={() => {if (route.mode === 'outfit') popTo('outfit'); else back();}} />
+    </StickyBar>
   </VStack>;
 }
 

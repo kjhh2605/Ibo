@@ -9,6 +9,11 @@ export function reducedMotion() {
   return typeof window === 'undefined' || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
+/** Last navigation, so entrance effects can stay quiet when a person returns to a screen they already saw. */
+export const navigation = {direction: 'push' as 'push' | 'back', at: 0};
+export function markNavigation(direction: 'push' | 'back') { navigation.direction = direction; navigation.at = performance.now(); }
+export function returning() { return navigation.direction === 'back' && performance.now() - navigation.at < 800; }
+
 /** Pointer handlers that give a pressable surface a quick squeeze. */
 export const pressFeedback = {
   onPointerDown(event: PointerEvent<HTMLElement>) {

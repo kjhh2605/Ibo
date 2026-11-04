@@ -10,7 +10,7 @@ import {Spinner} from '@astryxdesign/core/Spinner';
 import {Skeleton} from '@astryxdesign/core/Skeleton';
 import {Sweep} from '../ui/motion';
 import {Divider} from '@astryxdesign/core/Divider';
-import {Action, Button, Chip, Confirm, EditFields, Empty, Heading, Hint, HStack, Icon, IconTile, Media, Panel, PhotoView, Pop, Problem, Reveal, Section, SkeletonPhoto, SkeletonRows, SkeletonText, Text, Thumbnail, VStack} from '../ui/components';
+import {Action, Button, Chip, Confirm, EditFields, Empty, Heading, Hint, HStack, Icon, IconTile, Media, Panel, PhotoView, Pop, Problem, Reveal, Section, SkeletonPhoto, SkeletonRows, SkeletonText, StickyBar, Text, Thumbnail, VStack} from '../ui/components';
 import {CameraIcon, HangerIcon, ImageIcon, LockIcon, NoteIcon, PencilIcon, PinIcon, PlusIcon, RouteIcon, ShieldIcon, SparkleIcon, TrashIcon} from '../ui/icons';
 
 const MAX_COMPANIONS = 5;
@@ -211,6 +211,8 @@ export function Outfit() {
   const allCompanionsExist = companionIds.every(id => pieces.data?.pieces.some(piece => piece.id === id));
   const ready = !pieces.loading && !pieces.error && !refreshError && target?.origin === 'shop' && state.selfState === 'ready' && !!state.selfPhoto && companionIds.length <= MAX_COMPANIONS && allCompanionsExist && !busy && online;
   const steps = [state.selfState === 'ready' && !!state.selfPhoto, target?.origin === 'shop', companionIds.length > 0];
+  // Say why Generate is unavailable right next to it, instead of leaving a silently disabled button.
+  const blocker = !online ? 'Connect to the internet to generate your look.' : state.selfState !== 'ready' || !state.selfPhoto ? 'Add a full-body photo of yourself to generate.' : target?.origin !== 'shop' ? 'Choose a saved shop piece as the target first.' : !allCompanionsExist ? 'Remove the companion that is no longer saved.' : 'Your photo and pieces are being refreshed.';
   return <>
     <VStack gap={3}>
       <Text type="large">One shop piece. Your own combination.</Text>
@@ -247,11 +249,14 @@ export function Outfit() {
         <Button label="Add a companion" variant="secondary" icon={<Icon icon={PlusIcon}/>} isDisabled={!target || busy || companionIds.length >= MAX_COMPANIONS} onClick={() => showSheet({title: 'Wear with it', content: <CompanionChooser/>})}/>
       </Section>
     </>}
+    <StickyBar>
     {generating(state) && <Reveal from="scale"><VStack role="status" aria-live="polite" gap={3} padding={5} style={{background: 'var(--color-hero)', color: 'var(--color-on-hero)', borderRadius: 'var(--radius-container)'}}><HStack gap={3} vAlign="center"><Spinner size="lg" shade="inherit" aria-label="Generating"/><Text type="label" weight="semibold" color="inherit">{phases[state.phase]}</Text></HStack><HStack gap={1}>{(['preparing', 'sending', 'compositing', 'saving'] as const).map((phase, index, all) => <VStack key={phase} height="var(--spacing-1)" style={{flex: 1, borderRadius: 'var(--radius-full)', overflow: 'hidden', transition: 'background 400ms ease', background: all.indexOf(state.phase as typeof phase) > index ? 'var(--color-on-hero)' : 'color-mix(in srgb, var(--color-on-hero) 25%, transparent)'}}>{all.indexOf(state.phase as typeof phase) === index && <Sweep/>}</VStack>)}</HStack><Text size="sm" style={{color: 'color-mix(in srgb, var(--color-on-hero) 78%, transparent)'}}>Your original photo, face and hair stay on this phone.</Text><Button label="Cancel generation" variant="secondary" onClick={() => services.fitting.cancel()}/></VStack></Reveal>}
     {state.phase === 'cancelled' && <Hint>{phases.cancelled}</Hint>}
     {state.error && errorCode(state.error) !== 'cancelled' && state.selfState !== 'failed' && <Problem message={fittingError(state.error.code)}/>}
+    {!ready && !busy && !pieces.loading && <Hint icon="info">{blocker}</Hint>}
     <Action label="Generate" size="lg" icon={<Icon icon={SparkleIcon}/>} disabled={!ready} run={async () => {const result = await services.fitting.generate(); if (result && alive.current) popTo('outfit', {name: 'result', resultId: result.id});}}/>
     <Hint icon={ShieldIcon}>One face-and-hair-removed photo, your target and up to 5 companion cut-outs are sent for generation.</Hint>
+    </StickyBar>
   </>;
 }
 
