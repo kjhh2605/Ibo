@@ -23,14 +23,14 @@ export function UiProvider({services, children}:{services:Services; children:Rea
   useEffect(()=>{if (!toast) return; const timer=window.setTimeout(()=>setToast(null),2600); return ()=>window.clearTimeout(timer);},[toast]);
   useEffect(()=>{
     let live=true;
-    const sessionState=()=>services.shopping.getState().then(value=>{if(live)setSession(value);}).catch(()=>{if(live)setToast('Shopping status could not be loaded. Try opening Home again.');});
+    const sessionState=()=>services.shopping.getState().then(value=>{if(live)setSession(value);}).catch(()=>{if(live)setToast('Couldn’t check shopping mode. Go back to Home and try again.');});
     void sessionState();
     const handles=[
       services.shopping.addListener('state',value=>{if(live)setSession(value);}),
       services.store.addListener('changed',()=>{if(live){setRevision(value=>value+1);void sessionState();}}),
-      services.shopping.addListener('notice',()=>{if(live)setToast('Shopping mode on · no notification card');}),
-      services.shopping.addListener('error',({code})=>{if(live)setToast(code==='service_unavailable'?'Shopping location service is unavailable. Try again when it is ready.':'Shopping location is unavailable. Check location access in settings.');}),
-      services.shopping.addListener('open',({url})=>{void services.shopping.getState().then(value=>{if(live){setSheet(null);setStack(current=>deepLink(current,url,value.phase==='recording'));}}).catch(()=>{if(live)setToast('Could not open the shopping notification.');});}),
+      services.shopping.addListener('notice',()=>{if(live)setToast('Shopping mode is on. Allow notifications to see it in your status bar.');}),
+      services.shopping.addListener('error',({code})=>{if(live)setToast(code==='service_unavailable'?'Location isn’t available right now. Try again in a moment.':'Ibo can’t get your location. Check location access in Settings.');}),
+      services.shopping.addListener('open',({url})=>{void services.shopping.getState().then(value=>{if(live){setSheet(null);setStack(current=>deepLink(current,url,value.phase==='recording'));}}).catch(()=>{if(live)setToast('Couldn’t open that notification.');});}),
       Network.addListener('networkStatusChange',status=>{if(live)setOnline(status.connected);}),
     ];
     void Network.getStatus().then(status=>{if(live)setOnline(status.connected);}).catch(()=>{});
@@ -74,7 +74,7 @@ export function useData<T>(read:()=>Promise<T>,keys:readonly unknown[]) {
   const {revision}=useUi();
   const [state,setState]=useState<{data:T|null;error:string|null;loading:boolean}>({data:null,error:null,loading:true});
   const [retry,setRetry]=useState(0);
-  useEffect(()=>{let live=true;setState(current=>({...current,error:null,loading:true}));void read().then(data=>{if(live)setState({data,error:null,loading:false});}).catch(()=>{if(live)setState({data:null,error:'Could not load your saved data.',loading:false});});return()=>{live=false;};},[...keys,revision,retry]);
+  useEffect(()=>{let live=true;setState(current=>({...current,error:null,loading:true}));void read().then(data=>{if(live)setState({data,error:null,loading:false});}).catch(()=>{if(live)setState({data:null,error:'Couldn’t load your saved items.',loading:false});});return()=>{live=false;};},[...keys,revision,retry]);
   return {...state,retry:()=>setRetry(value=>value+1)};
 }
 export async function listAll<K extends keyof EntityMap>(services:Services, entity:K, filter:{tripId?:string;shopId?:string;origin?:'shop'|'wardrobe'}={}):Promise<EntityMap[K][]> {

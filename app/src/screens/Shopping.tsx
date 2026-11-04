@@ -30,7 +30,7 @@ function shopLine(shop:Shop,online:boolean){
 }
 function EndShopping({style}:{style?:CSSProperties}) {
   const {services,popTo}=useUi();
-  return <Confirm tone="plain" style={style} title="End shopping mode?" description="Your photos and saved locations stay on this device. The raw location trail will be deleted." action="End shopping" onConfirm={async()=>{await services.shopping.stop();popTo('home');}}/>;
+  return <Confirm tone="plain" style={style} title="End shopping mode?" description="Your photos and shop locations stay on this phone. Your route history will be deleted." action="End shopping" onConfirm={async()=>{await services.shopping.stop();popTo('home');}}/>;
 }
 export function Home() {
   const {services,push,session,showSheet,online}=useUi();
@@ -43,8 +43,8 @@ export function Home() {
     catch(error){
       if(!active.current)return;
       const code=failureCode(error);
-      if(code==='location_permission_denied'||code==='location_disabled')showSheet({title:'Shopping mode needs your location',content:<VStack gap={4}><Text>It's how each shop gets pinned so you can walk back to it. Shopping mode can't start without it.</Text><Button label="Not now" variant="secondary" onClick={()=>showSheet(null)}/><Action label="Open settings" run={()=>services.shopping.openSettings()}/></VStack>});
-      else if(code==='location_unavailable')showSheet({title:'Your location is unavailable',content:<VStack gap={4}><Text>A current location fix is needed before shopping can start. Move somewhere with a clearer signal, then try again. No trip has been started.</Text><Button label="OK" onClick={()=>showSheet(null)}/></VStack>});
+      if(code==='location_permission_denied'||code==='location_disabled')showSheet({title:'Shopping mode needs your location',content:<VStack gap={4}><Text>Ibo pins each shop so you can walk back to it later. Shopping mode needs location to start.</Text><Button label="Not now" variant="secondary" onClick={()=>showSheet(null)}/><Action label="Open settings" run={()=>services.shopping.openSettings()}/></VStack>});
+      else if(code==='location_unavailable')showSheet({title:'Your location is unavailable',content:<VStack gap={4}><Text>Ibo couldn’t find where you are. Move somewhere with a clearer signal and try again.</Text><Button label="OK" onClick={()=>showSheet(null)}/></VStack>});
       else throw error;
     }
   };
@@ -52,7 +52,7 @@ export function Home() {
   const itemPhotos=(shopId?:string)=>data.data?.photos.filter(photo=>photo.kind==='item'&&(!shopId||photo.shopId===shopId)).length??0;
   return <>
     <VStack as="section" gap={5} padding={6} style={{background:'var(--color-hero)',color:'var(--color-on-hero)',borderRadius:'var(--radius-page)',position:'relative',overflow:'hidden'}}>
-            {recording?<Chip tone="onHero" live>Recording · Shop {session.shop?.n??'—'}</Chip>:<Eyebrow color="var(--color-hanok-earth)">Your shopping memory</Eyebrow>}
+            {recording?<Chip tone="onHero" live>Recording · Shop {session.shop?.n??'—'}</Chip>:null}
       <VStack gap={2}>
         <Heading level={2} style={{...ON_HERO,letterSpacing:'-0.02em'}}>{recording?'Shopping mode is on':'Keep what catches your eye'}</Heading>
         <Text style={{color:'color-mix(in srgb, var(--color-on-hero) 82%, transparent)'}}>Take photos while you shop. Find a piece later, try it on, and walk back to it.</Text>
@@ -82,7 +82,7 @@ export function Home() {
         <VStack gap={0.5} paddingInline={1}><Text type="label" weight="semibold" maxLines={1} hasTruncateTooltip={false}>{piece.label}</Text><Text type="supporting" size="xsm">{piece.category!=='unknown'?`${piece.category} · `:''}{shortDate(piece.createdAt)}</Text></VStack>
       </TileButton></Reveal>)}</Grid>:<Empty title="No saved pieces" icon={HangerIcon}><Text type="supporting">Find a garment in your trip photos to save it.</Text></Empty>}
     </Section>
-    <Hint icon={ShieldIcon}>Your original self photo and raw location trail never leave this phone.</Hint>
+    <Hint icon={ShieldIcon}>Your original self photo and route history never leave this phone.</Hint>
   </>;
 }
 export function Trips({route}:{route:Extract<Route,{name:'trips'}>}) {
@@ -94,7 +94,7 @@ export function Trips({route}:{route:Extract<Route,{name:'trips'}>}) {
     for(const photo of photos){const count=counts.get(photo.tripId);if(count&&photo.kind==='item')count.photos++;}
     return {trips:trips.sort((a,b)=>b.startedAt-a.startedAt),counts};
   },[services]);
-  return <Section title={route.forOutfit?'Choose a trip photo':'Your trips'} description={route.forOutfit?'Open a trip, then tap a photo to cut out a companion piece.':undefined}>{data.loading&&!data.data?<SkeletonRows count={3} label="Loading your trips"/>:data.error?<Problem message={data.error} retry={data.retry}/>:!data.data?.trips.length?<Empty title="No trips yet" icon={BagIcon}><Text type="supporting">Your shopping trips will appear here.</Text></Empty>:<VStack gap={2}>{data.data.trips.map((trip,index)=>{const count=data.data!.counts.get(trip.id);const live=trip.status==='recording';return <Reveal key={trip.id} index={index}><RowButton label={new Date(trip.startedAt).toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'})} title={new Date(trip.startedAt).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'})} start={<IconTile icon="calendar" tone={live?'hero':'accent'}/>} meta={`${live?'Recording now':`${clock(trip.startedAt)} – ${clock(trip.endedAt!)}`} · ${count?.shops??0} ${count?.shops===1?'shop':'shops'} · ${count?.photos??0} photos`} end={live?<Chip tone="success" live>Live</Chip>:undefined} onClick={()=>push({name:'trip',tripId:trip.id,forOutfit:route.forOutfit})}/></Reveal>;})}</VStack>}{route.forOutfit&&<Button label="Cancel selection" variant="ghost" onClick={back}/>}</Section>;
+  return <Section title={route.forOutfit?'Choose a trip photo':'Your trips'} description={route.forOutfit?'Open a trip, then tap a photo to pick a piece to wear with it.':undefined}>{data.loading&&!data.data?<SkeletonRows count={3} label="Loading your trips"/>:data.error?<Problem message={data.error} retry={data.retry}/>:!data.data?.trips.length?<Empty title="No trips yet" icon={BagIcon}><Text type="supporting">Your shopping trips will appear here.</Text></Empty>:<VStack gap={2}>{data.data.trips.map((trip,index)=>{const count=data.data!.counts.get(trip.id);const live=trip.status==='recording';return <Reveal key={trip.id} index={index}><RowButton label={new Date(trip.startedAt).toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'})} title={new Date(trip.startedAt).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'})} start={<IconTile icon="calendar" tone={live?'hero':'accent'}/>} meta={`${live?'Recording now':`${clock(trip.startedAt)} – ${clock(trip.endedAt!)}`} · ${count?.shops??0} ${count?.shops===1?'shop':'shops'} · ${count?.photos??0} photos`} end={live?<Chip tone="success" live>Live</Chip>:undefined} onClick={()=>push({name:'trip',tripId:trip.id,forOutfit:route.forOutfit})}/></Reveal>;})}</VStack>}{route.forOutfit&&<Button label="Cancel selection" variant="ghost" onClick={back}/>}</Section>;
 }
 function ShopSection({shop,forOutfit}:{shop:Shop;forOutfit?:boolean}) {
   const {services,push,showSheet,online}=useUi();const data=useData(()=>listAll(services,'Photo',{shopId:shop.id}),[services,shop.id]);
@@ -113,10 +113,10 @@ function ShopSection({shop,forOutfit}:{shop:Shop;forOutfit?:boolean}) {
       <HStack gap={2} wrap="wrap">
         <Button label={storefront?'Retake storefront':'Add storefront photo'} variant="secondary" size="sm" icon={<Icon icon={CameraIcon}/>} onClick={()=>push({name:'capture',purpose:'storefront',shopId:shop.id})}/>
         <Button variant="secondary" size="sm" icon={<Icon icon={PencilIcon}/>} label={shop.note?'Edit note':'Add note'} onClick={()=>showSheet({title:`Note for Shop ${shop.n}`,content:<EditFields label={shop.note??''} onSave={note=>services.store.updateShop({id:shop.id,note:note||null})}/>})}/>
-        {storefront&&<Confirm title="Delete storefront photo?" description="The storefront and its description will be removed. Saved look snapshots stay." action="Delete storefront photo" icon={<Icon icon={TrashIcon}/>} onConfirm={()=>services.store.deletePhoto({id:storefront.id})}/>}
+        {storefront&&<Confirm title="Delete storefront photo?" description="The storefront photo and its description will be removed. Looks you’ve saved keep their copy." action="Delete storefront photo" icon={<Icon icon={TrashIcon}/>} onConfirm={()=>services.store.deletePhoto({id:storefront.id})}/>}
       </HStack>
       <Divider/>
-      <Eyebrow>{forOutfit?'Tap a photo to pick a companion':'Garment photos'}</Eyebrow>
+      <Eyebrow>{forOutfit?'Tap a photo to pick a piece':'Garment photos'}</Eyebrow>
       {data.loading&&!data.data?<SkeletonGrid count={4} columns={4} captions={false} label="Loading garment photos"/>:data.error?<Problem message={data.error} retry={data.retry}/>:items.length?<Grid columns={4} gap={2}>{items.map((photo,index)=><Reveal key={photo.id} index={index} from="scale"><Thumbnail label={`photo ${clock(photo.takenAt)}`} src={photo.file} alt="Shopping photo" style={{width:'100%',height:'auto',aspectRatio:'1'}} onClick={()=>push({name:'pick',photoId:photo.id,mode:forOutfit?'outfit':'shop'})}/></Reveal>)}</Grid>:<Text type="supporting">No garment photos in this shop.</Text>}
     </Panel>
   </VStack>;
@@ -132,12 +132,12 @@ export function Trip({route}:{route:Extract<Route,{name:'trip'}>}) {
   return <>
     <VStack gap={3}>
       <HStack gap={2} vAlign="center" wrap="wrap"><Text type="large" weight="semibold">{new Date(data.data.trip.startedAt).toLocaleDateString('en-US',{dateStyle:'full'})}</Text>{live&&<Chip tone="success" live>Recording</Chip>}</HStack>
-      <Hint icon={live?PinIcon:ShieldIcon}>{live?'Your location trail is recorded while shopping mode is on.':'The raw location trail was deleted when shopping ended. Saved photo and shop locations remain on this device.'}</Hint>
+      <Hint icon={live?PinIcon:ShieldIcon}>{live?'Your route is recorded while shopping mode is on.':'Your route history was deleted when you ended shopping. Photo and shop locations are kept on this phone.'}</Hint>
       {!route.forOutfit&&<Button label="Find it" variant="secondary" icon={<Icon icon="search"/>} onClick={()=>push({name:'ask'})}/>}
     </VStack>
     {data.data.shops.length?data.data.shops.toSorted((a,b)=>a.n-b.n).map((shop,index)=><Reveal key={shop.id} index={index}><ShopSection shop={shop} forOutfit={route.forOutfit}/></Reveal>):<Empty title="No shops recorded" icon={StoreIcon}/>}
     {route.forOutfit&&<Button label="Cancel selection" variant="secondary" onClick={()=>popTo('outfit')}/>}
-    <Confirm title="Delete this trip?" description="Trip photos, shop notes, and the location trail will be deleted. Saved cutouts and their walking destinations stay. Shopping mode will stop if this trip is recording." action="Delete trip" icon={<Icon icon={TrashIcon}/>} onConfirm={async()=>{await services.store.deleteTrip({id:route.tripId});deleted('Trip',route.tripId);}}/>
+    <Confirm title="Delete this trip?" description="This deletes the trip’s photos, shop notes and route history. Pieces you saved stay, and you can still walk back to them. If you’re shopping now, shopping mode stops." action="Delete trip" icon={<Icon icon={TrashIcon}/>} onConfirm={async()=>{await services.store.deleteTrip({id:route.tripId});deleted('Trip',route.tripId);}}/>
   </>;
 }
 export function Capture({route}:{route:Extract<Route,{name:'capture'}>}) {
@@ -163,14 +163,14 @@ export function Capture({route}:{route:Extract<Route,{name:'capture'}>}) {
     void opened.then(()=>{if(!active)return;resize();observer=new ResizeObserver(resize);if(view.current)observer.observe(view.current);window.addEventListener('resize',resize);window.addEventListener('scroll',resize,true);setReady(true);}).catch(cause=>{if(active)setError(failureCode(cause));});
     return()=>{active=false;observer?.disconnect();window.removeEventListener('resize',resize);window.removeEventListener('scroll',resize,true);void withCamera(()=>services.capture.closePreview()).catch(()=>{});ancestors.forEach((element,index)=>{element.style.background=backgrounds[index];});};
   },[services,purpose,route.purpose,route.shopId,attempt,recording]);
-  if(purpose==='shopping'&&session&&session.phase!=='recording')return <Empty title="Shopping mode is off"><Text>Start shopping from Home before taking shop photos.</Text><Button label="Home" onClick={()=>popTo('home')}/></Empty>;
+  if(purpose==='shopping'&&session&&session.phase!=='recording')return <Empty title="Shopping mode is off"><Text>Start shopping from Home to take shop photos.</Text><Button label="Home" onClick={()=>popTo('home')}/></Empty>;
   return <VStack gap={3} minHeight={0} style={{flex:1}}>
     <VStack gap={3} minHeight={0} isScrollable style={{flex:1}}>
-      {purpose==='shopping'?<HStack gap={3} hAlign="between" vAlign="center"><HStack gap={3} vAlign="center"><IconTile icon={StoreIcon} tone="hero" size="sm"/><VStack gap={0.5}><Text type="label" weight="semibold">Shop {session?.shop?.n??'—'} · {session?.photos??0} photos</Text><HStack gap={1} vAlign="center" style={{color:'var(--color-text-secondary)'}}><Icon icon={PinIcon} size="xsm" color="inherit"/><Text type="supporting" size="xsm">{session?.latestFix?`Location accuracy ${Math.round(session.latestFix.accuracyM)} m`:'Waiting for location…'}</Text></HStack></VStack></HStack><EndShopping/></HStack>:<Hint icon={purpose==='self'?ShieldIcon:CameraIcon}>{purpose==='self'?'Stand back so your full body is visible. Your original photo stays on this device.':purpose==='storefront'?'Fit the whole shop front in the frame. Taking this photo uses your current location once; it does not start a shopping trail.':'Photograph one wardrobe piece.'}</Hint>}
+      {purpose==='shopping'?<HStack gap={3} hAlign="between" vAlign="center"><HStack gap={3} vAlign="center"><IconTile icon={StoreIcon} tone="hero" size="sm"/><VStack gap={0.5}><Text type="label" weight="semibold">Shop {session?.shop?.n??'—'} · {session?.photos??0} photos</Text><HStack gap={1} vAlign="center" style={{color:'var(--color-text-secondary)'}}><Icon icon={PinIcon} size="xsm" color="inherit"/><Text type="supporting" size="xsm">{session?.latestFix?`Location accuracy ${Math.round(session.latestFix.accuracyM)} m`:'Waiting for location…'}</Text></HStack></VStack></HStack><EndShopping/></HStack>:<Hint icon={purpose==='self'?ShieldIcon:CameraIcon}>{purpose==='self'?'Stand back so your whole body is in the frame. The original photo stays on this phone.':purpose==='storefront'?'Fit the whole shop front in the frame. Your current location is saved with this photo.':'Photograph one wardrobe piece.'}</Hint>}
       {purpose==='shopping'&&banner&&session?.shop&&<VStack gap={3} padding={4} style={{background:'var(--color-accent-muted)',borderRadius:'var(--radius-container)'}}><HStack gap={3} vAlign="center"><IconTile icon={PinIcon} tone="hero" size="sm"/><VStack gap={0.5}><Heading level={2} style={{fontSize:'var(--font-size-lg)'}}>Shop {session.shop.n} started</Heading><Text type="supporting" size="sm">This spot is saved.</Text></VStack></HStack><HStack gap={2} wrap="wrap"><Button label="Storefront photo" variant="secondary" size="sm" icon={<Icon icon={StoreIcon}/>} onClick={()=>setStorefront(true)}/><Button label="Add note" variant="secondary" size="sm" icon={<Icon icon={NoteIcon}/>} onClick={()=>showSheet({title:`Note for Shop ${session.shop!.n}`,content:<EditFields label={session.shop?.note??''} onSave={note=>services.store.updateShop({id:session.shop!.id,note:note||null})}/>})}/><Button label="Dismiss" variant="ghost" size="sm" onClick={()=>setBanner(false)}/></HStack></VStack>}
       {storefront&&<Chip tone="accent">Fit the whole shop front in the frame</Chip>}
       <VStack ref={view} role="img" aria-label="Camera preview" width="100%" minHeight="25dvh" style={{background:'transparent',position:'relative',flex:1,borderRadius:'var(--radius-container)',overflow:'hidden',outline:'thin solid var(--color-border)'}}/>
-      {error?<Problem message={error==='camera_permission_denied'?'Camera access is off. Allow access in device settings, then try again.':'The camera preview could not start. Try again or return to your saved photos.'} retry={()=>setAttempt(value=>value+1)}/>:!ready?<Loading label="Starting camera…"/>:null}
+      {error?<Problem message={error==='camera_permission_denied'?'Camera access is off. Allow access in device settings, then try again.':'The camera couldn’t start. Try again, or go back to your saved photos.'} retry={()=>setAttempt(value=>value+1)}/>:!ready?<Loading label="Starting camera…"/>:null}
     </VStack>
     <HStack role="group" aria-label="Camera controls" gap={2} hAlign="between" vAlign="center" wrap="wrap" padding={3} style={{flexShrink:0,background:'var(--color-background-card)',borderRadius:'var(--radius-page)',boxShadow:'var(--shadow-low)'}}>
     {purpose==='shopping'&&!storefront&&latest&&<Thumbnail src={latest.file} alt="Latest captured garment" label="Latest photo" style={{width:'var(--spacing-12)',height:'var(--spacing-12)'}} onClick={()=>push({name:'pick',photoId:latest.id,mode:'shop'})}/>}

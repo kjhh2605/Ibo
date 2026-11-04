@@ -162,7 +162,7 @@ export function Loading({label = 'Loading…'}: {label?: string}) {
 export function PhotoView({file, label}: {file: string; label: string}) {
   const image = useImageUrl(file);
   const fade = useFadeIn();
-  if (image?.failed) return <Problem message="This saved image could not be opened."/>;
+  if (image?.failed) return <Problem message="Couldn’t open this image."/>;
   if (!image?.url) return <SkeletonPhoto/>;
   return <VStack align="center" width="100%" style={{background: 'var(--color-background-muted)', borderRadius: 'var(--radius-container)', overflow: 'hidden', boxShadow: 'var(--shadow-low)'}}>
     <img src={image.url} alt={label} onLoad={fade.onLoad} style={{width: '100%', maxHeight: '60dvh', objectFit: 'contain', display: 'block', ...fade.style}}/>

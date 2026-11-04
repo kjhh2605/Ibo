@@ -30,23 +30,23 @@ function errorMessage(code: string): string {
     case 'audio_unavailable': return 'The microphone is unavailable. Try again or type your question.';
     case 'index_unavailable': return 'Some photos are not ready to search. Try again or browse your trips.';
     case 'model_missing':
-    case 'model_invalid': return 'On-device item selection is unavailable. Try preparing the photo again.';
-    case 'handle_expired': return 'This photo’s selection session expired. Prepare the photo again.';
-    case 'inference_failed': return 'Could not outline that area. Tap the item again or choose a saved match.';
+    case 'model_invalid': return 'Tap-to-select isn’t available right now. Try again.';
+    case 'handle_expired': return 'This photo needs to reload. Try again.';
+    case 'inference_failed': return 'Couldn’t outline that spot. Tap the item again or pick a match.';
     case 'not_found':
-    case 'data_changed': return 'The saved data changed or was deleted. Browse your trips or ask again.';
-    case 'photo_limit_exceeded': return 'This search reached its photo limit. Ask a new question or browse your trips.';
-    case 'turn_limit_exceeded': return 'This search reached its limit. Ask a new question or browse your trips.';
-    case 'content_policy_violation': return 'This request could not be processed. Try a different description.';
+    case 'data_changed': return 'Something you saved changed or was deleted. Browse your trips or ask again.';
+    case 'photo_limit_exceeded': return 'That search checked as many photos as it can. Try a new question or browse your trips.';
+    case 'turn_limit_exceeded': return 'That search went as far as it can. Try a new question or browse your trips.';
+    case 'content_policy_violation': return 'Couldn’t search for that. Try describing it differently.';
     case 'unauthorized':
     case 'authentication_failed':
-    case 'app_check_failed': return 'Could not authenticate this request. Try again when your connection is ready.';
+    case 'app_check_failed': return 'Couldn’t connect securely. Try again in a moment.';
     case 'companion_limit':
     case 'companion_limit_reached':
-    case 'too_many_companions': return 'Your outfit already has five companion pieces. Return to the outfit to remove one first.';
+    case 'too_many_companions': return 'Your outfit already has 5 extra pieces. Go back and remove one first.';
     case 'busy': return 'The previous operation is still finishing. Please try again.';
     case 'export_failed': return 'Could not save the photo to your gallery. Please try again.';
-    case 'cleanup_failed': return 'Temporary selection data could not be removed from this device. Try again.';
+    case 'cleanup_failed': return 'Couldn’t clear the last selection. Try again.';
     case 'io_error': return 'Could not read or save the local photo. Please try again.';
     default: return 'That didn’t work. Please try again or browse your saved trips.';
   }
@@ -199,7 +199,7 @@ function PhotoSurface({asset, candidates, selected = null, cache, point = null, 
       decoded.current = valid;
       paintPhoto(canvas.current, image, valid, selected, cursorPoint);
       onReady?.(new Set(valid.map(mask => mask.candidate.id)));
-      if (results.some(result => result.status === 'rejected')) setError('One or more item outlines could not be displayed. Try again, choose another match, or tap the item yourself.');
+      if (results.some(result => result.status === 'rejected')) setError('Some outlines couldn’t be shown. Try again, pick another match, or tap the item yourself.');
     })().catch(() => {if (live) {decoded.current = []; setError('Could not display this photo. Please try again.');}});
     return () => {live = false;};
   }, [asset, cache, candidates, selected, cursorPoint, attempt, onReady]);
@@ -261,10 +261,10 @@ function stageLabel(stage: string | null): string {
   switch (stage) {
     case 'listening': return 'Listening…';
     case 'transcribing': return 'Transcribing…';
-    case 'reading_visits': return 'Read your trips';
+    case 'reading_visits': return 'Checking your trips…';
     case 'narrowing': return 'Narrowing the search…';
-    case 'searching_photos': return 'Searched its photos';
-    case 'outlining_items': return 'Outlined the items';
+    case 'searching_photos': return 'Searching photos…';
+    case 'outlining_items': return 'Outlining items…';
     default: return 'Finding your item…';
   }
 }
@@ -276,9 +276,9 @@ function searchSteps(state: AgentState) {
     if (event.type === 'voice_started') steps.push({label: 'Listening…', state: 'working'});
     if (event.type === 'voice_stopped') {finish(); steps.push({label: 'Transcribing…', state: 'working'});}
     if (event.type === 'query_started') finish();
-    if (event.type === 'scope_narrowed' && event.scope) steps.push({label: `Narrowed to Shop ${event.scope.n}`, tool: 'find_photos', state: 'working'});
+    if (event.type === 'scope_narrowed' && event.scope) steps.push({label: `Focus on Shop ${event.scope.n}`, tool: 'find_photos', state: 'working'});
     if (event.type === 'tool_started') {
-      const label = event.toolName === 'list_visits' ? 'Read your trips' : event.toolName === 'find_photos' ? 'Searched its photos' : event.toolName === 'extract_items' ? 'Outlined the items' : null;
+      const label = event.toolName === 'list_visits' ? 'Check your trips' : event.toolName === 'find_photos' ? 'Search photos' : event.toolName === 'extract_items' ? 'Outline items' : null;
       if (label) steps.push({label, tool: event.toolName, state: 'working'});
     }
     if (event.type === 'tool_completed') {
@@ -302,7 +302,7 @@ function SearchResult({photo, candidates, allCandidates, concept, index}: {photo
   const destination: PickRoute = {name: 'pick', mode: 'shop', photoId: photo.id, candidates: allCandidates, concept: concept ?? undefined};
   if (!context.data && context.loading) return <SkeletonCard index={index} label="Loading matching photo" />;
   if (context.error) return <Problem message={context.error} retry={context.retry} />;
-  if (!context.data) return <Text type="supporting">This matching photo was deleted.</Text>;
+  if (!context.data) return <Text type="supporting">This photo was deleted.</Text>;
   return <Reveal index={index}><Panel gap={3} padding={3}>
     <HStack gap={2} vAlign="center" hAlign="between">
       <HStack gap={2} vAlign="center"><IconTile icon={StoreIcon} tone={index === 0 ? 'hero' : 'muted'} size="sm"/><VStack gap={0}><Text type="label" weight="semibold">{context.data.shop ? `Shop ${context.data.shop.n}` : 'Trip photo'}</Text><Text type="supporting" size="xsm">{new Date(context.data.trip?.startedAt ?? photo.takenAt).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})} · {new Date(photo.takenAt).toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit'})} · {allCandidates.length} {allCandidates.length === 1 ? 'item' : 'items'}</Text></VStack></HStack>
@@ -386,11 +386,11 @@ export function Ask() {
         {state.status === 'running' && <Button label="Cancel search" variant="ghost" onClick={() => perform(() => agent.cancel())} />}
       </HStack>
     </Panel>
-    {!online && <Text role="status">You’re offline. Finding photos and voice need a connection; your saved trips and item selection are still available.</Text>}
+    {!online && <Text role="status">You’re offline. Search and voice need a connection, but you can still browse your trips.</Text>}
     {displayQuery && status !== 'idle' && <VStack gap={1}><Eyebrow>You asked</Eyebrow><Text type="large" weight="semibold">“{displayQuery}”</Text></VStack>}
     {status === 'running' && <HStack gap={3} vAlign="center" padding={4} style={{background: 'var(--color-accent-muted)', borderRadius: 'var(--radius-container)'}}><Spinner size="lg" aria-label="Searching"/><Text role="status" color="accent">{stageLabel(state.stage)}{listening ? ' Search starts automatically when you finish speaking.' : ''}</Text></HStack>}
     {finished && steps.length > 0 && <Button label={`${state.status === 'results' ? `${state.photos.length} photos found` : state.status === 'not_found' ? 'No matching photos' : 'Search stopped'} · ${state.stepsExpanded ? 'Hide steps' : 'Show steps'}`} variant="ghost" aria-expanded={state.stepsExpanded} onClick={() => agent.setStepsExpanded(!state.stepsExpanded)} />}
-    {(!finished || state.stepsExpanded) && steps.length > 0 && <VStack as="ol" gap={0} aria-label="Search steps" style={{listStyle: 'none', paddingInlineStart: 0, margin: 0}}>{steps.map((step, index) => <VStack as="li" key={`${index}:${step.tool ?? step.label}`}><Reveal><HStack gap={3} vAlign="start"><VStack align="center" gap={0} style={{alignSelf: 'stretch'}}><VStack align="center" justify="center" width="var(--spacing-6)" height="var(--spacing-6)" style={{flexShrink: 0, borderRadius: 'var(--radius-full)', background: step.state === 'complete' ? 'var(--color-success-muted)' : step.state === 'failed' ? 'var(--color-error-muted)' : 'var(--color-accent-muted)', color: step.state === 'complete' ? 'var(--color-on-success-muted)' : step.state === 'failed' ? 'var(--color-on-error-muted)' : 'var(--color-text-accent)'}}>{step.state === 'working' ? <Spinner size="sm" shade="inherit" aria-label="In progress"/> : <Pop><Icon icon={step.state === 'complete' ? 'check' : 'close'} size="xsm" color="inherit"/></Pop>}</VStack>{index < steps.length - 1 && <VStack width="thin" style={{flex: 1, minHeight: 'var(--spacing-3)', borderInlineStart: 'thin solid var(--color-border)'}}/>}</VStack><VStack gap={0.5} paddingBlock={0.5} style={{paddingBottom: 'var(--spacing-3)'}}><Text type="label">{step.label}</Text><Text type="supporting" size="xsm">{step.state === 'complete' ? 'Done' : step.state === 'failed' ? 'Could not complete' : 'In progress…'}</Text></VStack></HStack></Reveal></VStack>)}</VStack>}
+    {(!finished || state.stepsExpanded) && steps.length > 0 && <VStack as="ol" gap={0} aria-label="Search steps" style={{listStyle: 'none', paddingInlineStart: 0, margin: 0}}>{steps.map((step, index) => <VStack as="li" key={`${index}:${step.tool ?? step.label}`}><Reveal><HStack gap={3} vAlign="start"><VStack align="center" gap={0} style={{alignSelf: 'stretch'}}><VStack align="center" justify="center" width="var(--spacing-6)" height="var(--spacing-6)" style={{flexShrink: 0, borderRadius: 'var(--radius-full)', background: step.state === 'complete' ? 'var(--color-success-muted)' : step.state === 'failed' ? 'var(--color-error-muted)' : 'var(--color-accent-muted)', color: step.state === 'complete' ? 'var(--color-on-success-muted)' : step.state === 'failed' ? 'var(--color-on-error-muted)' : 'var(--color-text-accent)'}}>{step.state === 'working' ? <Spinner size="sm" shade="inherit" aria-label="In progress"/> : <Pop><Icon icon={step.state === 'complete' ? 'check' : 'close'} size="xsm" color="inherit"/></Pop>}</VStack>{index < steps.length - 1 && <VStack width="thin" style={{flex: 1, minHeight: 'var(--spacing-3)', borderInlineStart: 'thin solid var(--color-border)'}}/>}</VStack><VStack gap={0.5} paddingBlock={0.5} style={{paddingBottom: 'var(--spacing-3)'}}><Text type="label">{step.label}</Text><Text type="supporting" size="xsm">{step.state === 'complete' ? 'Done' : step.state === 'failed' ? 'Didn’t finish' : 'In progress…'}</Text></VStack></HStack></Reveal></VStack>)}</VStack>}
     {status === 'running' && !listening && !transcribing && <VStack gap={4} aria-hidden><SkeletonCard index={0} label="Searching your photos" /><SkeletonCard index={1} label="Searching your photos" /></VStack>}
     {state.notice && !operationError && <Text role="status">{state.notice}</Text>}
     {failure && <Problem message={errorMessage(failure)} retry={() => {
@@ -413,7 +413,7 @@ export function Ask() {
     {status === 'not_found' && <Empty title="No matching photos" icon="search"><Text>{state.summary ?? 'We couldn’t find that item in your trips. Try a color, a type of clothing, or something you remember about the shop.'}</Text><Button label="Ask again" variant="secondary" onClick={askAgain} /></Empty>}
     {status === 'error' && <Button label="Ask again" variant="secondary" onClick={askAgain} />}
     <Button label="Browse your trips" variant="ghost" icon={<Icon icon="calendar"/>} onClick={() => push({name: 'trips'})} />
-    <Hint icon={ShieldIcon}>Your words and shop summaries from all trips, including your notes, are sent to Spark to find the photo. Up to three selected shopping photos can be sent to SAM for item outlines. Photos of you, location coordinates, and photo embeddings are not part of this search.</Hint>
+    <Hint icon={ShieldIcon}>Your question and shop notes go to Meta AI to find the photo, along with up to 3 shop photos to outline items. Photos of you and your locations are never part of a search.</Hint>
   </VStack>;
 }
 
@@ -471,7 +471,7 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
           discard(current.files, current.files),
           route.mode === 'wardrobe' && (lifecycle.current === current || !lifecycle.current.live) ? services.media.discard({assetId: asset.id}) : Promise.resolve(),
         ]);
-        if ([...released, ...cleaned].some(result => result.status === 'rejected')) say('Some temporary photo data could not be removed from this device.');
+        if ([...released, ...cleaned].some(result => result.status === 'rejected')) say('Couldn’t clean up a temporary photo.');
       })();
     };
   }, [asset.id, discard, route.mode, services, say]);
@@ -512,7 +512,7 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
     setSelectionError(null);
     void discard(old, current.files).catch(() => {
       if (current.live) setSelectionError('cleanup_failed');
-      else say('Some temporary photo data could not be removed from this device.');
+      else say('Couldn’t clean up a temporary photo.');
     });
   };
 
@@ -560,7 +560,7 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
           }
         } catch {
           if (current.live) setSelectionError('cleanup_failed');
-          else say('Some temporary photo data could not be removed from this device.');
+          else say('Couldn’t clean up a temporary photo.');
         } finally {
           current.tap = null;
           if (current.live) setSegmenting(false);
@@ -596,7 +596,7 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
   return <VStack gap={4}>
     {route.mode === 'wardrobe' && <Heading level={2}>Add to wardrobe</Heading>}
     <Text type="supporting">{route.mode === 'wardrobe' ? 'Tap the piece you own' : `${shop ? `Shop ${shop.n} · ` : ''}${new Date(trip?.startedAt ?? photo!.takenAt).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})} · ${new Date(photo!.takenAt).toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit'})}`}</Text>
-    {!online && <Text role="status">You’re offline. You can still select, save, and delete local items. New item names will be queued until you reconnect.</Text>}
+    {!online && <Text role="status">You’re offline. You can still pick and save items. Naming finishes when you reconnect.</Text>}
     {photo && !saving && <HStack gap={2} wrap="wrap">
       <Action label="Save to gallery" variant="secondary" size="sm" icon={<Icon icon={ImageIcon}/>} run={async () => {
         try {await services.media.exportPhoto({photoId: photo.id}); say('Saved to gallery · location removed');}
@@ -606,13 +606,13 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
     </HStack>}
     <VStack ref={photoArea} style={{scrollMarginTop: 'var(--spacing-4)'}}><PhotoSurface asset={asset} candidates={visibleCandidates} selected={selected} cache={cache} point={tapping ? point : null} disabled={saving || (tapping && (preparing || segmenting || Boolean(prepareError)))} onTap={tapping ? tap : undefined} onSelect={tapping ? undefined : setSelected} onReady={onReady} /></VStack>
     {tapping && !point && <Chip tone="accent">Tap the item in the photo</Chip>}
-    {preparing && <HStack gap={2} vAlign="center"><Spinner size="sm" aria-label="Preparing"/><Text role="status" type="supporting">Preparing on-device item selection…</Text></HStack>}
+    {preparing && <HStack gap={2} vAlign="center"><Spinner size="sm" aria-label="Preparing"/><Text role="status" type="supporting">Getting the photo ready…</Text></HStack>}
     {prepareError && <Problem message={errorMessage(prepareError)} retry={() => setPrepareAttempt(value => value + 1)} />}
-    {segmenting && <HStack gap={2} vAlign="center"><Spinner size="sm" aria-label="Outlining"/><Text role="status" type="supporting">Outlining this area on your device…</Text></HStack>}
+    {segmenting && <HStack gap={2} vAlign="center"><Spinner size="sm" aria-label="Outlining"/><Text role="status" type="supporting">Outlining…</Text></HStack>}
     {selectionError && <Problem message={errorMessage(selectionError)} retry={selectionError === 'cleanup_failed' && !point ? clearTap : point && !prepareError ? () => tap(point) : undefined} />}
     {choices.length > 0 && <VStack gap={2}>
       <Heading level={3}>{tapping ? 'Which area?' : `Found ${choices.length} ${choices.length === 1 ? 'item' : 'items'}, best first`}</Heading>
-      <Hint>Scores describe mask quality, not the probability that this is your item.</Hint>
+      <Hint>The score shows how clean the outline is, not how sure we are that it’s your item.</Hint>
       {visible.map(({candidate, areaName}, index) => <Reveal key={`${candidate.id}:${index}`} index={index}><RowButton label={`${index + 1}. ${areaName ?? candidate.label} · score ${Math.round(candidate.score * 100)}%`} pressed={candidate.id === selected} isDisabled={saving || segmenting} onClick={() => {setSelected(candidate.id); setSaveError(null);}}
         start={<VStack align="center" justify="center" width="var(--spacing-12)" height="var(--spacing-12)" style={{flexShrink: 0, borderRadius: 'var(--radius-element)', background: 'var(--color-background-muted)', overflow: 'hidden'}}><CandidatePreview asset={asset} candidate={candidate} cache={cache} ready={readyMasks.has(candidate.id)} /></VStack>}
         title={`${index + 1}. ${areaName ?? candidate.label}`}
@@ -624,9 +624,9 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
     {matches.length > 0 && <Button label={tapping ? 'Show matches' : 'Not here? Tap it'} variant="ghost" isDisabled={saving} onClick={() => {clearTap(); setTapping(value => !value); setShowAll(false); if (tapping) setSelected(matches[0]?.id ?? null); else requestAnimationFrame(() => photoArea.current?.scrollIntoView({block: 'start', behavior: reducedMotion() ? 'auto' : 'smooth'}));}} />}
     {tapping && (tapChoices.length > 0 || segmenting) && <Button label="Cancel area selection" variant="ghost" isDisabled={saving} onClick={clearTap} />}
     <StickyBar>
-    {atLimit && <Problem message="Your outfit already has five companion pieces. Return to the outfit to remove one first." />}
+    {atLimit && <Problem message="Your outfit already has 5 extra pieces. Go back and remove one first." />}
     {saveError && <Problem message={errorMessage(saveError)} retry={maskReady && !atLimit ? complete : undefined} />}
-    {chosen && !route.concept && <Text type="supporting">This will be saved as “Picked item” while its name and category are prepared. You can edit them after saving.</Text>}
+    {chosen && !route.concept && <Text type="supporting">It’s saved as “Picked item” until it’s named. You can rename it anytime.</Text>}
     <Button label={route.mode === 'wardrobe' ? 'Add to wardrobe' : route.mode === 'outfit' ? 'Add to outfit' : 'Use this item'} variant="primary" size="lg" isLoading={saving} isDisabled={!chosen || !maskReady || segmenting || atLimit} onClick={complete} />
     <Button label={route.mode === 'outfit' ? 'Cancel and return to outfit' : 'Cancel'} variant="ghost" onClick={() => {if (route.mode === 'outfit') popTo('outfit'); else back();}} />
     </StickyBar>
@@ -645,7 +645,7 @@ export function Pick({route}: {route: PickRoute}) {
   }, [services, route.photoId, route.asset, route.mode]);
   if (!source.data && source.loading) return <VStack gap={4}><SkeletonText lines={1} width="50%" /><SkeletonPhoto height="45dvh" label="Loading photo" /><SkeletonRows count={3} label="Loading items" /></VStack>;
   if (source.error) return <Problem message={source.error} retry={source.retry} />;
-  if (!source.data) return <Empty title={route.mode === 'wardrobe' ? 'Photo unavailable' : 'Photo deleted'}><Text>{route.mode === 'wardrobe' ? 'Choose a wardrobe photo to select an item.' : 'This photo is no longer in your trips. Saved cutouts and walking directions are unchanged.'}</Text><Button label="Go back" variant="secondary" onClick={back} /></Empty>;
-  if (route.candidates?.some(candidate => candidate.photoId !== source.data!.asset.id)) return <Problem message="These item outlines belong to a different photo. Go back and choose the photo again." />;
+  if (!source.data) return <Empty title={route.mode === 'wardrobe' ? 'Photo unavailable' : 'Photo deleted'}><Text>{route.mode === 'wardrobe' ? 'Choose a photo of something you own.' : 'This photo was deleted. Pieces you saved from it are still here.'}</Text><Button label="Go back" variant="secondary" onClick={back} /></Empty>;
+  if (route.candidates?.some(candidate => candidate.photoId !== source.data!.asset.id)) return <Problem message="These outlines are from a different photo. Go back and open the photo again." />;
   return <PickPhoto key={`${route.mode}:${source.data.asset.id}`} route={route} source={source.data} />;
 }
