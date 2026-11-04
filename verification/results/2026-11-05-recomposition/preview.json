@@ -1,0 +1,40 @@
+{
+  "source": "native test-driver actual renderer; synthetic self and previously generated actual Muse target-only provider; not human approval or product enablement",
+  "newProviderCalls": 0,
+  "measured": {
+    "ok": true,
+    "faceless": true,
+    "compositionEligible": true,
+    "previewWritten": true,
+    "metrics": {
+      "neckColorDeltaE95": 39.55656434625901,
+      "shoulderColorDeltaE95": 34.27526643248424,
+      "neckOffsetRatio95": 0.005570541385784471,
+      "shoulderOffsetRatio95": 0.008201463426494002,
+      "thresholdVersion": null,
+      "decision": "not_calibrated",
+      "passed": false
+    },
+    "status": "passed"
+  },
+  "croppedRejected": {
+    "ok": true,
+    "faceless": true,
+    "compositionEligible": false,
+    "previewWritten": false,
+    "metrics": {
+      "neckColorDeltaE95": null,
+      "shoulderColorDeltaE95": null,
+      "neckOffsetRatio95": null,
+      "shoulderOffsetRatio95": null,
+      "thresholdVersion": "smoke-test-only",
+      "decision": "metrics_unavailable",
+      "passed": false
+    },
+    "status": "passed"
+  },
+  "providerUnchanged": true,
+  "providerSha256": "d3a229ffe8946ae480c0bf2ca49406fd4f846dac3d201b0a42b4d52b7d66ff3c",
+  "previewSha256": "ad9b081d2b6abcf5fbfc0b9660a80ab242680c8f14bb365e15ce32b9c3138091",
+  "previewPath": "/Users/gnar/.cache/street-fitting/recomposition-smoke/target-only-preview.png"
+}

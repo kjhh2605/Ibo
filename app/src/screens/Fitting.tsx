@@ -2,6 +2,7 @@ import {useCallback, useEffect, useRef, useState, useSyncExternalStore} from 're
 import type {ReactNode} from 'react';
 import {config} from '../config';
 import type {Asset, Piece, QueueJob, Result as SavedResult} from '../native/contracts';
+import {localCompositionConfig} from '../native/compositionConfig';
 import type {Route} from '../ui/navigation';
 import type {FittingState} from '../ui/services';
 
@@ -33,12 +34,13 @@ const phases: Record<FittingState['phase'], string> = {
   sending: 'Sending without your face and generating the look…',
   compositing: 'Checking the look and putting your face back on this phone…',
   saving: 'Saving your look on this phone…',
+  cancelling: 'Cancelling and cleaning up on this phone…',
   complete: 'Your look is saved.',
   failed: 'Your look could not be completed.',
   cancelled: 'Generation cancelled. Your combination is still here.',
 };
 function generating(state: FittingState) {
-  return state.phase === 'preparing' || state.phase === 'sending' || state.phase === 'compositing' || state.phase === 'saving';
+  return state.phase === 'preparing' || state.phase === 'sending' || state.phase === 'compositing' || state.phase === 'saving' || state.phase === 'cancelling';
 }
 function errorCode(cause: unknown) {
   return typeof cause === 'object' && cause !== null && 'code' in cause ? String(cause.code) : '';
@@ -78,7 +80,7 @@ function Naming({piece, jobs}: {piece: Piece; jobs: QueueJob[]}) {
   const job = jobs.find(value => value.kind === 'label_piece' && value.refId === piece.id);
   if (job) return <Text type="supporting">{!online ? 'Waiting for connection to name this piece.' : job.attempts > 0 ? 'Naming is waiting to retry. You can also rename this piece.' : 'Spark is naming this piece…'}</Text>;
   if (piece.category !== 'unknown') return null;
-  return <VStack gap={2}><Text type="supporting">No automatic name is available. You can rename this piece or ask Spark to name the cut-out.</Text><Action label="Try naming again" variant="ghost" run={() => services.store.enqueue({kind: 'label_piece', refId: piece.id})}/></VStack>;
+  return <VStack gap={2}><Text type="supporting">Category not set. You can edit this piece or ask Spark to name the cut-out.</Text><Action label="Ask Spark to name this piece" variant="ghost" run={() => services.store.enqueue({kind: 'label_piece', refId: piece.id})}/></VStack>;
 }
 function PieceRow({piece, jobs, action}: {piece: Piece; jobs: QueueJob[]; action?: ReactNode}) {
   return <HStack gap={4} wrap="wrap" vAlign="center"><Thumbnail src={piece.cutoutFile} label={piece.label} alt={piece.label}/><VStack gap={2}><Text type="label">{piece.label}</Text><Text type="supporting">{piece.origin === 'shop' ? 'Saved from a shop' : 'Your wardrobe'}{piece.category !== 'unknown' ? ` · ${piece.category}` : ''}</Text><Naming piece={piece} jobs={jobs}/></VStack>{action}</HStack>;
@@ -226,11 +228,12 @@ export function Outfit() {
         <Button label="Add a companion" variant="secondary" isDisabled={!target || busy || companionIds.length >= MAX_COMPANIONS} onClick={() => showSheet({title: 'Wear with it', content: <CompanionChooser/>})}/>
       </Section>
     </>}
-    {generating(state) && <VStack role="status" aria-live="polite" gap={3}><Text type="label">{phases[state.phase]}</Text><Text type="supporting">Your original photo, face and hair stay on this phone.</Text><Button label="Cancel generation" variant="secondary" onClick={() => services.fitting.cancel()}/></VStack>}
+    {generating(state) && <VStack role="status" aria-live="polite" gap={3}><Text type="label">{phases[state.phase]}</Text><Text type="supporting">Your original photo, face and hair stay on this phone.</Text><Button label="Cancel generation" variant="secondary" isDisabled={state.phase === 'cancelling'} onClick={() => services.fitting.cancel()}/></VStack>}
     {state.phase === 'cancelled' && <Text type="supporting">{phases.cancelled}</Text>}
     {state.error && errorCode(state.error) !== 'cancelled' && state.selfState !== 'failed' && <Problem message={fittingError(state.error.code)}/>}
     <Action label="Generate" disabled={!ready} run={async () => {const result = await services.fitting.generate(); if (result && alive.current) popTo('outfit', {name: 'result', resultId: result.id});}}/>
     <Text type="supporting">One face-and-hair-removed photo, your target and up to 5 companion cut-outs are sent for generation.</Text>
+    {localCompositionConfig.provenance?.humanApproved === false && <Text type="supporting">This demo bundles provisional face-restoration calibration for one synthetic self photo, used only in debug or verification builds. It has not been human-reviewed. Other photos remain faceless.</Text>}
   </>;
 }
 
@@ -258,7 +261,7 @@ export function Result({route}: {route: Extract<Route, {name: 'result'}>}) {
   const canChange = view.canChangePieces;
   const targetDeleted = links.data && !links.data.pieceIds.has(result.targetPieceId);
   return <>
-    <VStack gap={4}><Text>{snapshots.length} {snapshots.length === 1 ? 'piece' : 'pieces'} · {dateTime(result.createdAt)}</Text><PhotoView file={view.file} label={`Your generated look wearing ${view.target.label}`}/>{view.faceless && <Text>Your face couldn’t be put back cleanly, so this look is shown without it.</Text>}{targetDeleted && <Text>The target piece was deleted. Your look and walk-back location are still saved.</Text>}</VStack>
+    <VStack gap={4}><Text>{snapshots.length} {snapshots.length === 1 ? 'piece' : 'pieces'} · {dateTime(result.createdAt)}</Text><PhotoView file={view.file} label={`Your generated look wearing ${view.target.label}`}/>{view.faceless && <Text>This look is shown without a face because face restoration did not meet the required safety or calibration checks.</Text>}{targetDeleted && <Text>The target piece was deleted. Your look and walk-back location are still saved.</Text>}</VStack>
     {links.error && <Problem message="Your look is available, but links to the original pieces could not be checked." retry={links.retry}/>}
     <Section title="Wearing">
       {snapshots.map((piece, index) => <HStack key={piece.pieceId} gap={4} wrap="wrap" vAlign="center"><Thumbnail src={piece.cutoutFile} label={piece.label} alt={piece.label}/><VStack gap={2}><Text type="label">{piece.label}</Text><Text type="supporting">{index === 0 ? 'Target · ' : 'Companion · '}{piece.origin === 'wardrobe' ? 'Your wardrobe' : piece.shop ? `Shop ${piece.shop.n}` : 'Saved from a shop'}{links.data && !links.data.pieceIds.has(piece.pieceId) ? ' · Saved snapshot' : ''}</Text></VStack>{links.data?.pieceIds.has(piece.pieceId) && !links.loading && <Button label={`Open ${piece.label}`} variant="ghost" onClick={() => push({name: 'item', pieceId: piece.pieceId})}/>}</HStack>)}

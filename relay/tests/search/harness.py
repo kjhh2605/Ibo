@@ -70,7 +70,7 @@ def sam_text(scores=(0.01, 0.9, 0.9)):
     # Published codec example from the official meta-sam-parser package README.
     payload = '!!!!!(QO(0lu8?'
     return '<0f>' + ','.join(f'{i}<|box;x1=0;y1=0;x2=4;y2=4;w=5;h=5;c={score}|>'
-                            f'<|mask;x=0;y=0;c={score};data=5,5,!{payload}|>' for i, score in enumerate(scores))
+                            f'<|mask;x=0;y=0;c={score};data=5,5,{payload}|>' for i, score in enumerate(scores))
 
 
 def fixture(root, scenario, operation, step, expected, body, *, status=200, match=None, ignore=None):

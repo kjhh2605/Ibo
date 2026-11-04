@@ -39,7 +39,7 @@ Main은 `auth_headers` dependency를 `require_auth`로 override한다. Endpoint�
 
 ### S03 provider 연결
 
-Meta `responses`는 `https://api.meta.ai/v1/responses`만 호출하며 model/store/safety ID를 adapter가 결정한다. Spark의 function tools는 list_visits/find_photos/extract_items뿐이다. Image의 image_generation에는 image_search/web_search/shell을 false로 강제한다. Voice 전용 API에는 공식 multipart WAV/English 필드만 보낸다. OSRM은 `routing.openstreetmap.de`의 foot service 고정 경로이며 Meta Authorization을 보내지 않는다. Dedicated API에 지원 여부가 확인되지 않은 store/safety 필드를 추가하지 않는다. 실제 모델 입력/출력 변환과 PE 로딩은 S02/S03 책임이다.
+Meta `responses`는 Spark/SAM의 `https://api.meta.ai/v1/responses`만 호출하며 model/store/safety ID를 adapter가 결정한다. Spark의 function tools는 list_visits/find_photos/extract_items뿐이다. Muse Image는 실제 Responses 도구 호환 오류 때문에 공식 `https://api.meta.ai/v1/images/edits` 단일 경로를 사용하며 `tool_enablement`의 image_search/web_search/shell을 false로 강제한다. 가명 `user`, PNG base64 1장, low reasoning을 고정하며 URL 다운로드/다른 endpoint fallback은 없다. Voice 전용 API에는 공식 multipart WAV/English 필드만 보낸다. OSRM은 `routing.openstreetmap.de`의 foot service 고정 경로이며 Meta Authorization을 보내지 않는다. Dedicated API에 지원 여부가 확인되지 않은 store/safety 필드를 추가하지 않는다. 실제 모델 입력/출력 변환과 PE 로딩은 S02/S03 책임이다.
 
 ### S11 fixture 연결
 

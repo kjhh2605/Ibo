@@ -1,0 +1,10 @@
+{
+  "sourceRun": "provisional-synthetic-20261105-r3",
+  "sourceImageSha256": "893e383e306cee4d4a07318ca36efef63a9ca9de0cfeea63535c6a1c53a993f8",
+  "fitSha256": "d10d6ae94dc05580466bc25c79b83ddab1f6ff5bd46e32e4caf32b86a5842033",
+  "frozenAt": "2026-11-04T20:47:55.249254+00:00",
+  "thresholds": {
+    "maxBoundaryColorDeltaE": 52.92406593298473,
+    "maxBoundaryOffsetRatio": 0.01087116327113919
+  }
+}

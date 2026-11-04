@@ -1,5 +1,13 @@
 # S03 relay-media 구현·검증
 
+## 2026-11-05 실제 Meta 추론 수정
+
+- 실제 Spark 설명 2종과 4턴 `list_visits → find_photos → extract_items → final`, SAM 3.1 binary mask를 관측했다. SAM codec에는 `!`/`~` marker를 포함한 **전체 payload**를 전달해야 한다. 기존 marker 제거와 marker를 중복한 합성 helper를 함께 수정하고 codec 오류를 안전한 `502 upstream_error`로 변환한다.
+- Muse Image Responses의 문서화된 `image_generation` 도구는 실제 서비스에서 `400 invalid_request_error` (`tools`, `unknown`)를 반환했다. [공식 one-shot edits 문서](https://dev.meta.ai/docs/image-generation#edit)에 따라 `/v1/images/edits`로 **단일 경로 전환**했다. `images` 순서는 동일하며 `n=1`, `response_format=b64_json`, PNG, low reasoning, 세 `tool_enablement` 모두 false다. 사용자 식별은 같은 HMAC 가명의 `user` 필드이며 미지원 `store`/`safety_identifier`를 넣지 않는다. 실패 시 Responses/URL 다운로드/도구 활성화 fallback은 없다.
+- 실제 edits 응답은 PNG 1296×1952, 2,522,151 bytes였다. 이는 생성/파싱 증거이지 머리 마스킹·옷 정확도·watermark/기기 재합성·사람 승인 증거가 아니다. 사용자 원본은 사용하지 않았고 기존 synthetic head-masked self + synthetic garment만 전송했다.
+- 재사용 명령: `cd relay && .venv/bin/python scripts/live_provider_smoke.py --key-file \"$HOME/.cache/street-fitting/m1-runtime-config/meta-api-key\" --evidence ../verification/results/2026-11-05-live-provider/final.json`. 또는 `MODEL_API_KEY` 환경 변수만 사용한다. 키/이미지/응답 텍스트는 출력하지 않으며 생성 파일은 메모리에서만 검증한다. evidence에는 모델·상태·shape·count·오류 코드·digest만 남긴다.
+- 증거: `verification/results/2026-11-05-live-provider/`의 initial/codec-correction/search-correction/image-edit-diagnostic/final JSON. 검색의 방문/로컬 ranking은 명시적 synthetic tool 입력이며 PE text vector는 실제 loader를 사용한다. HTTP Firebase/App Check·Android E2E·실시간 음성/GPS는 이 smoke의 범위가 아니다. 이 변경 후 pytest/build/lint는 작업자가 실행하지 않았으며 통합 담당자가 실행한다.
+
 ## 구현 경계
 
 담당 경로는 `app/routes/{transcribe,describe,tryon,route}.py`와 `tests/media/**`다. 인증·입력 파일 검사·fixture 선택·오류·로그·provider transport는 S01을 재사용한다. schema/main/config/transport/product 계약 변경은 coordinator 소유이며 이 작업자는 수정하지 않았다. S02의 PE 모델 준비·검색은 별도 gate다.
@@ -7,7 +15,7 @@
 - `POST /v1/transcribe`: 검증된 WAV를 전용 multipart API로 전송하고 `transcript`를 공백·문장부호까지 그대로 반환한다. 빈 전사도 200이다. 실제 PCM sample/chunk/size 검사는 공통 Audio DTO가 provider 전에 수행한다.
 - `POST /v1/describe/storefront`, `/v1/describe/piece`: 이미지 1장과 route 내부 고정 영어 정책을 Spark 1.3 Standard에 보낸다. Responses `text.format`의 JSON Schema 출력과 실제 응답을 검증한다. 거절은 정책 오류, 잘못된 JSON/빈 label/상한 초과/예상치 않은 도구는 상류 오류다. 옷장/바로 자른 가게 조각은 같은 입력을 사용한다.
 - `POST /v1/tryon`: 마스킹 본인 → 가게 target → companions 순서, 총 2~7장이다. `headMasked`는 기기 완료 신호이며 시각적 마스킹 증명이 아니다. 원본 본인 사진이나 별도 mask를 요구하지 않는다. Muse Image의 웹/이미지 검색·shell은 false, low reasoning, PNG를 고정한다. 출력은 정확히 1장만 받으며 원래 파일 바이트를 재인코딩하지 않는다.
-- D-R11-03 사용자 승인에 따라 **공식 Responses base64 출력만** 받는다. URL-only 출력은 `502 upstream_error`, 추가 GET 0회다. 임의 파일 host allowlist·다운로더·다른 endpoint fallback을 만들지 않았다.
+- 공식 Muse Image edits의 base64 출력만 받는다. URL-only 출력은 `502 upstream_error`, 추가 GET 0회다. 임의 파일 host allowlist·다운로더·다른 endpoint fallback을 만들지 않았다. 아래 2026-11-04 절은 전환 전 관측 기록이다.
 - `POST /v1/route`: FOSSGIS foot 응답 첫 경로, legs 순서의 steps와 2개 snapped waypoints를 변환한다. 원래 destination을 재작성하거나 가짜 직선을 만들지 않는다. 단일 worker/event loop에서 process-wide scheduler를 공유하며 queue와 transport 전체에 15초 deadline을 적용한다. 실제 HTTP 시작 간격을 보수적으로 보장하려고 이전 attempt가 끝난 시각부터 1초를 기다린다. 자동 retry는 없다.
 - mock은 `(scenario, operation, 01)`만 사용한다. 입력 실제 파일 검사 후 matching하며 누락 녹화는 501이다. ignore는 유효성 검사를 우회하지 않는다.
 
@@ -20,12 +28,12 @@
 | [Meta speech-to-text](https://dev.meta.ai/docs/speech-to-text) | `/v1/asr/transcribe`, request/audio multipart, WAV PCM16 mono 16/24kHz, PUSH_TO_TALK, 응답 `transcript` |
 | [Meta overview](https://dev.meta.ai/docs/overview) | Standard `muse-spark-1.3`, `muse-image-1.0`, `muse-voice-transcribe-1.0` |
 | [Meta structured output](https://dev.meta.ai/docs/structured-output) | Responses는 `text.format`; Chat의 `response_format`과 혼용하지 않음 |
-| [Meta image generation](https://dev.meta.ai/docs/image-generation) | interleaved input_image 순서, `output[].image_generation_call.result` base64, output_format PNG, low reasoning, 내부 도구 false 제어, size는 정확한 픽셀 수가 아닌 비율 |
+| [Meta image generation](https://dev.meta.ai/docs/image-generation) | edits `images` 순서, `data[0].b64_json`, PNG/low reasoning, 내부 `tool_enablement` false 제어, size는 정확한 픽셀 수가 아닌 비율 |
 | [Meta images schemas](https://dev.meta.ai/docs/api-reference/images/schemas) | WxH 문자열 비율; 고정된 3개 aspect ratio enum을 임의로 가정하지 않음 |
 | [Meta Responses schemas](https://dev.meta.ai/docs/api-reference/responses/schemas) | store:false, safety_identifier, input_image, structured output |
 | [FOSSGIS about/usage](https://routing.openstreetmap.de/about.html) | 최대 1req/s, 유효한 User-Agent, 무거운 이용/스크래핑 금지, provider 자체 경로 요청 로그 존재 |
 
-Voice `languageBias:["English"]`는 공식 문서상 **힌트**이며 강제 영어 변환이나 번역 옵션이 아니다. Dedicated Voice에 지원 근거가 없는 store/safety 필드를 넣지 않았다. 이미지 size는 self의 WxH를 그대로 사용하되 공식 가이드의 최대 비율 16:1/1:16로 제한한다. 출력 픽셀 크기·비율 정확도·머리 마스킹 유지 여부는 실제 API에서 미확인이다. 공식 Responses 경로에 URL-only 출력 형식/파일 host 근거가 없어 승인받은 base64 cutover를 적용했다.
+Voice `languageBias:[\"English\"]`는 공식 문서상 **힌트**이며 강제 영어 변환이나 번역 옵션이 아니다. Dedicated Voice/Image에 지원 근거가 없는 store/safety 필드를 넣지 않는다. 이미지 size는 self의 WxH를 그대로 사용하되 공식 가이드의 최대 비율 16:1/1:16로 제한한다. 실제 출력 크기와 생성 성공은 위 2026-11-05 절을 따르며 머리 마스킹 유지/픽셀 정렬/품질은 미확인이다.
 
 ## 최종 MacBook 관측
 

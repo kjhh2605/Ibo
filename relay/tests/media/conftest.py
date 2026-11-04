@@ -73,8 +73,7 @@ def text_output(body):
 
 
 def image_output(data=None):
-    return {'status': 'completed', 'output': [{'type': 'image_generation_call',
-            'status': 'completed', 'result': image()['data'] if data is None else data}]}
+    return {'data': [{'b64_json': image()['data'] if data is None else data}], 'output_format': 'png'}
 
 
 def osrm_output():

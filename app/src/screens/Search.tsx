@@ -452,6 +452,11 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
     const current = lifecycle.current;
     let active = true;
     let handle: string | null = null;
+    if (!tapping) {
+      setPreparing(false);
+      setPrepareError(null);
+      return;
+    }
     setPreparing(true);
     setPrepareError(null);
     const prepared = services.segmenter.prepare({asset}).then(result => {
@@ -472,7 +477,7 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
       if (current.handle === handle) current.handle = null;
       void release().catch(() => say('On-device selection resources could not be released.'));
     };
-  }, [asset, services, prepareAttempt, say]);
+  }, [asset, services, prepareAttempt, tapping, say]);
 
   const clearTap = () => {
     const current = lifecycle.current;
@@ -545,7 +550,8 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
   const complete = () => {
     const current = lifecycle.current;
     if (!current.live || !chosen || !maskReady || current.save || current.tap || atLimit) return;
-    const candidate = {...chosen, label: route.concept ?? 'Picked item'};
+    // Search concepts allow 160 characters; persisted piece labels allow 120.
+    const candidate = {...chosen, label: (route.concept ?? 'Picked item').trim().slice(0, 120).trimEnd()};
     setSaveError(null);
     setSaving(true);
     const task = (async () => {
@@ -578,8 +584,8 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
     </HStack>}
     <PhotoSurface asset={asset} candidates={visibleCandidates} selected={selected} cache={cache} point={tapping ? point : null} disabled={saving || (tapping && (preparing || segmenting || Boolean(prepareError)))} onTap={tapping ? tap : undefined} onSelect={tapping ? undefined : setSelected} onReady={onReady} />
     {tapping && !point && <Text type="label">Tap the item in the photo</Text>}
-    {preparing && <Text role="status">Preparing on-device item selection…</Text>}
-    {prepareError && <Problem message={errorMessage(prepareError)} retry={() => setPrepareAttempt(value => value + 1)} />}
+    {tapping && preparing && <Text role="status">Preparing on-device item selection…</Text>}
+    {tapping && prepareError && <Problem message={errorMessage(prepareError)} retry={() => setPrepareAttempt(value => value + 1)} />}
     {segmenting && <Text role="status">Outlining this area on your device…</Text>}
     {selectionError && <Problem message={errorMessage(selectionError)} retry={selectionError === 'cleanup_failed' && !point ? clearTap : point && !prepareError ? () => tap(point) : undefined} />}
     {choices.length > 0 && <VStack gap={3}>
@@ -590,13 +596,13 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
       </Button>)}
       {choices.length > 3 && <Button label={showAll ? 'Show first 3' : `Show all (${choices.length})`} variant="secondary" isDisabled={saving} onClick={() => {setShowAll(value => !value); if (showAll && selected && !choices.slice(0, 3).some(choice => choice.candidate.id === selected)) setSelected(null);}} />}
     </VStack>}
-    {matches.length > 0 && <Button label={tapping ? 'Show matches' : 'Not here? Tap it'} variant="secondary" isDisabled={saving} onClick={() => {clearTap(); setTapping(value => !value); setShowAll(false); if (tapping) setSelected(matches[0]?.id ?? null);}} />}
+    {matches.length > 0 && <Button label={tapping ? 'Show matches' : 'Not here? Tap it'} variant="secondary" isDisabled={saving || segmenting || preparing} onClick={() => {clearTap(); setTapping(value => !value); setShowAll(false); if (tapping) setSelected(matches[0]?.id ?? null);}} />}
     {tapping && (tapChoices.length > 0 || segmenting) && <Button label="Cancel area selection" variant="ghost" isDisabled={saving} onClick={clearTap} />}
     {atLimit && <Problem message="Your outfit already has five companion pieces. Return to the outfit to remove one first." />}
     {saveError && <Problem message={errorMessage(saveError)} retry={maskReady && !atLimit ? complete : undefined} />}
     {chosen && !route.concept && <Text type="supporting">This will be saved as “Picked item” while its name and category are prepared. You can edit them after saving.</Text>}
     <Button label={route.mode === 'wardrobe' ? 'Add to wardrobe' : route.mode === 'outfit' ? 'Add to outfit' : 'Use this item'} variant="primary" isLoading={saving} isDisabled={!chosen || !maskReady || segmenting || atLimit} onClick={complete} />
-    <Button label={route.mode === 'outfit' ? 'Cancel and return to outfit' : 'Cancel'} variant="ghost" onClick={() => {if (route.mode === 'outfit') popTo('outfit'); else back();}} />
+    <Button label={route.mode === 'outfit' ? 'Cancel and return to outfit' : 'Cancel'} variant="ghost" isDisabled={saving} onClick={() => {if (route.mode === 'outfit') popTo('outfit'); else back();}} />
   </VStack>;
 }
 

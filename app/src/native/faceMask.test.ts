@@ -5,6 +5,15 @@ import type {HeadGeometry} from './faceMask';
 import {binaryPixels, decodeWebRaster, encodeWebPng} from './segmenter';
 import type {WebRaster} from './segmenter';
 import {createMockContext} from './web/context';
+import {parseCompositionConfig} from './compositionConfig';
+import type {FaceMaskConfig} from './compositionConfig';
+import type * as CompositionConfigModule from './compositionConfig';
+
+const testConfig = vi.hoisted(() => ({schemaVersion: 1, configVersion: 'local-composition-uncalibrated-v1', mode: 'a', compositionThresholds: null, provenance: null} as FaceMaskConfig));
+vi.mock('./compositionConfig', async importOriginal => {
+  const actual = await importOriginal<typeof CompositionConfigModule>();
+  return {...actual, localCompositionConfig: testConfig};
+});
 
 const storage = vi.hoisted(() => ({files: new Map<string, Blob>(), next: 0, self: null as SelfPhoto | null, sidecar: null as string | null, retained: 0}));
 vi.mock('../data/web/repository', () => ({
@@ -52,8 +61,11 @@ async function fixtureRuntime() {
   }});
   return {context, face: createWebFaceMask(context), asset: {id: 'self', file: 'blob:source', w, h}};
 }
-beforeEach(() => { storage.files.clear(); storage.next = 0; storage.self = null; storage.sidecar = null; storage.retained = 0; });
-afterEach(() => { vi.unstubAllGlobals(); });
+beforeEach(() => {
+  storage.files.clear(); storage.next = 0; storage.self = null; storage.sidecar = null; storage.retained = 0;
+  Object.assign(testConfig, {schemaVersion: 1, configVersion: 'local-composition-uncalibrated-v1', mode: 'a', compositionThresholds: null, provenance: null});
+});
+afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
 
 const thresholds = {version: 'unit-boundaries-not-calibration', maxBoundaryColorDeltaE: 10, maxBoundaryOffsetRatio: 0.1};
 const exact = {neckColorDeltaE95: 10, shoulderColorDeltaE95: 10, neckOffsetRatio95: 0.1, shoulderOffsetRatio95: 0.1};
@@ -110,12 +122,23 @@ describe('binary silhouette and source-contribution privacy', () => {
     const composed = composeRaster(source, provider, found, found, true);
     expect(Array.from(composed.rgba.slice((30 * w + 80) * 4, (30 * w + 80) * 4 + 4))).toEqual([70, 120, 170, 255]);
     const at = (11 * w + 52) * 4;
-    expect(Array.from(composed.rgba.slice(at, at + 4))).toEqual([98, 124, 148, 255]);
+    expect(Array.from(composed.rgba.slice(at, at + 4))).toEqual([70, 120, 170, 255]);
     expect(provider.rgba[(30 * w + 80) * 4]).toBe(250);
+    expect(() => composeRaster(source, provider, found, found, true, found.headBox[1] + found.headBox[3])).toThrow();
+    expect(decideComposition(measureComposition(source, provider, found, found, 62), thresholds)).toMatchObject({passed: false, decision: 'metrics_unavailable'});
+    const uncovered = {...found, headBox: [found.headBox[0] - 1, found.headBox[1], found.headBox[2] + 1, found.headBox[3]] as HeadGeometry['headBox']};
+    expect(decideComposition(measureComposition(source, provider, found, uncovered), thresholds)).toMatchObject({passed: false, decision: 'metrics_unavailable'});
+    expect(() => composeRaster(source, provider, found, uncovered, true)).toThrow();
   });
 });
 
 describe('FaceMask web runtime', () => {
+  it('rejects fixture threshold overrides rather than enabling synthetic calibration', async () => {
+    const {face, context, asset} = await fixtureRuntime();
+    context.setFixture('FaceMask.config', {mode: 'a', compositionThresholds: thresholds});
+    await expect(face.register({asset})).rejects.toMatchObject({code: 'invalid_argument'});
+    expect(storage.self).toBeNull();
+  });
   it('registers actual metadata-free masks, evaluates without replacement, and retains the previous good self on rejection', async () => {
     const {face, context, asset} = await fixtureRuntime();
     const registered = await face.register({asset});
@@ -147,6 +170,39 @@ describe('FaceMask web runtime', () => {
     context.setFixture('Segmenter.asset:blob:provider', {person: masks(noPerson()), taps: []});
     expect(await face.compose({providerFile: 'blob:provider', selfUpdatedAt: registered.selfPhoto.updatedAt})).toMatchObject({ok: false, reason: 'unsafe_output', metrics: {decision: 'not_calibrated'}});
     expect(await face.compose({providerFile: 'blob:provider', selfUpdatedAt: 0})).toMatchObject({ok: false, reason: 'self_photo_changed'});
+  });
+  it.each([
+    {matching: true, debug: true, restored: true},
+    {matching: false, debug: true, restored: false},
+    {matching: true, debug: false, restored: false},
+    {matching: false, debug: false, restored: false},
+  ])('gates provisional restoration by stored bytes and build: %j', async ({matching, debug, restored}) => {
+    vi.stubEnv('DEV', debug);
+    // A verification environment flag alone must never enable a production web build.
+    vi.stubEnv('VITE_SF_VERIFICATION', '1');
+    const {face, asset} = await fixtureRuntime(), registered = await face.register({asset});
+    if (!registered.ok) throw new Error('fixture failed');
+    const savedSelf = structuredClone(storage.self), sidecar = storage.sidecar;
+    const originalBlob = storage.files.get(registered.selfPhoto.file)!;
+    const digest = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', await originalBlob.arrayBuffer())), byte => byte.toString(16).padStart(2, '0')).join('');
+    const otherOriginal = await encodeWebPng(w, h, image([1, 2, 3, 255]).rgba);
+    const otherDigest = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', await otherOriginal.arrayBuffer())), byte => byte.toString(16).padStart(2, '0')).join('');
+    const evidence = 'e'.repeat(64), measured = measureComposition(image(), image([90, 140, 190, 255]), geometry(), geometry());
+    Object.assign(testConfig, parseCompositionConfig({
+      schemaVersion: 1, configVersion: `local-composition-provisional-${evidence}`, mode: 'a',
+      compositionThresholds: {version: `provisional-${evidence.slice(0, 16)}`, maxBoundaryColorDeltaE: Math.max(measured.neckColorDeltaE95!, measured.shoulderColorDeltaE95!), maxBoundaryOffsetRatio: Math.max(measured.neckOffsetRatio95!, measured.shoulderOffsetRatio95!)},
+      provenance: {kind: 'provisional-synthetic', sourceRun: 'runtime-unit-only', evidenceSha256: evidence, sourceImageSha256: matching ? digest : otherDigest, providerSamples: 1, humanApproved: false},
+    }));
+    storage.files.set('blob:old-result', await encodeWebPng(w, h, image([5, 6, 7, 255]).rgba));
+    const before = new Map(storage.files);
+    const result = await face.compose({providerFile: 'blob:provider', selfUpdatedAt: registered.selfPhoto.updatedAt});
+    expect(result).toMatchObject({ok: true, faceless: !restored, metrics: {passed: restored, decision: restored ? 'composited' : 'not_calibrated', thresholdVersion: restored ? `provisional-${evidence.slice(0, 16)}` : null}});
+    if (!result.ok) throw new Error('composition failed');
+    expect((await decodeWebRaster(storage.files.get(result.file)!)).h).toBe(restored ? h : 178);
+    expect(storage.self).toEqual(savedSelf);
+    expect(storage.sidecar).toBe(sidecar);
+    for (const [file, blob] of before) expect(storage.files.get(file)).toBe(blob);
+    expect(storage.retained).toBe(0);
   });
   it('faceMaskNoNetworkOnSuccessFailureCancel has no fetch calls for success, injected cancellation, or retry', async () => {
     const fetch = vi.fn(); vi.stubGlobal('fetch', fetch);

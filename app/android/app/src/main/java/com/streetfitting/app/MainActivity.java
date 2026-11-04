@@ -1,7 +1,9 @@
 package com.streetfitting.app;
 
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
+import android.webkit.WebSettings;
 import com.getcapacitor.BridgeActivity;
 import com.streetfitting.app.plugins.shopping.ShoppingSessionPlugin;
 import com.streetfitting.app.plugins.capture.CapturePlugin;
@@ -26,6 +28,10 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(StorePlugin.class);
         registerPlugin(SfAuthPlugin.class);
         super.onCreate(savedInstanceState);
+        if ((getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
+            // The debug network-security config still restricts HTTP to local relay hosts.
+            getBridge().getWebView().getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        }
     }
     @Override
     protected void onNewIntent(Intent intent) {

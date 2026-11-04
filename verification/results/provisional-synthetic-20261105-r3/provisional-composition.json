@@ -1,0 +1,417 @@
+{
+  "schemaVersion": 1,
+  "kind": "provisional-synthetic",
+  "syntheticOnly": true,
+  "humanApproved": false,
+  "sourceRun": "provisional-synthetic-20261105-r3",
+  "sourceImage": {
+    "sha256": "893e383e306cee4d4a07318ca36efef63a9ca9de0cfeea63535c6a1c53a993f8",
+    "bytes": 404013,
+    "cacheRun": "provisional-synthetic-20261105"
+  },
+  "context": {
+    "sources": {
+      "scripts/e2e/quality.py": "78d792cc1e821aad0639d667f8e2a4459b608f27b4945a5e4d73f8c0ed6f6574",
+      "scripts/e2e/instrumentation.py": "4cb271b25799d145db7541fb2670df5c76419ad6ef9956136cd99f45120fd92a",
+      "scripts/e2e/android-src/com/streetfitting/verification/NativeVerificationTest.java": "af823472797503387a2ef5ad87a92fd7dcb82dff3cffb74af7991b35f3cd9fa3",
+      "relay/app/routes/tryon.py": "c8d11f862a496369455c19c62de56b346d86bea4ab1ad2fc64ec7f5d80369037",
+      "relay/app/meta_client.py": "23a721ad90fee461ddab799da5e3dc7e97c0df1613077b36a2465235020c9915",
+      "app/android/app/src/main/java/com/streetfitting/app/plugins/facemask/BoundaryMetrics.java": "2593eb4c8bbe311c22307aa34979bfdcb1f34891bf0a73fa2d11a2436af41d50",
+      "app/android/app/src/main/java/com/streetfitting/app/plugins/facemask/FaceMaskCore.java": "64cdc864006703d99a54e00c97e6c53b35fe808d1c21ebbc57556401fa9b5f43",
+      "app/android/app/src/main/java/com/streetfitting/app/plugins/facemask/HeadGeometry.java": "00491ee6528cc200cc1dfd5184edc26037560528a32d22c7e0107237eb7ad44d",
+      "verification/fixtures/images/self/positive/calibration-hat.png": "8cae4180d99e2673231e06eae94375468ec7373906cec7b5a6bfce4592b5b2a4"
+    }
+  },
+  "fit": [
+    {
+      "id": "fit-max-companions-rejected",
+      "sourceImageSha256": "893e383e306cee4d4a07318ca36efef63a9ca9de0cfeea63535c6a1c53a993f8",
+      "providerSha256": "99741c011db11b08596affb0ce6fd5e3790e50e512a9c8941b987658c2fbadd3",
+      "providerBytes": 2918996,
+      "localCacheRun": "provisional-synthetic-20261105",
+      "evaluation": {
+        "ok": true,
+        "faceless": true,
+        "compositionEligible": false,
+        "previewWritten": false,
+        "metrics": {
+          "neckColorDeltaE95": null,
+          "shoulderColorDeltaE95": null,
+          "neckOffsetRatio95": null,
+          "shoulderOffsetRatio95": null,
+          "thresholdVersion": null,
+          "decision": "not_calibrated",
+          "passed": false
+        },
+        "status": "passed"
+      },
+      "measuredAt": "2026-11-04T20:36:08.729155+00:00",
+      "providerUnchanged": true,
+      "previewAvailable": false,
+      "status": "passed",
+      "statusCode": 200,
+      "maskMode": "a",
+      "reasoning": "low",
+      "maskCheck": {
+        "kind": "native-auto-mask",
+        "protectedPixelsOpaque": true
+      },
+      "metricsSha256": "6637321fb903cc4e948d3fea7b6610f40c873ed8acb5ed68f4ab7ec3423ed4f6",
+      "freezeSha256": null,
+      "thresholds": null,
+      "review": {
+        "kind": "assistant-visual",
+        "humanApproved": false,
+        "reviewer": "coding-assistant",
+        "reviewedAt": "2026-11-04T20:36:58.201489+00:00",
+        "providerSha256": "99741c011db11b08596affb0ce6fd5e3790e50e512a9c8941b987658c2fbadd3",
+        "previewSha256": null,
+        "acceptableComposition": false,
+        "note": "Not approved: geometry gate produced no safe composition preview; keep faceless fallback."
+      }
+    },
+    {
+      "id": "fit-target-original",
+      "sourceImageSha256": "893e383e306cee4d4a07318ca36efef63a9ca9de0cfeea63535c6a1c53a993f8",
+      "providerSha256": "d3a229ffe8946ae480c0bf2ca49406fd4f846dac3d201b0a42b4d52b7d66ff3c",
+      "providerBytes": 2804960,
+      "localCacheRun": "provisional-synthetic-20261105",
+      "evaluation": {
+        "ok": true,
+        "faceless": true,
+        "compositionEligible": true,
+        "previewWritten": true,
+        "metrics": {
+          "neckColorDeltaE95": 39.55656434625901,
+          "shoulderColorDeltaE95": 34.27526643248424,
+          "neckOffsetRatio95": 0.005570541385784471,
+          "shoulderOffsetRatio95": 0.008201463426494002,
+          "thresholdVersion": null,
+          "decision": "not_calibrated",
+          "passed": false
+        },
+        "status": "passed"
+      },
+      "measuredAt": "2026-11-04T20:36:11.657679+00:00",
+      "providerUnchanged": true,
+      "previewAvailable": true,
+      "previewSha256": "ad9b081d2b6abcf5fbfc0b9660a80ab242680c8f14bb365e15ce32b9c3138091",
+      "previewBytes": 2321960,
+      "previewCacheRun": "provisional-synthetic-20261105",
+      "status": "passed",
+      "statusCode": 200,
+      "maskMode": "a",
+      "reasoning": "low",
+      "maskCheck": {
+        "kind": "native-auto-mask",
+        "protectedPixelsOpaque": true
+      },
+      "metricsSha256": "51078e5108f276e67ef35afdeab43c011c222ec45ce61c95df8bff62acf9d786",
+      "freezeSha256": null,
+      "thresholds": null,
+      "review": {
+        "kind": "assistant-visual",
+        "humanApproved": false,
+        "reviewer": "coding-assistant",
+        "reviewedAt": "2026-11-04T20:36:58.201489+00:00",
+        "providerSha256": "d3a229ffe8946ae480c0bf2ca49406fd4f846dac3d201b0a42b4d52b7d66ff3c",
+        "previewSha256": "ad9b081d2b6abcf5fbfc0b9660a80ab242680c8f14bb365e15ce32b9c3138091",
+        "acceptableComposition": true,
+        "note": "Original synthetic face and hat restored; neck aligned without visible rectangular boundary."
+      }
+    },
+    {
+      "id": "fit-target-fresh",
+      "sourceImageSha256": "893e383e306cee4d4a07318ca36efef63a9ca9de0cfeea63535c6a1c53a993f8",
+      "providerSha256": "30c38a1e1fcdc086045ceb58d6d8b08b9e871631a2c7c352ff2f16e2fd97b8c8",
+      "providerBytes": 2858787,
+      "localCacheRun": "provisional-synthetic-20261105",
+      "evaluation": {
+        "ok": true,
+        "faceless": true,
+        "compositionEligible": true,
+        "previewWritten": true,
+        "metrics": {
+          "neckColorDeltaE95": 42.042525439201285,
+          "shoulderColorDeltaE95": 31.41436662589029,
+          "neckOffsetRatio95": 0.005143686098309953,
+          "shoulderOffsetRatio95": 0.004413114062683495,
+          "thresholdVersion": null,
+          "decision": "not_calibrated",
+          "passed": false
+        },
+        "status": "passed"
+      },
+      "measuredAt": "2026-11-04T20:36:14.648107+00:00",
+      "providerUnchanged": true,
+      "previewAvailable": true,
+      "previewSha256": "e7c59a758dcca60301ab1ce8661e9b157c62d5cf1f75bdada41f41105a682169",
+      "previewBytes": 2372649,
+      "previewCacheRun": "provisional-synthetic-20261105",
+      "status": "passed",
+      "statusCode": 200,
+      "maskMode": "a",
+      "reasoning": "low",
+      "maskCheck": {
+        "kind": "native-auto-mask",
+        "protectedPixelsOpaque": true
+      },
+      "metricsSha256": "da0e34269afdaa8dc0d9355d491f3740c21a9879c81a7ee4add400a11934ffa1",
+      "freezeSha256": null,
+      "thresholds": null,
+      "review": {
+        "kind": "assistant-visual",
+        "humanApproved": false,
+        "reviewer": "coding-assistant",
+        "reviewedAt": "2026-11-04T20:36:58.201489+00:00",
+        "providerSha256": "30c38a1e1fcdc086045ceb58d6d8b08b9e871631a2c7c352ff2f16e2fd97b8c8",
+        "previewSha256": "e7c59a758dcca60301ab1ce8661e9b157c62d5cf1f75bdada41f41105a682169",
+        "acceptableComposition": true,
+        "note": "Original synthetic face and hat restored; neck aligned without visible rectangular boundary."
+      }
+    },
+    {
+      "id": "fit-target-previous-heldout",
+      "sourceImageSha256": "893e383e306cee4d4a07318ca36efef63a9ca9de0cfeea63535c6a1c53a993f8",
+      "providerSha256": "044a91f045b1f1b9f11af4cc68bab418d714b086541bb11bd061dc78a826d947",
+      "providerBytes": 2751314,
+      "localCacheRun": "provisional-synthetic-20261105",
+      "evaluation": {
+        "ok": true,
+        "faceless": true,
+        "compositionEligible": true,
+        "previewWritten": true,
+        "metrics": {
+          "neckColorDeltaE95": 39.36767591410231,
+          "shoulderColorDeltaE95": 34.08761811016827,
+          "neckOffsetRatio95": 0.008125797174575506,
+          "shoulderOffsetRatio95": 0.01087116327113919,
+          "thresholdVersion": null,
+          "decision": "not_calibrated",
+          "passed": false
+        },
+        "status": "passed"
+      },
+      "measuredAt": "2026-11-04T20:44:11.223545+00:00",
+      "providerUnchanged": true,
+      "previewAvailable": true,
+      "previewSha256": "469ff11b8ad02cce4f6f1b0c7627bbde45cc98745ef2f2221950fbf198c7c945",
+      "previewBytes": 2289705,
+      "previewCacheRun": "provisional-synthetic-20261105",
+      "status": "passed",
+      "statusCode": 200,
+      "maskMode": "a",
+      "reasoning": "low",
+      "maskCheck": {
+        "kind": "native-auto-mask",
+        "protectedPixelsOpaque": true
+      },
+      "metricsSha256": "2bacfa19c9868a427492c57921d41e616356efe466e56ef153fd64968370376d",
+      "freezeSha256": null,
+      "thresholds": null,
+      "review": {
+        "kind": "assistant-visual",
+        "humanApproved": false,
+        "reviewer": "coding-assistant",
+        "reviewedAt": "2026-11-04T20:44:26.704921+00:00",
+        "providerSha256": "044a91f045b1f1b9f11af4cc68bab418d714b086541bb11bd061dc78a826d947",
+        "previewSha256": "469ff11b8ad02cce4f6f1b0c7627bbde45cc98745ef2f2221950fbf198c7c945",
+        "acceptableComposition": true,
+        "note": "Restored synthetic face and hat remain aligned; no visible rectangular privacy patch or doubled head. This was rejected by the previous frozen offset threshold and is fitting data only in this new iteration."
+      }
+    },
+    {
+      "id": "fit-r2-geometry-rejected",
+      "sourceImageSha256": "893e383e306cee4d4a07318ca36efef63a9ca9de0cfeea63535c6a1c53a993f8",
+      "providerSha256": "3ee28d965b072d3831387557c68ebc9477574d53e8794d167680c8d0b15f4b39",
+      "providerBytes": 2822616,
+      "localCacheRun": "provisional-synthetic-20261105",
+      "evaluation": {
+        "ok": true,
+        "faceless": true,
+        "compositionEligible": false,
+        "previewWritten": false,
+        "metrics": {
+          "neckColorDeltaE95": null,
+          "shoulderColorDeltaE95": null,
+          "neckOffsetRatio95": null,
+          "shoulderOffsetRatio95": null,
+          "thresholdVersion": null,
+          "decision": "not_calibrated",
+          "passed": false
+        },
+        "status": "passed"
+      },
+      "measuredAt": "2026-11-04T20:47:24.415287+00:00",
+      "providerUnchanged": true,
+      "previewAvailable": false,
+      "status": "passed",
+      "statusCode": 200,
+      "maskMode": "a",
+      "reasoning": "low",
+      "maskCheck": {
+        "kind": "native-auto-mask",
+        "protectedPixelsOpaque": true
+      },
+      "metricsSha256": "6637321fb903cc4e948d3fea7b6610f40c873ed8acb5ed68f4ab7ec3423ed4f6",
+      "freezeSha256": null,
+      "thresholds": null,
+      "review": {
+        "kind": "assistant-visual",
+        "humanApproved": false,
+        "reviewer": "coding-assistant",
+        "reviewedAt": "2026-11-04T20:47:55.248968+00:00",
+        "providerSha256": "3ee28d965b072d3831387557c68ebc9477574d53e8794d167680c8d0b15f4b39",
+        "previewSha256": null,
+        "acceptableComposition": false,
+        "note": "Native geometry rejects composition; no safe restored preview exists, so keep faceless fallback."
+      }
+    },
+    {
+      "id": "fit-target-closed-collar",
+      "sourceImageSha256": "893e383e306cee4d4a07318ca36efef63a9ca9de0cfeea63535c6a1c53a993f8",
+      "providerSha256": "7934bf5a0d4dff7daf43a7ac2653a8c73752879deb3e8e15056b7381f653c86f",
+      "providerBytes": 2871076,
+      "localCacheRun": "provisional-synthetic-20261105",
+      "evaluation": {
+        "ok": true,
+        "faceless": true,
+        "compositionEligible": true,
+        "previewWritten": true,
+        "metrics": {
+          "neckColorDeltaE95": 52.92406593298473,
+          "shoulderColorDeltaE95": 34.39243083531369,
+          "neckOffsetRatio95": 0.00557012626034605,
+          "shoulderOffsetRatio95": 0.007259430510952329,
+          "thresholdVersion": null,
+          "decision": "not_calibrated",
+          "passed": false
+        },
+        "status": "passed"
+      },
+      "measuredAt": "2026-11-04T20:47:27.333535+00:00",
+      "providerUnchanged": true,
+      "previewAvailable": true,
+      "previewSha256": "9f6b1e7b6022ad31612cea2e694b6832cd24fef460cb006201a79e119e09559a",
+      "previewBytes": 2378900,
+      "previewCacheRun": "provisional-synthetic-20261105",
+      "status": "passed",
+      "statusCode": 200,
+      "maskMode": "a",
+      "reasoning": "low",
+      "maskCheck": {
+        "kind": "native-auto-mask",
+        "protectedPixelsOpaque": true
+      },
+      "metricsSha256": "5a06520a44d7ebf24517ba626472da2a097eff56797b8464b0a220ae459d27a2",
+      "freezeSha256": null,
+      "thresholds": null,
+      "review": {
+        "kind": "assistant-visual",
+        "humanApproved": false,
+        "reviewer": "coding-assistant",
+        "reviewedAt": "2026-11-04T20:47:55.249055+00:00",
+        "providerSha256": "7934bf5a0d4dff7daf43a7ac2653a8c73752879deb3e8e15056b7381f653c86f",
+        "previewSha256": "9f6b1e7b6022ad31612cea2e694b6832cd24fef460cb006201a79e119e09559a",
+        "acceptableComposition": true,
+        "note": "Original synthetic face and hat align with the closed-collar jacket; no visible rectangular boundary. Included as fit only after previous frozen color-limit rejection."
+      }
+    }
+  ],
+  "freeze": {
+    "sourceRun": "provisional-synthetic-20261105-r3",
+    "sourceImageSha256": "893e383e306cee4d4a07318ca36efef63a9ca9de0cfeea63535c6a1c53a993f8",
+    "fitSha256": "d10d6ae94dc05580466bc25c79b83ddab1f6ff5bd46e32e4caf32b86a5842033",
+    "frozenAt": "2026-11-04T20:47:55.249254+00:00",
+    "thresholds": {
+      "maxBoundaryColorDeltaE": 52.92406593298473,
+      "maxBoundaryOffsetRatio": 0.01087116327113919
+    }
+  },
+  "freezeSha256": "028d6492dbd818fc149bdbd02f59a995e6f73404c79431a0af39df147484f22d",
+  "freezeFile": "verification/results/provisional-synthetic-20261105-r3/provisional-freeze.json",
+  "validation": [
+    {
+      "id": "heldout-target-r3",
+      "sourceImageSha256": "893e383e306cee4d4a07318ca36efef63a9ca9de0cfeea63535c6a1c53a993f8",
+      "providerSha256": "8cb34918f322ff6329e07b9d7e376fad1fb61659260ad33ce1fed877de25922e",
+      "providerBytes": 2825171,
+      "localCacheRun": "provisional-synthetic-20261105",
+      "evaluation": {
+        "ok": true,
+        "faceless": false,
+        "compositionEligible": true,
+        "previewWritten": true,
+        "metrics": {
+          "neckColorDeltaE95": 45.26168998977236,
+          "shoulderColorDeltaE95": 32.4748799604572,
+          "neckOffsetRatio95": 0.005144298130194389,
+          "shoulderOffsetRatio95": 0.00770932987311939,
+          "thresholdVersion": "provisional-fit-bbd710933406f97e",
+          "decision": "composited",
+          "passed": true
+        },
+        "status": "passed"
+      },
+      "measuredAt": "2026-11-04T20:48:29.034482+00:00",
+      "providerUnchanged": true,
+      "previewAvailable": true,
+      "previewSha256": "8ffc335d05cbe84d098e4c4e612a5f33839e69d66e67f30a0f3fc1927547bbab",
+      "previewBytes": 2339201,
+      "previewCacheRun": "provisional-synthetic-20261105",
+      "status": "passed",
+      "statusCode": 200,
+      "maskMode": "a",
+      "reasoning": "low",
+      "maskCheck": {
+        "kind": "native-auto-mask",
+        "protectedPixelsOpaque": true
+      },
+      "metricsSha256": "6208e948d64226f10cf03dc43e1a06b36d8b68199b4aa94322d123e69e63f631",
+      "freezeSha256": "028d6492dbd818fc149bdbd02f59a995e6f73404c79431a0af39df147484f22d",
+      "thresholds": {
+        "maxBoundaryColorDeltaE": 52.92406593298473,
+        "maxBoundaryOffsetRatio": 0.01087116327113919
+      },
+      "review": {
+        "kind": "assistant-visual",
+        "humanApproved": false,
+        "reviewer": "coding-assistant",
+        "reviewedAt": "2026-11-04T20:49:02.228607+00:00",
+        "providerSha256": "8cb34918f322ff6329e07b9d7e376fad1fb61659260ad33ce1fed877de25922e",
+        "previewSha256": "8ffc335d05cbe84d098e4c4e612a5f33839e69d66e67f30a0f3fc1927547bbab",
+        "acceptableComposition": true,
+        "note": "Frozen thresholds passed on a distinct later Meta output. Original synthetic face and hat are aligned; no visible privacy rectangle or doubled head."
+      }
+    }
+  ],
+  "automaticMaskProof": {
+    "kind": "native-auto-mask-not-human-ground-truth",
+    "maskedSha256": "fb3443e2a50b83e5625bc20f7b1740d4a1a845d5d06aca369bbb093809f5721b",
+    "headMaskSha256": "fbf936085c2a5f42f8c0073348f4b87511de5ffde3f1155e524c43cdf91cbae6",
+    "protectedPixels": 18354,
+    "protectedRgba": [
+      127,
+      127,
+      127,
+      255
+    ],
+    "outsideProtectedUnchanged": true,
+    "canonicalSourcePixelsMatchSyntheticFixture": true
+  },
+  "generationAccounting": {
+    "newLiveCallsThisSession": 6,
+    "newProviderOutputsRetained": 5,
+    "unsafeOutputNotSaved": 1,
+    "previousProviderOutputsReused": 2,
+    "priorUnsuccessfulAttempts": [
+      "verification/results/provisional-synthetic-20261105/calibration-attempt.json",
+      "verification/results/provisional-synthetic-20261105-r2/calibration-attempt.json"
+    ]
+  },
+  "limits": [
+    "Only exact stored synthetic source bytes in debug builds.",
+    "Assistant visual review is not human approval or real-person privacy validation.",
+    "New outputs may remain faceless or be rejected by geometry/threshold safety checks."
+  ]
+}

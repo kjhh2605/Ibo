@@ -1,0 +1,33 @@
+{
+  "source": "installed native FaceMask.compose, previously generated actual Muse outputs; no new provider calls",
+  "results": [
+    {
+      "resultId": "d5e1ba38-a16e-453e-aca9-bab0806601a0",
+      "faceless": true,
+      "ok": true,
+      "metrics": {
+        "neckColorDeltaE95": 55.75562265080442,
+        "shoulderColorDeltaE95": 34.27388646613556,
+        "neckOffsetRatio95": 0.22177434262061563,
+        "shoulderOffsetRatio95": 0.21412929934842453,
+        "thresholdVersion": null,
+        "passed": false,
+        "decision": "not_calibrated"
+      }
+    },
+    {
+      "resultId": "8feed674-cb18-4335-93aa-5f11c79b70a8",
+      "faceless": true,
+      "ok": true,
+      "metrics": {
+        "neckColorDeltaE95": 39.55656434625901,
+        "shoulderColorDeltaE95": 34.27526643248424,
+        "neckOffsetRatio95": 0.005570541385784471,
+        "shoulderOffsetRatio95": 0.008201463426494002,
+        "thresholdVersion": null,
+        "passed": false,
+        "decision": "not_calibrated"
+      }
+    }
+  ]
+}

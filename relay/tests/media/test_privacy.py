@@ -18,19 +18,22 @@ from .conftest import HEADERS, ROUTE, Verifier, audio, fitting, image, image_out
     ('describe/piece', {'image': image()}, text_output({'label': 'Blue coat', 'category': 'coat'})),
     ('describe/storefront', {'image': image()}, text_output({'description': 'A blue awning.'})),
     ('tryon', fitting(), image_output())])
-def test_responses_store_false_no_tools_pseudonymous_id(provider, path, body, result):
+def test_stateless_provider_requests_no_tools_pseudonymous_id(provider, path, body, result):
     client, calls = provider(result)
     assert client.post('/v1/' + path, json=body).status_code == 200
     payload = json.loads(calls[0].content)
-    assert payload['store'] is False
-    assert re.fullmatch('[a-f0-9]{64}', payload['safety_identifier'])
     assert 'private-media-user' not in calls[0].content.decode()
     if path != 'tryon':
+        assert calls[0].url == 'https://api.meta.ai/v1/responses'
+        assert payload['store'] is False
+        assert re.fullmatch('[a-f0-9]{64}', payload['safety_identifier'])
         assert payload['tools'] == []
     else:
-        tool = payload['tools'][0]
-        assert tool['type'] == 'image_generation'
-        assert all(tool[name] is False for name in ('enable_image_search', 'enable_web_search', 'enable_shell'))
+        assert calls[0].url == 'https://api.meta.ai/v1/images/edits'
+        assert 'store' not in payload and 'safety_identifier' not in payload
+        assert re.fullmatch('[a-f0-9]{64}', payload['user'])
+        assert all(payload['tool_enablement'][name] is False
+                   for name in ('enable_image_search', 'enable_web_search', 'enable_shell'))
 
 
 @pytest.mark.parametrize('log_text', [False, True])

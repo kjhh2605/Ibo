@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "configVersion": "local-composition-provisional-0e136226ab50f7fd52bea593ba2dbf7496aa6ceb5adaeca35ce54d80c396d0f2",
+  "mode": "a",
+  "compositionThresholds": {
+    "version": "provisional-0e136226ab50f7fd",
+    "maxBoundaryColorDeltaE": 52.92406593298473,
+    "maxBoundaryOffsetRatio": 0.01087116327113919
+  },
+  "provenance": {
+    "kind": "provisional-synthetic",
+    "sourceRun": "provisional-synthetic-20261105-r3",
+    "evidenceSha256": "0e136226ab50f7fd52bea593ba2dbf7496aa6ceb5adaeca35ce54d80c396d0f2",
+    "sourceImageSha256": "893e383e306cee4d4a07318ca36efef63a9ca9de0cfeea63535c6a1c53a993f8",
+    "providerSamples": 7,
+    "humanApproved": false
+  }
+}

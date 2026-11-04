@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-11-04T19:29:28.238757+00:00",
+  "boundary": "direct live Meta inference through production relay payloads/parsers; not HTTP/Firebase or Android E2E",
+  "syntheticOnly": true,
+  "humanApprovalClaimed": false,
+  "userOriginalUploaded": false,
+  "voiceTested": false,
+  "generatedImagesPersisted": false,
+  "operations": {
+    "spark-search": {
+      "model": "muse-spark-1.3",
+      "turnCount": 4,
+      "toolSequence": [
+        "list_visits",
+        "find_photos",
+        "extract_items"
+      ],
+      "terminal": "final",
+      "passed": true,
+      "elapsedMs": 18532,
+      "calls": [
+        {
+          "httpStatus": 200,
+          "status": "completed",
+          "outputTypes": [
+            "reasoning",
+            "function_call"
+          ],
+          "messageShapes": [],
+          "functionCalls": [
+            {
+              "name": "list_visits",
+              "status": "completed"
+            }
+          ]
+        },
+        {
+          "httpStatus": 200,
+          "status": "completed",
+          "outputTypes": [
+            "reasoning",
+            "message",
+            "function_call"
+          ],
+          "messageShapes": [
+            {
+              "status": "completed",
+              "role": "assistant",
+              "phase": "commentary",
+              "contentTypes": [
+                "output_text"
+              ]
+            }
+          ],
+          "functionCalls": [
+            {
+              "name": "find_photos",
+              "status": "completed"
+            }
+          ]
+        },
+        {
+          "httpStatus": 200,
+          "status": "completed",
+          "outputTypes": [
+            "reasoning",
+            "message",
+            "function_call"
+          ],
+          "messageShapes": [
+            {
+              "status": "completed",
+              "role": "assistant",
+              "phase": "commentary",
+              "contentTypes": [
+                "output_text"
+              ]
+            }
+          ],
+          "functionCalls": [
+            {
+              "name": "extract_items",
+              "status": "completed"
+            }
+          ]
+        },
+        {
+          "httpStatus": 200,
+          "status": "completed",
+          "outputTypes": [
+            "message"
+          ],
+          "messageShapes": [
+            {
+              "status": "completed",
+              "role": "assistant",
+              "phase": null,
+              "contentTypes": [
+                "output_text"
+              ]
+            }
+          ],
+          "functionCalls": []
+        },
+        {
+          "httpStatus": 200,
+          "status": "completed",
+          "outputTypes": [
+            "reasoning",
+            "message"
+          ],
+          "messageShapes": [
+            {
+              "status": "completed",
+              "role": "assistant",
+              "phase": null,
+              "contentTypes": [
+                "output_text"
+              ]
+            }
+          ],
+          "functionCalls": []
+        }
+      ]
+    }
+  }
+}

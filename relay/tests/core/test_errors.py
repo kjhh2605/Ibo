@@ -95,7 +95,6 @@ def test_only_allowlisted_tools_and_models(settings):
                     {'input': 'coat', 'tools': [{'type': 'function', 'name': 'execute_shell'}]}]:
         with pytest.raises(ValueError):
             client._responses_payload(Operation.SPARK, payload, 'a' * 64)
-    body = client._responses_payload(Operation.IMAGE, {'input': 'coat'}, 'a' * 64)
-    assert body['store'] is False and body['model'] == 'muse-image-1.0'
-    assert all(body['tools'][0][field] is False for field in ('enable_image_search', 'enable_web_search', 'enable_shell'))
+    with pytest.raises(ValueError):
+        client._responses_payload(Operation.IMAGE, {'input': 'coat'}, 'a' * 64)
     asyncio.run(client.aclose())

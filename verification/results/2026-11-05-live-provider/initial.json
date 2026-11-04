@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-11-04T19:26:01.247937+00:00",
+  "boundary": "direct live Meta inference through production relay payloads/parsers; not HTTP/Firebase or Android E2E",
+  "syntheticOnly": true,
+  "humanApprovalClaimed": false,
+  "userOriginalUploaded": false,
+  "voiceTested": false,
+  "generatedImagesPersisted": false,
+  "operations": {
+    "spark-search": {
+      "model": "muse-spark-1.3",
+      "passed": false,
+      "exceptionType": "InvalidSegmentationMaskError",
+      "elapsedMs": 19587,
+      "calls": [
+        {
+          "httpStatus": 200,
+          "status": "completed",
+          "outputTypes": [
+            "reasoning",
+            "function_call"
+          ],
+          "messageShapes": []
+        },
+        {
+          "httpStatus": 200,
+          "status": "completed",
+          "outputTypes": [
+            "reasoning",
+            "message",
+            "function_call"
+          ],
+          "messageShapes": [
+            {
+              "status": "completed",
+              "role": "assistant",
+              "phase": "commentary",
+              "contentTypes": [
+                "output_text"
+              ]
+            }
+          ]
+        },
+        {
+          "httpStatus": 200,
+          "status": "completed",
+          "outputTypes": [
+            "reasoning",
+            "message",
+            "function_call"
+          ],
+          "messageShapes": [
+            {
+              "status": "completed",
+              "role": "assistant",
+              "phase": "commentary",
+              "contentTypes": [
+                "output_text"
+              ]
+            }
+          ]
+        },
+        {
+          "httpStatus": 200,
+          "status": "completed",
+          "outputTypes": [
+            "message"
+          ],
+          "messageShapes": [
+            {
+              "status": "completed",
+              "role": "assistant",
+              "phase": null,
+              "contentTypes": [
+                "output_text"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "spark-storefront": {
+      "model": "muse-spark-1.3",
+      "validatedFields": [
+        "description"
+      ],
+      "textLengths": {
+        "description": 234
+      },
+      "passed": true,
+      "elapsedMs": 7242,
+      "calls": [
+        {
+          "httpStatus": 200,
+          "status": "completed",
+          "outputTypes": [
+            "reasoning",
+            "message"
+          ],
+          "messageShapes": [
+            {
+              "status": "completed",
+              "role": "assistant",
+              "phase": null,
+              "contentTypes": [
+                "output_text"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "spark-piece": {
+      "model": "muse-spark-1.3",
+      "validatedFields": [
+        "category",
+        "label"
+      ],
+      "textLengths": {
+        "label": 35,
+        "category": 13
+      },
+      "passed": true,
+      "elapsedMs": 16515,
+      "calls": [
+        {
+          "httpStatus": 200,
+          "status": "completed",
+          "outputTypes": [
+            "reasoning",
+            "message"
+          ],
+          "messageShapes": [
+            {
+              "status": "completed",
+              "role": "assistant",
+              "phase": null,
+              "contentTypes": [
+                "output_text"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "sam-mask": {
+      "model": "sam-3.1",
+      "passed": false,
+      "exceptionType": "InvalidSegmentationMaskError",
+      "elapsedMs": 603,
+      "calls": [
+        {
+          "httpStatus": 200,
+          "status": "completed",
+          "outputTypes": [
+            "message"
+          ],
+          "messageShapes": [
+            {
+              "status": "completed",
+              "role": "assistant",
+              "phase": null,
+              "contentTypes": [
+                "output_text"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "muse-image": {
+      "model": "muse-image-1.0",
+      "passed": false,
+      "relayErrorCode": "upstream_error",
+      "elapsedMs": 930,
+      "calls": [
+        {
+          "httpStatus": 400,
+          "status": null,
+          "errorCode": null,
+          "errorType": "invalid_request_error",
+          "errorParam": null,
+          "errorHints": [
+            "tools"
+          ]
+        }
+      ]
+    }
+  }
+}

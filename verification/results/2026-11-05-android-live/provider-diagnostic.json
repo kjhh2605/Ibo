@@ -1,0 +1,14 @@
+{
+  "diagnosticOnly": true,
+  "humanAnnotationClaimed": false,
+  "registrationOk": false,
+  "reason": "person_not_found",
+  "metrics": {
+    "personAccepted": false,
+    "headAreaRatio": null,
+    "gtHeadPixels": null,
+    "exposedHeadPixels": null,
+    "privacyPassed": null
+  },
+  "selfUnchanged": true
+}

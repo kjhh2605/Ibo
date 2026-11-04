@@ -17,8 +17,13 @@ let roots: Promise<string[]> | undefined;
 function privateRoots() {
   return roots ??= Promise.all([Directory.Data, Directory.Cache].map(async directory => {
     const {uri} = await Filesystem.getUri({directory, path: ''});
-    return decodeURIComponent(new URL(uri).pathname).replace(/\/$/, '') + '/';
-  })).catch(error => { roots = undefined; throw error; });
+    const root = decodeURIComponent(new URL(uri).pathname).replace(/\/$/, '') + '/';
+    // Android's Store returns canonical /data/data paths, while Filesystem can
+    // return the equivalent owner-user /data/user/0 path for the same app.
+    const alias = root.startsWith('/data/user/0/') ? root.replace('/data/user/0/', '/data/data/')
+      : root.startsWith('/data/data/') ? root.replace('/data/data/', '/data/user/0/') : root;
+    return alias === root ? [root] : [root, alias];
+  })).then(paths => paths.flat()).catch(error => { roots = undefined; throw error; });
 }
 async function requirePrivateFile(file: FileRef): Promise<void> {
   let path: string;

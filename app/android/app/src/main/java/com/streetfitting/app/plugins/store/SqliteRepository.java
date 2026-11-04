@@ -350,9 +350,9 @@ public final class SqliteRepository implements NativeRepository {
         if("recording".equals(current.getString("status"))) update("Trip",values("status","ended","endedAt",t),"id",trip);
         db.delete("TrailPoint","tripId=?",new String[]{trip});changed("TrailPoint",trip);return required("Trip",trip);
     }); }
-    @Override public synchronized JSObject commitPhoto(JSObject input) { return transaction(()->commitPhotoInternal(input,false)); }
-    @Override public synchronized JSObject commitStorefront(JSObject input) { return transaction(()->commitPhotoInternal(input,true)); }
-    private JSObject commitPhotoInternal(JSObject input,boolean storefrontPreview) throws Exception {
+    @Override public synchronized JSObject commitPhoto(JSObject input) { return transaction(()->commitPhotoInternal(input,false,false)); }
+    @Override public synchronized JSObject commitStorefront(JSObject input) { return transaction(()->commitPhotoInternal(input,true,false)); }
+    private JSObject commitPhotoInternal(JSObject input,boolean storefrontPreview,boolean demo) throws Exception {
         JSObject photo=nested(input,"photo");String id=id(photo,"id"),trip=id(photo,"tripId"),shop=id(photo,"shopId");
         String kind=choice(photo,"kind","item","storefront");long t=time(photo,"takenAt");
         if(storefrontPreview&&!"storefront".equals(kind)) throw error("invalid_input");
@@ -363,7 +363,7 @@ public final class SqliteRepository implements NativeRepository {
         }
         if(!trip.equals(required("Shop",shop).getString("tripId"))) throw error("invalid_input");
         JSObject currentTrip=required("Trip",trip);
-        if((!storefrontPreview&&!"recording".equals(currentTrip.getString("status")))||t<currentTrip.optLong("startedAt")) throw error("invalid_input");
+        if((!storefrontPreview&&!demo&&!"recording".equals(currentTrip.getString("status")))||t<currentTrip.optLong("startedAt")) throw error("invalid_input");
         int w=(int)time(photo,"w"),h=(int)time(photo,"h");if(w<=0||h<=0) throw error("invalid_input");
         File source=owned(string(photo,"file")); validateImage(source,w,h);
         String file=promote(source,"Photo",id,"original");
@@ -414,11 +414,102 @@ public final class SqliteRepository implements NativeRepository {
     @Override public synchronized JSObject releaseSelf(JSObject input) { return transaction(()->{
         long t=time(input,"updatedAt");int count=pins.getOrDefault(t,0);if(count>1) pins.put(t,count-1);else {pins.remove(t);JSObject current=getSelfPhoto();if(current==null||current.getLong("updatedAt")!=t) releaseVersion(t);}return new JSObject();
     }); }
-    @Override public synchronized JSObject registerAsset(JSObject input) { return transaction(()->{
+    private static final String DEMO_PREFIX = "demo_street_fitting_v1_";
+    private static String demoId(JSONObject input,String key) {
+        String value=id(input,key);
+        if(!value.startsWith(DEMO_PREFIX)) throw error("invalid_input");
+        return value;
+    }
+    /**
+     * Private debug importer: stable slots own only imported entities. No self,
+     * result, embedding or approval input is accepted. Normal file promotion,
+     * candidate cropping, queueing, deletion and change events remain in use.
+     */
+    public synchronized JSObject debugDemoFixture(JSObject input) {
+        if((context.getApplicationInfo().flags&android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE)==0) throw error("unsupported");
+        db.execSQL("CREATE TABLE IF NOT EXISTS DemoFixture (slot TEXT PRIMARY KEY, entity TEXT NOT NULL, id TEXT NOT NULL)");
+        String action=choice(input,"action","lookup","import","rollback","status");
+        if(action.equals("status")||action.equals("rollback")) {
+            JSONArray entries=new JSONArray();
+            try(Cursor c=db.query("DemoFixture",null,null,null,null,null,"slot")) {
+                while(c.moveToNext()) entries.put(obj("slot",c.getString(0),"entity",c.getString(1),"id",c.getString(2)));
+            }
+            if(action.equals("rollback")) {
+                // Restartable, and deliberately leaves user-created results and
+                // user-saved additional pieces (including their walkTo) alone.
+                for(String entity:new String[]{"Piece","Trip","Asset"}) for(int i=0;i<entries.length();i++) {
+                    JSONObject entry=entries.optJSONObject(i);
+                    if(!entity.equals(entry.optString("entity"))) continue;
+                    String ownedId=entry.optString("id");
+                    if(entity.equals("Piece")) deletePiece(obj("id",ownedId));
+                    else if(entity.equals("Trip")) deleteTrip(obj("id",ownedId));
+                    else discardAsset(obj("assetId",ownedId));
+                }
+                db.delete("DemoFixture",null,null);
+            }
+            return obj("entries",entries,"namespace",DEMO_PREFIX);
+        }
+        String slot=demoId(input,"slot"),entity=choice(input,"entity","Trip","Shop","Photo","Asset","Piece");
+        JSObject existing=null;
+        boolean tracked=false;
+        try(Cursor c=db.query("DemoFixture",null,"slot=?",new String[]{slot},null,null,null)) {
+            if(c.moveToFirst()) {
+                if(!entity.equals(c.getString(1))) throw error("invalid_input");
+                tracked=true; existing=row(entity,"id",c.getString(2));
+            }
+        }
+        if(action.equals("lookup")) return obj("item",existing);
+        if(existing!=null) return obj("item",existing,"created",false);
+        final boolean replaceSlot=tracked;
+        return transaction(()->{
+            JSObject item;
+            if(entity.equals("Trip")) {
+                JSObject trip=nested(input,"record");String key=demoId(trip,"id");
+                if(!key.equals(slot)||row("Trip","id",key)!=null) throw error("constraint_violation");
+                long start=time(trip,"startedAt"),end=time(trip,"endedAt");
+                if(end<start) throw error("invalid_input");
+                insert("Trip",values("id",key,"startedAt",start,"endedAt",end,"status","ended"),key);
+                item=required("Trip",key);
+            } else if(entity.equals("Shop")) {
+                JSObject shop=nested(input,"record");String key=demoId(shop,"id"),trip=demoId(shop,"tripId");
+                if(!key.equals(slot)||row("Shop","id",key)!=null) throw error("constraint_violation");
+                JSObject parent=required("Trip",trip);long start=time(shop,"startedAt");int n=(int)time(shop,"n");
+                if(n<1||start<parent.getLong("startedAt")||start>parent.getLong("endedAt")) throw error("invalid_input");
+                ContentValues fields=values("id",key,"tripId",trip,"n",n,"startedAt",start,"storefrontPhotoId",null,"description",null,"descriptionState","none","note",text(shop,"note",280));
+                location(fields,nested(shop,"spot"));insert("Shop",fields,key);item=required("Shop",key);
+            } else if(entity.equals("Photo")) {
+                JSObject photo=nested(input,"photo");String key=demoId(photo,"id");
+                demoId(photo,"tripId");demoId(photo,"shopId");
+                if(!key.equals(slot)||row("Photo","id",key)!=null) throw error("constraint_violation");
+                demoStagedFile(string(photo,"file"));
+                item=commitPhotoInternal(input,false,true);
+            } else if(entity.equals("Asset")) {
+                JSObject asset=nested(input,"asset");String key=demoId(asset,"id");
+                if(!key.equals(slot)||!"wardrobe".equals(input.optString("purpose"))) throw error("invalid_input");
+                demoStagedFile(string(asset,"file"));item=registerAssetInternal(input);
+            } else {
+                JSObject candidate=nested(input,"candidate");demoId(candidate,"photoId");
+                // Caller supplies only actual EdgeTAM outputs, never draft GT.
+                if(!"edgetam".equals(candidate.optString("source"))) throw error("invalid_input");
+                item=saveCandidateInternal(input);
+                String key=item.getString("id");
+                update("Piece",values("label",text(input,"label",120),"category",text(input,"category",64)),"id",key);
+                cancelJobs("label_piece",key);item=required("Piece",key);
+            }
+            if(replaceSlot) db.delete("DemoFixture","slot=?",new String[]{slot});
+            db.insertOrThrow("DemoFixture",null,values("slot",slot,"entity",entity,"id",item.getString("id")));
+            return obj("item",item,"created",true);
+        });
+    }
+    private void demoStagedFile(String ref) throws Exception {
+        if(!owned(ref).getCanonicalPath().startsWith(new File(context.getCacheDir(),"demo-fixtures").getCanonicalPath()+"/")) throw error("file_not_owned");
+    }
+    @Override public synchronized JSObject registerAsset(JSObject input) { return transaction(()->registerAssetInternal(input)); }
+    private JSObject registerAssetInternal(JSObject input) throws Exception {
         JSObject asset=nested(input,"asset");String id=id(asset,"id"),purpose=choice(input,"purpose","self","wardrobe");int w=(int)time(asset,"w"),h=(int)time(asset,"h");if(w<=0||h<=0) throw error("invalid_input");File file=owned(string(asset,"file"));validateImage(file,w,h);
         if(row("Asset","id",id)!=null) throw error("invalid_input");
         String stored=promote(file,"Asset",id,"original");db.insertOrThrow("Asset",null,values("id",id,"file",stored,"w",w,"h",h,"purpose",purpose));transferSource(file);return obj("id",id,"file",stored,"w",w,"h",h);
-    }); }
+    }
     @Override public synchronized JSObject getAsset(JSObject input) {
         JSObject asset=row("Asset","id",id(input,"id"));if(asset!=null) asset.remove("purpose");return asset;
     }
@@ -444,7 +535,8 @@ public final class SqliteRepository implements NativeRepository {
         File[] children=directory.listFiles();if(children==null) return;
         for(File file:children) {if(file.isDirectory()) retireTree(file);else {owned(Uri.fromFile(file).toString());retire(Uri.fromFile(file).toString());}}
     }
-    @Override public synchronized JSObject saveCandidate(JSObject input) { return transaction(()->{
+    @Override public synchronized JSObject saveCandidate(JSObject input) { return transaction(()->saveCandidateInternal(input)); }
+    private JSObject saveCandidateInternal(JSObject input) throws Exception {
         JSObject candidate=nested(input,"candidate");String photoId=id(candidate,"photoId"),source=choice(candidate,"source","sam","edgetam");
         String origin=choice(input,"origin","shop","wardrobe"),labelMode=choice(input,"labelMode","concept","describe");
         if(origin.equals("wardrobe")&&!labelMode.equals("describe")) throw error("invalid_input");
@@ -492,7 +584,7 @@ public final class SqliteRepository implements NativeRepository {
             if(labelMode.equals("describe")) enqueueInternal("label_piece",pieceId,false);
             return required("Piece",pieceId);
         } finally {mask.recycle();if(original!=null) original.recycle();if(cutout!=null) cutout.recycle();if(temp!=null) temp.delete();}
-    }); }
+    }
     @Override public synchronized JSObject updateShop(JSObject input) { return transaction(()->{
         String id=id(input,"id");required("Shop",id);
         if(!input.has("note")) throw error("invalid_input");String note=input.isNull("note")?null:string(input,"note").trim();

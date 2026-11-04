@@ -48,6 +48,14 @@ public class StorePlugin extends Plugin {
         info.put("debug", (getContext().getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0);
         call.resolve(info);
     }
+    /** Private adb/WebView tooling only; release builds reject before repository access. */
+    @PluginMethod public void debugDemoFixture(PluginCall call) {
+        if ((getContext().getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) == 0) {
+            call.reject("Demo fixture import is unavailable.", "unsupported");
+            return;
+        }
+        execute(call, () -> repository.debugDemoFixture(call.getData()), false);
+    }
     @PluginMethod public void get(PluginCall call) { execute(call, () -> repository.get(call.getData()), true); }
     @PluginMethod public void list(PluginCall call) { execute(call, () -> repository.list(call.getData()), false); }
     @PluginMethod public void getSelfPhoto(PluginCall call) { execute(call, () -> repository.getSelfPhoto(), true); }

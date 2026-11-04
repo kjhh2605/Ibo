@@ -23,6 +23,15 @@ SAM 입력은 선택된 shop item 사진만 픽셀로 다시 그려 EXIF/GPS를 
 
 WAV는 실제 RIFF/fmt/data 헤더, PCM16/mono/16kHz, sample 수 1..240000, 메타데이터 chunk 부재를 검사한다. 비어 있지 않은 전사문은 공백/대소문자 포함 그대로 새 검색에 사용한다. 빈 전사/무음은 idle 안내이고, 오프라인/전사 실패는 오류다. 양쪽 모두 WAV를 회수한다.
 
+### 검색 결과 저장과 수동 선택
+
+- SAM 후보를 고르는 동안 EdgeTAM 모델을 불러오지 않는다. `Not here? Tap it` 또는 후보 없는 사진을 열었을 때만 on-device 선택을 준비하며, 기존 SAM 후보는 EdgeTAM 준비 실패와 무관하게 저장할 수 있다.
+- relay의 검색 concept 한도는 160자이고 Store의 piece label 한도는 120자다. Pick은 저장 직전에 앞뒤 공백을 제거한 concept의 앞 120자를 label로 사용한다. 검색·SAM에 보내는 원래 concept와 후보 ID/mask는 변경하지 않는다.
+- 저장은 Store의 원자적 작업이므로 진행 중 Cancel 버튼을 비활성화한다. 수동 모델 준비/탭 진행 중에는 SAM/탭 모드 전환을 비활성화해 handle 해제와 새 작업의 중첩을 막는다.
+- concept로 저장한 piece는 이미 검색어 이름을 갖고 있으므로 `labelMode: concept`는 `label_piece` 작업을 만들지 않는다. `category: unknown`와 naming job 부재만으로 자동 이름 생성 실패라고 판단할 수 없다. 직접 탭한 사진/wardrobe의 `labelMode: describe`만 기본 `Picked item`과 실제 영속 naming queue를 사용한다.
+
+2026-11-05 변경의 Android/UI 회귀 확인 항목: SAM 후보 열기 시 local prepare 미호출, `Not here? Tap it` 후 실제 모델 준비/3개 영역 선택, 121–160자 concept 저장, 저장 중 Cancel 비활성화, 사진/Trip 삭제 후 저장 cut-out·목적지 보존. 이 항목은 변경 작성 중 실행하지 않았으며 기존 검증 결과를 새 변경의 합격으로 간주하지 않는다.
+
 ## 실행 검증
 
 2026-11-04 실행 결과:

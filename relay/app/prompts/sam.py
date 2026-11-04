@@ -8,7 +8,7 @@ import io
 import re
 
 from PIL import Image
-from meta_sam_parser import SegmentationMask, decode_mask_to_raster
+from meta_sam_parser import InvalidSegmentationMaskError, SegmentationMask, decode_mask_to_raster
 
 from app.errors import RelayError
 from app.prompts.search import output_text
@@ -82,7 +82,7 @@ def sam_candidates(response, photo, concept):
                 raise ValueError()
             decoded = decode_mask_to_raster(SegmentationMask(
                 encoding='one_bit' if payload[0] == '!' else 'lossless',
-                payload=payload[1:], width=mw, height=mh))
+                payload=payload, width=mw, height=mh))
             raster = Image.frombytes('L', (mw, mh), decoded).point(lambda p: p * 255)
             canvas = Image.new('L', (width, height), 0)
             canvas.paste(raster, (x1, y1))
@@ -104,7 +104,7 @@ def sam_candidates(response, photo, concept):
         return sorted(candidates, key=lambda candidate: -candidate['score'])
     except RelayError:
         raise
-    except (ValueError, TypeError, KeyError, IndexError, OSError):
+    except (ValueError, TypeError, KeyError, IndexError, OSError, InvalidSegmentationMaskError):
         raise RelayError('upstream_error') from None
 
 

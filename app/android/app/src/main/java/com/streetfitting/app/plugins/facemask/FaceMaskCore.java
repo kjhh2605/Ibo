@@ -71,14 +71,25 @@ public final class FaceMaskCore {
         long exposed=0;for(int y=0;y<g.h;y++)for(int x=0;x<g.w;x++)if(contributes[y*g.w+x]&&gt.getPixel(x,y)==0xffffffff)exposed++;
         return new long[]{count,exposed};
     }
-    public static Bitmap compose(Bitmap original,HeadGeometry source,Bitmap provider,int cropOffset) {
+    /** Every generated protected pixel must map to a restorable source pixel. */
+    public static boolean compositionEligible(HeadGeometry source,HeadGeometry generated,int w,int h,int cropOffset) {
+        if(cropOffset!=0||w<=0||h<=0||generated.w!=w||generated.h!=h)return false;
+        double sx=(double)source.w/w,sy=(double)source.h/h;
+        return (generated.headLeft+.5)*sx-.5>=source.headLeft
+            && (generated.headRight+.5)*sx-.5<=source.headRight
+            && (generated.headTop+.5)*sy-.5>=source.headTop
+            && (generated.headBottom+.5)*sy-.5<=source.headBottom;
+    }
+    public static Bitmap compose(Bitmap original,HeadGeometry source,Bitmap provider,HeadGeometry generated,int cropOffset) {
+        if(!compositionEligible(source,generated,provider.getWidth(),provider.getHeight(),cropOffset))throw new IllegalArgumentException("unsafe_output");
         int w=provider.getWidth(),h=provider.getHeight();int[] pixels=new int[w*h];provider.getPixels(pixels,0,w,0,0,w,h);
         double sx=(double)source.w/w,sy=(double)(source.h-cropOffset)/h;
         for(int y=0;y<h;y++)for(int x=0;x<w;x++) {
             double ox=(x+.5)*sx-.5,oy=(y+.5)*sy-.5+cropOffset;
             if(ox<source.headLeft||ox>source.headRight||oy<source.headTop||oy>source.headBottom)continue;
             double edge=Math.min(Math.min(ox-source.headLeft,source.headRight-ox),Math.min(oy-source.headTop,source.headBottom-oy));
-            double alpha=Math.max(0,Math.min(1,edge/2));
+            boolean protectedOutput=x>=generated.headLeft&&x<=generated.headRight&&y>=generated.headTop&&y<=generated.headBottom;
+            double alpha=protectedOutput?1:Math.max(0,Math.min(1,edge/2));
             int sourcePixel=original.getPixel(Math.max(0,Math.min(source.w-1,(int)Math.round(ox))),Math.max(0,Math.min(source.h-1,(int)Math.round(oy))));
             int dest=pixels[y*w+x],rgb=0xff000000;
             for(int shift=0;shift<=16;shift+=8)rgb|=((int)Math.round(((sourcePixel>>shift)&255)*alpha+((dest>>shift)&255)*(1-alpha)))<<shift;

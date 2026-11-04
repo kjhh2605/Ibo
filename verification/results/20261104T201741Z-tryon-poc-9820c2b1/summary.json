@@ -1,0 +1,13 @@
+{
+  "runId": "20261104T201741Z-tryon-poc-9820c2b1",
+  "operation": "tryon-poc",
+  "mode": "live",
+  "status": "blocked",
+  "assertions": [],
+  "providerCalls": 0,
+  "startedAt": "2026-11-04T20:17:41.232810+00:00",
+  "blocked": [
+    "Human annotation/classification required: verification/fixtures/review/head.json#calibration-hat"
+  ],
+  "elapsedMs": 220
+}

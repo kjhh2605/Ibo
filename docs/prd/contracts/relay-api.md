@@ -282,13 +282,15 @@ Voice 전용 전사 API의 language를 영어로 고정한다. 도구는 없음.
 
 `TryOnPiece={pieceRef:Ref, image:Image, label:string(1~120), category:string(1~64), origin:"shop"|"wardrobe"}`; 전부 필수. target.origin은 반드시 `shop`, 모든 pieceRef는 중복 불가다. 앱이 저장되지 않은 임시 조각을 골랐다면 먼저 저장한 옷으로 만든다. 본문 44 MiB, 장당 공통 Image 상한을 적용한다. `headMasked:true`는 앱의 완료 신호이며 릴레이가 원본 얼굴을 요구하거나 얼굴 마스크 파일을 요구하지 않는다. 근거: D-R4-08, D-R4-09, D-R4-11; `[추론·기술 결정]`.
 
-Muse Image Responses에 `store:false`, 도구 없음, `safety_identifier`, 출력 1장을 고정한다. 입력 순서는 selfPhoto, target, companions 배열 순이다. Muse Image의 `mask` 파라미터는 쓰지 않고 이미 얼굴·머리가 제거된 이미지 자체를 보낸다. `[추론·기술 결정]` 초기 reasoning_strength는 `low`, 출력 비율은 본인 이미지의 가장 가까운 provider 지원 비율로 서버에서 선택한다(동률은 세로 비율 우선). 정확한 지원 비율·마스킹 유지·픽셀 정렬은 **미확인**, S11 실호출에서 확인한다. 근거: D-R4-03, D-R4-04; research §6.3·§10.
+Muse Image는 공식 `POST /v1/images/edits`를 사용한다. 실제 Responses `image_generation` 도구 요청은 400으로 거절되어 이 endpoint로 전환했다. 모델 `muse-image-1.0`, `n:1`, PNG/base64 출력, `reasoning_strength:"low"`, 가명 안전 식별자 `user`를 고정하며 `tool_enablement`의 이미지 검색·웹 검색·shell을 모두 끈다. 이 endpoint에는 문서화된 `store`/`safety_identifier` 필드가 없으므로 provider 무보관을 주장하지 않는다. 입력 순서는 selfPhoto, target, companions이며 별도 `mask` 대신 이미 얼굴·머리가 제거된 이미지를 보낸다. 출력 비율은 본인 이미지의 가로×세로를 사용하되 최대 16:1/1:16 범위로 제한한다. 실제 합성 입력으로 PNG 생성은 확인했고, 마스킹 유지·픽셀 정렬·개인정보 품질 최종 합격은 미확인이다. 근거: D-R4-03~04; [실호출 증거](../../../verification/results/2026-11-05-live-provider/final.json), [공식 이미지 API](https://dev.meta.ai/docs/image-generation).
+
+생성 프롬프트는 원본 신원을 추론·복원하지 않고, 기기에서 감지해 제거할 수 있는 가상의 머리·목 윤곽을 요청한다. 기존 "사각형 가림막 유지" 요청은 실제 Muse 출력에서 중심 사람 마스크의 머리를 분리해 `unsafe_output`을 유발했다. 입력은 계속 얼굴·머리를 제거한 self만 전송한다. 생성된 머리를 그대로 사용자에게 보이지 않고 [device-modules의 출력 검증·제거](device-modules.md#전송본-설정-재합성)를 거친다. native 검출·임계값은 변경하지 않았으며, 실제 Android에서 출력 검사 후 `faceless:true` 저장을 확인했다. 사람 GT·재합성 품질 합격을 뜻하지 않는다.
 
 | 200 응답 필드 | 타입·제한 | 근거 |
 |---|---|---|
 | `image` | `{mimeType:"image/jpeg"|"image/png",data:base64,width:int,height:int}`. 생성 이미지 정확히 1장. 최대 디코딩 32 MiB, 가로·세로 각 8192 이하, 총 33,554,432픽셀 이하 | D-R4-07; `[추론·기술 결정]` |
 
-공식 Responses API의 `image_generation_call.result` base64에서 얻은 provider 파일 바이트를 **재인코딩·메타데이터 제거·워터마크 제거 없이** 반환한다. URL-only 결과는 `upstream_error`로 거부하며 파일 URL 다운로드 요청을 하지 않는다(사용자 URL도 받지 않음). 이미지 크기가 앱 계약 상한을 넘으면 `upstream_error`로 종료하고 임의 축소하지 않는다. 앱은 받은 바이트 그대로 `Result.providerFile`에 보존하고 별도 기기 파생본으로 얼굴 재합성/얼굴 없는 결과를 만든다. 서버는 `faceless`를 결정하지 않는다. 결과 내려받기는 보존 검증까지 기능 플래그로 꺼 둔다. 근거: D-R4-04, D-R4-10, D-R11-03; [공식 출력 계약](https://dev.meta.ai/docs/image-generation#read-the-response).
+공식 이미지 편집 응답의 `data[0].b64_json`에서 얻은 provider 파일 바이트를 **재인코딩·메타데이터 제거·워터마크 제거 없이** 반환한다. 결과는 정확히 한 장이어야 하며 URL-only 결과는 `upstream_error`로 거부한다. 파일 URL 다운로드 요청을 하지 않으며 사용자 URL도 받지 않는다. 이미지 크기가 앱 계약 상한을 넘으면 `upstream_error`로 종료하고 임의 축소하지 않는다. 앱은 받은 바이트 그대로 `Result.providerFile`에 보존하고 별도 기기 파생본으로 얼굴 재합성/얼굴 없는 결과를 만든다. 서버는 `faceless`를 결정하지 않는다. 결과 내려받기는 보존 검증까지 기능 플래그로 꺼 둔다. 근거: D-R4-04, D-R4-10, D-R11-03; [공식 출력 계약](https://dev.meta.ai/docs/image-generation).
 
 오류: 인증·입력·크기·Meta 오류. 6번째 companion/두 번째 selfPhoto/wardrobe target은 호출 전 `invalid_request`. Meta `content_policy_violation`은 400 false로 그대로 의미를 보존한다. 마스킹이 실패했다면 앱은 이 API를 호출하지 않는다. mock은 `tryon.01`에서 선택한 조합에 맞는 provider 원본 파일을 재생하며 입력 이미지를 합성한 척하지 않는다. 근거: D-R1-04, D-R4-07, D-R4-11.
 

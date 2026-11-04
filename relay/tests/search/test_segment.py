@@ -161,3 +161,18 @@ def test_unrotated_exif_upload_rejected_before_sam(client):
     response = flow.segment(photos=[{'photoRef': 'photo_blue_1', 'image': upload}])
     assert response.status_code == 400
     assert 'X-Query-Token' not in response.headers
+
+
+@pytest.mark.parametrize('payload', ['!bad', '!!!!!(QO(0lu8?', '!!!!!!(QO(0lu8?'])
+def test_invalid_mask_codec_is_safe_upstream_error(live_client, payload):
+    # The complete official 5x5 sample includes its encoding marker. Removing
+    # that marker, truncating bytes, or inserting another marker is not repairable.
+    text = sam_text((0.7,)).replace('!!!!!(QO(0lu8?', payload)
+    with live_client(segment_live_replies(provider_text(text))) as (client, requests):
+        response = live_flow(client).to_extract().segment()
+        if payload == '!!!!!(QO(0lu8?':
+            assert response.status_code == 200
+        else:
+            assert response.status_code == 502
+            assert response.json()['error']['code'] == 'upstream_error'
+            assert 'X-Query-Token' in response.headers

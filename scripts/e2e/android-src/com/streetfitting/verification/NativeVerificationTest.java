@@ -116,7 +116,14 @@ public final class NativeVerificationTest {
                 thresholds=new BoundaryMetrics.Thresholds(t.getString("version"),t.getDouble("maxBoundaryColorDeltaE"),t.getDouble("maxBoundaryOffsetRatio"));
             }
             BoundaryMetrics m=BoundaryMetrics.measure(source,a,provider,b,request.getInt("cropOffset"),thresholds);
-            return obj("ok",true,"faceless",!m.passed,"metrics",obj("neckColorDeltaE95",m.neckColorDeltaE95,"shoulderColorDeltaE95",m.shoulderColorDeltaE95,"neckOffsetRatio95",m.neckOffsetRatio95,"shoulderOffsetRatio95",m.shoulderOffsetRatio95,"thresholdVersion",m.thresholdVersion,"decision",m.decision,"passed",m.passed));
+            boolean eligible=FaceMaskCore.compositionEligible(a,b,provider.getWidth(),provider.getHeight(),request.getInt("cropOffset"));
+            boolean previewWritten=false;
+            if(eligible&&request.has("previewOutput")&&!request.isNull("previewOutput")) {
+                Bitmap preview=FaceMaskCore.compose(source,a,provider,b,request.getInt("cropOffset"));
+                try {Images.png(preview,Images.local(context,request.getString("previewOutput")));previewWritten=true;}
+                finally {preview.recycle();}
+            }
+            return obj("ok",true,"faceless",!m.passed,"compositionEligible",eligible,"previewWritten",previewWritten,"metrics",obj("neckColorDeltaE95",m.neckColorDeltaE95,"shoulderColorDeltaE95",m.shoulderColorDeltaE95,"neckOffsetRatio95",m.neckOffsetRatio95,"shoulderOffsetRatio95",m.shoulderOffsetRatio95,"thresholdVersion",m.thresholdVersion,"decision",m.decision,"passed",m.passed));
         } finally {provider.recycle();source.recycle();}
     }
 }

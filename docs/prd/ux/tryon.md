@@ -29,6 +29,7 @@ R9 추가 근거: D-R9-01(자동 수치 판정), D-R9-02(바로 자른 옷 이�
 ### 실제 구현
 
 - `Piece`와 앱 전용 `cutoutFile`을 사용한다. `walkTo`는 저장 시 사진 좌표를 복사하므로 `Shop.spot`이나 첫 번째 동반 옷으로 목적지를 다시 계산하지 않는다(D-R3-11, D-R5-01, D-R5-03).
+- 실제 앱에서 category가 `unknown`이고 naming 작업이 없다는 이유만으로 실패를 표시하지 않는다. 검색 concept나 사용자가 정한 이름을 보존하고 "Category not set. You can edit this piece or ask Spark to name the cut-out."와 "Ask Spark to name this piece"를 제공한다. 이는 이름 생성 실패 판정이 아니라 선택적 보완 안내다.
 
 ### 프로토타입
 
@@ -89,6 +90,7 @@ R9 추가 근거: D-R9-01(자동 수치 판정), D-R9-02(바로 자른 옷 이�
 
 - `targetPieceId`, `companionPieceIds[]`, 단일 `SelfPhoto`를 사용한다. 사용자 입력 없이 `FaceMask`가 중심점 사람 마스크 → 윤곽 목 위치 → 머리 영역을 계산한다. 정확도는 미확인이다(D-R7-01).
 - 원본 파일을 다루는 기기 단계와 네트워크 요청에 실을 마스킹 파일을 분리한다. 새 사진의 마스킹 실패가 원본 업로드로 이어지는 우회 경로는 금지한다(D-R4-11).
+- 임시 합성 데모 보정이 번들에 있을 때 Try on 하단에 "This demo bundles provisional face-restoration calibration for one synthetic self photo, used only in debug or verification builds. It has not been human-reviewed. Other photos remain faceless."를 표시한다. 현재 번들의 적용 범위 안내이며 과거 Result마다 해당 검토를 받았다는 표시가 아니다. source hash와 build gate는 native/web 구현이 판정한다(D-R12-01).
 - 마스킹 합격은 모든 본인 fixture에서 사람이 표시한 머리 영역과 전송본을 비교해 얼굴·머리 픽셀이 0인 조건이다. 사람 없는 사진은 반드시 실패해야 한다. 사용자가 영역을 조정하는 기능이 아니라 검증용 정답 영역과 비교하는 자동 판정이다(D-R9-01).
 
 ### 프로토타입
@@ -105,7 +107,7 @@ R9 추가 근거: D-R9-01(자동 수치 판정), D-R9-02(바로 자른 옷 이�
 
 - 마스킹 성공한 본인 사진만 전송하며, 사용자에게 전송본을 보여 주거나 확인을 받는 단계를 넣지 않는다(D-R4-03, D-R4-11).
 - 요청은 본인 1장 + 대상 1장 + 동반 0~5장, 최대 7장이다. 진행 중 같은 생성 액션의 중복 제출은 막는다 [추론] (D-R4-07).
-- 생성 결과마다 목·어깨 경계의 색 차이와 어긋남을 자동 수치로 판정한다. 두 지표가 PoC에서 정한 임계값 안일 때만 원본 얼굴을 기기에서 붙인다. 하나라도 기준을 벗어나면 그 결과를 자동으로 얼굴 없는 결과로 만들고 `faceless=true`로 저장한다. 판정 방법은 확정이고 임계값 수치·실측 합격 여부는 아직 미확인이다(D-R4-04, D-R9-01).
+- 생성 결과마다 목·어깨 경계의 색 차이와 어긋남을 자동 수치로 판정한다. 두 지표가 실측 임계값 안이고 구도가 안전할 때만 원본 얼굴을 기기에서 붙인다. 하나라도 기준을 벗어나면 그 결과를 자동으로 얼굴 없는 결과로 만들고 `faceless=true`로 저장한다. 일반 사진용 정식 합격은 미확인이다. 합성 self 한 장의 임시 보정은 정확한 저장 원본 hash·debug 환경으로 한정하며 사람 승인으로 표시하지 않는다(D-R4-04, D-R9-01, D-R12-01).
 - 마스킹 실패는 재촬영 안내, 원격 생성 실패·정책 거절·시간 초과는 실패 상태다. 결과 파일 없이 성공 기록을 만들지 않는다 [추론]. 오프라인은 연결 안내 후 재시도이며 자동 생성 대기열은 없다(D-R4-11, D-R6-03; research §6.3).
 
 ### 화면 배치·문구
@@ -116,6 +118,7 @@ R9 추가 근거: D-R9-01(자동 수치 판정), D-R9-02(바로 자른 옷 이�
 ### 실제 구현
 
 - `/v1/tryon` → Muse Image → `Result.providerFile` 보관 → 기기 재합성/얼굴 없는 `Result.file`을 만든다. 재합성 파일을 서버에 다시 보내지 않는다. `Result.faceless`로 결과 종류를 보관한다(D-R4-04, D-R4-10).
+- 취소 직후에는 `cancelling` / "Cancelling and cleaning up on this phone…" 상태를 유지한다. native 합성·임시 파일 정리와 필요 시 방금 저장한 결과의 rollback이 끝나기 전 Generate·조합 편집을 다시 허용하지 않는다. 원본 self/headMask/maskedFile을 결과 파일로 재사용할 수 없다.
 
 ### 프로토타입
 
@@ -145,6 +148,7 @@ R9 추가 근거: D-R9-01(자동 수치 판정), D-R9-02(바로 자른 옷 이�
 ### 실제 구현
 
 - 기기에서 Result 생성 당시 옷 이름·조각 이미지·목적지의 독립 복사본과 표시 파일을 보관한다. 파일/필드 이름은 [data-model](../contracts/data-model.md)의 스냅샷 계약을 따른다. `providerFile`은 워터마크 보존 검증에 쓰고 `Media` 내보내기는 플래그와 GPS/provenance 조건을 검사한다(D-R4-10, D-R7-08, D-R9-03).
+- 실제 앱의 얼굴 없는 안내는 "This look is shown without a face because face restoration did not meet the required safety or calibration checks."다. 미보정 임계값 때문에 얼굴을 붙이지 않은 경우도 포함하며, 품질 승인·검증된 재합성 실패로 과장하지 않는다.
 
 ### 프로토타입
 

@@ -1,6 +1,7 @@
 package com.streetfitting.app.plugins.facemask;
 
 import android.graphics.Bitmap;
+import android.content.pm.ApplicationInfo;
 import com.getcapacitor.*;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.streetfitting.app.plugins.segmenter.model.*;
@@ -18,13 +19,13 @@ public class FaceMaskPlugin extends Plugin {
     private static final ExecutorService WORKER=Executors.newSingleThreadExecutor();
     private static final AtomicLong VERSION=new AtomicLong();
     private volatile boolean destroyed;
-    private final HeadGeometry.Config config=HeadGeometry.DEFAULT;
+    private HeadGeometry.Config config;
     private interface Work {JSObject run() throws Exception;}
     private static JSObject object(String key,Object value){JSObject o=new JSObject();o.put(key,value==null?JSONObject.NULL:value);return o;}
     private void stage(String value){if(!destroyed)notifyListeners("stage",object("stage",value));}
     private void submit(PluginCall call,Work work) {
         WORKER.execute(()->{
-            try {if(destroyed)throw new IOException("cancelled");JSObject result=work.run();if(destroyed)throw new IOException("cancelled");call.resolve(result);}
+            try {if(destroyed)throw new IOException("cancelled");if(config==null)config=CompositionConfig.load(getContext());JSObject result=work.run();if(destroyed)throw new IOException("cancelled");call.resolve(result);}
             catch(Exception e){String code=e.getMessage();if(code==null||!code.matches("[a-z_]{1,64}"))code="inference_failed";call.reject("Privacy operation failed",code,object("retryable",false));}
         });
     }
@@ -107,23 +108,29 @@ public class FaceMaskPlugin extends Plugin {
         submit(call,()->{
             Long version=call.getLong("selfUpdatedAt");if(version==null)throw new IOException("invalid_argument");
             NativeRepository repo=RepositoryProvider.get(getContext());JSObject key=object("updatedAt",version),self;
-            BoundaryMetrics measured=new BoundaryMetrics(null,null,null,null,config.compositionThresholds);
+            boolean verificationBuild=(getContext().getApplicationInfo().flags&ApplicationInfo.FLAG_DEBUGGABLE)!=0;
+            BoundaryMetrics measured=new BoundaryMetrics(null,null,null,null,config.thresholdsForSource(null,verificationBuild));
             try {self=repo.retainSelf(key);}catch(Exception e){return failure("self_photo_changed",measured);}
             Bitmap original=null,provider=null,result=null;File derived=null;
             try {
                 File metadata=sidecar(version);if(!metadata.isFile())return failure("self_photo_changed",measured);
                 JSONObject data=new JSONObject(new String(Files.readAllBytes(metadata.toPath()),StandardCharsets.UTF_8));
+                File sourceFile=Images.local(getContext(),self.getString("file"));
+                String sourceHash=config.provisionalSourceImageSha256!=null&&verificationBuild?Models.hash(sourceFile):null;
+                BoundaryMetrics.Thresholds thresholds=config.thresholdsForSource(sourceHash,verificationBuild);
+                measured=new BoundaryMetrics(null,null,null,null,thresholds);
                 File providerFile=Images.local(getContext(),call.getString("providerFile"));String hash=Models.hash(providerFile);
                 provider=Images.decode(getContext(),call.getString("providerFile"));original=Images.decode(getContext(),self.getString("file"));stage("compositing");
                 HeadGeometry source,output;
                 try {source=FaceMaskCore.detect(getContext(),original,config);output=FaceMaskCore.detect(getContext(),provider,config);}
                 catch(HeadGeometry.Rejected e){return failure("unsafe_output",measured);}
-                measured=BoundaryMetrics.measure(original,source,provider,output,data.getInt("cropOffset"),config.compositionThresholds);
-                if(measured.passed)result=FaceMaskCore.compose(original,source,provider,data.getInt("cropOffset"));
+                measured=BoundaryMetrics.measure(original,source,provider,output,data.getInt("cropOffset"),thresholds);
+                if(measured.passed)result=FaceMaskCore.compose(original,source,provider,output,data.getInt("cropOffset"));
                 else {int cut=output.headBottom+1;if(cut>=provider.getHeight())return failure("unsafe_output",measured);result=Bitmap.createBitmap(provider,0,cut,provider.getWidth(),provider.getHeight()-cut);}
                 if(destroyed)throw new IOException("cancelled");
                 derived=Images.temp(getContext(),"result-");Images.png(result,derived);
                 if(!hash.equals(Models.hash(providerFile)))throw new IOException("io_error");
+                if(sourceHash!=null&&!sourceHash.equals(Models.hash(sourceFile)))throw new IOException("io_error");
                 JSObject out=object("ok",true);out.put("file",derived.toURI().toString());out.put("faceless",!measured.passed);out.put("metrics",metrics(measured));derived=null;return out;
             } finally {if(derived!=null)derived.delete();if(result!=null&&result!=provider)result.recycle();if(provider!=null)provider.recycle();if(original!=null)original.recycle();repo.releaseSelf(key);cleanSidecars(repo);}
         });

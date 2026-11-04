@@ -12,10 +12,21 @@ public final class HeadGeometry {
         public final int minMargin=8;
         public final String mode;
         public final BoundaryMetrics.Thresholds compositionThresholds;
+        public final String configVersion;
+        public final String provisionalSourceImageSha256;
         public Config() { this("a",null); }
-        public Config(String mode,BoundaryMetrics.Thresholds thresholds) {
-            if(!Set.of("a","b","c").contains(mode))throw new IllegalArgumentException("invalid_argument");
-            this.mode=mode;this.compositionThresholds=thresholds;
+        public Config(String mode,BoundaryMetrics.Thresholds thresholds) {this(mode,thresholds,"local-composition-uncalibrated-v1");}
+        public Config(String mode,BoundaryMetrics.Thresholds thresholds,String configVersion) {
+            this(mode,thresholds,configVersion,null);
+        }
+        Config(String mode,BoundaryMetrics.Thresholds thresholds,String configVersion,String provisionalSourceImageSha256) {
+            if(!Set.of("a","b","c").contains(mode)||configVersion==null||configVersion.trim().isEmpty()
+                ||provisionalSourceImageSha256!=null&&!provisionalSourceImageSha256.matches("[a-f0-9]{64}"))throw new IllegalArgumentException("invalid_argument");
+            this.mode=mode;this.compositionThresholds=thresholds;this.configVersion=configVersion;this.provisionalSourceImageSha256=provisionalSourceImageSha256;
+        }
+        /** Call only with the digest of the retained, locally stored original file. */
+        public BoundaryMetrics.Thresholds thresholdsForSource(String sourceImageSha256,boolean verificationBuild) {
+            return provisionalSourceImageSha256==null||verificationBuild&&provisionalSourceImageSha256.equals(sourceImageSha256)?compositionThresholds:null;
         }
     }
     public static final Config DEFAULT=new Config();

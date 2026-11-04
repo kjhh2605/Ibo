@@ -122,6 +122,22 @@ describe('privacy', () => {
     expect(f.deps.writeProvider).not.toHaveBeenCalled(); expect(f.faceMask.compose).not.toHaveBeenCalled();
     expect(f.drafts.size).toBe(0); expect(f.controller.getSnapshot().phase).toBe('cancelled');
   });
+  it('keeps cancellation busy until a non-interruptible native compose settles', async () => {
+    const f = fixture(); await f.controller.start('piece-0');
+    const gate = deferred<void>(); const compose = f.faceMask.compose.getMockImplementation()!;
+    f.faceMask.compose.mockImplementation(async input => { await gate.promise; return compose(input); });
+    const pending = f.controller.generate();
+    await vi.waitFor(() => expect(f.controller.getSnapshot().phase).toBe('compositing'));
+    f.controller.cancel();
+    expect(f.controller.getSnapshot().phase).toBe('cancelling');
+    expect(() => f.controller.generate()).toThrowError('Please wait');
+    await expect(f.controller.start('piece-2')).rejects.toMatchObject({code: 'busy'});
+    gate.resolve();
+    expect(await pending).toBeNull();
+    expect(f.controller.getSnapshot()).toMatchObject({phase: 'cancelled', result: null});
+    expect(f.store.saveResult).not.toHaveBeenCalled();
+    expect([...f.files.keys()].filter(file => /^(draft|cache)\//.test(file))).toEqual([]);
+  });
   it('does not queue or automatically retry offline and policy failures', async () => {
     const f = fixture(); await f.controller.start('piece-0'); vi.mocked(f.deps.online).mockResolvedValue(false);
     await f.controller.generate(); expect(f.deps.request).not.toHaveBeenCalled();
@@ -167,6 +183,33 @@ describe('snapshot', () => {
     f.controller.cancel(); gate.resolve(); expect(await pending).toBeNull(); expect(f.results.size).toBe(0);
     expect(f.store.deleteResult).toHaveBeenCalledWith({id: 'draft-1'});
   });
+  it('does not expose a completed result before cleanup and removes it if cancelled during cleanup', async () => {
+    const f = fixture(); await f.controller.start('piece-0');
+    const gate = deferred<void>(); const discard = f.store.discardTemp.getMockImplementation()!;
+    f.store.discardTemp.mockImplementation(async input => { await gate.promise; return discard(input); });
+    const pending = f.controller.generate();
+    await vi.waitFor(() => expect(f.store.discardTemp).toHaveBeenCalled());
+    expect(f.controller.getSnapshot()).toMatchObject({phase: 'saving', result: null});
+    f.controller.cancel();
+    expect(f.controller.getSnapshot().phase).toBe('cancelling');
+    gate.resolve();
+    expect(await pending).toBeNull();
+    expect(f.results.size).toBe(0);
+    expect(f.store.deleteResult).toHaveBeenCalledWith({id: 'draft-1'});
+    expect(f.controller.getSnapshot()).toMatchObject({phase: 'cancelled', result: null});
+  });
+  it('releases the operation and reports an I/O failure if cancellation rollback fails', async () => {
+    const f = fixture(); await f.controller.start('piece-0');
+    const gate = deferred<void>(); const save = f.store.saveResult.getMockImplementation()!;
+    f.store.saveResult.mockImplementation(async input => { await gate.promise; return save(input); });
+    f.store.deleteResult.mockRejectedValue(new TryOnError('io_error'));
+    const pending = f.controller.generate();
+    await vi.waitFor(() => expect(f.controller.getSnapshot().phase).toBe('saving'));
+    f.controller.cancel(); gate.resolve();
+    expect(await pending).toBeNull();
+    expect(f.controller.getSnapshot()).toMatchObject({phase: 'cancelled', result: null, error: {code: 'io_error'}});
+    await expect(f.controller.start('piece-2')).resolves.toBeUndefined();
+  });
 });
 
 describe('quality', () => {
@@ -179,6 +222,20 @@ describe('quality', () => {
     const result = (await f.controller.generate())!;
     expect(result.faceless).toBe(faceless); expect(result.file).not.toBe(result.providerFile);
     expect(f.files.get(result.providerFile)).toEqual(f.masked);
+  });
+  it('persists only the safe native faceless derivative when thresholds are not calibrated', async () => {
+    const f = fixture(); await f.controller.start('piece-0');
+    f.faceMask.compose.mockImplementation(async ({providerFile}) => {
+      f.files.set('cache/faceless', f.files.get(providerFile)!.slice());
+      return {ok: true, file: 'cache/faceless', faceless: true, metrics: {
+        neckColorDeltaE95: null, shoulderColorDeltaE95: null, neckOffsetRatio95: null, shoulderOffsetRatio95: null,
+        thresholdVersion: null, passed: false, decision: 'not_calibrated',
+      }};
+    });
+    const result = await f.controller.generate();
+    expect(result).toMatchObject({faceless: true});
+    expect(result?.file).not.toBe(result?.providerFile);
+    expect(f.controller.getSnapshot().phase).toBe('complete');
   });
   it.each(['unsafe_output', 'self_photo_changed'] as const)('never exposes/saves %s', async reason => {
     const f = fixture(); await f.controller.start('piece-0');
@@ -196,6 +253,16 @@ describe('quality', () => {
     const f = fixture(); await f.controller.start('piece-0');
     f.faceMask.compose.mockImplementation(async ({providerFile}) => ({ok: true, file: providerFile, faceless: false, metrics: passedMetrics}));
     expect(await f.controller.generate()).toBeNull(); expect(f.store.saveResult).not.toHaveBeenCalled();
+  });
+  it.each(['file', 'headMask', 'maskedFile'] as const)('never saves or discards self %s returned as a composed output', async key => {
+    const f = fixture(); await f.controller.start('piece-0');
+    const source = f.self[key], before = f.files.get(source)!.slice();
+    f.faceMask.compose.mockResolvedValue({ok: true, file: source, faceless: false, metrics: passedMetrics});
+    expect(await f.controller.generate()).toBeNull();
+    expect(f.store.saveResult).not.toHaveBeenCalled();
+    expect(f.store.discardTemp).not.toHaveBeenCalledWith({file: source});
+    expect(f.files.get(source)).toEqual(before);
+    expect(f.controller.getSnapshot().error?.code).toBe('unsafe_output');
   });
 });
 

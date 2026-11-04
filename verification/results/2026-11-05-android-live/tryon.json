@@ -1,0 +1,34 @@
+{
+  "requests": [
+    {
+      "path": "/v1/tryon",
+      "status": 200
+    }
+  ],
+  "fitting": {
+    "draft": {
+      "targetPieceId": "piece:a928c6ed08d9ab1bf851f2fad7af9e240c27a67d9542cf4232147b4a964f1a58",
+      "companionPieceIds": [
+        "piece:7551541356f2f9d82943c159d733ac604c0ccbdd91e17305167881825ebfe448"
+      ]
+    },
+    "phase": "failed",
+    "selfState": "ready",
+    "resultId": null
+  },
+  "transport": {
+    "counts": {
+      "/v1/search/turn": 4,
+      "/v1/search/segment": 1,
+      "/v1/tryon": 1
+    },
+    "rawSelfReads": 0,
+    "headMaskReads": 0,
+    "resultExports": 0,
+    "knownSelfVersions": 1,
+    "scope": "relay-attempts/shared-file-reads/media-export-attempts"
+  },
+  "resultCount": 0,
+  "results": [],
+  "text": "Skip to content\nStreet Fitting\nBack\nTry on\nOne shop piece. Your own combination.\nYour photo\nFull-body · Nov 5, 2026, 4:32 AM. Your original stays on this phone.\nChange\nTarget · 1 shop piece\nblue denim jacket\nSaved from a shop\nCategory not set. You can edit this piece or ask Spark to name the cut-out.\nAsk Spark to name this piece\nFixed target\nWear with it · 1 of 5\n[Demo] Blue everyday jeans\nYour wardrobe · bottom\nRemove [Demo] Blue everyday jeans\nAdd a companion\nThis look could not be safely finished. No completed look was saved.\nGenerate\nOne face-and-hair-removed photo, your target and up to 5 companion cut-outs are sent for generation."
+}

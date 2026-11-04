@@ -1,0 +1,36 @@
+{
+  "cancellationSettled": true,
+  "cancellationPreservedResultCount": 1,
+  "sixthCompanionBlocked": true,
+  "addCompanionBlockedAtFive": true,
+  "httpStatus": 200,
+  "fitting": {
+    "draft": {
+      "targetPieceId": "piece:a928c6ed08d9ab1bf851f2fad7af9e240c27a67d9542cf4232147b4a964f1a58",
+      "companionPieceIds": [
+        "piece:1ae1c3d42da2f34671eb5af036db91f4613dcc05417220fe19b0954ff3499e99",
+        "piece:050df8e69eb66fcf2241fe46453bc9d5ad97072dad5a3407e89a673ec0cf5155",
+        "piece:410ed50c6626c2f3623fb6345cb54db21b57d41b3a2ec10b67e289b5256223a1",
+        "piece:465e1a729e6328ec2b0e87363bbd1f633529b74c0bb4065d5e2edb7e8dfc86c0",
+        "piece:7551541356f2f9d82943c159d733ac604c0ccbdd91e17305167881825ebfe448"
+      ]
+    },
+    "phase": "complete",
+    "selfState": "ready",
+    "resultId": "d5e1ba38-a16e-453e-aca9-bab0806601a0"
+  },
+  "resultCount": 2,
+  "results": [
+    {
+      "id": "d5e1ba38-a16e-453e-aca9-bab0806601a0",
+      "faceless": true,
+      "companions": 5
+    },
+    {
+      "id": "8feed674-cb18-4335-93aa-5f11c79b70a8",
+      "faceless": true,
+      "companions": 0
+    }
+  ],
+  "text": "Skip to content\nStreet Fitting\nBack\nYour look\n6 pieces · Nov 5, 2026, 4:44 AM\nThis look is shown without a face because face restoration did not meet the required safety or calibration checks.\nWearing\nBlue Zip-Front Bomber Jacket\nTarget · Shop 1\nOpen Blue Zip-Front Bomber Jacket\n[Demo] Grey wool coat\nCompanion · Your wardrobe\nOpen [Demo] Grey wool coat\n[Demo] Cream knit\nCompanion · Your wardrobe\nOpen [Demo] Cream knit\n[Demo] White bow blouse\nCompanion · Your wardrobe\nOpen [Demo] White bow blouse\n[Demo] White low-top sneakers\nCompanion · Your wardrobe\nOpen [Demo] White low-top sneakers\n[Demo] Blue everyday jeans\nCompanion · Your wardrobe\nOpen [Demo] Blue everyday jeans\nShop 1\nDark blue storefront with matching fabric awning, large glass display windows showing clothing racks and warm interior lighting, and a glass-paneled side door. A small potted tree in a terracotta pot sits beside the entrance on the paved sidewalk.\nNote: [Synthetic demo] Seongsu Saturday / Blue awning studio: denim and soft neutrals. Invented visit; images unreviewed.\nSaved with this look · Oct 31, 2026, 1:00 PM\nChange pieces\nWalk to Shop 1\nDelete look"
+}

@@ -6,7 +6,7 @@ import {serializeTryOn} from './request';
 import type {PreparedResult, TryOnRequest} from './request';
 
 export type TryOnDraft = {readonly targetPieceId: string | null; readonly companionPieceIds: readonly string[]};
-export type TryOnPhase = 'idle' | 'preparing' | 'sending' | 'compositing' | 'saving' | 'complete' | 'failed' | 'cancelled';
+export type TryOnPhase = 'idle' | 'preparing' | 'sending' | 'compositing' | 'saving' | 'cancelling' | 'complete' | 'failed' | 'cancelled';
 export type TryOnState = {
   readonly draft: TryOnDraft;
   readonly phase: TryOnPhase;
@@ -96,12 +96,13 @@ export function createTryOnController(deps: TryOnDependencies): TryOnController 
   const cancel = () => {
     revision++;
     active?.abort();
-    if (active) publish({phase: 'cancelled', error: null});
+    if (active) publish({phase: 'cancelling', error: null});
   };
   const run = async (operation: AbortController): Promise<Result | null> => {
     const signal = operation.signal;
     let prepared: PreparedResult | null = null;
     let saved: Result | null = null;
+    let error: DeviceError | null = null;
     const temp = new Set<string>();
     try {
       publish({phase: 'preparing', error: null, result: null});
@@ -128,12 +129,12 @@ export function createTryOnController(deps: TryOnDependencies): TryOnController 
       signal.throwIfAborted();
       publish({phase: 'compositing'});
       const composed = await deps.faceMask.compose({providerFile, selfUpdatedAt: self.updatedAt});
-      if (composed.ok) temp.add(composed.file);
+      if (composed.ok && ![self.file, self.headMask, self.maskedFile, providerFile].includes(composed.file)) temp.add(composed.file);
       signal.throwIfAborted();
       if (!composed.ok) throw new TryOnError(composed.reason);
       const metrics = composed.metrics;
       const measurements = [metrics.neckColorDeltaE95, metrics.shoulderColorDeltaE95, metrics.neckOffsetRatio95, metrics.shoulderOffsetRatio95];
-      if (composed.file === providerFile || composed.faceless === metrics.passed ||
+      if ([self.file, self.headMask, self.maskedFile, providerFile].includes(composed.file) || composed.faceless === metrics.passed ||
           (metrics.passed && (metrics.decision !== 'composited' || !metrics.thresholdVersion ||
             measurements.some(value => value === null || !Number.isFinite(value) || value < 0))) ||
           (!metrics.passed && metrics.decision === 'composited')) throw new TryOnError('unsafe_output');
@@ -141,21 +142,26 @@ export function createTryOnController(deps: TryOnDependencies): TryOnController 
       saved = await deps.store.saveResult({draftId: prepared.draftId, file: composed.file, faceless: composed.faceless, providerFile});
       // A cancellation during the atomic save removes that result, not an unrelated one.
       signal.throwIfAborted();
-      publish({phase: 'complete', result: saved});
-      return saved;
-    } catch (error) {
-      if (saved) await deps.store.deleteResult({id: saved.id});
-      publish({phase: signal.aborted ? 'cancelled' : 'failed', result: null, error: signal.aborted ? null : safeError(error)});
-      return null;
+    } catch (cause) {
+      error = signal.aborted ? null : safeError(cause);
     } finally {
-      // Native work cannot be interrupted midway. Reclaim only after it settles.
-      const cleanup: Promise<unknown>[] = [...temp].map(file => deps.store.discardTemp({file}));
-      if (prepared && (!saved || signal.aborted)) cleanup.push(deps.store.discardResultDraft({draftId: prepared.draftId}));
+      // Keep the operation busy until native work and file ownership cleanup settle.
+      // Discarding an already-promoted draft is a no-op in both repositories.
+      const cleanup = [...temp].map(async file => deps.store.discardTemp({file}));
+      if (prepared) cleanup.push(deps.store.discardResultDraft({draftId: prepared.draftId}));
       const failures = await Promise.allSettled(cleanup);
-      if (failures.some(result => result.status === 'rejected')) publish({error: safeError(new TryOnError('io_error'))});
+      if (failures.some(result => result.status === 'rejected')) error = safeError(new TryOnError('io_error'));
+      // Cancellation can arrive during the atomic save or its asynchronous cleanup.
+      if (saved && signal.aborted) {
+        try { await deps.store.deleteResult({id: saved.id}); }
+        catch { error = safeError(new TryOnError('io_error')); }
+      }
       active = null;
       running = null;
     }
+    const result = signal.aborted ? null : saved;
+    publish({phase: signal.aborted ? 'cancelled' : result ? 'complete' : 'failed', result, error});
+    return result;
   };
   return {
     getSnapshot: () => state,

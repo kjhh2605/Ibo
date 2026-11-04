@@ -15,13 +15,16 @@ def test_two_to_seven_images_allowed_in_order(provider, count):
     response = client.post('/v1/tryon', json=body)
     assert response.status_code == 200
     wire = json.loads(calls[0].content)
+    assert calls[0].url == 'https://api.meta.ai/v1/images/edits'
+    assert wire['model'] == 'muse-image-1.0'
     images = [body['selfPhoto']['image'], body['target']['image'], *(p['image'] for p in body['companions'])]
-    assert [part['image_url'] for part in wire['input'][0]['content']] == [
+    assert [part['image_url'] for part in wire['images']] == [
         'data:' + item['mimeType'] + ';base64,' + item['data'] for item in images]
-    tool = wire['tools'][0]
+    tool = wire['tool_enablement']
     assert tool['enable_image_search'] is tool['enable_web_search'] is tool['enable_shell'] is False
-    assert tool['output_format'] == 'png' and tool['reasoning_strength'] == 'low'
-    assert 'mask' not in wire and wire['store'] is False
+    assert wire['output_format'] == 'png' and wire['reasoning_strength'] == 'low'
+    assert wire['response_format'] == 'b64_json' and wire['n'] == 1
+    assert 'mask' not in wire and 'store' not in wire and 'safety_identifier' not in wire
 
 
 @pytest.mark.parametrize('invalid', ['sixth', 'second-self', 'wardrobe', 'duplicate', 'unmasked'])
@@ -72,8 +75,8 @@ def test_url_only_provider_output_rejected_without_fetch(provider, value):
 
 
 @pytest.mark.parametrize('body', [
-    {'status': 'completed', 'output': []},
-    {'status': 'completed', 'output': image_output()['output'] * 2},
+    {'data': []}, {'data': image_output()['data'] * 2},
+    {'data': [{'url': 'https://files.meta.ai/result.png'}]},
     image_output('not base64'), image_output(base64.b64encode(b'not an image').decode()),
     image_output(image(size=(8193, 1))['data']),
     image_output(base64.b64encode(b'x' * (33554432 + 1)).decode())])
@@ -91,4 +94,4 @@ def test_output_aspect_ratio_uses_supported_range(provider, size, expected):
     body['selfPhoto']['image'] = image(size=size)
     client, calls = provider(image_output())
     assert client.post('/v1/tryon', json=body).status_code == 200
-    assert json.loads(calls[0].content)['tools'][0]['size'] == expected
+    assert json.loads(calls[0].content)['size'] == expected

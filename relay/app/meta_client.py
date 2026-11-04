@@ -91,14 +91,6 @@ class MetaClient:
             if 'metadata' in payload and payload['metadata'] != metadata:
                 raise ValueError('Unsupported SAM metadata')
             payload = {**payload, 'metadata': metadata}
-        elif operation == Operation.IMAGE:
-            if len(tools) > 1 or any(t.get('type') != 'image_generation' or
-                                    set(t) - {'type', 'size', 'output_format', 'reasoning_strength', 'enable_image_search', 'enable_web_search', 'enable_shell'} for t in tools):
-                raise ValueError('Unsupported image tool')
-            # Image internally searches by default even with an empty tools list.
-            tools = [{**(tools[0] if tools else {}), 'type': 'image_generation',
-                      'enable_image_search': False, 'enable_web_search': False, 'enable_shell': False,
-                      'reasoning_strength': 'low', 'output_format': 'png'}]
         else:
             raise ValueError('Not a Responses operation')
         return {**payload, 'model': MODELS[operation], 'store': False,
@@ -107,6 +99,21 @@ class MetaClient:
     async def responses(self, operation: Operation, payload: dict, *, sub: str):
         body = self._responses_payload(operation, payload, sub)
         return await self._send(operation, 'POST', META_HOST + '/v1/responses', json_body=body)
+
+    async def edit_image(self, images, *, prompt, size, sub: str):
+        """One stateless Muse edit; the deployed Responses image tool rejects tools.
+
+        The official images endpoint has equivalent tool controls and a `user`
+        safety identifier. It has no documented `store`/`safety_identifier` fields.
+        Do not fall back to a tool-enabled request or fetch provider result URLs.
+        """
+        if not isinstance(sub, str) or not re.fullmatch('[0-9a-f]{64}', sub):
+            raise ValueError('A pseudonymous safety identifier is required')
+        body = {'model': MODELS[Operation.IMAGE], 'prompt': prompt, 'images': images,
+                'n': 1, 'size': size, 'output_format': 'png', 'response_format': 'b64_json',
+                'user': sub, 'reasoning_strength': 'low',
+                'tool_enablement': {'enable_image_search': False, 'enable_web_search': False, 'enable_shell': False}}
+        return await self._send(Operation.IMAGE, 'POST', META_HOST + '/v1/images/edits', json_body=body)
 
     async def transcribe(self, audio: bytes):
         # In-memory multipart for the provider only; public relay input remains JSON.

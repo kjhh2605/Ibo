@@ -20,7 +20,8 @@ def parser():
         command=commands.add_parser(name);command.add_argument('--run',required=True)
         if name=='provenance':command.add_argument('--app-run',help='For a separate PoC run, link actual native app download-OFF evidence')
     head=commands.add_parser('head-mask');head.add_argument('--all',action='store_true',required=True)
-    quality=commands.add_parser('tryon-poc');quality.add_argument('--plan',type=int,choices=[16],required=True);quality.add_argument('--mode',choices=['live'],required=True);quality.add_argument('--resume',help='Resume completed 12-call calibration after genuine human review')
+    quality=commands.add_parser('tryon-poc');quality.add_argument('--plan',type=int,choices=[16],required=True);quality.add_argument('--mode',choices=['live'],required=True);quality.add_argument('--resume',help='Continue journaled calls/measurements without rebilling completed attempts')
+    review=commands.add_parser('quality-review');review.add_argument('--run',required=True);review.add_argument('--phase',choices=['fit','validate'],required=True,help='Offline fit candidate or validate frozen, reproduced 16-call evidence; no provider/device calls')
     pages=commands.add_parser('android-pages');pages.add_argument('--apk',required=True)
     measurement=commands.add_parser('measure');measurement.add_argument('--suite',choices=['research10'],required=True);measurement.add_argument('--mode',choices=['live'],required=True);measurement.add_argument('--full-run');measurement.add_argument('--poc-run');measurement.add_argument('--seed-search',action='store_true',help='Explicitly import synthetic historical data using the S11 test APK, real device clock and real native index; requires empty trips')
     demo=commands.add_parser('demo');demo.add_argument('--mode',choices=['live'],default='live');demo.add_argument('--segment',choices=['full','shopping','search','walk','tryon'],default='full');demo.add_argument('--seconds',type=int,default=180);demo.add_argument('--concat',action='store_true');demo.add_argument('--inputs',nargs='+',help='Live segment run IDs in presentation order')
@@ -46,6 +47,9 @@ def main(argv=None):
         elif args.command=='tryon-poc':
             from quality import poc
             value=poc(run,args)
+        elif args.command=='quality-review':
+            from quality import offline_review
+            value=offline_review(run,args)
         elif args.command=='android-pages':value=backends.android_pages(run,args)
         elif args.command=='privacy':value=backends.privacy(run,args)
         elif args.command=='provenance':value=backends.provenance(run,args)

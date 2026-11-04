@@ -32,6 +32,7 @@ public final class BoundaryMetrics {
         Point(double x,double y,double nx,double ny){this.x=x;this.y=y;this.nx=nx;this.ny=ny;}
     }
     public static BoundaryMetrics measure(Bitmap original,HeadGeometry source,Bitmap provider,HeadGeometry output,int cropOffset,Thresholds thresholds) {
+        if(!FaceMaskCore.compositionEligible(source,output,provider.getWidth(),provider.getHeight(),cropOffset))return new BoundaryMetrics(null,null,null,null,thresholds);
         List<Point> sourceNeck=boundary(source,false,1,1,0),sourceShoulder=boundary(source,true,1,1,0);
         double sx=(double)source.w/output.w,sy=(double)(source.h-cropOffset)/output.h;
         List<Point> outputNeck=boundary(output,false,sx,sy,cropOffset),outputShoulder=boundary(output,true,sx,sy,cropOffset);

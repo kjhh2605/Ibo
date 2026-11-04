@@ -5,10 +5,11 @@ import type {MockContext} from './web/context';
 import {getWebRepository, readBlob, writeBlob} from '../data/web/repository';
 import {binaryPixels, checkMlFailure, decodeWebRaster, encodeWebPng, getSegmenterFixture, maskBounds, mlError, sortedFixtureMasks} from './segmenter';
 import type {WebMask, WebRaster} from './segmenter';
+import {localCompositionConfig, selectCompositionThresholds} from './compositionConfig';
+import type {CompositionThresholds, FaceMaskConfig} from './compositionConfig';
+export type {CompositionThresholds, FaceMaskConfig} from './compositionConfig';
 
-export type CompositionThresholds = {version: string; maxBoundaryColorDeltaE: number; maxBoundaryOffsetRatio: number};
-export type FaceMaskConfig = {mode: 'a' | 'b' | 'c'; compositionThresholds: CompositionThresholds | null};
-export const faceMaskConfig: FaceMaskConfig = {mode: 'a', compositionThresholds: null};
+export const faceMaskConfig: FaceMaskConfig = localCompositionConfig;
 export type HeadGeometry = {w: number; h: number; person: Uint8Array; head: Uint8Array; bbox: BBox; headBox: BBox; neckY: number; left: number[]; right: number[]};
 export type HeadDetection = {ok: true; geometry: HeadGeometry} | {ok: false; reason: MaskFailure};
 type BoundaryValues = Pick<ComposeMetrics, 'neckColorDeltaE95' | 'shoulderColorDeltaE95' | 'neckOffsetRatio95' | 'shoulderOffsetRatio95'>;
@@ -177,8 +178,17 @@ function band(image: WebRaster, point: XY, normal: XY, sign: number): number[] |
   return lab(channels.map(values => median(values)));
 }
 
+export function compositionEligible(original: HeadGeometry, generated: HeadGeometry, width: number, height: number, cropOffset = 0): boolean {
+  if (cropOffset !== 0 || width <= 0 || height <= 0 || generated.w !== width || generated.h !== height) return false;
+  const [left, top, w, h] = original.headBox, [gx, gy, gw, gh] = generated.headBox;
+  const sx = original.w / width, sy = original.h / height;
+  return (gx + 0.5) * sx - 0.5 >= left && (gx + gw - 0.5) * sx - 0.5 <= left + w - 1
+    && (gy + 0.5) * sy - 0.5 >= top && (gy + gh - 0.5) * sy - 0.5 <= top + h - 1;
+}
+
 /** Metrics are measured before feathering, in original-canvas coordinates. */
 export function measureComposition(source: WebRaster, provider: WebRaster, original: HeadGeometry, generated: HeadGeometry, cropOffset = 0): BoundaryValues {
+  if (!compositionEligible(original, generated, provider.w, provider.h, cropOffset)) return {neckColorDeltaE95: null, shoulderColorDeltaE95: null, neckOffsetRatio95: null, shoulderOffsetRatio95: null};
   const a = boundaries(original, source.w, source.h), b = boundaries(generated, source.w, source.h - cropOffset);
   for (const point of [...b.neck, ...b.shoulder]) point[1] += cropOffset;
   function measure(first: XY[], second: XY[], shoulder: boolean): {color: number | null; offset: number | null} {
@@ -204,25 +214,31 @@ export function measureComposition(source: WebRaster, provider: WebRaster, origi
   return {neckColorDeltaE95: neck.color, shoulderColorDeltaE95: shoulder.color, neckOffsetRatio95: neck.offset, shoulderOffsetRatio95: shoulder.offset};
 }
 
-function scaleRaster(image: WebRaster, w: number, h: number): WebRaster {
+function scaleRaster(image: WebRaster, w: number, h: number, protectedHead: BBox): WebRaster {
   const rgba = new Uint8ClampedArray(w * h * 4);
+  const [headX, headY, headW, headH] = protectedHead;
+  function channel(x: number, y: number, c: number): number {
+    // Redact before interpolation so neighboring samples cannot leak generated-head pixels.
+    return x >= headX && x < headX + headW && y >= headY && y < headY + headH ? (c === 3 ? 255 : 127) : image.rgba[(y * image.w + x) * 4 + c];
+  }
   for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
     const sx = Math.max(0, Math.min(image.w - 1, (x + 0.5) * image.w / w - 0.5)), sy = Math.max(0, Math.min(image.h - 1, (y + 0.5) * image.h / h - 0.5));
     const left = Math.floor(sx), top = Math.floor(sy), right = Math.min(image.w - 1, left + 1), bottom = Math.min(image.h - 1, top + 1);
     const fx = sx - left, fy = sy - top;
-    for (let c = 0; c < 4; c++) rgba[(y * w + x) * 4 + c] = image.rgba[(top * image.w + left) * 4 + c] * (1 - fx) * (1 - fy) + image.rgba[(top * image.w + right) * 4 + c] * fx * (1 - fy) + image.rgba[(bottom * image.w + left) * 4 + c] * (1 - fx) * fy + image.rgba[(bottom * image.w + right) * 4 + c] * fx * fy;
+    for (let c = 0; c < 4; c++) rgba[(y * w + x) * 4 + c] = channel(left, top, c) * (1 - fx) * (1 - fy) + channel(right, top, c) * fx * (1 - fy) + channel(left, bottom, c) * (1 - fx) * fy + channel(right, bottom, c) * fx * fy;
   }
   return {w, h, rgba};
 }
 
 export function composeRaster(source: WebRaster, provider: WebRaster, original: HeadGeometry, generated: HeadGeometry, passed: boolean, cropOffset = 0): WebRaster {
+  if (passed && !compositionEligible(original, generated, provider.w, provider.h, cropOffset)) mlError('unsafe_output');
   if (!passed) {
     const crop = generated.headBox[1] + generated.headBox[3];
     if (crop >= provider.h) mlError('unsafe_output');
     return {w: provider.w, h: provider.h - crop, rgba: provider.rgba.slice(crop * provider.w * 4)};
   }
   const bodyHeight = source.h - cropOffset;
-  const scaled = scaleRaster(provider, source.w, bodyHeight);
+  const scaled = scaleRaster(provider, source.w, bodyHeight, generated.headBox);
   const output: WebRaster = {w: source.w, h: source.h, rgba: new Uint8ClampedArray(source.w * source.h * 4)};
   for (let i = 0; i < source.w * cropOffset; i++) output.rgba.set([127, 127, 127, 255], i * 4);
   output.rgba.set(scaled.rgba, source.w * cropOffset * 4);
@@ -232,7 +248,9 @@ export function composeRaster(source: WebRaster, provider: WebRaster, original: 
   const [left, top, width, height] = original.headBox;
   for (let y = top; y < top + height; y++) for (let x = left; x < left + width; x++) {
     const distance = Math.min(x - left, left + width - 1 - x, y - top, top + height - 1 - y);
-    const alpha = Math.min(1, (distance + 1) / 2), at = (y * source.w + x) * 4;
+    const protectedOutput = x >= Math.floor(gx * source.w / provider.w) && x < Math.ceil((gx + gw) * source.w / provider.w)
+      && y >= Math.floor(gy * bodyHeight / provider.h) && y < Math.ceil((gy + gh) * bodyHeight / provider.h);
+    const alpha = protectedOutput ? 1 : Math.min(1, (distance + 1) / 2), at = (y * source.w + x) * 4;
     for (let c = 0; c < 3; c++) output.rgba[at + c] = source.rgba[at + c] * alpha + output.rgba[at + c] * (1 - alpha);
     output.rgba[at + 3] = 255;
   }
@@ -247,9 +265,10 @@ export function createWebFaceMask(context?: MockContext): FaceMaskContract {
     for (const listener of listeners) listener({stage: value});
   }
   function config(ctx: MockContext): FaceMaskConfig {
-    const value = ctx.fixture<FaceMaskConfig>('FaceMask.config') ?? faceMaskConfig;
-    if (!['a', 'b', 'c'].includes(value.mode)) mlError('invalid_argument');
-    return value;
+    const fixture = ctx.fixture<{mode: 'a' | 'b' | 'c'; compositionThresholds?: unknown}>('FaceMask.config');
+    if (!fixture) return faceMaskConfig;
+    if (!['a', 'b', 'c'].includes(fixture.mode) || (fixture.compositionThresholds !== undefined && fixture.compositionThresholds !== null)) mlError('invalid_argument');
+    return {...faceMaskConfig, mode: fixture.mode};
   }
   async function core(asset: Asset, ctx: MockContext) {
     const image = await decodeWebRaster(await readBlob(asset.file));
@@ -312,7 +331,7 @@ export function createWebFaceMask(context?: MockContext): FaceMaskContract {
       const ctx = current();
       checkMlFailure(ctx, 'FaceMask.compose');
       const settings = config(ctx), repository = getWebRepository();
-      let metrics = decideComposition(emptyBoundaries, settings.compositionThresholds);
+      let metrics = decideComposition(emptyBoundaries, selectCompositionThresholds(settings, null, import.meta.env.DEV));
       let retained = false;
       try {
         let self;
@@ -326,7 +345,14 @@ export function createWebFaceMask(context?: MockContext): FaceMaskContract {
         if (!sidecarFile) mlError('io_error');
         const sidecar: {mode: 'a' | 'b' | 'c'; cropOffset: number; w: number; h: number; person: number[]} = JSON.parse(await (await readBlob(sidecarFile)).text());
         if (!sidecar || !['a', 'b', 'c'].includes(sidecar.mode) || !Array.isArray(sidecar.person) || !Number.isSafeInteger(sidecar.w) || !Number.isSafeInteger(sidecar.h) || sidecar.person.length !== sidecar.w * sidecar.h || sidecar.person.some(value => value !== 0 && value !== 255)) mlError('io_error');
-        const source = await decodeWebRaster(await readBlob(self.file));
+        const sourceBlob = await readBlob(self.file);
+        const provisional = settings.provenance && 'kind' in settings.provenance && settings.provenance.kind === 'provisional-synthetic';
+        const sourceHash = provisional && import.meta.env.DEV
+          ? Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', await sourceBlob.arrayBuffer())), value => value.toString(16).padStart(2, '0')).join('')
+          : null;
+        const thresholds = selectCompositionThresholds(settings, sourceHash, import.meta.env.DEV);
+        metrics = decideComposition(emptyBoundaries, thresholds);
+        const source = await decodeWebRaster(sourceBlob);
         if (source.w !== sidecar.w || source.h !== sidecar.h) mlError('io_error');
         const original = detectHead(Uint8Array.from(sidecar.person), source.w, source.h);
         if (!original.ok) mlError('io_error');
@@ -336,7 +362,7 @@ export function createWebFaceMask(context?: MockContext): FaceMaskContract {
         if (!generated.ok) return {ok: false, reason: 'unsafe_output', metrics};
         const cropOffset = sidecar.mode === 'b' ? original.geometry.headBox[1] + original.geometry.headBox[3] : 0;
         if (sidecar.cropOffset !== cropOffset) mlError('io_error');
-        metrics = decideComposition(measureComposition(source, provider, original.geometry, generated.geometry, cropOffset), settings.compositionThresholds);
+        metrics = decideComposition(measureComposition(source, provider, original.geometry, generated.geometry, cropOffset), thresholds);
         const output = composeRaster(source, provider, original.geometry, generated.geometry, metrics.passed, cropOffset);
         const file = await writeBlob(await encodeWebPng(output.w, output.h, output.rgba), 'composed');
         return {ok: true, file, faceless: !metrics.passed, metrics};

@@ -129,15 +129,34 @@ Host 구현 smoke 범위는 아래에 기록한다. 전체 Android/live 합격�
 - full은 실제 UI로 과거2가게 trip, 현재3가게 trip, 검색/저장, Item/Result Walk, 두 조합의 Result를 만든다. 한 Result 삭제 시 다른 Result의 row·모든 복사본 hash 불변을 확인한 뒤 두 번째를 삭제한다. 자체 파일 삭제와 PhotoEmbedding cascade도 확인한다. 추가 오류/경합 변형의 slice suite를 대체하지 않는다.
 - mock route는 `e2e-route-start`/`e2e-route-reroute`, 두 번째 조합은 `e2e-tryon-other`(동반1), 분할 tryon 영상은 `e2e-tryon-target-only`(동반0)를 사용한다. harness phase/path만으로 실제 POST의 `X-SF-Fixture` 헤더를 바꾸며 body/response는 그대로 전달한다. 좌표·동반 수를 ignore하지 않으며 잘못된 값은409이다. live는 헤더 interception을 설치하지 않는다. 실제 Android WebView의 header 전달은 **미확인**이며 host Chromium 성공으로 대신하지 않는다.
 - `privacy.sh`는 실제 ASGI 입력/HTTPX Meta·OSRM 출력, request-context 파일/DB audit, metadata 로그를 검사한다. body는 메모리에서 폐기하며 hash/count/허용 assertion만 저장한다. native Store 파일 hash inventory와 실제 12개 head 검사 결과를 결합한다. 앱 inspector counter 범위는 `relay-attempts/shared-file-reads/media-export-attempts`이며 native 전체 호출 spy라고 주장하지 않는다. 다운로드 차단은 별도 실제 native export 실패·MediaStore 전후로 확인한다.
-- `tryon-poc.sh --plan 16 --mode live`는 12개 calibration 뒤 사람의 구도 승인/최적 mode 선택을 기다리고 `--resume <run-id>`로 나머지3+1을 실행한다. 원본 provider bytes는 로컬 `~/.cache/street-fitting/poc/<run-id>/`에 보관한다. 자동 metric/thresholdVersion과 held-out 재현을 기록하지만 product threshold를 몰래 승격하지 않는다. `provenance.sh --run <poc-run> --app-run <full-run>`으로 실제 앱 download-OFF 증거를 연결한다. 워터마크 판정 미확인은 그대로 OFF이다.
+- `tryon-poc.sh --plan 16 --mode live`는 현재 Meta `/v1/images/edits`에 앱과 같은 prompt로 호출한다. 12개 calibration 뒤 사람의 합성 미리보기 승인/최적 mode·reasoning 선택을 기다리고 `--resume <run-id>`로 나머지3+1을 실행한다. 원본 provider bytes와 실제 native 합성 미리보기는 별도 hash로 로컬 `~/.cache/street-fitting/poc/<run-id>/`에 보관한다. 호출 전 journal을 원자적으로 기록하며 완료/결과 불명 요청은 자동 재청구하지 않는다. 13번째 호출 전에 fit을 고정하고 최종4개 사람 승인·전체16개 native 재현 뒤에만 승격용 증거를 만든다. `provenance.sh --run <poc-run> --app-run <full-run>`으로 실제 앱 download-OFF 증거를 연결한다. 워터마크 판정 미확인은 그대로 OFF이다.
 - `measure.sh`는 원본22×7 native proof, 실제 query/SAM 결과·IoU, 1시간 background FGS, 실제 ASGI endpoint 지연·모델 load/encode와 app PSS/relay RSS 표본을 연결한다. `--seed-search`만 S11 test APK의 실제 native repository/인덱싱을 통한 과거 합성 방문 import를 허용한다. 합성 embedding 주입이나 실제 연구 수치 대체는 없다. 표본 peak는 무관측 구간의 절대 peak가 아니다.
 - `research.mjs`의 `hourForeground(context)`는 동일한 실제 1시간 검사를 독립 component 증거로 실행할 수 있도록 export한다. 상위 emulator lock·실제 Android 연결·출력 디렉터리는 caller 책임이며 full 연구/사람 승인 gate를 대체하지 않는다. 매 관측마다 이전보다 새 `latestFix.t`, 같은 Trip의 실제 TrailPoint 증가와 해당 fix 저장, FGS 유지·가게 자동 증가0을 요구하고 1시간 이후에도 마지막 새 fix를 확인한다. 종료 시 자기 trip의 trail0을 확인한다. 요청 주기는 현재 native 소스의 LocationRequest 설정에서 읽고 실제 관측 간격과 구분하며 좌표는 보고서에 기록하지 않는다.
 - 주입 GPX와 emulator/FusedLocation의 동일 지점 확인은 haversine 거리 ≤1 m로 한다. M1은 새 timestamp와 trail 증가 중에도 주입값 대비 submeter 차이를 실측했다(accuracy 5 m). 종전 각 축 `1e-7`도 일치는 제품 계약에 없는 약 cm 조건이었다. 이 검증용 위치 식별 범위는 제품의 위치 정확도 정책이나 timestamp/trail 지속성 조건을 바꾸지 않으며 IEEE float32 원인으로 단정하지 않는다.
 - 영상은 `demo.sh --mode live --segment shopping|search|tryon|walk --seconds <1..180>`를 순서대로 실행하고 `demo.sh --concat --inputs <shopping-run> <search-run> <tryon-run> <walk-run>`으로 합친다. 단일 full 영상도 가능하나 실제 시나리오가 녹화시간을 넘으면 실패한다. concat은 성공 live 입력과 전체 흐름 순서, 최종180초 이하, ffmpeg 끝까지 decode를 요구한다.
 
+### 재합성 보정 산출물과 승격
+
+1. 아래 head GT·자산 승인을 먼저 준비한다. 보정 실행은 기존 로컬 API 자격 증명 환경에서 `ANDROID_SERIAL=emulator-5554 bash scripts/emulator-lock.sh scripts/e2e/tryon-poc.sh --plan 16 --mode live`로 시작한다.
+2. 처음 12개를 검토한 실제 사람이 `verification/fixtures/quality/calibration-review.json`을 제공한다. `humanAttestation`, `reviewer`, `reviewedAt`, `sourceRun`, `best:{mode,reasoning}`, `outputs:{call-id:{providerSha256,previewSha256,acceptableComposition:boolean}}`이 필요하다. 미리보기 없는 출력도 빠뜨리지 않고 false로 판정한다. provider 얼굴이 아니라 원래 머리를 붙인 **합성 미리보기**를 검토한다.
+3. `uv --directory "$PWD/relay" run python "$PWD/scripts/e2e/entry.py" quality-review --phase fit --run <12회-run>`은 API/기기 없이 후보 fit을 검사한다. 사람 positive의 실측 최댓값 안에 human negative가 들어오면 fit을 거부한다. 후보 파일은 production 승격 증거가 아니다. 같은 locked PoC 명령에 `--resume <최신-run>`을 붙여 고정 후 나머지4회를 실행한다.
+4. 최종4개 검토는 `quality/validation-review.json`에 같은 검토자 필드·원래 `sourceRun`, 완료 `poc-progress.json`의 `callsSha256`, 13–16번 출력별 두 hash·승인값을 기록한다. `quality-review --phase validate --run <16회-재실행-run>`은 추가 API 호출 없이 최종 `thresholds.json`을 만든다. held-out/repeat/top-only 모두 사람 승인과 native 합성 통과가 필요하다.
+5. 저장소 루트에서 `uv --directory "$PWD/relay" run python "$PWD/scripts/promote_composition.py" --evidence "$PWD/verification/results/<완료-run>/thresholds.json"`을 실행한다. 현재 production `a/low`와 일치하고 전체 증거·현재 소스/자산·provider/미리보기 cache가 일치해야 `app/config/local-composition.json`을 교체한다. 임계값을 직접 수기로 넣지 않는다. 이후 app build/doctor/cap sync, APK 재설치와 native 합성 검증이 필요하다.
+
+초기 2026-11-05 관측에서는 사람 GT가 없어 정식 16회 실험이 **providerCalls 0, blocked**였고 앱 설정은 null이었다. 당시 증거: `verification/results/2026-11-05-recomposition/`, `verification/results/20261104T201741Z-tryon-poc-9820c2b1/summary.json`. 이후 아래 합성 데모 예외를 승인·적용했으며 정식 품질 합격과는 구별한다.
+
+#### 합성 self 한 장의 임시 승격 (D-R12-01)
+
+- 수동 GT/판정은 이 경로의 선행 조건이 아니다. 실제 Meta provider와 native 합성 미리보기를 AI가 확인하되 `kind:'assistant-visual'`, `humanApproved:false`로 기록한다. 자동 head mask 영역이 불투명하게 대체된 확인은 GT 기반 `exposedHeadPixels=0`/privacyPassed의 대체가 아니다.
+- `--provisional-synthetic --evidence <run>/provisional-composition.json`은 source/provider/preview 바이트 hash, 측정 코드 hash, 지표 digest, 음성 거부를 검사한다. 양성 실측 최대값만 fit으로 허용한다. 별도 `provisional-freeze.json`을 먼저 쓰고 유지한 뒤 다른 provider 출력의 native 통과를 확인해야 설정을 교체한다. 실패한 freeze에 값을 덧붙이지 않고 새 보정 시도와 실패 증거를 구분한다.
+- 실행: 저장소 루트에서 `uv --directory "$PWD/relay" run python "$PWD/scripts/promote_composition.py" --provisional-synthetic --evidence "$PWD/verification/results/provisional-synthetic-20261105-r3/provisional-composition.json"`. 이미지 cache는 로컬 `~/.cache/street-fitting/poc/<cacheRun>/<sha256>.png`이며 relay에는 저장하지 않는다. 현재 소스나 cache가 달라지면 승격을 거부한다.
+- 2026-11-05: 실제 출력 fit 6개(복원 가능4·구도 거부2), freeze 후 새 출력1 통과. 초기 두 시도는 거부되어 별도 보존했다. 신규 Meta 요청6회 중 unsafe_output 1회는 결과 미저장이다. 최종 임계값은 색 차이 `52.92406593298473`, 어긋남 `0.01087116327113919`이며 일반 사진용 값이 아니다.
+- 설치본은 Android debug + 저장 원본 SHA-256 일치를 요구한다. 다른 self·release에서는 null/faceless, 구도 불충족이면 faceless 또는 저장 거부다. 실제 native provider 재검사 7개에서 복원5·faceless2, 복원 결과2개의 Store 저장·앱 표시를 확인했다. 원본/provider/기존 결과는 보존한다. 증거: `verification/results/provisional-synthetic-20261105-r3/`. 사람 승인과 실사용 개인정보 보장은 미확인이다.
+
+
 ### 사람이 제공해야 하는 입력
 
-현재 승인/GT는 **0**이다. 생성 초안은 parser/replay smoke에만 사용하며 승인 corpus로 취급하지 않는다.
+정식 품질 합격용 사람 승인/GT는 현재 **0**이다. 생성 초안과 D-R12-01의 합성 데모 임시 증거를 승인 corpus로 취급하지 않는다. 아래 입력은 일반 사진용 정식 검증에 필요하지만 합성 데모 임시 승격을 다시 차단하는 조건은 아니다.
 
 1. `verification/fixtures/review/head.json`: 12개 정확한 case의 사람 annotation/classification·검토자/일자·source/GT hash. positive6은 실제 머리 GT, negative6은 사람 판정이 필요하다. 자동 person-mask proof는 GT가 아니다.
 2. `verification/fixtures/masks/items/cases.json`, `review/items.html`: 실제 사람의 옷 경계 annotation/검토를 `import_review.py --kind items`로 반영한다. manifest public-use 승인과 각 relay recording 승인은 별개다.
