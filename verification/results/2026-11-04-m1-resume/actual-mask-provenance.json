@@ -1,0 +1,20 @@
+{
+  "kind": "actual-android-edgetam-tap-export",
+  "device": "M1 Medium_Phone API37 arm64-v8a PAGE_SIZE16384",
+  "apkSha256": "c8bcc67c443c11c65706082ecedbeee5627cac5ae020c579acbaa766b3979e91",
+  "ortVersion": "1.22.0",
+  "inferenceTest": "com.streetfitting.app.plugins.segmenter.PersonMaskExportTest",
+  "extractionCommand": "bash scripts/emulator-lock.sh adb exec-out run-as com.streetfitting.app tar cf - files/ml-proof/results/person-masks files/ml-proof/results/person-mask-export.json files/ml-proof/results/photo-index-original-jpeg.f32 files/ml-proof/results/photo-index-research.f32 files/s04-evidence/system-photo-picker.xml files/s04-evidence/system-photo-picker.png",
+  "metadata": "person-mask-export-after.json",
+  "caseCount": 13,
+  "maskFiles": 78,
+  "allPublishedPngAndBinarySha256Verified": true,
+  "fullResolutionDimensionsVerified": true,
+  "humanGroundTruth": false,
+  "privacyApproval": false,
+  "notes": [
+    "Actual model outputs, not human head masks or acceptance ground truth.",
+    "All three synthetic-mock-provider candidates reject head geometry; no safe recomposition claim.",
+    "Wardrobe exact-input export is pending the next native run."
+  ]
+}

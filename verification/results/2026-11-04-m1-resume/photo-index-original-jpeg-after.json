@@ -1,0 +1,306 @@
+{
+  "vectorComparisons": [
+    {
+      "id": "i02",
+      "inputSha256": "213c025f64a58c966c2ac623dfb342ea51591dcae33b2ae4ba85e0fcf395d191",
+      "maxAbs": 8.940696716308594e-07,
+      "cosine": 0.9999999999849476,
+      "l2Error": 6.461556401049506e-09,
+      "passed": true
+    },
+    {
+      "id": "i03",
+      "inputSha256": "818d96a8a8a9b66cfa4a5f4108ab98cb6304f9404c411a0cacadc9641a4a08c8",
+      "maxAbs": 8.046627044677734e-07,
+      "cosine": 0.9999999999853066,
+      "l2Error": 3.095471656777704e-09,
+      "passed": true
+    },
+    {
+      "id": "i04",
+      "inputSha256": "3dfb62488cbb4d95b4d8e798d83b3bce460100b49a132920be76547cfb11209d",
+      "maxAbs": 5.979090929031372e-07,
+      "cosine": 0.9999999999901958,
+      "l2Error": 1.034108798592115e-09,
+      "passed": true
+    },
+    {
+      "id": "i05",
+      "inputSha256": "337e172ad67d2f5edc09582723b13651132c139d91a00f792f4f9f5c250304f9",
+      "maxAbs": 6.752088665962219e-07,
+      "cosine": 0.9999999999886013,
+      "l2Error": 7.408345048531828e-10,
+      "passed": true
+    },
+    {
+      "id": "i06",
+      "inputSha256": "3693963fb9bc4a3bf2e8ea5279b19768da82ca61a4a59680884b2b447b48d34c",
+      "maxAbs": 9.797513484954834e-07,
+      "cosine": 0.999999999971886,
+      "l2Error": 2.4131052711595657e-09,
+      "passed": true
+    },
+    {
+      "id": "i07",
+      "inputSha256": "36bdb07e0b975dca6b96c0744c2516cdbd13f31f59e3db6e765a380e918f09db",
+      "maxAbs": 9.057112038135529e-07,
+      "cosine": 0.999999999989592,
+      "l2Error": 7.405698276841122e-10,
+      "passed": true
+    },
+    {
+      "id": "i10",
+      "inputSha256": "f88ae28b1889c9bdb5ad5af0c4811c85abfcb7850a48be84eb407876556cfa65",
+      "maxAbs": 4.6938657760620117e-07,
+      "cosine": 0.9999999999931328,
+      "l2Error": 3.1666198552215974e-09,
+      "passed": true
+    },
+    {
+      "id": "i11",
+      "inputSha256": "406c77cf269ebb62c83e50d9f3730b195892e1b225afc708577daafbb9446e14",
+      "maxAbs": 7.152557373046875e-07,
+      "cosine": 0.9999999999874443,
+      "l2Error": 4.3603841648476305e-09,
+      "passed": true
+    },
+    {
+      "id": "i13",
+      "inputSha256": "910c019c2535cf78bceb82e771ad6e6084b40eb9fe6d1c7eb33e60968ae5435c",
+      "maxAbs": 7.075723260641098e-07,
+      "cosine": 0.9999999999898075,
+      "l2Error": 2.959139155933599e-09,
+      "passed": true
+    },
+    {
+      "id": "i14",
+      "inputSha256": "e0ff056023a41cef8eb7ef5686b87ca2981f4eba1731779de899925b1f4cde08",
+      "maxAbs": 7.078051567077637e-07,
+      "cosine": 0.9999999999890139,
+      "l2Error": 2.293411016651703e-09,
+      "passed": true
+    },
+    {
+      "id": "i15",
+      "inputSha256": "dce7e6ef5bf13d613c2cc41782b988565617b736ddc169fe11856073b89437e7",
+      "maxAbs": 8.344650268554688e-07,
+      "cosine": 0.9999999999763702,
+      "l2Error": 6.008220587716551e-10,
+      "passed": true
+    },
+    {
+      "id": "i16",
+      "inputSha256": "e6d50817b85e497f45dbf7d11b6fca30e262a516828fdb5ba54b04224e366523",
+      "maxAbs": 9.126961231231689e-07,
+      "cosine": 0.9999999999840679,
+      "l2Error": 2.849604552324081e-09,
+      "passed": true
+    },
+    {
+      "id": "i17",
+      "inputSha256": "ec25c4b6e1671841783d76eb33487c7143856cd6e9f7b26498ec48252ed3827f",
+      "maxAbs": 1.0319054126739502e-06,
+      "cosine": 0.9999999999823767,
+      "l2Error": 4.884620374845383e-09,
+      "passed": true
+    },
+    {
+      "id": "i18",
+      "inputSha256": "da3ced38544dd05e4c4909222b4732eb2005b408fa275de32a6115ebcab5da7f",
+      "maxAbs": 6.593763828277588e-07,
+      "cosine": 0.9999999999892536,
+      "l2Error": 4.286772825601304e-09,
+      "passed": true
+    },
+    {
+      "id": "i19",
+      "inputSha256": "91c7f3478e7429c9edeceb9294d9377d581c68660a5c6787b725d598b44396b2",
+      "maxAbs": 1.3783574104309082e-06,
+      "cosine": 0.99999999997222,
+      "l2Error": 2.5062624198213257e-09,
+      "passed": true
+    },
+    {
+      "id": "i20",
+      "inputSha256": "5c13c535441ae226e3bf6c4bc0543508450cef4afd1d58f2d855b26e131239a0",
+      "maxAbs": 8.828938007354736e-07,
+      "cosine": 0.9999999999856303,
+      "l2Error": 6.481991388085362e-09,
+      "passed": true
+    },
+    {
+      "id": "i21",
+      "inputSha256": "735f4a9893dd0d62a12b96b2d67d84d3c2c9961c5a7b6b1a7d768c2ca85e18bf",
+      "maxAbs": 9.96515154838562e-07,
+      "cosine": 0.9999999999793369,
+      "l2Error": 2.0883146323313895e-09,
+      "passed": true
+    },
+    {
+      "id": "i22",
+      "inputSha256": "dc1127693aab4b663bec8be3f40782b4f3f1e09a502bbefa405be61ca012e7b1",
+      "maxAbs": 8.568167686462402e-07,
+      "cosine": 0.9999999999832472,
+      "l2Error": 2.3142820992916313e-09,
+      "passed": true
+    },
+    {
+      "id": "i23",
+      "inputSha256": "dc87f863886f0d2b793469dafe103098da9d85fa868887d6f4c0fdec5ea29f65",
+      "maxAbs": 8.195638656616211e-07,
+      "cosine": 0.9999999999829634,
+      "l2Error": 3.3690108480755043e-09,
+      "passed": true
+    },
+    {
+      "id": "i24",
+      "inputSha256": "7aa0393760963c2016a2fc6bded63541964466f8c08830dbab83291eac119489",
+      "maxAbs": 3.5390257835388184e-07,
+      "cosine": 0.9999999999964279,
+      "l2Error": 3.4180560604113452e-09,
+      "passed": true
+    },
+    {
+      "id": "i25",
+      "inputSha256": "43113d61be4031b989d0972cc2e48a293169af055c65f050115c1d97efd56ac6",
+      "maxAbs": 8.363276720046997e-07,
+      "cosine": 0.9999999999874831,
+      "l2Error": 3.894179423369337e-09,
+      "passed": true
+    },
+    {
+      "id": "i26",
+      "inputSha256": "644073eb3757229020be610ed7c82543b3c8c5ad85ad51f3fe91d16f2fe851c6",
+      "maxAbs": 9.760260581970215e-07,
+      "cosine": 0.9999999999787327,
+      "l2Error": 7.020091175036214e-10,
+      "passed": true
+    }
+  ],
+  "rankings": [
+    {
+      "query": "a blue jacket",
+      "top3": [
+        {
+          "id": "i21",
+          "score": 0.47818087820507954
+        },
+        {
+          "id": "i20",
+          "score": 0.4586514741120037
+        },
+        {
+          "id": "i18",
+          "score": 0.45795108582793737
+        }
+      ]
+    },
+    {
+      "query": "a red dress",
+      "top3": [
+        {
+          "id": "i06",
+          "score": 0.45922735207428267
+        },
+        {
+          "id": "i22",
+          "score": 0.4526453990864106
+        },
+        {
+          "id": "i05",
+          "score": 0.4488601700334302
+        }
+      ]
+    },
+    {
+      "query": "a striped shirt",
+      "top3": [
+        {
+          "id": "i04",
+          "score": 0.46201637079759506
+        },
+        {
+          "id": "i03",
+          "score": 0.45275195870011903
+        },
+        {
+          "id": "i19",
+          "score": 0.41479742761017346
+        }
+      ]
+    },
+    {
+      "query": "clothes on a clothing rack",
+      "top3": [
+        {
+          "id": "i10",
+          "score": 0.4787664217538531
+        },
+        {
+          "id": "i02",
+          "score": 0.46460727021486764
+        },
+        {
+          "id": "i24",
+          "score": 0.4288420807559893
+        }
+      ]
+    },
+    {
+      "query": "denim shorts",
+      "top3": [
+        {
+          "id": "i24",
+          "score": 0.45259485479621514
+        },
+        {
+          "id": "i19",
+          "score": 0.37823812855982464
+        },
+        {
+          "id": "i04",
+          "score": 0.3744430888796538
+        }
+      ]
+    },
+    {
+      "query": "black shoes",
+      "top3": [
+        {
+          "id": "i26",
+          "score": 0.4291022144932586
+        },
+        {
+          "id": "i25",
+          "score": 0.40987117725144306
+        },
+        {
+          "id": "i19",
+          "score": 0.384267811613222
+        }
+      ]
+    },
+    {
+      "query": "a blue puffer jacket",
+      "top3": [
+        {
+          "id": "i17",
+          "score": 0.4889278410527319
+        },
+        {
+          "id": "i20",
+          "score": 0.44284890089160256
+        },
+        {
+          "id": "i21",
+          "score": 0.4237254945219739
+        }
+      ]
+    }
+  ],
+  "hit1": 6,
+  "hit3": 7,
+  "inputDecode": "Android original JPEG with production EXIF normalization",
+  "package": "com.streetfitting.app",
+  "ortVersion": "1.22.0"
+}
