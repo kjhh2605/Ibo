@@ -15,9 +15,10 @@
 - 실제 self 12건의 detection을 실행했다. 양성 6건의 사람이 검토한 face+hair GT 승인이 없어 개인정보 gate는 **hard failure/차단 상태**다. 일부 양성 detection 실패와 GT 부재를 skip하거나 실제 모델 출력으로 대신 승인하지 않는다.
 - self/provider 및 wardrobe-jeans를 포함한 14입력의 실제 Android tap 결과 42개를 PNG와 binary 84파일로 추출했다. 모든 SHA와 원본 해상도를 확인했다. 이는 **person/garment 모델 출력이며 사람이 승인한 head GT가 아니다**.
 - synthetic composition 경계 검사는 통과했지만, 실제 self/provider 조합의 품질과 calibration 16회·독립 heldout 검증은 아직 미확인이다.
-- 동일 APK에서 Capture 6개, Voice 7개, Store 14개 및 별도 프로세스 저장→재시작·삭제가 통과했다. Store에는 기존 file URI 별칭의 소유권 이관과 충돌 시 rollback 검사가 포함된다. Media는 4개 중 3개 통과이며 실제 picker 선택 후 callback timeout 1건을 수정 중이다. 실제 Capture 화면의 preview 가시성과 전체 UI E2E는 별도 검증이 남아 있다.
+- 동일 APK에서 Capture 6개, Voice 7개, Store 14개 및 별도 프로세스 저장→재시작·삭제가 통과했다. Store에는 기존 file URI 별칭의 소유권 이관과 충돌 시 rollback 검사가 포함된다. Media는 실제 시스템 picker의 선택 후 **Done** 확인을 누락했던 검증 드라이버를 고친 뒤 4/4 통과했다. 제품 callback 우회나 timeout 확대는 하지 않았다. 실제 CameraX preview·셔터·종료·재시작 및 같은 Activity의 fixture 폴더/실제 카메라 전환도 통과했다. 전체 UI E2E 합격과는 구분한다.
 - 최신 관측 APK SHA는 `943f7f3e5d3ce6ce0eb102145612ac09806c57ce9468252d651a7811bf81795a`다. 공유 소유자 승인으로 CameraX 4개 의존성을 1.5.1→1.5.2로 올린 뒤 API 37의 bind 동적 범위 NPE가 사라지고 Capture 6개가 통과했다. backend가 바뀌는 1.6으로 대체하지 않았다.
 - 실행 증거는 `../2026-11-04-m1-resume/`에 있다. 최신 기록은 `native-fixed-contracts.json`, `apk-layout.json`, `ml-timing-after.json`, `photo-index-{original-jpeg,research}-after.json`, `segmenter-research-after.json`, `person-mask-export-after.json`, `actual-mask-provenance.json`, `relay-real-pe-after.{json,xml}`이다. `*-before.json`, `native-diagnostics.json`, `native-contracts*.json`, `relay-real-pe.xml`의 이전 실패를 덮어 합격으로 숨기지 않는다.
+- 후속 실제 실행은 `media-after.json`, `native-capture-ui-after.json`, `native-intent-source.json`, `native-auth-current.json`과 [M1 통합 체크포인트](../2026-11-04-m1-resume/checkpoint.md)를 따른다. Firebase Admin은 현재 APK의 ID/App Check 토큰을 각각 검증했으며, 앱 PID 로그의 반환 토큰·등록 debug secret 일치 항목은 0이다. 값이나 원시 로그는 보존하지 않았다.
 
 이전 체크포인트의 “실행 없음”, “GT gate skip”, “JPEG 미검사” 문장은 당시 상태다. 현재는 실제 실행 실패를 보존하며, GT 부재를 hard failure로 처리한다.
 

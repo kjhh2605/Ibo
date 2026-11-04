@@ -1,0 +1,251 @@
+{
+  "runtime": "actual Android private debug fixtures, CameraX and persisted photo files",
+  "globalDeviceLock": true,
+  "apkSha256": "943f7f3e5d3ce6ce0eb102145612ac09806c57ce9468252d651a7811bf81795a",
+  "syntheticDiagnosticFixtures": true,
+  "modelQualityEvaluated": false,
+  "steps": [
+    {
+      "source": "a",
+      "sameProcess": true,
+      "deliveredToExistingActivity": true
+    },
+    {
+      "source": "b",
+      "sameProcess": true,
+      "deliveredToExistingActivity": true
+    },
+    {
+      "source": "a",
+      "sameProcess": true,
+      "deliveredToExistingActivity": true
+    },
+    {
+      "source": "native",
+      "sameProcess": true,
+      "deliveredToExistingActivity": true
+    },
+    {
+      "source": "a",
+      "sameProcess": true,
+      "deliveredToExistingActivity": true
+    },
+    "All six photo files and their Trip survive fixture-source deletion plus real process restart"
+  ],
+  "captures": [
+    {
+      "label": "A index 0",
+      "photoId": "e12e572d-1d90-4a1d-9735-d77edbabcf48",
+      "width": 128,
+      "height": 128,
+      "rgb": [
+        217,
+        21,
+        31
+      ],
+      "range": 196
+    },
+    {
+      "label": "A advances to index 1",
+      "photoId": "53a2f7e8-b38e-43c5-a270-78a6bd6b1f1d",
+      "width": 128,
+      "height": 128,
+      "rgb": [
+        31,
+        198,
+        67
+      ],
+      "range": 167
+    },
+    {
+      "label": "B resets to index 0",
+      "photoId": "4acec686-d67c-4adc-948a-a11ea9739622",
+      "width": 128,
+      "height": 128,
+      "rgb": [
+        23,
+        63,
+        210
+      ],
+      "range": 187
+    },
+    {
+      "label": "A resets after folder switch",
+      "photoId": "7bc1b0a3-115c-4ac2-9162-7ffe61d61679",
+      "width": 128,
+      "height": 128,
+      "rgb": [
+        217,
+        21,
+        31
+      ],
+      "range": 196
+    },
+    {
+      "label": "Actual CameraX after fixture mode",
+      "photoId": "9ab87abc-2350-4d0a-8da1-b488ddd1d488",
+      "width": 1392,
+      "height": 1856,
+      "rgb": [
+        255,
+        248,
+        255
+      ],
+      "range": 206
+    },
+    {
+      "label": "A resets after native source",
+      "photoId": "0e0697d6-0bb8-4975-aaf0-1de864cd6414",
+      "width": 128,
+      "height": 128,
+      "rgb": [
+        217,
+        21,
+        31
+      ],
+      "range": 196
+    }
+  ],
+  "failure": null,
+  "before": {
+    "route": "home",
+    "ids": {
+      "trips": [
+        "a1a7c986-556f-4d0b-aca3-b6c81bebae6f",
+        "b6f46ef8-cb15-4793-990a-604061eb405c",
+        "618bfeba-4b2e-42c5-be3e-d342be2f4963",
+        "86900187-c84f-46d3-9e30-153c0706f15e",
+        "aa370907-9640-4e49-b700-d023e2dfd0ac",
+        "b42e1f00-5dab-44bd-8d82-6f68d3f989e6",
+        "5b45c998-c2d0-4941-993b-e16271bacc92",
+        "e2c7f460-f098-49e9-8ee1-1dfbd639d05c",
+        "3d9d9fe9-84c8-4c3b-bc41-74de37cf342f",
+        "eefd99cf-cc13-48cb-8eb4-c86a32567b42",
+        "421307e9-f9cd-4e43-83db-2374a89e9a74",
+        "9fb5d5a7-d4d4-44b6-a3d2-9853653e6033",
+        "bca42318-275f-499b-88c6-5898b5f0404a",
+        "d0eb9388-9897-482e-acae-4679ee698844",
+        "d2609095-5e0e-412c-9f68-f84d1d63c6c0",
+        "14c204d3-5a70-46c7-be56-0429af546f5d",
+        "3363e308-b3f3-45e9-b655-7b1c542927d7",
+        "42818c8d-0773-4139-8bb2-d7332d8bddb3",
+        "8773136e-76fc-416e-9695-07abbf59ad69"
+      ],
+      "photos": [
+        "23c5f6b8-f5f8-433a-882f-cb2fcccf66f5",
+        "ae5703f1-c19e-4048-b309-bcf3d026343d",
+        "974b7909-4cd8-4be0-a7ef-dd19a31a62e7",
+        "341b0d68-c38a-4fd8-b8d9-502bc961fe24",
+        "7cafdc60-9679-4e19-85ef-962231e146c4",
+        "f62b4d93-8714-4040-95a8-1bed71836f46",
+        "f966f02a-0428-4961-8f24-2951cf2ee7b7"
+      ],
+      "pieces": [],
+      "results": []
+    }
+  },
+  "afterCapture": {
+    "route": "home",
+    "ids": {
+      "trips": [
+        "62ca75fa-804e-4817-8c88-bd16cff05cee",
+        "a1a7c986-556f-4d0b-aca3-b6c81bebae6f",
+        "b6f46ef8-cb15-4793-990a-604061eb405c",
+        "618bfeba-4b2e-42c5-be3e-d342be2f4963",
+        "86900187-c84f-46d3-9e30-153c0706f15e",
+        "aa370907-9640-4e49-b700-d023e2dfd0ac",
+        "b42e1f00-5dab-44bd-8d82-6f68d3f989e6",
+        "5b45c998-c2d0-4941-993b-e16271bacc92",
+        "e2c7f460-f098-49e9-8ee1-1dfbd639d05c",
+        "3d9d9fe9-84c8-4c3b-bc41-74de37cf342f",
+        "eefd99cf-cc13-48cb-8eb4-c86a32567b42",
+        "421307e9-f9cd-4e43-83db-2374a89e9a74",
+        "9fb5d5a7-d4d4-44b6-a3d2-9853653e6033",
+        "bca42318-275f-499b-88c6-5898b5f0404a",
+        "d0eb9388-9897-482e-acae-4679ee698844",
+        "d2609095-5e0e-412c-9f68-f84d1d63c6c0",
+        "14c204d3-5a70-46c7-be56-0429af546f5d",
+        "3363e308-b3f3-45e9-b655-7b1c542927d7",
+        "42818c8d-0773-4139-8bb2-d7332d8bddb3",
+        "8773136e-76fc-416e-9695-07abbf59ad69"
+      ],
+      "photos": [
+        "0e0697d6-0bb8-4975-aaf0-1de864cd6414",
+        "9ab87abc-2350-4d0a-8da1-b488ddd1d488",
+        "7bc1b0a3-115c-4ac2-9162-7ffe61d61679",
+        "4acec686-d67c-4adc-948a-a11ea9739622",
+        "53a2f7e8-b38e-43c5-a270-78a6bd6b1f1d",
+        "e12e572d-1d90-4a1d-9735-d77edbabcf48",
+        "23c5f6b8-f5f8-433a-882f-cb2fcccf66f5",
+        "ae5703f1-c19e-4048-b309-bcf3d026343d",
+        "974b7909-4cd8-4be0-a7ef-dd19a31a62e7",
+        "341b0d68-c38a-4fd8-b8d9-502bc961fe24",
+        "7cafdc60-9679-4e19-85ef-962231e146c4",
+        "f62b4d93-8714-4040-95a8-1bed71836f46",
+        "f966f02a-0428-4961-8f24-2951cf2ee7b7"
+      ],
+      "pieces": [],
+      "results": []
+    }
+  },
+  "fixtureOriginalsRetained": 4,
+  "afterRestart": {
+    "route": "home",
+    "ids": {
+      "trips": [
+        "62ca75fa-804e-4817-8c88-bd16cff05cee",
+        "a1a7c986-556f-4d0b-aca3-b6c81bebae6f",
+        "b6f46ef8-cb15-4793-990a-604061eb405c",
+        "618bfeba-4b2e-42c5-be3e-d342be2f4963",
+        "86900187-c84f-46d3-9e30-153c0706f15e",
+        "aa370907-9640-4e49-b700-d023e2dfd0ac",
+        "b42e1f00-5dab-44bd-8d82-6f68d3f989e6",
+        "5b45c998-c2d0-4941-993b-e16271bacc92",
+        "e2c7f460-f098-49e9-8ee1-1dfbd639d05c",
+        "3d9d9fe9-84c8-4c3b-bc41-74de37cf342f",
+        "eefd99cf-cc13-48cb-8eb4-c86a32567b42",
+        "421307e9-f9cd-4e43-83db-2374a89e9a74",
+        "9fb5d5a7-d4d4-44b6-a3d2-9853653e6033",
+        "bca42318-275f-499b-88c6-5898b5f0404a",
+        "d0eb9388-9897-482e-acae-4679ee698844",
+        "d2609095-5e0e-412c-9f68-f84d1d63c6c0",
+        "14c204d3-5a70-46c7-be56-0429af546f5d",
+        "3363e308-b3f3-45e9-b655-7b1c542927d7",
+        "42818c8d-0773-4139-8bb2-d7332d8bddb3",
+        "8773136e-76fc-416e-9695-07abbf59ad69"
+      ],
+      "photos": [
+        "0e0697d6-0bb8-4975-aaf0-1de864cd6414",
+        "9ab87abc-2350-4d0a-8da1-b488ddd1d488",
+        "7bc1b0a3-115c-4ac2-9162-7ffe61d61679",
+        "4acec686-d67c-4adc-948a-a11ea9739622",
+        "53a2f7e8-b38e-43c5-a270-78a6bd6b1f1d",
+        "e12e572d-1d90-4a1d-9735-d77edbabcf48",
+        "23c5f6b8-f5f8-433a-882f-cb2fcccf66f5",
+        "ae5703f1-c19e-4048-b309-bcf3d026343d",
+        "974b7909-4cd8-4be0-a7ef-dd19a31a62e7",
+        "341b0d68-c38a-4fd8-b8d9-502bc961fe24",
+        "7cafdc60-9679-4e19-85ef-962231e146c4",
+        "f62b4d93-8714-4040-95a8-1bed71836f46",
+        "f966f02a-0428-4961-8f24-2951cf2ee7b7"
+      ],
+      "pieces": [],
+      "results": []
+    }
+  },
+  "retainedSmokeRecords": {
+    "tripIds": [
+      "62ca75fa-804e-4817-8c88-bd16cff05cee"
+    ],
+    "photoIds": [
+      "e12e572d-1d90-4a1d-9735-d77edbabcf48",
+      "53a2f7e8-b38e-43c5-a270-78a6bd6b1f1d",
+      "4acec686-d67c-4adc-948a-a11ea9739622",
+      "7bc1b0a3-115c-4ac2-9162-7ffe61d61679",
+      "9ab87abc-2350-4d0a-8da1-b488ddd1d488",
+      "0e0697d6-0bb8-4975-aaf0-1de864cd6414"
+    ]
+  },
+  "persistedIndependentPhotoCopies": 6,
+  "passed": true
+}

@@ -1,0 +1,7 @@
+{
+  "apk_sha256": "943f7f3e5d3ce6ce0eb102145612ac09806c57ce9468252d651a7811bf81795a",
+  "global_device_lock": true,
+  "passed": false,
+  "elapsed_seconds": 29.954076,
+  "instrumentation_output": "\ncom.streetfitting.app.plugins.media.MediaContractTest:\nError in pickerCopiesWardrobeAndSelfIntoPrivateFiles(com.streetfitting.app.plugins.media.MediaContractTest):\njava.util.concurrent.TimeoutException\n\tat java.util.concurrent.CompletableFuture.timedGet(CompletableFuture.java:1936)\n\tat java.util.concurrent.CompletableFuture.get(CompletableFuture.java:2071)\n\tat com.streetfitting.app.plugins.shopping.NativeHarness$TestCall.await(NativeHarness.java:80)\n\tat com.streetfitting.app.plugins.media.MediaContractTest.pickerCopiesWardrobeAndSelfIntoPrivateFiles(MediaContractTest.java:114)\n\n\nTime: 29.153\nThere was 1 failure:\n1) pickerCopiesWardrobeAndSelfIntoPrivateFiles(com.streetfitting.app.plugins.media.MediaContractTest)\njava.util.concurrent.TimeoutException\n\tat java.util.concurrent.CompletableFuture.timedGet(CompletableFuture.java:1936)\n\tat java.util.concurrent.CompletableFuture.get(CompletableFuture.java:2071)\n\tat com.streetfitting.app.plugins.shopping.NativeHarness$TestCall.await(NativeHarness.java:80)\n\tat com.streetfitting.app.plugins.media.MediaContractTest.pickerCopiesWardrobeAndSelfIntoPrivateFiles(MediaContractTest.java:114)\n\nFAILURES!!!\nTests run: 1,  Failures: 1\n\n\n"
+}

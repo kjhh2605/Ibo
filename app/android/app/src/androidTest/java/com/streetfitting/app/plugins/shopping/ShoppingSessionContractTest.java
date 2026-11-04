@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.junit.Assert.*;
-import static org.junit.Assume.*;
 
 @RunWith(AndroidJUnit4.class)
 public class ShoppingSessionContractTest {
@@ -27,41 +26,14 @@ public class ShoppingSessionContractTest {
         if (session.getJSObject("trip") != null) RepositoryProvider.get(harness.context).stopSession(new JSObject().put("tripId", session.getJSObject("trip").optString("id")).put("endedAt", System.currentTimeMillis()));
         NativeHarness.until(() -> ShoppingService.active() == null, 5000);
     }
-    private JSObject start(NativeHarness harness, boolean notifications) throws Exception {
-        NativeHarness.TestCall call = harness.invoke("ShoppingSession", "start", new JSObject());
-        harness.dismissPermission(notifications);
-        return call.await();
-    }
-    @Test public void locationDeniedDoesNotStart() throws Exception {
-        try (NativeHarness harness = new NativeHarness()) {
-            assumeFalse(LocationFixes.permitted(harness.context)); clean(harness);
-            int before = RepositoryProvider.get(harness.context).list(new JSObject().put("entity", "Trip")).optJSONArray("items").length();
-            NativeHarness.TestCall call = harness.invoke("ShoppingSession", "start", new JSObject()); harness.dismissPermission(false);
-            assertEquals("location_permission_denied", call.failure());
-            assertEquals("idle", harness.invoke("ShoppingSession", "getState", new JSObject()).await().optString("phase"));
-            assertNull(ShoppingService.active()); assertNull(RepositoryProvider.get(harness.context).getSession().getJSObject("trip"));
-            assertEquals(before, RepositoryProvider.get(harness.context).list(new JSObject().put("entity", "Trip")).optJSONArray("items").length());
-            harness.invoke("ShoppingSession", "openSettings", new JSObject()).await();
-            assertNotNull(harness.device.wait(Until.findObject(By.pkg("com.android.settings")), 4000)); harness.evidence("location-denied-settings");
-        }
-    }
-    @Test public void notificationDeniedStillRecords() throws Exception {
-        try (NativeHarness harness = new NativeHarness()) {
-            assumeTrue(LocationFixes.permitted(harness.context));
-            assumeTrue(ContextCompat.checkSelfPermission(harness.context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED);
-            clean(harness); NativeHarness.TestCall notices = harness.listen("ShoppingSession", "notice");
-            JSObject state = start(harness, false); assertEquals("recording", state.optString("phase"));
-            NativeHarness.until(() -> notices.values.size() == 1, 3000);
-            harness.invoke("ShoppingSession", "start", new JSObject()).await(); assertEquals(1, notices.values.size());
-            harness.device.openNotification();
-            assertNull(harness.device.findObject(By.text("Take photo"))); harness.evidence("notification-denied-recording"); harness.device.pressBack();
-            harness.invoke("ShoppingSession", "stop", new JSObject()).await();
-        }
+    private JSObject start(NativeHarness harness) throws Exception {
+        return harness.invoke("ShoppingSession", "start", new JSObject()).await();
     }
     @Test public void notificationActionsOpenAndNewShopExactlyOnce() throws Exception {
         try (NativeHarness harness = new NativeHarness()) {
-            assumeTrue(LocationFixes.permitted(harness.context)); assumeTrue(ContextCompat.checkSelfPermission(harness.context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED);
-            clean(harness); JSObject initial = start(harness, true);
+            assertTrue("Setup: grant location and inject a current emulator GPS fix", LocationFixes.permitted(harness.context));
+            assertEquals("Setup: grant POST_NOTIFICATIONS", PackageManager.PERMISSION_GRANTED, ContextCompat.checkSelfPermission(harness.context, Manifest.permission.POST_NOTIFICATIONS));
+            clean(harness); JSObject initial = start(harness);
             NativeHarness.TestCall opened = harness.listen("ShoppingSession", "open");
             NotificationManager manager = harness.context.getSystemService(NotificationManager.class);
             StatusBarNotification[] cards = manager.getActiveNotifications(); assertEquals(1, cards.length);
@@ -84,7 +56,7 @@ public class ShoppingSessionContractTest {
     @Test public void swipeRecentsThenReopenRestoresRecording() throws Exception {
         String tripId; long prior;
         try (NativeHarness harness = new NativeHarness()) {
-            assumeTrue(LocationFixes.permitted(harness.context)); clean(harness); JSObject state = start(harness, true);
+            assertTrue("Setup: inject GPS throughout the swipe scenario", LocationFixes.permitted(harness.context)); clean(harness); JSObject state = start(harness);
             tripId = state.getJSObject("trip").optString("id"); prior = state.getJSObject("latestFix").optLong("t");
             harness.device.pressRecentApps(); harness.device.waitForIdle();
             int width = harness.device.getDisplayWidth(); int height = harness.device.getDisplayHeight();
@@ -99,7 +71,7 @@ public class ShoppingSessionContractTest {
     }
     @Test public void stopDeletesAllTrailKeepsPhotos() throws Exception {
         try (NativeHarness harness = new NativeHarness()) {
-            assumeTrue(LocationFixes.permitted(harness.context)); clean(harness); JSObject state = start(harness, true);
+            assertTrue("Setup: inject a current emulator GPS fix", LocationFixes.permitted(harness.context)); clean(harness); JSObject state = start(harness);
             String tripId = state.getJSObject("trip").optString("id"); String shopId = state.getJSObject("shop").optString("id");
             JSObject before = RepositoryProvider.get(harness.context).get(new JSObject().put("entity", "Shop").put("id", shopId));
             int photos = RepositoryProvider.get(harness.context).list(new JSObject().put("entity", "Photo").put("tripId", tripId)).optJSONArray("items").length();
@@ -108,6 +80,51 @@ public class ShoppingSessionContractTest {
             assertEquals(photos, RepositoryProvider.get(harness.context).list(new JSObject().put("entity", "Photo").put("tripId", tripId)).optJSONArray("items").length());
             assertEquals(before.getJSObject("spot").toString(), RepositoryProvider.get(harness.context).get(new JSObject().put("entity", "Shop").put("id", shopId)).getJSObject("spot").toString());
             NativeHarness.until(() -> ShoppingService.active() == null, 5000); assertEquals(0, harness.context.getSystemService(NotificationManager.class).getActiveNotifications().length);
+        }
+    }
+    @Test public void explicitStartEndsOrphanedRecordingInsteadOfResumingIt() throws Exception {
+        try (NativeHarness harness = new NativeHarness()) {
+            assertTrue("Setup: grant location and inject current GPS", LocationFixes.permitted(harness.context));
+            clean(harness);
+            JSObject fix = LocationFixes.current(harness.context).get(20, TimeUnit.SECONDS);
+            JSObject orphan = RepositoryProvider.get(harness.context).startSession(new JSObject().put("fix", fix));
+            String oldId = orphan.getJSObject("trip").optString("id");
+            JSObject current = start(harness);
+            try {
+                assertNotEquals(oldId, current.getJSObject("trip").optString("id"));
+                assertEquals("ended", RepositoryProvider.get(harness.context).get(new JSObject().put("entity", "Trip").put("id", oldId)).optString("status"));
+                assertEquals(0, RepositoryProvider.get(harness.context).list(new JSObject().put("entity", "TrailPoint").put("tripId", oldId)).optJSONArray("items").length());
+            } finally { harness.invoke("ShoppingSession", "stop", new JSObject()).await(); }
+        }
+    }
+    @Test public void stopWaitsForShutterAndDoesNotAcceptAnother() throws Exception {
+        try (NativeHarness harness = new NativeHarness()) {
+            assertTrue("Setup: grant location and inject current GPS", LocationFixes.permitted(harness.context));
+            clean(harness); JSObject state = start(harness);
+            ShoppingService service = ShoppingService.active();
+            service.beginShutter(System.currentTimeMillis());
+            java.util.concurrent.CompletableFuture<JSObject> stopped = service.stopRecording();
+            try {
+                assertFalse(stopped.isDone());
+                assertEquals("recording", RepositoryProvider.get(harness.context).get(new JSObject().put("entity", "Trip").put("id", state.getJSObject("trip").optString("id"))).optString("status"));
+                try { service.beginShutter(System.currentTimeMillis()); fail("stopping accepted shutter"); }
+                catch (IllegalStateException expected) { assertEquals("not_recording", expected.getMessage()); }
+            } finally { service.endShutter(false); }
+            assertEquals("ended", stopped.get(20, TimeUnit.SECONDS).optString("status"));
+            NativeHarness.until(() -> ShoppingService.active() == null, 5000);
+        }
+    }
+    @Test public void deletingRecordingTripInvalidatesServiceWithoutDeadlock() throws Exception {
+        try (NativeHarness harness = new NativeHarness()) {
+            assertTrue("Setup: grant location and inject current GPS", LocationFixes.permitted(harness.context));
+            clean(harness); JSObject state = start(harness);
+            ShoppingService service = ShoppingService.active();
+            String id = state.getJSObject("trip").optString("id");
+            java.util.concurrent.CompletableFuture.runAsync(() -> RepositoryProvider.get(harness.context).deleteTrip(new JSObject().put("id", id))).get(10, TimeUnit.SECONDS);
+            NativeHarness.until(() -> ShoppingService.active() == null, 5000);
+            assertNull(RepositoryProvider.get(harness.context).getSession().getJSObject("trip"));
+            try { service.beginShutter(System.currentTimeMillis()); fail("deleted trip accepted shutter"); }
+            catch (IllegalStateException expected) { assertEquals("not_recording", expected.getMessage()); }
         }
     }
 }

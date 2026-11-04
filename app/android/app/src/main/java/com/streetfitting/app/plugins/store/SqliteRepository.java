@@ -45,8 +45,10 @@ public final class SqliteRepository implements NativeRepository {
     public SqliteRepository(Context context) { this(context, "street-fitting.db", "store"); }
     SqliteRepository(Context context, String databaseName, String directoryName) {
         this.context = context.getApplicationContext();
-        root = new File(context.getFilesDir(), directoryName);
-        draftRoot = new File(context.getCacheDir(), directoryName.equals("store") ? "result-drafts" : directoryName+"-drafts");
+        try {
+            root = new File(context.getFilesDir(), directoryName).getCanonicalFile();
+            draftRoot = new File(context.getCacheDir(), directoryName.equals("store") ? "result-drafts" : directoryName+"-drafts").getCanonicalFile();
+        } catch(java.io.IOException error) {throw error("io_error");}
         if (!root.isDirectory() && !root.mkdirs()) throw error("io_error");
         helper = new StoreDatabase(context, databaseName);
         db = helper.getWritableDatabase();
@@ -286,7 +288,8 @@ public final class SqliteRepository implements NativeRepository {
         return ref;
     }
     private void retire(String file) { db.insertWithOnConflict("Garbage",null,values("file",file),SQLiteDatabase.CONFLICT_IGNORE); }
-    private void transferSource(String ref) {
+    private void transferSource(File source) {
+        String ref=Uri.fromFile(source).toString();
         try(Cursor cursor=db.rawQuery("SELECT 1 FROM OwnedFile WHERE file=?",new String[]{ref})) {
             if(!cursor.moveToFirst()) retire(ref);
         }
@@ -296,6 +299,7 @@ public final class SqliteRepository implements NativeRepository {
         db.delete("OwnedFile","ownerType=? AND ownerId=?",new String[]{type,id});
     }
     private void drainGarbage() {
+        db.execSQL("DELETE FROM Garbage WHERE file IN (SELECT file FROM OwnedFile)");
         List<String> removed=new ArrayList<>();
         try(Cursor cursor=db.query("Garbage",null,null,null,null,null,null)) {
             while(cursor.moveToNext()) {
@@ -346,13 +350,20 @@ public final class SqliteRepository implements NativeRepository {
         if("recording".equals(current.getString("status"))) update("Trip",values("status","ended","endedAt",t),"id",trip);
         db.delete("TrailPoint","tripId=?",new String[]{trip});changed("TrailPoint",trip);return required("Trip",trip);
     }); }
-    @Override public synchronized JSObject commitPhoto(JSObject input) { return transaction(()->{
+    @Override public synchronized JSObject commitPhoto(JSObject input) { return transaction(()->commitPhotoInternal(input,false)); }
+    @Override public synchronized JSObject commitStorefront(JSObject input) { return transaction(()->commitPhotoInternal(input,true)); }
+    private JSObject commitPhotoInternal(JSObject input,boolean storefrontPreview) throws Exception {
         JSObject photo=nested(input,"photo");String id=id(photo,"id"),trip=id(photo,"tripId"),shop=id(photo,"shopId");
-        JSObject existing=row("Photo","id",id);if(existing!=null) return existing;
-        if(!trip.equals(required("Shop",shop).getString("tripId"))) throw error("invalid_input");
         String kind=choice(photo,"kind","item","storefront");long t=time(photo,"takenAt");
+        if(storefrontPreview&&!"storefront".equals(kind)) throw error("invalid_input");
+        JSObject existing=row("Photo","id",id);
+        if(existing!=null) {
+            if(!trip.equals(existing.getString("tripId"))||!shop.equals(existing.getString("shopId"))||!kind.equals(existing.getString("kind"))) throw error("invalid_input");
+            return existing;
+        }
+        if(!trip.equals(required("Shop",shop).getString("tripId"))) throw error("invalid_input");
         JSObject currentTrip=required("Trip",trip);
-        if(!"recording".equals(currentTrip.getString("status"))||t<currentTrip.optLong("startedAt")) throw error("invalid_input");
+        if((!storefrontPreview&&!"recording".equals(currentTrip.getString("status")))||t<currentTrip.optLong("startedAt")) throw error("invalid_input");
         int w=(int)time(photo,"w"),h=(int)time(photo,"h");if(w<=0||h<=0) throw error("invalid_input");
         File source=owned(string(photo,"file")); validateImage(source,w,h);
         String file=promote(source,"Photo",id,"original");
@@ -361,9 +372,9 @@ public final class SqliteRepository implements NativeRepository {
             JSObject old=required("Shop",shop);if(!old.isNull("storefrontPhotoId")) cancelJobs("describe_storefront",old.getString("storefrontPhotoId"));
             update("Shop",values("storefrontPhotoId",id,"description",null,"descriptionState","pending"),"id",shop);enqueueInternal("describe_storefront",id,false);
         }
-        transferSource(string(photo,"file"));
+        transferSource(source);
         return required("Photo",id);
-    }); }
+    }
     private static void validateImage(File file,int w,int h) {
         BitmapFactory.Options options=new BitmapFactory.Options();options.inJustDecodeBounds=true;BitmapFactory.decodeFile(file.getPath(),options);
         if(options.outWidth!=w||options.outHeight!=h) throw error("invalid_input");
@@ -406,7 +417,7 @@ public final class SqliteRepository implements NativeRepository {
     @Override public synchronized JSObject registerAsset(JSObject input) { return transaction(()->{
         JSObject asset=nested(input,"asset");String id=id(asset,"id"),purpose=choice(input,"purpose","self","wardrobe");int w=(int)time(asset,"w"),h=(int)time(asset,"h");if(w<=0||h<=0) throw error("invalid_input");File file=owned(string(asset,"file"));validateImage(file,w,h);
         if(row("Asset","id",id)!=null) throw error("invalid_input");
-        String stored=promote(file,"Asset",id,"original");db.insertOrThrow("Asset",null,values("id",id,"file",stored,"w",w,"h",h,"purpose",purpose));transferSource(string(asset,"file"));return obj("id",id,"file",stored,"w",w,"h",h);
+        String stored=promote(file,"Asset",id,"original");db.insertOrThrow("Asset",null,values("id",id,"file",stored,"w",w,"h",h,"purpose",purpose));transferSource(file);return obj("id",id,"file",stored,"w",w,"h",h);
     }); }
     @Override public synchronized JSObject getAsset(JSObject input) {
         JSObject asset=row("Asset","id",id(input,"id"));if(asset!=null) asset.remove("purpose");return asset;
@@ -421,7 +432,7 @@ public final class SqliteRepository implements NativeRepository {
         JSObject source=row("Photo","id",owner);
         if(source==null) {source=row("Asset","id",owner);if(source==null||!"wardrobe".equals(source.getString("purpose"))) throw error("invalid_reference");}
         validateImage(file,source.getInteger("w"),source.getInteger("h"));
-        db.insertOrThrow("OwnedFile",null,values("file",ref,"ownerType","Candidate","ownerId",owner));return new JSObject();
+        db.insertOrThrow("OwnedFile",null,values("file",Uri.fromFile(file).toString(),"ownerType","Candidate","ownerId",owner));return new JSObject();
     });}
     private void purgeCandidates(String owner) throws Exception {
         unown("Candidate",owner);
@@ -607,9 +618,12 @@ public final class SqliteRepository implements NativeRepository {
         db.delete("QueueJob","id=?",new String[]{id});claims.remove(id);changed("QueueJob",id);return new JSObject();
     }); }
     @Override public synchronized JSObject failJob(JSObject input) { return transaction(()->{
-        String id=id(input,"id");JSObject job=row("QueueJob","id",id);if(job==null) return new JSObject();
-        if(!claims.contains(id)) throw error("job_unavailable");
-        if(!(input.opt("retryable") instanceof Boolean)) throw error("invalid_input");
+        String id=id(input,"id");
+        if(!(input.opt("retryable") instanceof Boolean)||(input.has("preflight")&&!(input.opt("preflight") instanceof Boolean))) throw error("invalid_input");
+        boolean preflight=input.optBoolean("preflight",false);
+        if(preflight&&(input.getBoolean("retryable")||input.has("retryAfterMs"))) throw error("invalid_input");
+        JSObject job=row("QueueJob","id",id);if(job==null) return new JSObject();
+        if(preflight?claims.contains(id):!claims.contains(id)) throw error("job_unavailable");
         if(input.getBoolean("retryable")&&jobCurrent(job)) {
             long next=job.getLong("nextAt");
             if(input.has("retryAfterMs")) next=Math.max(next,Math.min(9007199254740991L,System.currentTimeMillis()+time(input,"retryAfterMs")));
@@ -623,10 +637,22 @@ public final class SqliteRepository implements NativeRepository {
         claims.remove(id);return new JSObject();
     }); }
     @Override public synchronized JSObject discardTemp(JSObject input) {
-        File file=owned(string(input,"file"));
+        Uri uri=Uri.parse(string(input,"file"));
+        String authority=uri.getAuthority();
+        if(!"file".equals(uri.getScheme())||uri.getPath()==null||uri.getQuery()!=null||uri.getFragment()!=null||(authority!=null&&!authority.isEmpty())) throw error("file_not_owned");
         try {
-            if(!file.getCanonicalPath().startsWith(context.getCacheDir().getCanonicalPath()+"/")) throw error("file_not_owned");
-            if(!file.delete()) throw error("io_error");return new JSObject();
+            File file=new File(uri.getPath()).getCanonicalFile();
+            if(!file.getPath().startsWith(context.getCacheDir().getCanonicalPath()+"/")||(file.exists()&&!file.isFile())) throw error("file_not_owned");
+            String ref=Uri.fromFile(file).toString();
+            JSObject result=transaction(()->{
+                try(Cursor cursor=db.query("OwnedFile",new String[]{"ownerType"},"file=?",new String[]{ref},null,null,null)) {
+                    if(cursor.moveToFirst()&&!"Candidate".equals(cursor.getString(0))) throw error("file_not_owned");
+                }
+                db.delete("OwnedFile","file=? AND ownerType='Candidate'",new String[]{ref});
+                retire(ref);return new JSObject();
+            });
+            if(file.exists()) throw error("io_error");
+            return result;
         } catch(java.io.IOException e) {throw error("io_error");}
     }
     @Override public synchronized JSObject getSession() {

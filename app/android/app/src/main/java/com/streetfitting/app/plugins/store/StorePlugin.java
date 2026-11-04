@@ -5,6 +5,7 @@ import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
+import android.content.pm.ApplicationInfo;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.json.JSONObject;
@@ -40,6 +41,12 @@ public class StorePlugin extends Plugin {
                 call.reject("The device operation could not be completed.", code, details);
             }
         });
+    }
+    /** Native build gate for the read-only development observer; exposes no stored data. */
+    @PluginMethod public void getRuntimeInfo(PluginCall call) {
+        JSObject info = new JSObject();
+        info.put("debug", (getContext().getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0);
+        call.resolve(info);
     }
     @PluginMethod public void get(PluginCall call) { execute(call, () -> repository.get(call.getData()), true); }
     @PluginMethod public void list(PluginCall call) { execute(call, () -> repository.list(call.getData()), false); }

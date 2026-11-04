@@ -1,0 +1,307 @@
+{
+  "vectorComparisons": [
+    {
+      "id": "i02",
+      "inputSha256": "e330206e1f31f9dea427c4e8e063010214611079482693d3ec62bff1347f7719",
+      "maxAbs": 0.00708375871181488,
+      "cosine": 0.9987127507356286,
+      "l2Error": 5.557632132280332e-10,
+      "passed": false
+    },
+    {
+      "id": "i03",
+      "inputSha256": "447861cfcb3055f4bb273bc1af578e1ae11b34e112e4d2ffcd3eaeb6ed4eb1f5",
+      "maxAbs": 8.046627044677734e-07,
+      "cosine": 0.9999999999853066,
+      "l2Error": 3.095471656777704e-09,
+      "passed": true
+    },
+    {
+      "id": "i04",
+      "inputSha256": "b7b39d9b3945e0ff1d792f56922c53e10380ca0b7a9d9dafda8980d7c6ba38bb",
+      "maxAbs": 5.979090929031372e-07,
+      "cosine": 0.9999999999901958,
+      "l2Error": 1.034108798592115e-09,
+      "passed": true
+    },
+    {
+      "id": "i05",
+      "inputSha256": "0b899e6694fdf74d31e97cba16fcb884670593b8c6e81318f3dfbf92dc4732d0",
+      "maxAbs": 0.009127037599682808,
+      "cosine": 0.9978835888835814,
+      "l2Error": 3.730761477527267e-09,
+      "passed": false
+    },
+    {
+      "id": "i06",
+      "inputSha256": "8c989d2b78bef36405f960a57080cab2edfa7542e2d7c6895d9774f956c7a350",
+      "maxAbs": 0.008499899879097939,
+      "cosine": 0.9983346430039937,
+      "l2Error": 2.945564903100717e-09,
+      "passed": false
+    },
+    {
+      "id": "i07",
+      "inputSha256": "b23fe6d5aee0dd5e36e0f46201b6c91af810365f1ec7e89a8ad175e80806ede7",
+      "maxAbs": 9.057112038135529e-07,
+      "cosine": 0.999999999989592,
+      "l2Error": 7.405698276841122e-10,
+      "passed": true
+    },
+    {
+      "id": "i10",
+      "inputSha256": "88319b15fe1970738acb9d2ed18e447b3cda307583577af98b109ec66e4bd8a1",
+      "maxAbs": 4.6938657760620117e-07,
+      "cosine": 0.9999999999931328,
+      "l2Error": 3.1666198552215974e-09,
+      "passed": true
+    },
+    {
+      "id": "i11",
+      "inputSha256": "343fde8403db1c5bf6b0d103977f0963a7222008c3a1221a9c87b84093b8c24d",
+      "maxAbs": 7.152557373046875e-07,
+      "cosine": 0.9999999999874443,
+      "l2Error": 4.3603841648476305e-09,
+      "passed": true
+    },
+    {
+      "id": "i13",
+      "inputSha256": "8610d95b885132803faf6ed0f5fa8fafec3cd2f9f0b0a2de646cbdbf4000fe9e",
+      "maxAbs": 0.014011908322572708,
+      "cosine": 0.9950554167789218,
+      "l2Error": 3.3335757487762407e-09,
+      "passed": false
+    },
+    {
+      "id": "i14",
+      "inputSha256": "3a92b77baf928efb2c545a046e49961c1785aa6bdcc45faff6c556e91f7f4489",
+      "maxAbs": 0.015042087063193321,
+      "cosine": 0.9964073014538287,
+      "l2Error": 5.629119392835946e-10,
+      "passed": false
+    },
+    {
+      "id": "i15",
+      "inputSha256": "801fd9d6664015446b4956a3846827557b8dc04fe8bd9af6907539e8003e08b2",
+      "maxAbs": 8.344650268554688e-07,
+      "cosine": 0.9999999999763702,
+      "l2Error": 6.008220587716551e-10,
+      "passed": true
+    },
+    {
+      "id": "i16",
+      "inputSha256": "99b66af631d364c06cdea84a8858cb85db4aa0524b396456ff76ecd8c0251c24",
+      "maxAbs": 9.126961231231689e-07,
+      "cosine": 0.9999999999840679,
+      "l2Error": 2.849604552324081e-09,
+      "passed": true
+    },
+    {
+      "id": "i17",
+      "inputSha256": "f875a403f2bcd4be4c7ecd1d27f1a127ff5ab96b95d8996302e50cef17722d71",
+      "maxAbs": 1.0319054126739502e-06,
+      "cosine": 0.9999999999823767,
+      "l2Error": 4.884620374845383e-09,
+      "passed": true
+    },
+    {
+      "id": "i18",
+      "inputSha256": "a05a1e2aeb5303d20c7aa8c388398cb44391495ca4cbeca9389fad7fa0cb6102",
+      "maxAbs": 6.593763828277588e-07,
+      "cosine": 0.9999999999892536,
+      "l2Error": 4.286772825601304e-09,
+      "passed": true
+    },
+    {
+      "id": "i19",
+      "inputSha256": "1debb01a4c544deb6dda16d56d8c489a80442feb36b3d14ffa23520e5ef43477",
+      "maxAbs": 1.3783574104309082e-06,
+      "cosine": 0.99999999997222,
+      "l2Error": 2.5062624198213257e-09,
+      "passed": true
+    },
+    {
+      "id": "i20",
+      "inputSha256": "3f06c1d1abbcd04310fa4ff8ea08fd882cc31fa551b336939a2560843aa8075f",
+      "maxAbs": 8.828938007354736e-07,
+      "cosine": 0.9999999999856303,
+      "l2Error": 6.481991388085362e-09,
+      "passed": true
+    },
+    {
+      "id": "i21",
+      "inputSha256": "3e1c1ff83c16869e51fb378285dc7e5021f96436f4746b5754555d247e35f09a",
+      "maxAbs": 9.96515154838562e-07,
+      "cosine": 0.9999999999793369,
+      "l2Error": 2.0883146323313895e-09,
+      "passed": true
+    },
+    {
+      "id": "i22",
+      "inputSha256": "caac3cd75c8cb5efe78917eb872903cd3c52cac53a80eb4912491c5cf69cc36f",
+      "maxAbs": 8.568167686462402e-07,
+      "cosine": 0.9999999999832472,
+      "l2Error": 2.3142820992916313e-09,
+      "passed": true
+    },
+    {
+      "id": "i23",
+      "inputSha256": "b31db89accbd85728e82ed2a3eba2bcf96bf9f94e1cd141dade032a9ccc80308",
+      "maxAbs": 8.195638656616211e-07,
+      "cosine": 0.9999999999829634,
+      "l2Error": 3.3690108480755043e-09,
+      "passed": true
+    },
+    {
+      "id": "i24",
+      "inputSha256": "1130737c81e54d8a8eaa644be9cee6eaa84e42b5e9c8b3ad739c9f8ab3ddac03",
+      "maxAbs": 3.5390257835388184e-07,
+      "cosine": 0.9999999999964279,
+      "l2Error": 3.4180560604113452e-09,
+      "passed": true
+    },
+    {
+      "id": "i25",
+      "inputSha256": "8a73114d6c6096fd4f390d9985f55b56b6174a9b6ff14270dbfe80ac3667364f",
+      "maxAbs": 8.363276720046997e-07,
+      "cosine": 0.9999999999874831,
+      "l2Error": 3.894179423369337e-09,
+      "passed": true
+    },
+    {
+      "id": "i26",
+      "inputSha256": "74bf57d0bdba7a6c0ba8b2d215ce154ed39d20a3f27008fa2c971e7a44169354",
+      "maxAbs": 9.760260581970215e-07,
+      "cosine": 0.9999999999787327,
+      "l2Error": 7.020091175036214e-10,
+      "passed": true
+    }
+  ],
+  "rankings": [
+    {
+      "query": "a blue jacket",
+      "top3": [
+        {
+          "id": "i21",
+          "score": 0.47818087820507954
+        },
+        {
+          "id": "i20",
+          "score": 0.4586514741120037
+        },
+        {
+          "id": "i18",
+          "score": 0.45795108582793737
+        }
+      ]
+    },
+    {
+      "query": "a red dress",
+      "top3": [
+        {
+          "id": "i06",
+          "score": 0.46510176515289
+        },
+        {
+          "id": "i05",
+          "score": 0.455631842487957
+        },
+        {
+          "id": "i22",
+          "score": 0.4526453990864106
+        }
+      ]
+    },
+    {
+      "query": "a striped shirt",
+      "top3": [
+        {
+          "id": "i04",
+          "score": 0.46201637079759506
+        },
+        {
+          "id": "i03",
+          "score": 0.45275195870011903
+        },
+        {
+          "id": "i19",
+          "score": 0.41479742761017346
+        }
+      ]
+    },
+    {
+      "query": "clothes on a clothing rack",
+      "top3": [
+        {
+          "id": "i10",
+          "score": 0.4787664217538531
+        },
+        {
+          "id": "i02",
+          "score": 0.463208621240907
+        },
+        {
+          "id": "i24",
+          "score": 0.4288420807559893
+        }
+      ]
+    },
+    {
+      "query": "denim shorts",
+      "top3": [
+        {
+          "id": "i24",
+          "score": 0.45259485479621514
+        },
+        {
+          "id": "i19",
+          "score": 0.37823812855982464
+        },
+        {
+          "id": "i04",
+          "score": 0.3744430888796538
+        }
+      ]
+    },
+    {
+      "query": "black shoes",
+      "top3": [
+        {
+          "id": "i26",
+          "score": 0.4291022144932586
+        },
+        {
+          "id": "i25",
+          "score": 0.40987117725144306
+        },
+        {
+          "id": "i19",
+          "score": 0.384267811613222
+        }
+      ]
+    },
+    {
+      "query": "a blue puffer jacket",
+      "top3": [
+        {
+          "id": "i17",
+          "score": 0.4889278410527319
+        },
+        {
+          "id": "i20",
+          "score": 0.44284890089160256
+        },
+        {
+          "id": "i21",
+          "score": 0.4237254945219739
+        }
+      ]
+    }
+  ],
+  "hit1": 6,
+  "hit3": 7,
+  "inputDecode": "Pillow RGB lossless PNG with production Android decode",
+  "package": "com.streetfitting.app",
+  "ortVersion": "1.22.0",
+  "apk_sha256": "be9d71fb738999cf835857abf495c59fdde577f5b762a12c6c782859f5cf25d0"
+}

@@ -58,22 +58,28 @@ public class SegmenterPlugin extends Plugin {
         if(x==null||y==null) throw new IOException("invalid_argument");
         EdgeEngine engine=EdgeEngine.SHARED;
         synchronized(engine) {
+            if(handle==null||!handle.equals(ownedHandle))throw new IOException("handle_expired");
             int w=engine.width(handle),h=engine.height(handle);
             List<EdgeEngine.Mask> masks=engine.tap(getContext(),handle,x,y);
-            JSArray array=new JSArray();
-            for(EdgeEngine.Mask mask:masks) {
+            JSArray array=new JSArray();List<File> pending=new ArrayList<>(3);
+            try {
                 File dir=new File(getContext().getCacheDir(),"candidates/"+ownedAssetId);
                 if(!dir.isDirectory()&&!dir.mkdirs())throw new IOException("io_error");
-                File file=File.createTempFile("mask-",".png",dir);
-                try { Images.maskPng(mask.pixels,w,h,file);engine.retainFile(handle,file); }
-                catch(Exception e) { file.delete();throw e; }
-                JSObject row=new JSObject();row.put("mask",file.toURI().toString());row.put("score",mask.score);
-                JSArray bbox=new JSArray();bbox.put((double)mask.left/w);bbox.put((double)mask.top/h);bbox.put((double)(mask.right-mask.left+1)/w);bbox.put((double)(mask.bottom-mask.top+1)/h);row.put("bbox",bbox);array.put(row);
-            }
-            JSObject result=new JSObject();result.put("masks",array);return result;
+                for(EdgeEngine.Mask mask:masks) {
+                    File file=File.createTempFile("mask-",".png",dir);pending.add(file);
+                    Images.maskPng(mask.pixels,w,h,file);
+                    JSObject row=new JSObject();row.put("mask",file.toURI().toString());row.put("score",mask.score);
+                    JSArray bbox=new JSArray();bbox.put((double)mask.left/w);bbox.put((double)mask.top/h);bbox.put((double)(mask.right-mask.left+1)/w);bbox.put((double)(mask.bottom-mask.top+1)/h);row.put("bbox",bbox);array.put(row);
+                }
+                for(File file:pending)engine.retainFile(handle,file);
+                JSObject result=new JSObject();result.put("masks",array);pending.clear();return result;
+            } finally {for(File file:pending)file.delete();}
         }
     }
-    @PluginMethod public void release(PluginCall call) { submit(call,()->{EdgeEngine.SHARED.release(call.getString("handle"));ownedHandle=null;return new JSObject();}); }
+    @PluginMethod public void release(PluginCall call) { submit(call,()->{
+        String handle=call.getString("handle");if(handle==null||!handle.equals(ownedHandle))throw new IOException("handle_expired");
+        EdgeEngine.SHARED.release(handle);ownedHandle=null;ownedAssetId=null;return new JSObject();
+    }); }
     @Override protected void handleOnDestroy() {
         destroyed=true;
         worker.execute(()->{if(ownedHandle!=null) try {EdgeEngine.SHARED.release(ownedHandle);} catch(IOException ignored) {} });

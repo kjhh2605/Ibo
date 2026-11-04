@@ -1,0 +1,34 @@
+{
+  "measurementFixture": "synthetic uniform surfaces, test thresholds only",
+  "uncalibrated": {
+    "neckColorDeltaE95": 0,
+    "shoulderColorDeltaE95": 0,
+    "neckOffsetRatio95": 0,
+    "shoulderOffsetRatio95": 0,
+    "thresholdVersion": null,
+    "passed": false,
+    "decision": "not_calibrated"
+  },
+  "inclusive": {
+    "neckColorDeltaE95": 0,
+    "shoulderColorDeltaE95": 0,
+    "neckOffsetRatio95": 0,
+    "shoulderOffsetRatio95": 0,
+    "thresholdVersion": "synthetic-test-only",
+    "passed": true,
+    "decision": "composited"
+  },
+  "exceeded": {
+    "neckColorDeltaE95": 40.512822127109175,
+    "shoulderColorDeltaE95": 40.512822127109175,
+    "neckOffsetRatio95": 0,
+    "shoulderOffsetRatio95": 0,
+    "thresholdVersion": "synthetic-test-only",
+    "passed": false,
+    "decision": "threshold_exceeded"
+  },
+  "providerImmutable": true,
+  "package": "com.streetfitting.app",
+  "ortVersion": "1.22.0",
+  "apk_sha256": "be9d71fb738999cf835857abf495c59fdde577f5b762a12c6c782859f5cf25d0"
+}

@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
 @RunWith(AndroidJUnit4.class)
 public class VoiceContractTest {
     private NativeHarness fixture(String scenario) {
-        return new NativeHarness(new Intent().putExtra("sf_voice_source", "fixture").putExtra("sf_voice_fixture_dir", "/sdcard/Android/data/com.streetfitting.app/files/voice-fixtures/" + scenario));
+        return new NativeHarness(new Intent().putExtra("sf_voice_source", "fixture").putExtra("sf_voice_fixture_dir", NativeHarness.fixturePath("voice-fixtures/" + scenario)));
     }
     @Test public void speechThenSilenceStopsOnce() throws Exception {
         try (NativeHarness harness = fixture("tone-silence")) {
@@ -61,15 +61,27 @@ public class VoiceContractTest {
     @Test public void invalidFixtureNeverFallsBackToMic() throws Exception {
         try (NativeHarness harness = fixture("corrupt")) {
             NativeHarness.TestCall completed = harness.listen("Voice", "completed");
-            assertEquals("invalid_fixture", harness.invoke("Voice", "start", new JSObject()).failure()); assertEquals(0, completed.values.size());
+            assertEquals("fixture_invalid", harness.invoke("Voice", "start", new JSObject()).failure()); assertEquals(0, completed.values.size());
         }
         try (NativeHarness harness = fixture("empty")) {
-            assertEquals("fixture_missing", harness.invoke("Voice", "start", new JSObject()).failure());
+            assertEquals("fixture_empty", harness.invoke("Voice", "start", new JSObject()).failure());
         }
     }
     @Test public void sourceOverrideCannotEscapeAppFiles() throws Exception {
         try (NativeHarness harness = new NativeHarness(new Intent().putExtra("sf_voice_source", "fixture").putExtra("sf_voice_fixture_dir", "/sdcard"))) {
-            assertEquals("invalid_fixture", harness.invoke("Voice", "start", new JSObject()).failure());
+            assertEquals("fixture_invalid", harness.invoke("Voice", "start", new JSObject()).failure());
+        }
+    }
+    @Test public void completedWavSurvivesActivityPauseUntilExplicitCleanup() throws Exception {
+        try (NativeHarness harness = fixture("tone-silence")) {
+            NativeHarness.TestCall completed = harness.listen("Voice", "completed");
+            harness.invoke("Voice", "start", new JSObject()).await();
+            File file = new File(android.net.Uri.parse(completed.await().optString("file")).getPath());
+            harness.activity.moveToState(androidx.lifecycle.Lifecycle.State.CREATED);
+            assertTrue("completed output must remain available to transcription", file.isFile());
+            harness.activity.moveToState(androidx.lifecycle.Lifecycle.State.RESUMED);
+            harness.invoke("Voice", "cancel", new JSObject()).await();
+            assertFalse(file.exists()); assertEquals(1, completed.values.size());
         }
     }
 }

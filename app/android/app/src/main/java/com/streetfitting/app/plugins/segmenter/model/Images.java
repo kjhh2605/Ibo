@@ -3,8 +3,10 @@ package com.streetfitting.app.plugins.segmenter.model;
 import android.content.Context;
 import android.graphics.*;
 import android.net.Uri;
+import android.os.Build;
 import androidx.exifinterface.media.ExifInterface;
 import java.io.*;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.zip.*;
 
@@ -23,6 +25,16 @@ public final class Images {
         File file = local(context, ref);
         Bitmap bitmap = BitmapFactory.decodeFile(file.getPath());
         if (bitmap == null) throw new IOException("invalid_image");
+        // Research Pillow RGB inputs retain encoded channel values, not ICC display conversion.
+        if(Build.VERSION.SDK_INT>=26&&!bitmap.getColorSpace().isSrgb()) {
+            if(Build.VERSION.SDK_INT>=29)bitmap.setColorSpace(ColorSpace.get(ColorSpace.Named.SRGB));
+            else {
+                ByteBuffer pixels=ByteBuffer.allocate(bitmap.getByteCount());
+                bitmap.copyPixelsToBuffer(pixels);pixels.rewind();
+                Bitmap rgb=Bitmap.createBitmap(bitmap.getWidth(),bitmap.getHeight(),bitmap.getConfig(),bitmap.hasAlpha(),ColorSpace.get(ColorSpace.Named.SRGB));
+                rgb.copyPixelsFromBuffer(pixels);bitmap.recycle();bitmap=rgb;
+            }
+        }
         int orientation = new ExifInterface(file).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
         Matrix matrix = new Matrix();
         switch (orientation) {

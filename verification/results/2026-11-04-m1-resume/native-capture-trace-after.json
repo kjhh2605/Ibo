@@ -1,0 +1,117 @@
+{
+  "globalDeviceLock": true,
+  "kind": "metadata-only native call timing",
+  "events": [
+    {
+      "id": 18,
+      "plugin": "Capture",
+      "method": "openPreview",
+      "phase": "start",
+      "at": 4867.699999999255
+    },
+    {
+      "id": 18,
+      "plugin": "Capture",
+      "method": "openPreview",
+      "phase": "resolved",
+      "at": 10670
+    },
+    {
+      "id": 30,
+      "plugin": "Capture",
+      "method": "setPreviewRect",
+      "phase": "start",
+      "at": 10670.299999998882
+    },
+    {
+      "id": 31,
+      "plugin": "Capture",
+      "method": "setPreviewRect",
+      "phase": "start",
+      "at": 10670.599999999627
+    },
+    {
+      "id": 30,
+      "plugin": "Capture",
+      "method": "setPreviewRect",
+      "phase": "resolved",
+      "at": 10683.5
+    },
+    {
+      "id": 31,
+      "plugin": "Capture",
+      "method": "setPreviewRect",
+      "phase": "resolved",
+      "at": 10683.799999998882
+    }
+  ],
+  "diagnosticWait": {
+    "failed": true,
+    "cause": "The diagnostic runner did not retain the wait error; it is not evidence of a native timeout."
+  },
+  "nativeOpenDurationMs": 5802.3,
+  "surface": {
+    "route": "capture",
+    "loading": false,
+    "preview": {
+      "x": 24,
+      "y": 219.99404907226562,
+      "width": 363.4285888671875,
+      "height": 484.5714416503906,
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "tag": "DIV",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "tag": "DIV",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "tag": "DIV",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "tag": "DIV",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "tag": "DIV",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "tag": "DIV",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "tag": "DIV",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "tag": "DIV",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "tag": "DIV",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "tag": "DIV",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "tag": "BODY",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "tag": "HTML",
+          "background": "rgba(0, 0, 0, 0)"
+        }
+      ]
+    }
+  }
+}

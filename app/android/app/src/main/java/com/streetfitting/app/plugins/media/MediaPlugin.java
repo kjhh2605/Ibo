@@ -38,7 +38,8 @@ public class MediaPlugin extends Plugin {
         pickerOpen = true;
         Intent intent = Build.VERSION.SDK_INT >= 33 ? new Intent(MediaStore.ACTION_PICK_IMAGES) : new Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/*");
-        startActivityForResult(call, intent, "picked");
+        try { startActivityForResult(call, intent, "picked"); }
+        catch (RuntimeException error) { pickerOpen = false; reject(call, "picker_unavailable"); }
     }
     @ActivityCallback private void picked(PluginCall call, ActivityResult result) {
         pickerOpen = false;
@@ -55,7 +56,7 @@ public class MediaPlugin extends Plugin {
                 normalized = ImageFiles.normalize(getContext(), raw, "imports", false);
                 JSObject asset = RepositoryProvider.get(getContext()).registerAsset(new JSObject().put("asset", normalized).put("purpose", call.getString("purpose")));
                 call.resolve(new JSObject().put("asset", asset));
-            } catch (Exception error) { reject(call, "import_failed"); }
+            } catch (Exception error) { reject(call, "io_error"); }
             finally { raw.delete(); if (normalized != null) try { ImageFiles.local(normalized.optString("file")).delete(); } catch (Exception ignored) { } }
         });
     }
@@ -79,7 +80,13 @@ public class MediaPlugin extends Plugin {
                         pendingExport = copy; pendingId = id; copy = null;
                     }
                     Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("image/jpeg").putExtra(Intent.EXTRA_TITLE, "Street-Fitting-" + id + ".jpg");
-                    getActivity().runOnUiThread(() -> startActivityForResult(call, intent, "exportDestination"));
+                    getActivity().runOnUiThread(() -> {
+                        try { startActivityForResult(call, intent, "exportDestination"); }
+                        catch (RuntimeException error) {
+                            synchronized (this) { if (pendingExport != null) pendingExport.delete(); pendingExport = null; pendingId = null; }
+                            reject(call, "export_failed");
+                        }
+                    });
                 }
             } catch (Exception error) { reject(call, "export_failed"); }
             finally { if (copy != null) copy.delete(); }
@@ -121,7 +128,7 @@ public class MediaPlugin extends Plugin {
         if (id == null) { reject(call, "invalid_argument"); return; }
         work.execute(() -> {
             try { RepositoryProvider.get(getContext()).discardAsset(new JSObject().put("assetId", id)); call.resolve(); }
-            catch (RuntimeException error) { reject(call, "discard_failed"); }
+            catch (RuntimeException error) { reject(call, "io_error"); }
         });
     }
     private void exported(PluginCall call, Uri uri, String id) {

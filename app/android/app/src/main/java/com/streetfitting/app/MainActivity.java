@@ -1,5 +1,6 @@
 package com.streetfitting.app;
 
+import android.content.Intent;
 import android.os.Bundle;
 import com.getcapacitor.BridgeActivity;
 import com.streetfitting.app.plugins.shopping.ShoppingSessionPlugin;
@@ -25,5 +26,10 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(StorePlugin.class);
         registerPlugin(SfAuthPlugin.class);
         super.onCreate(savedInstanceState);
+    }
+    @Override
+    protected void onNewIntent(Intent intent) {
+        if(intent!=null) setIntent(intent);
+        super.onNewIntent(intent);
     }
 }

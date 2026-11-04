@@ -1,0 +1,423 @@
+{
+  "apk_sha256": "be9d71fb738999cf835857abf495c59fdde577f5b762a12c6c782859f5cf25d0",
+  "ort_aar_version": "1.22.0",
+  "zipalign_exit": 0,
+  "zipalign_command": "zipalign -c -P 16 -v 4 app-debug.apk",
+  "elf_load_segments": [
+    {
+      "file": "lib/arm64-v8a/libdatastore_shared_counter.so",
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 4544,
+          "vaddr": 20928,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 5160,
+          "vaddr": 37928,
+          "alignment": 16384,
+          "aligned_16kb": true
+        }
+      ],
+      "aligned_16kb": true
+    },
+    {
+      "file": "lib/arm64-v8a/libimage_processing_util_jni.so",
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 29488,
+          "vaddr": 45872,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 30480,
+          "vaddr": 63248,
+          "alignment": 16384,
+          "aligned_16kb": true
+        }
+      ],
+      "aligned_16kb": true
+    },
+    {
+      "file": "lib/arm64-v8a/libonnxruntime.so",
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 17789488,
+          "vaddr": 17805872,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 18204904,
+          "vaddr": 18237672,
+          "alignment": 16384,
+          "aligned_16kb": true
+        }
+      ],
+      "aligned_16kb": true
+    },
+    {
+      "file": "lib/arm64-v8a/libonnxruntime4j_jni.so",
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 73056,
+          "vaddr": 89440,
+          "alignment": 16384,
+          "aligned_16kb": true
+        }
+      ],
+      "aligned_16kb": true
+    },
+    {
+      "file": "lib/arm64-v8a/libsurface_util_jni.so",
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 2480,
+          "vaddr": 18864,
+          "alignment": 16384,
+          "aligned_16kb": true
+        }
+      ],
+      "aligned_16kb": true
+    },
+    {
+      "file": "lib/armeabi-v7a/libdatastore_shared_counter.so",
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 2704,
+          "vaddr": 19088,
+          "alignment": 16384,
+          "aligned_16kb": true
+        }
+      ],
+      "aligned_16kb": true
+    },
+    {
+      "file": "lib/armeabi-v7a/libimage_processing_util_jni.so",
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 22368,
+          "vaddr": 38752,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 22876,
+          "vaddr": 55644,
+          "alignment": 16384,
+          "aligned_16kb": true
+        }
+      ],
+      "aligned_16kb": true
+    },
+    {
+      "file": "lib/armeabi-v7a/libonnxruntime.so",
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 13029152,
+          "vaddr": 13045536,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 13236640,
+          "vaddr": 13269408,
+          "alignment": 16384,
+          "aligned_16kb": true
+        }
+      ],
+      "aligned_16kb": true
+    },
+    {
+      "file": "lib/armeabi-v7a/libonnxruntime4j_jni.so",
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "alignment": 4096,
+          "aligned_16kb": false
+        },
+        {
+          "offset": 48144,
+          "vaddr": 52240,
+          "alignment": 4096,
+          "aligned_16kb": false
+        }
+      ],
+      "aligned_16kb": false
+    },
+    {
+      "file": "lib/armeabi-v7a/libsurface_util_jni.so",
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 1744,
+          "vaddr": 18128,
+          "alignment": 16384,
+          "aligned_16kb": true
+        }
+      ],
+      "aligned_16kb": true
+    },
+    {
+      "file": "lib/x86/libdatastore_shared_counter.so",
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 3600,
+          "vaddr": 19984,
+          "alignment": 16384,
+          "aligned_16kb": true
+        }
+      ],
+      "aligned_16kb": true
+    },
+    {
+      "file": "lib/x86/libimage_processing_util_jni.so",
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 39264,
+          "vaddr": 55648,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 39820,
+          "vaddr": 72588,
+          "alignment": 16384,
+          "aligned_16kb": true
+        }
+      ],
+      "aligned_16kb": true
+    },
+    {
+      "file": "lib/x86/libonnxruntime.so",
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 21308592,
+          "vaddr": 21324976,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 21514816,
+          "vaddr": 21547584,
+          "alignment": 16384,
+          "aligned_16kb": true
+        }
+      ],
+      "aligned_16kb": true
+    },
+    {
+      "file": "lib/x86/libonnxruntime4j_jni.so",
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "alignment": 4096,
+          "aligned_16kb": false
+        },
+        {
+          "offset": 67696,
+          "vaddr": 71792,
+          "alignment": 4096,
+          "aligned_16kb": false
+        }
+      ],
+      "aligned_16kb": false
+    },
+    {
+      "file": "lib/x86/libsurface_util_jni.so",
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 2208,
+          "vaddr": 18592,
+          "alignment": 16384,
+          "aligned_16kb": true
+        }
+      ],
+      "aligned_16kb": true
+    },
+    {
+      "file": "lib/x86_64/libdatastore_shared_counter.so",
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 3872,
+          "vaddr": 20256,
+          "alignment": 16384,
+          "aligned_16kb": true
+        }
+      ],
+      "aligned_16kb": true
+    },
+    {
+      "file": "lib/x86_64/libimage_processing_util_jni.so",
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 46752,
+          "vaddr": 63136,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 47432,
+          "vaddr": 80200,
+          "alignment": 16384,
+          "aligned_16kb": true
+        }
+      ],
+      "aligned_16kb": true
+    },
+    {
+      "file": "lib/x86_64/libonnxruntime.so",
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 21462048,
+          "vaddr": 21478432,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 21870560,
+          "vaddr": 21903328,
+          "alignment": 16384,
+          "aligned_16kb": true
+        }
+      ],
+      "aligned_16kb": true
+    },
+    {
+      "file": "lib/x86_64/libonnxruntime4j_jni.so",
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 70848,
+          "vaddr": 87232,
+          "alignment": 16384,
+          "aligned_16kb": true
+        }
+      ],
+      "aligned_16kb": true
+    },
+    {
+      "file": "lib/x86_64/libsurface_util_jni.so",
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "alignment": 16384,
+          "aligned_16kb": true
+        },
+        {
+          "offset": 2496,
+          "vaddr": 18880,
+          "alignment": 16384,
+          "aligned_16kb": true
+        }
+      ],
+      "aligned_16kb": true
+    }
+  ],
+  "scope": "APK static packaging; device model loading still pending"
+}

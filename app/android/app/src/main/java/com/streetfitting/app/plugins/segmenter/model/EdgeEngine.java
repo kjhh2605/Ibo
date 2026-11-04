@@ -64,7 +64,7 @@ public final class EdgeEngine {
                 List<Mask> masks=new ArrayList<>(3);
                 for(int i=0;i<3;i++) {
                     float score=scores.get(i);
-                    if(!Float.isFinite(score)) throw new IOException("invalid_mask");
+                    if(!Float.isFinite(score)) throw new IOException("inference_failed");
                     byte[] pixels=new byte[width*height];
                     int left=width,top=height,right=-1,bottom=-1;
                     for(int row=0;row<height;row++) {
@@ -74,11 +74,11 @@ public final class EdgeEngine {
                             int base=i*65536;
                             float a=logits.get(base+y0*256+x0),b=logits.get(base+y0*256+x1),c=logits.get(base+y1*256+x0),d=logits.get(base+y1*256+x1);
                             float value=(a*(1-fx)+b*fx)*(1-fy)+(c*(1-fx)+d*fx)*fy;
-                            if(!Float.isFinite(value)) throw new IOException("invalid_mask");
+                            if(!Float.isFinite(value)) throw new IOException("inference_failed");
                             if(value>0) { pixels[row*width+col]=(byte)255;left=Math.min(left,col);right=Math.max(right,col);top=Math.min(top,row);bottom=Math.max(bottom,row); }
                         }
                     }
-                    if(right<0) throw new IOException("invalid_mask");
+                    if(right<0) throw new IOException("inference_failed");
                     masks.add(new Mask(pixels,score,i,left,top,right,bottom));
                 }
                 masks.sort(Comparator.<Mask>comparingDouble(m->-m.score).thenComparingInt(m->m.decoderIndex));
