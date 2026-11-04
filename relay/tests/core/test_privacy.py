@@ -1,4 +1,5 @@
 import asyncio
+import base64
 import builtins
 import io
 import json
@@ -9,6 +10,7 @@ from dataclasses import replace
 
 import httpx
 import pytest
+from PIL import Image
 
 from app.errors import RelayError
 from app.logging import configure_logging, log_search_text
@@ -113,3 +115,17 @@ def test_success_failure_cancel_create_no_upload_files(settings, monkeypatch, ca
         await client.aclose()
     asyncio.run(run())
     assert writes == [] and 'PRIVATE_MEDIA_SENTINEL' not in caplog.text
+
+
+def test_rejected_image_metadata_never_reaches_debug_logs(client, caplog):
+    exif = Image.Exif()
+    exif[700] = b'<m GPSLatitude="37,46.494N"/>'
+    stream = io.BytesIO()
+    Image.new('RGB', (2, 2)).save(stream, format='JPEG', exif=exif)
+    image = {'mimeType': 'image/jpeg', 'data': base64.b64encode(stream.getvalue()).decode(),
+             'width': 2, 'height': 2}
+    caplog.set_level(logging.DEBUG)
+    response = client.post('/v1/describe/piece', json={'image': image})
+    assert response.status_code == 400
+    assert '37,46.494' not in caplog.text and 'GPSLatitude' not in caplog.text
+    assert image['data'] not in caplog.text

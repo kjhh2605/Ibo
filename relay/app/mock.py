@@ -221,8 +221,13 @@ class FixtureLoader:
                 error = body['error']
                 if error['code'] not in ERRORS:
                     raise ValueError('Invalid error code')
-                failure = RelayError(error['code'])
-                if failure.status != status or type(error['retryable']) is not bool or error['retryable'] != failure.retryable:
+                # Provider credentials/other 4xx and transient failures share 502,
+                # but only upstream_error permits both retryability values.
+                retryable = error['retryable']
+                if type(retryable) is not bool:
+                    raise ValueError('Invalid retryability')
+                failure = RelayError(error['code'], retryable=retryable if error['code'] == 'upstream_error' else None)
+                if failure.status != status or retryable != failure.retryable:
                     raise ValueError('Invalid error status')
                 # Hand-authored fixture text is not trusted for client/log output.
                 failure.headers.update(headers)
