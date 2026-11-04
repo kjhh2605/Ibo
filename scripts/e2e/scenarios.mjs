@@ -28,8 +28,9 @@ async function openResult(page,id) {
   await page.getByRole('button',{name:`Open look with ${label}`,exact:true}).nth(occurrence).click();await route(page,'result');
 }
 async function absentPrivate(file) {
-  const local=file.replace(/^file:\/\//,'');const prefix='/data/user/0/com.streetfitting.app/';
-  check(local.startsWith(prefix)&&!local.includes('..'),'deletion_check_outside_app');
+  const local=file.replace(/^file:\/\//,'');
+  const prefix=['/data/user/0/com.streetfitting.app/','/data/data/com.streetfitting.app/'].find(value=>local.startsWith(value));
+  check(prefix&&!local.includes('..'),'deletion_check_outside_app');
   const result=await adb('shell','run-as','com.streetfitting.app','sh','-c',`'if [ -e "${local.slice(prefix.length)}" ]; then echo present; else echo absent; fi'`);
   check(result.toString().trim()==='absent','deleted_private_file_retained');
 }
@@ -79,8 +80,9 @@ async function startShopping(page) {
   throw new Error('shopping_start_timeout');
 }
 async function shoppingFix(page,point) {
+  const previous=(await native(page,'ShoppingSession','getState')).latestFix?.t??-Infinity;
   await fix(point);
-  await until(()=>native(page,'ShoppingSession','getState'),s=>s.latestFix&&Math.abs(s.latestFix.lat-point.lat)<1e-7&&Math.abs(s.latestFix.lng-point.lng)<1e-7,'injected_fix_not_received');
+  return until(()=>native(page,'ShoppingSession','getState'),s=>s.latestFix&&Number.isFinite(s.latestFix.t)&&s.latestFix.t>previous&&Math.abs(s.latestFix.lat-point.lat)<1e-7&&Math.abs(s.latestFix.lng-point.lng)<1e-7,'injected_fix_not_received');
 }
 async function priorTrip(context,points) {
   const {page}=context;
