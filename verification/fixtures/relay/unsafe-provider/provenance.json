@@ -1,0 +1,13 @@
+{
+  "sourceType": "hand-authored",
+  "providerRecording": false,
+  "purpose": "strict deterministic synthetic wire fixture; not model quality evidence",
+  "requestAssetNotation": "data.asset expanded for offline schema validation; all data paths ignored for request matching",
+  "syntheticProviderResponse": {
+    "source": "images/derived/calibration-hat-masked.png",
+    "sourceSha256": "9895c86dd714697ba5e342a8aec7f9a792a840be4534d1c52f3243c163fb9a16",
+    "transform": "byte-identical copy of existing synthetic fixture; NOT Muse Image output",
+    "expectedNativeBehavior": "Actual native person/head detector rejects this head-removed output; app must fail unsafe_output",
+    "humanApproval": false
+  }
+}

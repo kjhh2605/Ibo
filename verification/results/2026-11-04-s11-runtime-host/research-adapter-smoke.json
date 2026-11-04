@@ -1,0 +1,14 @@
+{
+  "status": "passed",
+  "scope": "adapter schema/boundary smoke using temporary synthetic bytes; NOT original M1 research compatibility or inference evidence",
+  "checks": [
+    "actual M1 source/canonicalSha256/filename vector shape accepted with throwaway synthetic bytes",
+    "source hash rejected",
+    "canonical hash rejected",
+    "checkpoint rejected",
+    "path escape rejected",
+    "rehash does not hide source/canonical pixel drift"
+  ],
+  "nativeDeviceLaunched": false,
+  "providerCalls": 0
+}

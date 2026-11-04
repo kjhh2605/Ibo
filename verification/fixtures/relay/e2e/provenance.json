@@ -9,5 +9,12 @@
       "sha256": "7b7929af48ad301d86a795f079a8082c9c41eb606e34e9de48f223132ca37171",
       "transform": "Pillow RGB JPEG quality90; native JPEG bytes are intentionally not compared"
     }
+  },
+  "syntheticProviderResponse": {
+    "source": "images/self/positive/calibration-hat.png",
+    "sourceSha256": "8cae4180d99e2673231e06eae94375468ec7373906cec7b5a6bfce4592b5b2a4",
+    "transform": "byte-identical copy of existing synthetic fixture; NOT Muse Image output",
+    "expectedNativeBehavior": "Actual native person/head geometry permits evaluation; uncalibrated output must be faceless",
+    "humanApproval": false
   }
 }

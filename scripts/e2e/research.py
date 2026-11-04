@@ -51,18 +51,21 @@ def inputs(args):
     assets=load(FIX/'store/search.json')['nativeSeed']['Photo'];paths.extend(row['file'] for row in assets)
     approved_assets(paths)
     proof_dir=Path(os.environ.get('SF_ML_PROOF_DIR',str(FIX/'research/native-proof'))).expanduser().resolve()
-    if not (proof_dir/'research.json').is_file():raise Blocked('Original native research proof bundle required at SF_ML_PROOF_DIR/research.json; no synthetic vectors or generated ground truth permitted')
+    if not (proof_dir/'research.json').is_file():raise Blocked('Original native research proof bundle required: on M1 set SF_ML_PROOF_DIR=/tmp/sf-s05-proof; no synthetic vectors, re-exported research or generated ground truth permitted')
     return source,poc,review,proof_dir
 
 
 def proof_files(directory):
+    directory=directory.resolve()
     proof=load(directory/'research.json');require(len(proof['images'])==22 and len(proof['queries'])==7 and len(proof['segmentation'])==2,'native_research_bundle_cardinality')
+    require(proof.get('checkpointSha256')=='868f89f066b7c1ae51add02d2cb7b925fd051076282773f2ec3c71359fbdaf3b','native_research_checkpoint_changed')
     files={'research.json'}
     def file(name):
         path=(directory/name).resolve();require(path.is_relative_to(directory) and path.is_file() and re.fullmatch(r'[A-Za-z0-9_./-]+',name) is not None,'native_research_bundle_path_invalid');files.add(name);return path
     for row in proof['images']:
-        original=file(row['sourceOriginal']);require(digest(original)==row['sourceSha256'],'original_research_source_changed')
-        with Image.open(original) as source,Image.open(file(row['canonical'])) as canonical:
+        original=file(row['source']);require(digest(original)==row['sourceSha256'],'original_research_source_changed')
+        canonical_path=file(row['canonical']);require(digest(canonical_path)==row['canonicalSha256'],'canonical_research_source_changed')
+        with Image.open(original) as source,Image.open(canonical_path) as canonical:
             require(source.size==canonical.size and source.convert('RGB').tobytes()==canonical.convert('RGB').tobytes(),'canonical_research_pixels_changed')
         raw=file(row['vector']).read_bytes();require(len(raw)==2048,'reference_vector_dimension')
         values=struct.unpack('<512f',raw);require(all(math.isfinite(v) for v in values) and abs(sum(v*v for v in values)-1)<2e-4,'reference_vector_not_normalized')

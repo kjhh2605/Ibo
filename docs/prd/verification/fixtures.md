@@ -71,7 +71,7 @@ Apple `say` 출력은 공개 fixture로 배포하지 않는다. 기존 say 예�
 - 모든 입력의 OpenAPI·인증·토큰/pending/ref 관계·4턴/3장/7장/15초·미디어 실제 형식 검사는 항상 실행한다. ignore는 녹화값 비교만 생략한다. 최종 응답도 echo·asset 치환 후 OpenAPI로 검증한다.
 - response ref는 `"{{toolResults[0].result[0].photoRef}}"`, `"{{photos[0].photoRef}}"` 같은 현재 요청 echo로 치환한다. list_visits 결과는 실제 schema의 `.result.visits[index].shopRef` 경로를 사용한다. ref가 아닌 값/누락 경로/미해결 placeholder는 500 `fixture_invalid`다. 문자열 전체의 dot 경로/숫자 인덱스만 허용하며 임의 연산은 없다. 치환 ref를 후속 token history/pending에도 사용한다.
 - response queryToken은 저장하지 않고 runtime에서 발급한다. data 자리는 `{asset:"assets/..."}`로 관리하고 wire 전 base64로 확장한다. mock 헤더 `X-SF-Fixture`는 live로 보내지 않는다. 실패에 다른 fixture/live fallback은 없다.
-- 필수 scenario: `normal`, `shop-specific`, `time-specific`, `note-specific`, `past-trip`, `not-found`, `turn-limit`, `voice-empty`, `photo-limit`, `upstream-timeout`, `tryon-policy`, `route-unavailable`, `direct-cut-shop`. agent §8 추가 변형과 label queue·마스킹 실패·download OFF도 앱 fixture로 포함한다.
+- 필수 scenario: `normal`, `shop-specific`, `time-specific`, `note-specific`, `past-trip`, `not-found`, `turn-limit`, `voice-empty`, `photo-limit`, `upstream-timeout`, `tryon-policy`, `unsafe-provider`, `route-unavailable`, `direct-cut-shop`, `e2e`, `e2e-route-start`, `e2e-route-reroute`, `e2e-tryon-other`, `e2e-tryon-target-only`. agent §8 추가 변형과 label queue·마스킹 실패·download OFF도 앱 fixture로 포함한다.
 - 웨이브 1에는 합성 입력과 계약에 맞는 수기 mock 응답으로 준비한다. 수기 성공 응답을 실제 API 녹화라고 쓰지 않는다. 실제 API 사용은 통합 단계에만 허용한다.
 - 통합에서 `scripts/e2e/record-relay.sh --scenario normal --source live`를 사용한다. 이 도구는 **별도 S11 검증 클라이언트**이며 승인된 manifest 합성 자산만 허용한다. Firebase/App Check·Meta 키는 환경/저장소 밖 자격 증명으로 공급한다. 앱과 같은 목적별 endpoint를 호출하고 응답은 클라이언트가 메모리에서 검토·정규화하여 승인 fixture만 명시 저장한다.
 - relay 프로세스에 자동 녹화/body dump를 추가하지 않는다. recorder는 token/auth/UID를 제거하고 response ref를 요청 echo로 바꾸며 request에는 expected/match/ignore를 명시한다. provider 원본 파일 bytes·워터마크·메타데이터를 보존한 뒤 schema 검사한다. asset SHA-256은 무결성/provenance용 manifest에만 쓰고 mock 요청 선택·비교에는 쓰지 않는다. provider/model 버전·날짜·출처·조건을 manifest에 기록한다. 원본 self/headMask는 recorder 입력 allowlist 밖이다.
@@ -143,6 +143,7 @@ production replay 근거: [`validate-relay.json`](../../../verification/results/
 - `relay/e2e`: 현재 ended trip의 3가게(각 storefront+item, Shop1 note=`blue tarp, near the entrance`)와 UI로 만든 이전 ended trip 2가게(각 item 1장, descriptionState=`none`, 메모/외관 없음). query=`Find the blue jacket in the second shop`, target 1 + companions 2.
 - 모든 toolResults/companions 배열 길이·순서·의미 필드를 비교한다. 실제 refs/timestamps/media data, native PE score, try-on 입력 이미지 width/height는 정확한 pointer로 ignore한다. 날짜 표현이 없는 `e2e`만 device-dependent `context.timeZone`도 명시 ignore하며, 다른 semantic scenario의 timeZone 비교는 유지한다.
 - Shop2 셔터의 GPX 목적지는 `walk` destination과 같다. Shop.spot과 route waypoint는 별도 좌표다. token/auth/media 검증을 ignore로 생략하지 않는다.
+- normal/e2e 및 두 tryon phase의 `synthetic-full-person-output.png`는 기존 `calibration-hat.png`(`8cae4180…`)를 byte-identical 복사한 **수기 합성 API 응답**이다. Muse 생성/사람 GT/공개 승인으로 주장하지 않는다. 실제 native mask proof를 사용하는 compositor의 미보정 faceless 경로를 위한 입력이다. 기존 head-removed `synthetic-mock-output.png`(`9895c86d…`)는 `unsafe-provider`의 별도200 응답으로 보존하여 앱의 실제 `unsafe_output` 거부를 검사한다. 응답별 source/hash/의도는 `provenance.json.syntheticProviderResponse`에 기록한다.
 - item validator는 source/mask/cutout 크기, 0/255 mask, 실제 bbox, mask 내부 정수 tap, cutout RGB 원본 일치·alpha mask 일치, score 범위와 review hash를 검사한다.
 
 ### 사람이 제공할 구체 입력
@@ -170,3 +171,11 @@ coordinator가 전달한 원본 위치는 `/Users/user/.cache/street-fitting/mod
 
 전달된 PE checkpoint revision은 `8b4722741a516c18e7d311f158f13c600fea6c78`; image preprocessing은 RGB squash384 bilinear→ToTensor→mean/std 0.5, center crop 없음; text context32, normalized512다. 이는 coordinator 제공 metadata이며 이 host에서 모델/파일 hash를 직접 확인한 결과가 아니다. 실제 복사본과 파일별 원본 hash/unaltered 기록(`research/preservation.json`), 모델 revision/전처리 기록(`research/preprocessing.json`), 두 tap 이미지·기존 mask/vector·라이선스를 M1 owner가 제공해야 한다. 누락 자료를 새 합성 그림이나 임의 revision으로 대체하지 않는다.
 
+
+### 후속 runtime fixture 관측
+
+19 scenarios / 337 assets로 확장한 뒤 `validate-fixtures.sh --relay` exit0, `--all` exit2/구조 오류0/선행 조건163개를 관측했다. production replay는 full-person positive와 head-removed negative의 원본 byte identity·synthetic/unapproved provenance, 정확한 route origin/destination, 동반 수 변경409를 검사한다. 근거: [`positive-fixtures-relay.json`](../../../verification/results/2026-11-04-s11-runtime-host/positive-fixtures-relay.json), [`positive-fixtures-all.json`](../../../verification/results/2026-11-04-s11-runtime-host/positive-fixtures-all.json). 위 14-scenario 표는 이전 실행 관측이며 덮어쓰지 않는다.
+
+### M1 native proof adapter
+
+M1 owner가 제공한 실제 host bundle은 `/tmp/sf-s05-proof`, device 위치는 `files/ml-proof`, 기존 준비 helper는 `/tmp/sf-s05-prepare.py`다. helper를 재실행하거나 원본 연구를 재export하지 않는다. `SF_ML_PROOF_DIR=/tmp/sf-s05-proof`로 기존 bundle을 사용한다. image row의 원본 키는 `source`이며 `sourceOriginal`이 아니다. source/canonical SHA256과 checkpoint SHA256 `868f89f066b7c1ae51add02d2cb7b925fd051076282773f2ec3c71359fbdaf3b`를 검증한다. 정확한 schema는 [acceptance](acceptance.md#사람이-제공해야-하는-입력)에 기록했다. host의 임시 합성 byte로 schema·변조 거부·path 경계만 smoke한 결과는 [`research-adapter-smoke.json`](../../../verification/results/2026-11-04-s11-runtime-host/research-adapter-smoke.json)이며 원본22×7/native 추론 합격이 아니다.
