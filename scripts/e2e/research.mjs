@@ -1,6 +1,6 @@
 import path from 'node:path';
-import {writeFile} from 'node:fs/promises';
-import {check,fixture,gpx,json,list,native,stage,removeStaged,until,adb,screenshot} from './android.mjs';
+import {readFile,writeFile} from 'node:fs/promises';
+import {check,fixture,gpx,json,list,native,stage,removeStaged,until,adb,screenshot,root,fix} from './android.mjs';
 import {inspect,click,route,home,startShopping,shoppingFix,prepare,confirm} from './scenarios.mjs';
 
 function observeQuery(page) {
@@ -43,31 +43,55 @@ async function maskIou(page,actual,groundTruth) {
   },{actual,gt});}finally{await removeStaged(gt);}
 }
 
-async function hourForeground(context) {
+async function locationRequestConfiguration() {
+  const source='app/android/app/src/main/java/com/streetfitting/app/plugins/shopping/ShoppingService.java';
+  const text=await readFile(path.join(root,source),'utf8');
+  const match=text.match(/new\s+LocationRequest\.Builder\(\s*Priority\.PRIORITY_HIGH_ACCURACY\s*,\s*(\d+)\s*\)\s*\.setMinUpdateIntervalMillis\(\s*(\d+)\s*\)\s*\.setMaxUpdateDelayMillis\(\s*(\d+)\s*\)/);
+  check(match,'location_request_configuration_unrecognized');
+  return {intervalMs:Number(match[1]),minUpdateIntervalMs:Number(match[2]),maxUpdateDelayMs:Number(match[3]),source,scope:'native source configuration, not observed OS scheduling'};
+}
+
+/** Standalone component evidence is not full research/live/privacy acceptance. */
+export async function hourForeground(context) {
   const {page,options}=context;const point=(await gpx('shopping-three-shops'))[0];
-  await home(page);const session=await startShopping(page);await shoppingFix(page,point);
-  const start=performance.now();const samples=[];const fixTimes=new Set();let error;
-  await adb('shell','input','keyevent','KEYCODE_HOME');
+  const requestedLocation=await locationRequestConfiguration();
+  await home(page);await fix(point);const session=await startShopping(page);
+  const samples=[];const fixTimes=new Set();let error;
   try {
-    while(performance.now()-start<3600000){
-      await shoppingFix(page,point);
-      const state=await native(page,'ShoppingSession','getState');
+    const initial=await shoppingFix(page,point);
+    let previousFixTime=initial.latestFix.t;
+    let previousTrailCount=(await list(page,'TrailPoint',{tripId:session.trip.id})).length;
+    await adb('shell','input','keyevent','KEYCODE_HOME');
+    const start=performance.now();
+    for(;;){
+      const state=await shoppingFix(page,point);
       check(state.phase==='recording'&&state.trip.id===session.trip.id,'fgs_session_not_retained');
+      check(state.latestFix.t>previousFixTime,'fgs_fix_not_advancing');
       check((await list(page,'Shop',{tripId:session.trip.id})).length===1,'gps_created_automatic_shop');
       const services=(await adb('shell','dumpsys','activity','services','com.streetfitting.app')).toString();
       check(/isForeground=true/.test(services),'foreground_service_not_observed');
-      const trail=await list(page,'TrailPoint',{tripId:session.trip.id});for(const fix of trail)fixTimes.add(fix.t);
-      samples.push({elapsedMs:Math.round(performance.now()-start),phase:state.phase,foreground:true,trailCount:trail.length});
-      await writeFile(path.join(options.output,'fgs-progress.json'),JSON.stringify({scope:'emulator liveness, not physical battery',samples},null,2));
-      const remaining=3600000-(performance.now()-start);if(remaining>0)await new Promise(resolve=>setTimeout(resolve,Math.min(30000,remaining)));
+      const trail=await list(page,'TrailPoint',{tripId:session.trip.id});
+      check(trail.length>previousTrailCount&&trail.some(value=>value.t===state.latestFix.t),'fgs_trail_not_advancing');
+      for(const value of trail){check(Number.isFinite(value.t),'fgs_trail_timestamp_invalid');fixTimes.add(value.t);}
+      samples.push({elapsedMs:Math.round(performance.now()-start),phase:state.phase,foreground:true,trailCount:trail.length,newTrailPoints:trail.length-previousTrailCount,latestFixAdvanceMs:state.latestFix.t-previousFixTime});
+      previousFixTime=state.latestFix.t;previousTrailCount=trail.length;
+      await writeFile(path.join(options.output,'fgs-progress.json'),JSON.stringify({scope:'emulator liveness, not physical battery',requestedLocation,samples},null,2));
+      // Observe another fresh fix at/after the full hour, not merely a sleep ending at the deadline.
+      const remaining=3600000-(performance.now()-start);if(remaining<=0)break;
+      await new Promise(resolve=>setTimeout(resolve,Math.min(30000,remaining)));
     }
   }catch(cause){error=cause;}
-  finally{await home(page);await confirm(page,'End shopping');}
+  finally{
+    try{
+      const state=await native(page,'ShoppingSession','getState');
+      if(state.phase==='recording'&&state.trip.id===session.trip.id){await home(page);await confirm(page,'End shopping');}
+    }catch(cause){error??=cause;}
+  }
   if(error)throw error;
   check((await list(page,'TrailPoint',{tripId:session.trip.id})).length===0,'fgs_end_retains_raw_trail');
   const times=[...fixTimes].sort((a,b)=>a-b);const intervals=times.slice(1).map((time,i)=>time-times[i]);
-  check(samples.length>=2&&intervals.length>0,'fgs_location_samples_missing');
-  return {durationMs:Math.round(performance.now()-start),samples,observedFixIntervalsMs:intervals,scope:'one-hour emulator FGS/location retention; not battery drain'};
+  check(samples.length>=2&&samples.at(-1).elapsedMs>=3600000&&intervals.length>0,'fgs_location_samples_missing');
+  return {durationMs:samples.at(-1).elapsedMs,samples,requestedLocation,observedFixIntervalsMs:intervals,scope:'one-hour emulator FGS/location retention; not battery drain'};
 }
 
 export async function research(context) {
