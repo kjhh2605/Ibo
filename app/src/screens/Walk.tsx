@@ -3,7 +3,9 @@ import type {Listener, ResultPieceSnapshot} from '../native/contracts';
 import type {Route} from '../ui/navigation';
 import type {MapView, WalkState} from '../ui/services';
 import {useData, useUi} from '../ui/state';
-import {Action, Button, Empty, HStack, Loading, PhotoView, Problem, Section, Text, VStack} from '../ui/components';
+import {Spinner} from '@astryxdesign/core/Spinner';
+import {Action, Button, Chip, Empty, Hint, HStack, Icon, IconTile, Loading, Panel, PhotoView, Problem, Section, Text, VStack} from '../ui/components';
+import {FlagIcon, NoteIcon, PinIcon, StoreIcon} from '../ui/icons';
 
 // Map is a shared owner service. Finish a pending mount before unmounting it,
 // including when a screen is left and immediately opened again.
@@ -136,37 +138,45 @@ export function Walk({route}: {route: Extract<Route, {name: 'walk'}>}) {
     else setWalkAttempt(value => value + 1);
   };
   return <>
-    <Section title={info?.label ?? 'Walk back'}>
-      <Text>{shopName}{shop ? ` · ${new Date(shop.startedAt).toLocaleString('en-US', {dateStyle: 'medium', timeStyle: 'short'})}` : ''}</Text>
-      {pin && <Text type="supporting">Photo spot · {pin.lat.toFixed(5)}, {pin.lng.toFixed(5)} · Fixed pin</Text>}
-      <Text type="supporting">Walking guidance stays in the app. The destination is where the target item was photographed.</Text>
+    <Section title={info?.label ?? 'Walk back'} eyebrow="Destination">
+      <HStack gap={3} vAlign="center"><IconTile icon={StoreIcon} tone="hero"/><VStack gap={0.5} style={{minWidth: 0}}><Text type="label" weight="semibold">{shopName}</Text><Text type="supporting" size="sm">{shop ? new Date(shop.startedAt).toLocaleString('en-US', {dateStyle: 'medium', timeStyle: 'short'}) : 'Where the target item was photographed'}</Text></VStack></HStack>
+      {pin && <HStack gap={2} vAlign="center" wrap="wrap"><Chip tone="accent">Fixed pin</Chip><HStack gap={1} vAlign="center" style={{color: 'var(--color-text-secondary)'}}><Icon icon={PinIcon} size="xsm" color="inherit"/><Text type="supporting" size="xsm" hasTabularNumbers>Photo spot · {pin.lat.toFixed(5)}, {pin.lng.toFixed(5)} · Fixed pin</Text></HStack></HStack>}
+      <Hint>Walking guidance stays in the app. The destination is where the target item was photographed.</Hint>
     </Section>
-    <VStack ref={host} as="section" role="region" aria-label="Walking map" width="100%" height="50dvh" minHeight="var(--spacing-10)"/>
-    <HStack gap={2} wrap="wrap"><Text type="supporting">Map attribution:</Text><Button label="OpenFreeMap" href="https://openfreemap.org/" variant="ghost" size="sm"/><Button label="© OpenStreetMap contributors" href="https://www.openstreetmap.org/copyright" variant="ghost" size="sm"/><Text type="supporting">Walking routes: FOSSGIS OSRM</Text></HStack>
+    <VStack gap={2}>
+      <VStack ref={host} as="section" role="region" aria-label="Walking map" width="100%" height="50dvh" minHeight="var(--spacing-10)" style={{borderRadius: 'var(--radius-container)', overflow: 'hidden', boxShadow: 'var(--shadow-low)', background: 'var(--color-background-muted)'}}/>
+      <HStack gap={1} wrap="wrap" vAlign="center"><Text type="supporting" size="xsm">Map attribution:</Text><Button label="OpenFreeMap" href="https://openfreemap.org/" variant="ghost" size="sm"/><Button label="© OpenStreetMap contributors" href="https://www.openstreetmap.org/copyright" variant="ghost" size="sm"/><Text type="supporting" size="xsm">Walking routes: FOSSGIS OSRM</Text></HStack>
+    </VStack>
     {mapError && <Problem message={walkError('map_unavailable')} retry={() => setMapAttempt(value => value + 1)}/>}
     {source.loading ? <Loading/> : source.error ? <Problem message={source.error} retry={source.retry}/> : !hasDestination ? <Empty title="No saved photo location"><Text>Walking guidance needs the location where this item was photographed. A shop pin or companion piece cannot replace it.</Text><Button label="Back" onClick={back}/></Empty> : <>
       {startError && <Problem message={walkError(startError)} retry={() => setWalkAttempt(value => value + 1)}/>}
-      {!startError && (!state || mode === 'loading') && online && <VStack role="status" aria-live="polite" gap={3}><Text>Loading your current location and walking route…</Text></VStack>}
-      {mode === 'offline' && <VStack gap={3}><Problem message={walkError('offline')}/><Text type="supporting">Any previously loaded route or distance is for reference only, not live guidance.</Text><Action label="Try again" variant="secondary" disabled={!online} run={retryWalk}/></VStack>}
+      {!startError && (!state || mode === 'loading') && online && <HStack role="status" aria-live="polite" gap={3} vAlign="center" padding={4} style={{background: 'var(--color-accent-muted)', borderRadius: 'var(--radius-container)'}}><Spinner size="lg" aria-label="Loading route"/><Text color="accent">Loading your current location and walking route…</Text></HStack>}
+      {mode === 'offline' && <VStack gap={3}><Problem message={walkError('offline')}/><Hint>Any previously loaded route or distance is for reference only, not live guidance.</Hint><Action label="Try again" variant="secondary" disabled={!online} run={retryWalk}/></VStack>}
       {mode === 'error' && <VStack gap={3}><Problem message={walkError(state?.errorCode ?? 'route_unavailable')}/><Action label="Try again" variant="secondary" run={retryWalk}/></VStack>}
       {mode === 'route' && state && <Section title="Walking directions">
-        {state.rerouting ? <Text>Off route. Finding a new way…</Text> : instruction ? <HStack gap={3} wrap="wrap"><Text type="large">{modifier?.includes('uturn') ? '↶' : modifier?.includes('left') ? '↰' : modifier?.includes('right') ? '↱' : '↑'}</Text><VStack gap={2}>{state.stepDistanceM !== null && <Text type="label">In {distance(state.stepDistanceM)}</Text>}<Text>{instruction}</Text></VStack></HStack> : <Text>Waiting for the next walking instruction.</Text>}
-        {(state.distanceM !== null || state.durationS !== null) && <Text>{state.distanceM !== null ? distance(state.distanceM) : ''}{state.distanceM !== null && state.durationS !== null ? ' · ' : ''}{state.durationS !== null ? `${Math.ceil(state.durationS / 60)} min` : ''} remaining</Text>}
+        <VStack gap={4} padding={5} style={{background: 'var(--color-hero)', color: 'var(--color-on-hero)', borderRadius: 'var(--radius-container)'}}>
+        {state.rerouting ? <HStack gap={3} vAlign="center"><Spinner size="lg" shade="inherit" aria-label="Rerouting"/><Text color="inherit">Off route. Finding a new way…</Text></HStack> : instruction ? <HStack gap={4} vAlign="center"><VStack align="center" justify="center" width="var(--spacing-12)" height="var(--spacing-12)" style={{flexShrink: 0, borderRadius: 'var(--radius-element)', background: 'color-mix(in srgb, var(--color-on-hero) 14%, transparent)'}}><Text type="display-3" color="inherit">{modifier?.includes('uturn') ? '↶' : modifier?.includes('left') ? '↰' : modifier?.includes('right') ? '↱' : '↑'}</Text></VStack><VStack gap={1}>{state.stepDistanceM !== null && <Text type="large" weight="bold" color="inherit" hasTabularNumbers>In {distance(state.stepDistanceM)}</Text>}<Text color="inherit">{instruction}</Text></VStack></HStack> : <Text color="inherit">Waiting for the next walking instruction.</Text>}
+        {(state.distanceM !== null || state.durationS !== null) && <HStack gap={2} vAlign="center" paddingBlock={3} style={{borderTop: 'thin solid color-mix(in srgb, var(--color-on-hero) 22%, transparent)'}}><Icon icon={FlagIcon} size="sm" color="inherit"/><Text color="inherit" hasTabularNumbers>{state.distanceM !== null ? distance(state.distanceM) : ''}{state.distanceM !== null && state.durationS !== null ? ' · ' : ''}{state.durationS !== null ? `${Math.ceil(state.durationS / 60)} min` : ''} remaining</Text></HStack>}
+        </VStack>
       </Section>}
       {(mode === 'direction' || mode === 'nearby') && state && <Section title={mode === 'nearby' ? 'Check the surroundings' : 'Final segment'}>
-        {direction && <Text type="large">{direction.arrow} {direction.name}</Text>}
-        {state.distanceM !== null && <Text type="label">{distance(state.distanceM)} · straight-line distance to the photo spot</Text>}
-        {state.bearingDeg !== null && <Text type="supporting">{Math.round(state.bearingDeg)}° from north · the arrow is relative to north, not the direction you are facing.</Text>}
+        <Panel gap={3}>
+        {direction && <HStack gap={4} vAlign="center"><VStack align="center" justify="center" width="var(--spacing-12)" height="var(--spacing-12)" style={{flexShrink: 0, borderRadius: 'var(--radius-full)', background: 'var(--color-hero)', color: 'var(--color-on-hero)'}}><Text type="display-3" color="inherit">{direction.arrow}</Text></VStack><VStack gap={0.5}><Text type="large" weight="bold">{direction.arrow} {direction.name}</Text>{state.distanceM !== null && <Text type="label" hasTabularNumbers>{distance(state.distanceM)} · straight-line distance to the photo spot</Text>}</VStack></HStack>}
+        {!direction && state.distanceM !== null && <Text type="label">{distance(state.distanceM)} · straight-line distance to the photo spot</Text>}
+        {state.bearingDeg !== null && <Hint>{Math.round(state.bearingDeg)}° from north · the arrow is relative to north, not the direction you are facing.</Hint>}
+        </Panel>
         {state.errorCode === 'route_unavailable' && <Text>No walking route is available here. This is a straight-line direction, not a path through buildings or stalls.</Text>}
         {mode === 'direction' && <Action label="Retry walking route" variant="secondary" run={retryWalk}/>}
-        <Text>{shop?.storefrontFile ? 'Look for this shop front. Stalls here sit close together, so trust the photo over the pin.' : 'No storefront photo is saved. Check the note, nearby signs and the shaded photo-spot area; the pin alone does not confirm the shop.'}</Text>
+        <Hint icon={StoreIcon}>{shop?.storefrontFile ? 'Look for this shop front. Stalls here sit close together, so trust the photo over the pin.' : 'No storefront photo is saved. Check the note, nearby signs and the shaded photo-spot area; the pin alone does not confirm the shop.'}</Hint>
       </Section>}
-      {mode === 'arrived' && <Section title={`You confirmed ${shopName}`}><Text>{shop?.storefrontFile ? 'You confirmed the shop using the storefront and your surroundings.' : 'You confirmed the shop using your surroundings. The photo spot stays fixed.'}</Text><Button label="Done" variant="primary" onClick={back}/></Section>}
-      {shop?.storefrontFile ? <PhotoView file={shop.storefrontFile} label={`Storefront of ${shopName}`}/> : <Text type="supporting">No storefront photo</Text>}
+      {mode === 'arrived' && <Section title={`You confirmed ${shopName}`}><Panel tone="muted" gap={3}><HStack gap={3} vAlign="center"><IconTile icon="check" tone="success" size="lg"/><Text>{shop?.storefrontFile ? 'You confirmed the shop using the storefront and your surroundings.' : 'You confirmed the shop using your surroundings. The photo spot stays fixed.'}</Text></HStack><Button label="Done" variant="primary" size="lg" onClick={back}/></Panel></Section>}
+      <Panel gap={3} padding={3}>
+      {shop?.storefrontFile ? <PhotoView file={shop.storefrontFile} label={`Storefront of ${shopName}`}/> : <Hint icon={StoreIcon}>No storefront photo</Hint>}
       {shop?.description && <Text>{shop.description}</Text>}
-      {shop?.note && <Text>Note: {shop.note}</Text>}
-      {!shop?.storefrontFile && !shop?.description && !shop?.note && <Text type="supporting">No note or storefront description was saved. Use the photo spot and nearby signs to identify the shop.</Text>}
-      {mode === 'nearby' && <Action label="I found this shop" run={() => services.walk.confirmArrival()}/>}
+      {shop?.note && <HStack gap={2} vAlign="start" padding={3} style={{background: 'var(--color-hanok-bead)', borderRadius: 'var(--radius-element)'}}><Icon icon={NoteIcon} size="sm" color="secondary"/><Text size="sm">Note: {shop.note}</Text></HStack>}
+      {!shop?.storefrontFile && !shop?.description && !shop?.note && <Hint>No note or storefront description was saved. Use the photo spot and nearby signs to identify the shop.</Hint>}
+      </Panel>
+      {mode === 'nearby' && <Action label="I found this shop" size="lg" icon={<Icon icon="check"/>} run={() => services.walk.confirmArrival()}/>}
       {mode !== 'arrived' && <Button label="End" variant="secondary" onClick={back}/>}
     </>}
   </>;
