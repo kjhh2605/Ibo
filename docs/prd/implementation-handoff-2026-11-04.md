@@ -1,8 +1,21 @@
 # Street Fitting — 두 Mac 재개 핸드오프 (2026-11-04)
 
-## 중단 지시와 Git 상태
+## 재개 진행 상황 (2026-11-05 KST)
 
-**제품 미완료. 최신 사용자 지시는 “병합하지 말고 푸시한 브랜치에서 이어서 진행”이다. 추가 병합·구현·검증 실행을 중지했다.**
+사용자 요청으로 MacBook/M1 환경·소유권 합의 후 구현을 재개했다. **main/PR 병합 금지 유지, Fast 모드는 각 작업 세션에만 적용.** 아래 기존 중단 기록은 역사적 snapshot이며 현재 구현 상태와 혼동하지 않는다.
+
+- MacBook: `kjhh2605/macbook-resume`, M1: `kjhh2605/m1-native-resume`. 공유 파일은 MacBook 조정자, Java/native/모델·키·기기 검증은 M1 조정자가 소유한다. 명시 승인한 SHA만 교환하며 이미 존재하는 동등 변경을 중복 cherry-pick하지 않는다.
+- `55a289f`: 실제 영속 서비스/UI 연결과 M1 build 선행본. MacBook lint/build/doctor 통과, 당시 전체 검사 218 pass/1 잘못된 RGB assertion 실패를 기록했다.
+- `8f989e9`: S02/S03 제품 endpoint·실제 PE text loader·공식 SAM parser 구현. 통합 pytest 266 pass, 실제 TCP 검색 18개 응답 및 fixture 10 chain/12 boundary 통과. 실제 Meta/OSRM/PE 품질 합격과 구분한다.
+- `7e8a9d5`: portable fixture/엄격 replay·review import/validator. 구조 오류 0이지만 사람 승인/GT/배포 가능한 음성/연구 corpus의 외부 선행 조건은 그대로 보존한다. review UI의 polygon anti-alias를 binary mask로 보수적 변환하는 수정도 실제 화면에서 확인했다.
+- `f0213c4`: 실제 경계 계측과 native debug gate, web cross-tab GC 유실 수정, canonical device 오류 및 구형 bootstrap 제거. 실제 Chromium에서 계측 count 증가와 두 탭 소유권/파일 보존을 확인했다. M1의 private Store debug 메서드와 함께 검증 flag를 켜야 observer를 노출한다.
+- S01 M1 gate: 72 pytest + 실제 TCP 22 응답, 외부 호출/요청 파일 쓰기 0. M1 증거 `f237e2a`를 MacBook의 `5169aa8`로 가져왔다.
+- M1 보고: 실제 APK Home·Store 반복 정리·debug gate, 16 KB Android에서 ORT 추론 실행 확인. 원본 22장 비교의 5장 오차와 head detection 실패는 아직 조사 중이며 합격 기준을 낮추지 않았다. native 변경 checkpoint는 실제 검증 후 별도 SHA로 전달한다.
+- 남은 작업: native 원본 입력/전처리 일치, 사람 GT 기반 privacy, 실제 self/provider/wardrobe mask 연결, UI Result 종단, S11 mock/live E2E·16-call PoC·성능/출처·데모. 코드 checkpoint나 synthetic mock 성공을 이 gate들의 합격으로 대체하지 않는다.
+
+## 중단 당시 지시와 Git 상태
+
+**중단 당시 제품 미완료였으며 추가 병합·구현·검증을 멈췄다. 이후 재개 지시와 진행 상황은 위 절이 우선한다. main/PR 병합 금지는 유지한다.**
 
 - main의 마지막 승인 기준은 S00 PR [#4](https://github.com/kjhh2605/Meta-Hackathon/pull/4), `23baff764ed622be9dd2ed4e0673f60747937a7d`이다. 이번 중단 정리에서 main을 변경하지 않았다.
 - 이전 “전체 병합 후 중단” 지시에 따라 아래 작업을 로컬 `kjhh2605/wave1-shared-integration`에 이미 모았다. 이후 “병합하지 말라” 지시를 받아 추가 merge/PR 생성/PR 병합은 하지 않는다. 기존 로컬 통합 이력은 재작성하지 않고 보존한다. 이 브랜치는 **검증되지 않은 WIP 집합**이지 합격한 통합본이 아니다.
