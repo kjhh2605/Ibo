@@ -1,6 +1,7 @@
-import { useEffect, type CSSProperties, type MouseEvent, type ReactNode } from 'react'
-import { ArrowLeft, type LucideIcon } from 'lucide-react'
-import type { Box, Candidate, Photo, Piece } from './data'
+import { useEffect, useState, type CSSProperties, type MouseEvent, type ReactNode } from 'react'
+import { ArrowLeft, MapPin, type LucideIcon } from 'lucide-react'
+import { Button, Spinner } from './kit'
+import type { Box, Candidate, Img, Piece, Shop } from './data'
 import { useNav, useStore } from './state'
 
 /** One icon size and stroke for the whole app. */
@@ -78,6 +79,94 @@ export function Sheet({ open, onClose, children, label }: { open: boolean; onClo
   )
 }
 
+export function NoteSheet({ shop, onClose }: { shop: Shop; onClose: () => void }) {
+  const { saveNote, say } = useStore()
+  const [note, setNote] = useState(shop.note ?? '')
+  return (
+    <Sheet open onClose={onClose} label={`Note for ${shop.name}`}>
+      <div className="sf-sheet__title">Note for {shop.name}</div>
+      <div className="sf-sheet__text">Anything that helps you find it again.</div>
+      <input className="sf-note-input" aria-label={`Note for ${shop.name}`} placeholder="e.g. cash only, army jackets at the back" value={note} onChange={(e) => setNote(e.target.value)} autoFocus />
+      <div className="sf-sheet__actions">
+        <Button size="large" onClick={onClose}>Cancel</Button>
+        <Button variant="primary" size="large" data-disabled={!note.trim() || undefined} aria-disabled={!note.trim()} onClick={() => {
+          if (!note.trim()) return
+          saveNote(shop.id, note.trim())
+          onClose()
+          say('Note saved')
+        }}>Save</Button>
+      </div>
+    </Sheet>
+  )
+}
+
+export function LocationPermission({ onAllow, onDeny }: { onAllow: () => void; onDeny: () => void }) {
+  return (
+    <SystemPermission title="Allow Street Fitting to access this device's location?">
+      <button type="button" onClick={onAllow}>While using the app</button>
+      <button type="button" onClick={onAllow}>Only this time</button>
+      <button type="button" onClick={onDeny}>Don't allow</button>
+    </SystemPermission>
+  )
+}
+
+export function SystemPermission({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div className="sf-permission">
+      <div className="sf-permission__card" role="dialog" aria-modal="true" aria-label={title}>
+        <I icon={MapPin} size={28} />
+        <div className="sf-permission__title">{title}</div>
+        <div className="sf-permission__choices">{children}</div>
+      </div>
+    </div>
+  )
+}
+
+export function ShopImage({ shop, height = 160, thumb = false }: { shop: Shop; height?: number; thumb?: boolean }) {
+  if (shop.storefront) return thumb
+    ? <Thumb src={shop.storefront.src} size={height} />
+    : <Storefront {...shop.storefront} height={height} />
+  return <div className="sf-storefront sf-storefront--empty" data-thumb={thumb || undefined} style={{ height, width: thumb ? height : undefined }}>No storefront photo</div>
+}
+
+/** The storefront description, or where it is in Spark's queue. Offline it waits instead of spinning. */
+export function ShopDescription({ shop }: { shop: Shop }) {
+  const { demo } = useStore()
+  if (shop.descriptionState === 'pending') return demo.offline
+    ? <span className="sf-inline" data-state="queued">Will describe when you’re back online</span>
+    : <span className="sf-inline"><Spinner size={12} /> Describing the storefront…</span>
+  if (shop.descriptionState === 'failed') return <span className="sf-inline" data-state="failed">Couldn’t describe the storefront</span>
+  return <>{shop.description}</>
+}
+
+/** In place of a result that needs the network. Local data stays usable around it. */
+export function Offline({ text, onRetry }: { text: string; onRetry?: () => void }) {
+  return (
+    <div className="sf-offline" role="status">
+      <div className="sf-offline__title">You’re offline</div>
+      <div className="sf-offline__text">{text}</div>
+      {onRetry && <Button size="medium" onClick={onRetry}>Try again</Button>}
+    </div>
+  )
+}
+
+/** Confirmation before deleting something. One shape for trips, photos, pieces and looks. */
+export function ConfirmSheet({ open, title, text, action = 'Delete', onConfirm, onClose }: { open: boolean; title: string; text: string; action?: string; onConfirm: () => void; onClose: () => void }) {
+  return (
+    <Sheet open={open} onClose={onClose} label={title}>
+      <div className="sf-sheet__title">{title}</div>
+      <div className="sf-sheet__text">{text}</div>
+      <div className="sf-sheet__actions">
+        <Button size="large" onClick={onClose}>Cancel</Button>
+        <Button variant="primary" size="large" className="sf-danger" onClick={() => {
+          onConfirm()
+          onClose()
+        }}>{action}</Button>
+      </div>
+    </Sheet>
+  )
+}
+
 /** The part of a photo inside `box`, fitted into a w × h tile. */
 export function Crop({ src, w, h, box, width, height, fill = 0.88, className }: { src: string; w: number; h: number; box: Box; width: number; height: number; fill?: number; className?: string }) {
   const [bx, by, bw, bh] = box
@@ -115,7 +204,7 @@ export function Shot({
   onTap,
   tap,
 }: {
-  photo: Photo
+  photo: Img
   candidates: Candidate[]
   selected?: string
   onSelect?: (id: string) => void

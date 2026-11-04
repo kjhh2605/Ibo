@@ -1,32 +1,33 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { Shirt } from 'lucide-react'
+import { I } from './ui'
 import { Phone, Stage, Toast } from './kit'
-import { NavProvider, StoreProvider, TITLES, useNav, useStore, type Entry } from './state'
+import { NavProvider, StoreProvider, TITLES, useNav, useStore, type Demo, type Entry } from './state'
 import { Home } from './screens/Home'
 import { Capture } from './screens/Capture'
 import { Ask } from './screens/Ask'
 import { Pick } from './screens/Pick'
 import { Item } from './screens/Item'
-import { Outfit, Result, Results, Send } from './screens/TryOn'
+import { Outfit, Result, Results } from './screens/TryOn'
 import { Walk } from './screens/Walk'
 import { Wardrobe } from './screens/Wardrobe'
-import { Trip, Visit } from './screens/Trip'
+import { Trip, Trips } from './screens/Trip'
 import { Privacy } from './screens/Privacy'
 
 function Route({ e }: { e: Entry }) {
   switch (e.name) {
     case 'home': return <Home />
     case 'capture': return <Capture />
+    case 'trips': return <Trips forOutfit={e.forOutfit} />
+    case 'trip': return <Trip tripId={e.tripId} shopId={e.shopId} forOutfit={e.forOutfit} />
     case 'ask': return <Ask query={e.query} />
     case 'pick': return <Pick photoId={e.photoId} mode={e.mode} concept={e.concept} />
     case 'item': return <Item pieceId={e.pieceId} />
     case 'outfit': return <Outfit seed={e.seed} />
-    case 'send': return <Send />
     case 'result': return <Result resultId={e.resultId} />
     case 'results': return <Results />
-    case 'walk': return <Walk shop={e.shop} />
+    case 'walk': return <Walk pieceId={e.pieceId} resultId={e.resultId} />
     case 'wardrobe': return <Wardrobe />
-    case 'trip': return <Trip />
-    case 'visit': return <Visit shop={e.shop} />
     case 'privacy': return <Privacy />
   }
 }
@@ -43,19 +44,36 @@ function Layer({ e, pos }: { e: Entry; pos: string }) {
 
 /** The stack, drawn as layers: the top slides in from the right, the one under it eases left. */
 function Screens() {
-  const { stack, leaving, pop } = useNav()
-  const { toast } = useStore()
+  const { stack, leaving, pop, push, popTo } = useNav()
+  const { toast, shopping, notificationsAllowed, startShop, shop, tripPhotos } = useStore()
+  const current = shopping.shop ? shop(shopping.shop) : undefined
+  const [notifications, setNotifications] = useState(false)
+  const gestureY = useRef(0)
+  const openCamera = (newShop: boolean) => {
+    setNotifications(false)
+    if (newShop) startShop()
+    if (stack[stack.length - 1].name !== 'capture') push({ name: 'capture' })
+  }
 
   useEffect(() => {
     const onKey = (ev: KeyboardEvent) => {
-      if (ev.key === 'Escape') pop()
+      if (ev.key !== 'Escape') return
+      if (notifications) setNotifications(false)
+      else pop()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [pop])
+  }, [pop, notifications])
 
   const layers = leaving ? [...stack, leaving] : stack
   return (
+    <>
+    <button type="button" className="sf-notification-hotspot" aria-label="Open notifications" onClick={() => setNotifications(true)} onPointerDown={(e) => {
+      gestureY.current = e.clientY
+      e.currentTarget.setPointerCapture(e.pointerId)
+    }} onPointerMove={(e) => {
+      if (e.buttons && e.clientY - gestureY.current > 12) setNotifications(true)
+    }} />
     <div className="sf-app">
       {layers.map((e) => {
         const i = stack.indexOf(e)
@@ -65,7 +83,36 @@ function Screens() {
       <div className="sf-toaster">
         <Toast show={!!toast?.show}>{toast?.text ?? ''}</Toast>
       </div>
+      {notifications && (
+        <div className="sf-notifications" role="dialog" aria-modal="true" aria-label="Notifications">
+          <button type="button" className="sf-notifications__scrim" aria-label="Close notifications" onClick={() => setNotifications(false)} />
+          <div className="sf-notifications__panel" onPointerDown={(e) => { gestureY.current = e.clientY }} onPointerUp={(e) => {
+            if (gestureY.current - e.clientY > 32) setNotifications(false)
+          }}>
+            <div className="sf-notifications__time">2:51</div>
+            <div className="sf-notifications__date">Wednesday, November 4</div>
+            {shopping.on && notificationsAllowed ? (
+              <div className="sf-notification-card">
+                <button type="button" className="sf-notification-card__body" onClick={() => {
+                  setNotifications(false)
+                  popTo('home')
+                }}>
+                  <span className="sf-notification-card__app"><I icon={Shirt} size={18} /> Street Fitting <span>Recording</span></span>
+                  <strong>Shopping mode · {current?.name}</strong>
+                  <span>{shopping.trip ? tripPhotos(shopping.trip).length : 0} photos · {shopping.minutes} min</span>
+                </button>
+                <div className="sf-notification-card__actions">
+                  <button type="button" onClick={() => openCamera(false)}>Take photo</button>
+                  <button type="button" onClick={() => openCamera(true)}>New shop</button>
+                </div>
+              </div>
+            ) : <div className="sf-notifications__empty">No notifications</div>}
+            <button type="button" className="sf-notifications__handle" aria-label="Close notifications" onClick={() => setNotifications(false)} />
+          </div>
+        </div>
+      )}
     </div>
+    </>
   )
 }
 
@@ -84,8 +131,15 @@ function Device() {
   )
 }
 
+const DEMO_SWITCHES: { key: keyof Demo; label: string }[] = [
+  { key: 'offline', label: 'Offline' },
+  { key: 'maskFails', label: 'Masking fails' },
+  { key: 'faceFails', label: 'Face check fails' },
+]
+
 function Host({ onReset }: { onReset: () => void }) {
   const { stack } = useNav()
+  const { demo, setDemo } = useStore()
   return (
     <header className="host__bar">
       <div className="host__title">
@@ -100,6 +154,15 @@ function Host({ onReset }: { onReset: () => void }) {
       </nav>
       <div className="host__actions">
         <span className="host__keys">Esc = back</span>
+        <span className="host__hint">Tap the status bar to pull down notifications</span>
+        <span className="host__demo" role="group" aria-label="Simulate">
+          {DEMO_SWITCHES.map((s) => (
+            <label key={s.key} data-on={demo[s.key] || undefined}>
+              <input type="checkbox" checked={demo[s.key]} onChange={(e) => setDemo((d) => ({ ...d, [s.key]: e.target.checked }))} />
+              {s.label}
+            </label>
+          ))}
+        </span>
         <button type="button" onClick={onReset}>
           Reset
         </button>

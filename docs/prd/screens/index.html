@@ -1,0 +1,1293 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Street Fitting — 화면 흐름 (2026-11-04)</title>
+<style>
+:root{--bg:#f1ebdf;--card:#faf6ef;--ink:#2b2c2e;--muted:#6f665b;--line:#ddd0bc;--accent:#34507a}
+*{box-sizing:border-box}body{margin:0;font:15px/1.5 -apple-system,"Apple SD Gothic Neo","Outfit",system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+.top{position:sticky;top:0;z-index:5;background:rgba(241,235,223,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);padding:14px 28px}
+.top h1{margin:0 0 4px;font-size:20px}.top .meta{color:var(--muted);font-size:13px}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.toc a{display:inline-flex;gap:8px;align-items:center;padding:6px 12px;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--ink);text-decoration:none;font-size:13px}
+.toc a b{color:var(--accent)}.toc a span{color:var(--muted);font-size:12px}
+main{padding:8px 28px 80px}
+.flow{margin-top:36px;scroll-margin-top:200px}.flow header h2{display:flex;gap:10px;align-items:center;margin:0;font-size:19px}
+.flow header h2 span{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-size:14px}
+.flow header p{margin:6px 0 0;color:var(--muted);max-width:980px}.flow header .ids{font-size:12px}
+.steps{list-style:none;margin:16px 0 0;padding:0 0 12px;display:flex;flex-wrap:wrap;column-gap:34px;row-gap:30px}
+.step{position:relative;flex:none}
+.step+.step::before{content:"→";position:absolute;left:-24px;top:210px;color:var(--accent);font-size:20px}
+figure{margin:0;width:270px}figure img{display:block;width:270px;border-radius:22px;box-shadow:0 6px 18px rgba(60,45,20,.16);background:#fff}
+figcaption{padding:10px 4px 0}.no{font-size:12px;color:var(--accent);font-weight:700}.screen{font-weight:650}.state{font-size:14px}
+.action{margin-top:4px;font-size:12.5px;color:var(--muted)}.action::before{content:"조작: "}
+.note{margin-top:4px;font-size:12.5px;color:#7a4b1f}
+</style></head><body>
+<div class="top"><h1>Street Fitting — 화면 흐름</h1>
+<div class="meta">프로토타입 prototype/ (http://127.0.0.1:5180) · 2026-11-04 캡처 · 흐름 7개 · 화면 102장 · 번호 순서(왼쪽→오른쪽, 위→아래)가 사용자 흐름이다. 이미지를 누르면 원본 크기로 열린다. "조작"은 이전 화면에서 한 동작, host 스위치(Offline 등)는 화면 밖 시뮬레이션이다.</div>
+<nav class="toc"><a href="#shopping"><b>1</b>쇼핑 모드와 촬영<span>18</span></a><a href="#trips"><b>2</b>기록 탐색: All trips → Trip<span>11</span></a><a href="#search"><b>3</b>검색: Find it → 후보 → Pick → Item<span>18</span></a><a href="#tryon"><b>4</b>가상 피팅: 대상 1벌 + 함께 입을 옷 최대 5벌<span>27</span></a><a href="#walk"><b>5</b>길 안내: 옷을 찍은 자리로<span>9</span></a><a href="#wardrobe"><b>6</b>옷장과 개인정보 안내<span>12</span></a><a href="#edge"><b>7</b>빈 상태와 예외<span>7</span></a></nav></div>
+<main>
+<section id="shopping" class="flow">
+  <header><h2><span>1</span>쇼핑 모드와 촬영</h2><p>쇼핑 모드를 켜면 새 trip과 Shop 1이 생긴다. 위치 권한은 필수, 알림은 선택. 카메라에서 옷을 찍고 &quot;New shop&quot;으로 가게를 나누며, 외관 사진과 메모는 선택이다. 상태 표시줄을 내리면 알림 카드에서 바로 촬영할 수 있다.</p><p class="ids">근거: D-R2-01~11, D-R3-03, D-R6-03</p></header>
+  <ol class="steps">
+    
+    <li class="step" id="shopping-1">
+      <figure>
+        <a href="img/shopping-01.jpg" target="_blank"><img src="img/shopping-01.jpg" alt="Home — 쇼핑 모드 꺼짐 · 최근 trip(Sun, Nov 1)" loading="lazy"></a>
+        <figcaption>
+          <div class="no">1.1</div>
+          <div class="screen">Home</div>
+          <div class="state">쇼핑 모드 꺼짐 · 최근 trip(Sun, Nov 1)</div>
+          <div class="action">앱 시작</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="shopping-2">
+      <figure>
+        <a href="img/shopping-02.jpg" target="_blank"><img src="img/shopping-02.jpg" alt="OS 권한 — 위치 권한 요청" loading="lazy"></a>
+        <figcaption>
+          <div class="no">1.2</div>
+          <div class="screen">OS 권한</div>
+          <div class="state">위치 권한 요청</div>
+          <div class="action">&quot;Start shopping&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="shopping-3">
+      <figure>
+        <a href="img/shopping-03.jpg" target="_blank"><img src="img/shopping-03.jpg" alt="Home — 위치 거부 → 시작 불가 안내 시트" loading="lazy"></a>
+        <figcaption>
+          <div class="no">1.3</div>
+          <div class="screen">Home</div>
+          <div class="state">위치 거부 → 시작 불가 안내 시트</div>
+          <div class="action">&quot;Don't allow&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="shopping-4">
+      <figure>
+        <a href="img/shopping-04.jpg" target="_blank"><img src="img/shopping-04.jpg" alt="OS 권한 — 알림 권한 요청" loading="lazy"></a>
+        <figcaption>
+          <div class="no">1.4</div>
+          <div class="screen">OS 권한</div>
+          <div class="state">알림 권한 요청</div>
+          <div class="action">다시 &quot;Start shopping&quot; → &quot;While using the app&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="shopping-5">
+      <figure>
+        <a href="img/shopping-05.jpg" target="_blank"><img src="img/shopping-05.jpg" alt="Home — 기록 중 · 새 trip의 Shop 1" loading="lazy"></a>
+        <figcaption>
+          <div class="no">1.5</div>
+          <div class="screen">Home</div>
+          <div class="state">기록 중 · 새 trip의 Shop 1</div>
+          <div class="action">&quot;Allow&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="shopping-6">
+      <figure>
+        <a href="img/shopping-06.jpg" target="_blank"><img src="img/shopping-06.jpg" alt="Camera — 촬영 대기 · Shop 1 · 0 new" loading="lazy"></a>
+        <figcaption>
+          <div class="no">1.6</div>
+          <div class="screen">Camera</div>
+          <div class="state">촬영 대기 · Shop 1 · 0 new</div>
+          <div class="action">&quot;Take photo&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="shopping-7">
+      <figure>
+        <a href="img/shopping-07.jpg" target="_blank"><img src="img/shopping-07.jpg" alt="Camera — 옷 사진 2장 촬영 · 썸네일과 &quot;2 new&quot;" loading="lazy"></a>
+        <figcaption>
+          <div class="no">1.7</div>
+          <div class="screen">Camera</div>
+          <div class="state">옷 사진 2장 촬영 · 썸네일과 &quot;2 new&quot;</div>
+          <div class="action">셔터 2번</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="shopping-8">
+      <figure>
+        <a href="img/shopping-08.jpg" target="_blank"><img src="img/shopping-08.jpg" alt="Camera — &quot;New shop&quot; 즉시 시작 · Shop 2 배너(외관/메모 선택)" loading="lazy"></a>
+        <figcaption>
+          <div class="no">1.8</div>
+          <div class="screen">Camera</div>
+          <div class="state">&quot;New shop&quot; 즉시 시작 · Shop 2 배너(외관/메모 선택)</div>
+          <div class="action">&quot;New shop&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="shopping-9">
+      <figure>
+        <a href="img/shopping-09.jpg" target="_blank"><img src="img/shopping-09.jpg" alt="Camera — 외관 촬영 모드" loading="lazy"></a>
+        <figcaption>
+          <div class="no">1.9</div>
+          <div class="screen">Camera</div>
+          <div class="state">외관 촬영 모드</div>
+          <div class="action">&quot;Storefront photo&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="shopping-10">
+      <figure>
+        <a href="img/shopping-10.jpg" target="_blank"><img src="img/shopping-10.jpg" alt="Camera — 외관 저장 후 · 배너 유지" loading="lazy"></a>
+        <figcaption>
+          <div class="no">1.10</div>
+          <div class="screen">Camera</div>
+          <div class="state">외관 저장 후 · 배너 유지</div>
+          <div class="action">&quot;Take storefront photo&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="shopping-11">
+      <figure>
+        <a href="img/shopping-11.jpg" target="_blank"><img src="img/shopping-11.jpg" alt="Note 시트 — 가게 메모 입력" loading="lazy"></a>
+        <figcaption>
+          <div class="no">1.11</div>
+          <div class="screen">Note 시트</div>
+          <div class="state">가게 메모 입력</div>
+          <div class="action">&quot;Add note&quot; → 입력</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="shopping-12">
+      <figure>
+        <a href="img/shopping-12.jpg" target="_blank"><img src="img/shopping-12.jpg" alt="Home — 기록 중 · Shop 2 · trip 사진 수" loading="lazy"></a>
+        <figcaption>
+          <div class="no">1.12</div>
+          <div class="screen">Home</div>
+          <div class="state">기록 중 · Shop 2 · trip 사진 수</div>
+          <div class="action">Camera에서 뒤로</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="shopping-13">
+      <figure>
+        <a href="img/shopping-13.jpg" target="_blank"><img src="img/shopping-13.jpg" alt="알림 창(시뮬레이션) — 상시 알림 카드 · &quot;Take photo&quot; / &quot;New shop&quot;" loading="lazy"></a>
+        <figcaption>
+          <div class="no">1.13</div>
+          <div class="screen">알림 창(시뮬레이션)</div>
+          <div class="state">상시 알림 카드 · &quot;Take photo&quot; / &quot;New shop&quot;</div>
+          <div class="action">상태 표시줄 누르기</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="shopping-14">
+      <figure>
+        <a href="img/shopping-14.jpg" target="_blank"><img src="img/shopping-14.jpg" alt="Camera — 알림 카드에서 바로 촬영 진입" loading="lazy"></a>
+        <figcaption>
+          <div class="no">1.14</div>
+          <div class="screen">Camera</div>
+          <div class="state">알림 카드에서 바로 촬영 진입</div>
+          <div class="action">알림 &quot;Take photo&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="shopping-15">
+      <figure>
+        <a href="img/shopping-15.jpg" target="_blank"><img src="img/shopping-15.jpg" alt="Home — 종료 확인 시트" loading="lazy"></a>
+        <figcaption>
+          <div class="no">1.15</div>
+          <div class="screen">Home</div>
+          <div class="state">종료 확인 시트</div>
+          <div class="action">&quot;End&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="shopping-16">
+      <figure>
+        <a href="img/shopping-16.jpg" target="_blank"><img src="img/shopping-16.jpg" alt="Home — 종료 후 · 최근 trip이 오늘(Wed, Nov 4)" loading="lazy"></a>
+        <figcaption>
+          <div class="no">1.16</div>
+          <div class="screen">Home</div>
+          <div class="state">종료 후 · 최근 trip이 오늘(Wed, Nov 4)</div>
+          <div class="action">시트 &quot;End&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="shopping-17">
+      <figure>
+        <a href="img/shopping-17.jpg" target="_blank"><img src="img/shopping-17.jpg" alt="Home — 알림 거부 → 기록은 시작, 토스트 안내" loading="lazy"></a>
+        <figcaption>
+          <div class="no">1.17</div>
+          <div class="screen">Home</div>
+          <div class="state">알림 거부 → 기록은 시작, 토스트 안내</div>
+          <div class="action">위치 허용 → 알림 &quot;Don't allow&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="shopping-18">
+      <figure>
+        <a href="img/shopping-18.jpg" target="_blank"><img src="img/shopping-18.jpg" alt="알림 창(시뮬레이션) — 알림 거부 시 카드 없음" loading="lazy"></a>
+        <figcaption>
+          <div class="no">1.18</div>
+          <div class="screen">알림 창(시뮬레이션)</div>
+          <div class="state">알림 거부 시 카드 없음</div>
+          <div class="action">상태 표시줄 누르기</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+  </ol>
+</section>
+<section id="trips" class="flow">
+  <header><h2><span>2</span>기록 탐색: All trips → Trip</h2><p>홈에는 최근 trip 하나와 &quot;All trips&quot;가 있다. 별도 가게(Visit) 화면 없이 Trip 한 화면에 가게별 외관·묘사·메모·사진이 모인다. Trip에는 길 안내가 없고 trip 삭제를 제공한다. 오프라인이면 외관 묘사는 대기열에서 기다린다.</p><p class="ids">근거: D-R3-03, D-R3-10, D-R3-11, D-R6-03, D-R9-04</p></header>
+  <ol class="steps">
+    
+    <li class="step" id="trips-1">
+      <figure>
+        <a href="img/trips-01.jpg" target="_blank"><img src="img/trips-01.jpg" alt="Home — 최근 trip과 &quot;All trips&quot; 진입" loading="lazy"></a>
+        <figcaption>
+          <div class="no">2.1</div>
+          <div class="screen">Home</div>
+          <div class="state">최근 trip과 &quot;All trips&quot; 진입</div>
+          <div class="action">앱 시작</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="trips-2">
+      <figure>
+        <a href="img/trips-02.jpg" target="_blank"><img src="img/trips-02.jpg" alt="All trips — 날짜별 trip 목록" loading="lazy"></a>
+        <figcaption>
+          <div class="no">2.2</div>
+          <div class="screen">All trips</div>
+          <div class="state">날짜별 trip 목록</div>
+          <div class="action">&quot;All trips&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="trips-3">
+      <figure>
+        <a href="img/trips-03.jpg" target="_blank"><img src="img/trips-03.jpg" alt="Trip — Sun, Nov 1 · 가게별 외관·묘사·메모·사진" loading="lazy"></a>
+        <figcaption>
+          <div class="no">2.3</div>
+          <div class="screen">Trip</div>
+          <div class="state">Sun, Nov 1 · 가게별 외관·묘사·메모·사진</div>
+          <div class="action">Sun, Nov 1 trip</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="trips-4">
+      <figure>
+        <a href="img/trips-04.jpg" target="_blank"><img src="img/trips-04.jpg" alt="Trip — 스크롤 · Shop 2 영역" loading="lazy"></a>
+        <figcaption>
+          <div class="no">2.4</div>
+          <div class="screen">Trip</div>
+          <div class="state">스크롤 · Shop 2 영역</div>
+          <div class="action">아래로 스크롤</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="trips-5">
+      <figure>
+        <a href="img/trips-05.jpg" target="_blank"><img src="img/trips-05.jpg" alt="Trip — Sat, Oct 24 · 외관 사진 없는 가게" loading="lazy"></a>
+        <figcaption>
+          <div class="no">2.5</div>
+          <div class="screen">Trip</div>
+          <div class="state">Sat, Oct 24 · 외관 사진 없는 가게</div>
+          <div class="action">Sat, Oct 24 trip</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="trips-6">
+      <figure>
+        <a href="img/trips-06.jpg" target="_blank"><img src="img/trips-06.jpg" alt="Trip — trip 삭제 확인" loading="lazy"></a>
+        <figcaption>
+          <div class="no">2.6</div>
+          <div class="screen">Trip</div>
+          <div class="state">trip 삭제 확인</div>
+          <div class="action">&quot;Delete trip&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="trips-7">
+      <figure>
+        <a href="img/trips-07.jpg" target="_blank"><img src="img/trips-07.jpg" alt="All trips — 삭제 후 목록 · 저장한 옷은 남음" loading="lazy"></a>
+        <figcaption>
+          <div class="no">2.7</div>
+          <div class="screen">All trips</div>
+          <div class="state">삭제 후 목록 · 저장한 옷은 남음</div>
+          <div class="action">시트 &quot;Delete trip&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="trips-8">
+      <figure>
+        <a href="img/trips-08.jpg" target="_blank"><img src="img/trips-08.jpg" alt="Trip — 홈에서 가게 선택 → 그 가게로 이동 · 오프라인이라 묘사 대기" loading="lazy"></a>
+        <figcaption>
+          <div class="no">2.8</div>
+          <div class="screen">Trip</div>
+          <div class="state">홈에서 가게 선택 → 그 가게로 이동 · 오프라인이라 묘사 대기</div>
+          <div class="action">host &quot;Offline&quot; 켬 → 쇼핑 시작 → 촬영·New shop·외관 → 뒤로 → Home &quot;Shop 2&quot;</div>
+          <div class="note">오프라인·실패 시뮬레이션은 화면 밖 host 막대의 스위치</div>
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="trips-9">
+      <figure>
+        <a href="img/trips-09.jpg" target="_blank"><img src="img/trips-09.jpg" alt="Trip — 연결 복구 · 묘사 처리 중" loading="lazy"></a>
+        <figcaption>
+          <div class="no">2.9</div>
+          <div class="screen">Trip</div>
+          <div class="state">연결 복구 · 묘사 처리 중</div>
+          <div class="action">host &quot;Offline&quot; 끔</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="trips-10">
+      <figure>
+        <a href="img/trips-10.jpg" target="_blank"><img src="img/trips-10.jpg" alt="Trip — 묘사 완료" loading="lazy"></a>
+        <figcaption>
+          <div class="no">2.10</div>
+          <div class="screen">Trip</div>
+          <div class="state">묘사 완료</div>
+          <div class="action">잠시 대기</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="trips-11">
+      <figure>
+        <a href="img/trips-11.jpg" target="_blank"><img src="img/trips-11.jpg" alt="Note 시트 — Trip에서 가게 메모 추가" loading="lazy"></a>
+        <figcaption>
+          <div class="no">2.11</div>
+          <div class="screen">Note 시트</div>
+          <div class="state">Trip에서 가게 메모 추가</div>
+          <div class="action">&quot;Add note&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+  </ol>
+</section>
+<section id="search" class="flow">
+  <header><h2><span>3</span>검색: Find it → 후보 → Pick → Item</h2><p>모든 trip을 대상으로 영어 질의(입력 또는 음성)로 찾는다. 음성은 말이 끝나면 자동으로 멈추고 바로 검색한다. 진행 단계는 결과가 나오면 한 줄로 접히고, 후보는 상위 3개 + &quot;Show all&quot;. 못 찾으면 다시 묻거나 trip을 직접 둘러본다.</p><p class="ids">근거: D-R3-01~09, D-R7-09, D-R4-06, D-R3-11</p></header>
+  <ol class="steps">
+    
+    <li class="step" id="search-1">
+      <figure>
+        <a href="img/search-01.jpg" target="_blank"><img src="img/search-01.jpg" alt="Find it — 입력 대기 · 예시 질의 · 마이크는 여기만" loading="lazy"></a>
+        <figcaption>
+          <div class="no">3.1</div>
+          <div class="screen">Find it</div>
+          <div class="state">입력 대기 · 예시 질의 · 마이크는 여기만</div>
+          <div class="action">Home 검색창</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="search-2">
+      <figure>
+        <a href="img/search-02.jpg" target="_blank"><img src="img/search-02.jpg" alt="Find it — 음성 듣는 중(무음이면 자동 종료)" loading="lazy"></a>
+        <figcaption>
+          <div class="no">3.2</div>
+          <div class="screen">Find it</div>
+          <div class="state">음성 듣는 중(무음이면 자동 종료)</div>
+          <div class="action">마이크 &quot;Speak&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="search-3">
+      <figure>
+        <a href="img/search-03.jpg" target="_blank"><img src="img/search-03.jpg" alt="Find it — 자동 종료 직후 바로 검색 · 단계 진행" loading="lazy"></a>
+        <figcaption>
+          <div class="no">3.3</div>
+          <div class="screen">Find it</div>
+          <div class="state">자동 종료 직후 바로 검색 · 단계 진행</div>
+          <div class="action">대기(무음 자동 종료)</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="search-4">
+      <figure>
+        <a href="img/search-04.jpg" target="_blank"><img src="img/search-04.jpg" alt="Find it — 결과 · 단계 한 줄로 접힘 · 상위 3개" loading="lazy"></a>
+        <figcaption>
+          <div class="no">3.4</div>
+          <div class="screen">Find it</div>
+          <div class="state">결과 · 단계 한 줄로 접힘 · 상위 3개</div>
+          <div class="action">대기</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="search-5">
+      <figure>
+        <a href="img/search-05.jpg" target="_blank"><img src="img/search-05.jpg" alt="Find it — 질의 입력 후 단계 진행" loading="lazy"></a>
+        <figcaption>
+          <div class="no">3.5</div>
+          <div class="screen">Find it</div>
+          <div class="state">질의 입력 후 단계 진행</div>
+          <div class="action">&quot;red dress from the second shop&quot; 입력 → &quot;Find&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="search-6">
+      <figure>
+        <a href="img/search-06.jpg" target="_blank"><img src="img/search-06.jpg" alt="Find it — 결과 · 상위 3개 + &quot;Show all&quot;" loading="lazy"></a>
+        <figcaption>
+          <div class="no">3.6</div>
+          <div class="screen">Find it</div>
+          <div class="state">결과 · 상위 3개 + &quot;Show all&quot;</div>
+          <div class="action">대기</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="search-7">
+      <figure>
+        <a href="img/search-07.jpg" target="_blank"><img src="img/search-07.jpg" alt="Find it — &quot;Show all&quot; 펼침 · 다른 trip(Oct 24) 사진 포함" loading="lazy"></a>
+        <figcaption>
+          <div class="no">3.7</div>
+          <div class="screen">Find it</div>
+          <div class="state">&quot;Show all&quot; 펼침 · 다른 trip(Oct 24) 사진 포함</div>
+          <div class="action">&quot;Show all (4)&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="search-8">
+      <figure>
+        <a href="img/search-08.jpg" target="_blank"><img src="img/search-08.jpg" alt="Find it — 접힌 단계 다시 펼침" loading="lazy"></a>
+        <figcaption>
+          <div class="no">3.8</div>
+          <div class="screen">Find it</div>
+          <div class="state">접힌 단계 다시 펼침</div>
+          <div class="action">&quot;4 photos found · Show steps&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="search-9">
+      <figure>
+        <a href="img/search-09.jpg" target="_blank"><img src="img/search-09.jpg" alt="Pick the item — SAM 후보 박스 · 점수순" loading="lazy"></a>
+        <figcaption>
+          <div class="no">3.9</div>
+          <div class="screen">Pick the item</div>
+          <div class="state">SAM 후보 박스 · 점수순</div>
+          <div class="action">&quot;Best match&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="search-10">
+      <figure>
+        <a href="img/search-10.jpg" target="_blank"><img src="img/search-10.jpg" alt="Pick the item — 다른 후보 선택" loading="lazy"></a>
+        <figcaption>
+          <div class="no">3.10</div>
+          <div class="screen">Pick the item</div>
+          <div class="state">다른 후보 선택</div>
+          <div class="action">후보 2</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="search-11">
+      <figure>
+        <a href="img/search-11.jpg" target="_blank"><img src="img/search-11.jpg" alt="Pick the item — 사진 갤러리 내려받기(GPS 제거) 토스트" loading="lazy"></a>
+        <figcaption>
+          <div class="no">3.11</div>
+          <div class="screen">Pick the item</div>
+          <div class="state">사진 갤러리 내려받기(GPS 제거) 토스트</div>
+          <div class="action">&quot;Save to gallery&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="search-12">
+      <figure>
+        <a href="img/search-12.jpg" target="_blank"><img src="img/search-12.jpg" alt="Pick the item — 사진 삭제 확인" loading="lazy"></a>
+        <figcaption>
+          <div class="no">3.12</div>
+          <div class="screen">Pick the item</div>
+          <div class="state">사진 삭제 확인</div>
+          <div class="action">&quot;Delete photo&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="search-13">
+      <figure>
+        <a href="img/search-13.jpg" target="_blank"><img src="img/search-13.jpg" alt="Pick the item — 탭으로 직접 고르기 모드" loading="lazy"></a>
+        <figcaption>
+          <div class="no">3.13</div>
+          <div class="screen">Pick the item</div>
+          <div class="state">탭으로 직접 고르기 모드</div>
+          <div class="action">&quot;Not here? Tap it&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="search-14">
+      <figure>
+        <a href="img/search-14.jpg" target="_blank"><img src="img/search-14.jpg" alt="Pick the item — 탭 위치의 마스크 후보 3개" loading="lazy"></a>
+        <figcaption>
+          <div class="no">3.14</div>
+          <div class="screen">Pick the item</div>
+          <div class="state">탭 위치의 마스크 후보 3개</div>
+          <div class="action">사진 탭</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="search-15">
+      <figure>
+        <a href="img/search-15.jpg" target="_blank"><img src="img/search-15.jpg" alt="Item — 저장된 가게 옷 · 가게 정보 · &quot;Walk back&quot; / &quot;Try it on&quot;" loading="lazy"></a>
+        <figcaption>
+          <div class="no">3.15</div>
+          <div class="screen">Item</div>
+          <div class="state">저장된 가게 옷 · 가게 정보 · &quot;Walk back&quot; / &quot;Try it on&quot;</div>
+          <div class="action">&quot;Show matches&quot; → 후보 1 → &quot;Use this item&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="search-16">
+      <figure>
+        <a href="img/search-16.jpg" target="_blank"><img src="img/search-16.jpg" alt="Find it — 못 찾음 · &quot;Ask again&quot; / &quot;Browse your trips&quot;" loading="lazy"></a>
+        <figcaption>
+          <div class="no">3.16</div>
+          <div class="screen">Find it</div>
+          <div class="state">못 찾음 · &quot;Ask again&quot; / &quot;Browse your trips&quot;</div>
+          <div class="action">&quot;a straw hat&quot; → &quot;Find&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="search-17">
+      <figure>
+        <a href="img/search-17.jpg" target="_blank"><img src="img/search-17.jpg" alt="All trips — 못 찾았을 때 직접 둘러보기" loading="lazy"></a>
+        <figcaption>
+          <div class="no">3.17</div>
+          <div class="screen">All trips</div>
+          <div class="state">못 찾았을 때 직접 둘러보기</div>
+          <div class="action">&quot;Browse your trips&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="search-18">
+      <figure>
+        <a href="img/search-18.jpg" target="_blank"><img src="img/search-18.jpg" alt="Find it — 오프라인 · 검색 불가 안내 + 재시도" loading="lazy"></a>
+        <figcaption>
+          <div class="no">3.18</div>
+          <div class="screen">Find it</div>
+          <div class="state">오프라인 · 검색 불가 안내 + 재시도</div>
+          <div class="action">host &quot;Offline&quot; 켬 → 질의 → &quot;Find&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+  </ol>
+</section>
+<section id="tryon" class="flow">
+  <header><h2><span>4</span>가상 피팅: 대상 1벌 + 함께 입을 옷 최대 5벌</h2><p>가게 옷만 피팅 대상이 된다. 함께 입을 옷은 저장한 옷, 옷장, trip 사진에서 바로 자른 옷에서 고른다(최대 5벌). 본인 사진은 1장이고 얼굴·머리 마스킹은 기기에서 자동으로 한다. 전송 확인 화면 없이 이 화면에서 바로 생성한다.</p><p class="ids">근거: D-R4-01~11, D-R9-01~03</p></header>
+  <ol class="steps">
+    
+    <li class="step" id="tryon-1">
+      <figure>
+        <a href="img/tryon-01.jpg" target="_blank"><img src="img/tryon-01.jpg" alt="Item — 저장한 가게 옷" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.1</div>
+          <div class="screen">Item</div>
+          <div class="state">저장한 가게 옷</div>
+          <div class="action">Home &quot;Saved&quot;의 Red dress</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-2">
+      <figure>
+        <a href="img/tryon-02.jpg" target="_blank"><img src="img/tryon-02.jpg" alt="Try on — 대상 1벌 고정 · 함께 입을 옷 없음" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.2</div>
+          <div class="screen">Try on</div>
+          <div class="state">대상 1벌 고정 · 함께 입을 옷 없음</div>
+          <div class="action">&quot;Try it on&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-3">
+      <figure>
+        <a href="img/tryon-03.jpg" target="_blank"><img src="img/tryon-03.jpg" alt="Try on — 함께 입을 옷 2벌 선택" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.3</div>
+          <div class="screen">Try on</div>
+          <div class="state">함께 입을 옷 2벌 선택</div>
+          <div class="action">옷장 &quot;Light wash jeans&quot;, &quot;Navy flats&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-4">
+      <figure>
+        <a href="img/tryon-04.jpg" target="_blank"><img src="img/tryon-04.jpg" alt="All trips — 피팅용 사진 고르기 모드" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.4</div>
+          <div class="screen">All trips</div>
+          <div class="state">피팅용 사진 고르기 모드</div>
+          <div class="action">&quot;From a trip photo&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-5">
+      <figure>
+        <a href="img/tryon-05.jpg" target="_blank"><img src="img/tryon-05.jpg" alt="Trip — 피팅용 · 사진을 누르면 바로 자르기" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.5</div>
+          <div class="screen">Trip</div>
+          <div class="state">피팅용 · 사진을 누르면 바로 자르기</div>
+          <div class="action">Sun, Nov 1 trip</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-6">
+      <figure>
+        <a href="img/tryon-06.jpg" target="_blank"><img src="img/tryon-06.jpg" alt="Pick the item — 피팅용 · 탭으로 자르기" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.6</div>
+          <div class="screen">Pick the item</div>
+          <div class="state">피팅용 · 탭으로 자르기</div>
+          <div class="action">3:02 PM 사진</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-7">
+      <figure>
+        <a href="img/tryon-07.jpg" target="_blank"><img src="img/tryon-07.jpg" alt="Pick the item — 탭 위치 마스크 3개 · &quot;Add to outfit&quot;" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.7</div>
+          <div class="screen">Pick the item</div>
+          <div class="state">탭 위치 마스크 3개 · &quot;Add to outfit&quot;</div>
+          <div class="action">회색 블레이저 탭</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-8">
+      <figure>
+        <a href="img/tryon-08.jpg" target="_blank"><img src="img/tryon-08.jpg" alt="Try on — 바로 자른 옷 추가 · 이름 대기 &quot;Picked item&quot;" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.8</div>
+          <div class="screen">Try on</div>
+          <div class="state">바로 자른 옷 추가 · 이름 대기 &quot;Picked item&quot;</div>
+          <div class="action">&quot;Add to outfit&quot;</div>
+          <div class="note">이름은 Spark가 뒤에서 붙인다</div>
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-9">
+      <figure>
+        <a href="img/tryon-09.jpg" target="_blank"><img src="img/tryon-09.jpg" alt="Try on — Spark 이름 도착" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.9</div>
+          <div class="screen">Try on</div>
+          <div class="state">Spark 이름 도착</div>
+          <div class="action">잠시 대기</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-10">
+      <figure>
+        <a href="img/tryon-10.jpg" target="_blank"><img src="img/tryon-10.jpg" alt="Try on — 본인 사진 바꾸기 시트(촬영/갤러리)" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.10</div>
+          <div class="screen">Try on</div>
+          <div class="state">본인 사진 바꾸기 시트(촬영/갤러리)</div>
+          <div class="action">&quot;Change&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-11">
+      <figure>
+        <a href="img/tryon-11.jpg" target="_blank"><img src="img/tryon-11.jpg" alt="Try on — 본인 사진 확인 중(기기 마스킹)" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.11</div>
+          <div class="screen">Try on</div>
+          <div class="state">본인 사진 확인 중(기기 마스킹)</div>
+          <div class="action">&quot;Take a photo&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-12">
+      <figure>
+        <a href="img/tryon-12.jpg" target="_blank"><img src="img/tryon-12.jpg" alt="Try on — 마스킹 실패 → 다시 찍기" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.12</div>
+          <div class="screen">Try on</div>
+          <div class="state">마스킹 실패 → 다시 찍기</div>
+          <div class="action">host &quot;Masking fails&quot; 켬 상태</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-13">
+      <figure>
+        <a href="img/tryon-13.jpg" target="_blank"><img src="img/tryon-13.jpg" alt="Try on — 본인 사진 다시 찍음 · 준비 완료" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.13</div>
+          <div class="screen">Try on</div>
+          <div class="state">본인 사진 다시 찍음 · 준비 완료</div>
+          <div class="action">&quot;Retake&quot; → &quot;Take a photo&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-14">
+      <figure>
+        <a href="img/tryon-14.jpg" target="_blank"><img src="img/tryon-14.jpg" alt="Try on — 생성 1/3 · 얼굴 없이 보내는 중" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.14</div>
+          <div class="screen">Try on</div>
+          <div class="state">생성 1/3 · 얼굴 없이 보내는 중</div>
+          <div class="action">&quot;Generate&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-15">
+      <figure>
+        <a href="img/tryon-15.jpg" target="_blank"><img src="img/tryon-15.jpg" alt="Try on — 생성 2/3 · 피팅 이미지 생성 중" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.15</div>
+          <div class="screen">Try on</div>
+          <div class="state">생성 2/3 · 피팅 이미지 생성 중</div>
+          <div class="action">대기</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-16">
+      <figure>
+        <a href="img/tryon-16.jpg" target="_blank"><img src="img/tryon-16.jpg" alt="Try on — 생성 3/3 · 기기에서 얼굴 되돌리는 중" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.16</div>
+          <div class="screen">Try on</div>
+          <div class="state">생성 3/3 · 기기에서 얼굴 되돌리는 중</div>
+          <div class="action">대기</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-17">
+      <figure>
+        <a href="img/tryon-17.jpg" target="_blank"><img src="img/tryon-17.jpg" alt="Your look — 결과 · 대상 가게로 길 안내 · 비교/내려받기 없음" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.17</div>
+          <div class="screen">Your look</div>
+          <div class="state">결과 · 대상 가게로 길 안내 · 비교/내려받기 없음</div>
+          <div class="action">생성 완료</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-18">
+      <figure>
+        <a href="img/tryon-18.jpg" target="_blank"><img src="img/tryon-18.jpg" alt="Your look — 입은 옷 목록(대상 먼저)" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.18</div>
+          <div class="screen">Your look</div>
+          <div class="state">입은 옷 목록(대상 먼저)</div>
+          <div class="action">아래로 스크롤</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-19">
+      <figure>
+        <a href="img/tryon-19.jpg" target="_blank"><img src="img/tryon-19.jpg" alt="Your look — 얼굴 합성 기준 미달 → 얼굴 없는 결과" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.19</div>
+          <div class="screen">Your look</div>
+          <div class="state">얼굴 합성 기준 미달 → 얼굴 없는 결과</div>
+          <div class="action">host &quot;Face check fails&quot; 켬 → &quot;Change pieces&quot; → &quot;Generate&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-20">
+      <figure>
+        <a href="img/tryon-20.jpg" target="_blank"><img src="img/tryon-20.jpg" alt="Your look — 결과 삭제 확인" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.20</div>
+          <div class="screen">Your look</div>
+          <div class="state">결과 삭제 확인</div>
+          <div class="action">&quot;Delete&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-21">
+      <figure>
+        <a href="img/tryon-21.jpg" target="_blank"><img src="img/tryon-21.jpg" alt="Try-ons — 피팅 기록 목록" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.21</div>
+          <div class="screen">Try-ons</div>
+          <div class="state">피팅 기록 목록</div>
+          <div class="action">Home &quot;Try-ons&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-22">
+      <figure>
+        <a href="img/tryon-22.jpg" target="_blank"><img src="img/tryon-22.jpg" alt="Item — 저장한 옷 삭제 확인" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.22</div>
+          <div class="screen">Item</div>
+          <div class="state">저장한 옷 삭제 확인</div>
+          <div class="action">결과의 &quot;Red dress&quot; 행 → Item &quot;Delete&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-23">
+      <figure>
+        <a href="img/tryon-23.jpg" target="_blank"><img src="img/tryon-23.jpg" alt="Your look — 대상 옷 삭제 후 · 스냅샷으로 보기·길 안내 유지, &quot;Change pieces&quot; 비활성" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.23</div>
+          <div class="screen">Your look</div>
+          <div class="state">대상 옷 삭제 후 · 스냅샷으로 보기·길 안내 유지, &quot;Change pieces&quot; 비활성</div>
+          <div class="action">시트 &quot;Delete&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-24">
+      <figure>
+        <a href="img/tryon-24.jpg" target="_blank"><img src="img/tryon-24.jpg" alt="Walk back — 피팅 결과에서 시작 · 대상 옷이 삭제돼도 스냅샷 위치로 안내" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.24</div>
+          <div class="screen">Walk back</div>
+          <div class="state">피팅 결과에서 시작 · 대상 옷이 삭제돼도 스냅샷 위치로 안내</div>
+          <div class="action">&quot;Walk to Shop 2&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-25">
+      <figure>
+        <a href="img/tryon-25.jpg" target="_blank"><img src="img/tryon-25.jpg" alt="Try on — 함께 입을 옷 5벌(최대)" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.25</div>
+          <div class="screen">Try on</div>
+          <div class="state">함께 입을 옷 5벌(최대)</div>
+          <div class="action">&quot;From a trip photo&quot;로 3벌 더 추가</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-26">
+      <figure>
+        <a href="img/tryon-26.jpg" target="_blank"><img src="img/tryon-26.jpg" alt="Try on — 6벌째 시도 → 최대 5벌 안내 토스트" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.26</div>
+          <div class="screen">Try on</div>
+          <div class="state">6벌째 시도 → 최대 5벌 안내 토스트</div>
+          <div class="action">&quot;From a trip photo&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="tryon-27">
+      <figure>
+        <a href="img/tryon-27.jpg" target="_blank"><img src="img/tryon-27.jpg" alt="Try on — 오프라인 · 생성 불가 안내, &quot;Generate&quot; 비활성" loading="lazy"></a>
+        <figcaption>
+          <div class="no">4.27</div>
+          <div class="screen">Try on</div>
+          <div class="state">오프라인 · 생성 불가 안내, &quot;Generate&quot; 비활성</div>
+          <div class="action">host &quot;Offline&quot; 켬</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+  </ol>
+</section>
+<section id="walk" class="flow">
+  <header><h2><span>5</span>길 안내: 옷을 찍은 자리로</h2><p>목적지는 옷 사진을 찍은 위치이고 핀은 옮길 수 없다. Item과 피팅 결과에서만 시작한다. 경로가 끝나면 마지막 구간은 방향과 직선 거리로 안내하고, 도착 카드는 외관 사진이 없으면 메모·설명으로 대신한다. 거리와 관계없이 앱 안에서 안내한다.</p><p class="ids">근거: D-R5-01~05, D-R6-03, D-R9-03, D-R9-04</p></header>
+  <ol class="steps">
+    
+    <li class="step" id="walk-1">
+      <figure>
+        <a href="img/walk-01.jpg" target="_blank"><img src="img/walk-01.jpg" alt="Walk back — 경로 안내 시작 · 고정 핀" loading="lazy"></a>
+        <figcaption>
+          <div class="no">5.1</div>
+          <div class="screen">Walk back</div>
+          <div class="state">경로 안내 시작 · 고정 핀</div>
+          <div class="action">Item &quot;Walk back&quot;</div>
+          <div class="note">&quot;Demo&quot; 패널은 시연용 조작이며 제품 UI가 아니다</div>
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="walk-2">
+      <figure>
+        <a href="img/walk-02.jpg" target="_blank"><img src="img/walk-02.jpg" alt="Walk back — 경로 중간" loading="lazy"></a>
+        <figcaption>
+          <div class="no">5.2</div>
+          <div class="screen">Walk back</div>
+          <div class="state">경로 중간</div>
+          <div class="action">&quot;Walk a step&quot; ×2</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="walk-3">
+      <figure>
+        <a href="img/walk-03.jpg" target="_blank"><img src="img/walk-03.jpg" alt="Walk back — 경로 이탈 → 재탐색" loading="lazy"></a>
+        <figcaption>
+          <div class="no">5.3</div>
+          <div class="screen">Walk back</div>
+          <div class="state">경로 이탈 → 재탐색</div>
+          <div class="action">&quot;Go off route&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="walk-4">
+      <figure>
+        <a href="img/walk-04.jpg" target="_blank"><img src="img/walk-04.jpg" alt="Walk back — 마지막 구간 · 방향 + 직선 거리" loading="lazy"></a>
+        <figcaption>
+          <div class="no">5.4</div>
+          <div class="screen">Walk back</div>
+          <div class="state">마지막 구간 · 방향 + 직선 거리</div>
+          <div class="action">&quot;Walk a step&quot; ×2</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="walk-5">
+      <figure>
+        <a href="img/walk-05.jpg" target="_blank"><img src="img/walk-05.jpg" alt="Walk back — 도착 · 외관 사진 카드" loading="lazy"></a>
+        <figcaption>
+          <div class="no">5.5</div>
+          <div class="screen">Walk back</div>
+          <div class="state">도착 · 외관 사진 카드</div>
+          <div class="action">&quot;Walk a step&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="walk-6">
+      <figure>
+        <a href="img/walk-06.jpg" target="_blank"><img src="img/walk-06.jpg" alt="Walk back — 오프라인 · 경로를 못 불러옴, 목적지 정보 유지 + 재시도" loading="lazy"></a>
+        <figcaption>
+          <div class="no">5.6</div>
+          <div class="screen">Walk back</div>
+          <div class="state">오프라인 · 경로를 못 불러옴, 목적지 정보 유지 + 재시도</div>
+          <div class="action">host &quot;Offline&quot; 켬 → &quot;Walk back&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="walk-7">
+      <figure>
+        <a href="img/walk-07.jpg" target="_blank"><img src="img/walk-07.jpg" alt="Item — 바로 자른 가게 옷 · 이름 대기 &quot;Picked item&quot; · 외관 없는 가게" loading="lazy"></a>
+        <figcaption>
+          <div class="no">5.7</div>
+          <div class="screen">Item</div>
+          <div class="state">바로 자른 가게 옷 · 이름 대기 &quot;Picked item&quot; · 외관 없는 가게</div>
+          <div class="action">Oct 24 사진 탭 → &quot;Use this item&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="walk-8">
+      <figure>
+        <a href="img/walk-08.jpg" target="_blank"><img src="img/walk-08.jpg" alt="Item — Spark 이름 도착" loading="lazy"></a>
+        <figcaption>
+          <div class="no">5.8</div>
+          <div class="screen">Item</div>
+          <div class="state">Spark 이름 도착</div>
+          <div class="action">잠시 대기</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="walk-9">
+      <figure>
+        <a href="img/walk-09.jpg" target="_blank"><img src="img/walk-09.jpg" alt="Walk back — 도착 · 외관 사진 없는 가게는 메모 카드" loading="lazy"></a>
+        <figcaption>
+          <div class="no">5.9</div>
+          <div class="screen">Walk back</div>
+          <div class="state">도착 · 외관 사진 없는 가게는 메모 카드</div>
+          <div class="action">&quot;Walk a step&quot; ×5</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+  </ol>
+</section>
+<section id="wardrobe" class="flow">
+  <header><h2><span>6</span>옷장과 개인정보 안내</h2><p>옷장은 내 옷을 갤러리나 촬영으로 추가하고 Spark가 이름을 붙인다(수정 가능). 옷장 옷은 함께 입을 옷으로만 쓰고 단독 피팅 대상이 아니다. Privacy는 기기 밖으로 나가는 데이터의 경계를 보여 준다.</p><p class="ids">근거: D-R4-06, D-R4-09, D-R3-11, D-R7-08</p></header>
+  <ol class="steps">
+    
+    <li class="step" id="wardrobe-1">
+      <figure>
+        <a href="img/wardrobe-01.jpg" target="_blank"><img src="img/wardrobe-01.jpg" alt="Wardrobe — 옷장 목록" loading="lazy"></a>
+        <figcaption>
+          <div class="no">6.1</div>
+          <div class="screen">Wardrobe</div>
+          <div class="state">옷장 목록</div>
+          <div class="action">Home &quot;Wardrobe&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="wardrobe-2">
+      <figure>
+        <a href="img/wardrobe-02.jpg" target="_blank"><img src="img/wardrobe-02.jpg" alt="Wardrobe — 추가 방법 시트" loading="lazy"></a>
+        <figcaption>
+          <div class="no">6.2</div>
+          <div class="screen">Wardrobe</div>
+          <div class="state">추가 방법 시트</div>
+          <div class="action">&quot;Add a piece&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="wardrobe-3">
+      <figure>
+        <a href="img/wardrobe-03.jpg" target="_blank"><img src="img/wardrobe-03.jpg" alt="Add to wardrobe — 내 옷 사진 · 탭으로 고르기" loading="lazy"></a>
+        <figcaption>
+          <div class="no">6.3</div>
+          <div class="screen">Add to wardrobe</div>
+          <div class="state">내 옷 사진 · 탭으로 고르기</div>
+          <div class="action">&quot;Choose from gallery&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="wardrobe-4">
+      <figure>
+        <a href="img/wardrobe-04.jpg" target="_blank"><img src="img/wardrobe-04.jpg" alt="Add to wardrobe — 탭 위치 마스크 후보" loading="lazy"></a>
+        <figcaption>
+          <div class="no">6.4</div>
+          <div class="screen">Add to wardrobe</div>
+          <div class="state">탭 위치 마스크 후보</div>
+          <div class="action">옷 탭</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="wardrobe-5">
+      <figure>
+        <a href="img/wardrobe-05.jpg" target="_blank"><img src="img/wardrobe-05.jpg" alt="Wardrobe — 추가 직후 · 이름 대기 &quot;Picked item&quot;" loading="lazy"></a>
+        <figcaption>
+          <div class="no">6.5</div>
+          <div class="screen">Wardrobe</div>
+          <div class="state">추가 직후 · 이름 대기 &quot;Picked item&quot;</div>
+          <div class="action">&quot;Add to wardrobe&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="wardrobe-6">
+      <figure>
+        <a href="img/wardrobe-06.jpg" target="_blank"><img src="img/wardrobe-06.jpg" alt="Wardrobe — Spark 이름 도착" loading="lazy"></a>
+        <figcaption>
+          <div class="no">6.6</div>
+          <div class="screen">Wardrobe</div>
+          <div class="state">Spark 이름 도착</div>
+          <div class="action">잠시 대기</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="wardrobe-7">
+      <figure>
+        <a href="img/wardrobe-07.jpg" target="_blank"><img src="img/wardrobe-07.jpg" alt="Item — 옷장 옷 · 피팅 시작 버튼 없음" loading="lazy"></a>
+        <figcaption>
+          <div class="no">6.7</div>
+          <div class="screen">Item</div>
+          <div class="state">옷장 옷 · 피팅 시작 버튼 없음</div>
+          <div class="action">&quot;Light wash jeans&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="wardrobe-8">
+      <figure>
+        <a href="img/wardrobe-08.jpg" target="_blank"><img src="img/wardrobe-08.jpg" alt="Item — 이름 수정 시트" loading="lazy"></a>
+        <figcaption>
+          <div class="no">6.8</div>
+          <div class="screen">Item</div>
+          <div class="state">이름 수정 시트</div>
+          <div class="action">&quot;Rename&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="wardrobe-9">
+      <figure>
+        <a href="img/wardrobe-09.jpg" target="_blank"><img src="img/wardrobe-09.jpg" alt="Item — 옷장 옷 삭제 확인" loading="lazy"></a>
+        <figcaption>
+          <div class="no">6.9</div>
+          <div class="screen">Item</div>
+          <div class="state">옷장 옷 삭제 확인</div>
+          <div class="action">&quot;Delete&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="wardrobe-10">
+      <figure>
+        <a href="img/wardrobe-10.jpg" target="_blank"><img src="img/wardrobe-10.jpg" alt="Privacy — 데이터 경계 안내 (1/3)" loading="lazy"></a>
+        <figcaption>
+          <div class="no">6.10</div>
+          <div class="screen">Privacy</div>
+          <div class="state">데이터 경계 안내 (1/3)</div>
+          <div class="action">Home 방패 아이콘</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="wardrobe-11">
+      <figure>
+        <a href="img/wardrobe-11.jpg" target="_blank"><img src="img/wardrobe-11.jpg" alt="Privacy — 데이터 경계 안내 (2/3)" loading="lazy"></a>
+        <figcaption>
+          <div class="no">6.11</div>
+          <div class="screen">Privacy</div>
+          <div class="state">데이터 경계 안내 (2/3)</div>
+          <div class="action">아래로 스크롤</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="wardrobe-12">
+      <figure>
+        <a href="img/wardrobe-12.jpg" target="_blank"><img src="img/wardrobe-12.jpg" alt="Privacy — 데이터 경계 안내 (3/3)" loading="lazy"></a>
+        <figcaption>
+          <div class="no">6.12</div>
+          <div class="screen">Privacy</div>
+          <div class="state">데이터 경계 안내 (3/3)</div>
+          <div class="action">끝까지 스크롤</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+  </ol>
+</section>
+<section id="edge" class="flow">
+  <header><h2><span>7</span>빈 상태와 예외</h2><p>기록이 없거나, 오프라인이거나, 모두 지웠을 때의 화면. 로컬 데이터는 오프라인에도 그대로 보이고, 네트워크가 필요한 일만 기다리거나 막힌다.</p><p class="ids">근거: D-R3-11, D-R6-03, D-R9-02</p></header>
+  <ol class="steps">
+    
+    <li class="step" id="edge-1">
+      <figure>
+        <a href="img/edge-01.jpg" target="_blank"><img src="img/edge-01.jpg" alt="Try-ons — 피팅 기록 없음" loading="lazy"></a>
+        <figcaption>
+          <div class="no">7.1</div>
+          <div class="screen">Try-ons</div>
+          <div class="state">피팅 기록 없음</div>
+          <div class="action">Home &quot;Try-ons&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="edge-2">
+      <figure>
+        <a href="img/edge-02.jpg" target="_blank"><img src="img/edge-02.jpg" alt="Wardrobe — 옷장 비어 있음" loading="lazy"></a>
+        <figcaption>
+          <div class="no">7.2</div>
+          <div class="screen">Wardrobe</div>
+          <div class="state">옷장 비어 있음</div>
+          <div class="action">옷 2벌을 Item에서 &quot;Delete&quot;</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="edge-3">
+      <figure>
+        <a href="img/edge-03.jpg" target="_blank"><img src="img/edge-03.jpg" alt="All trips — trip 없음" loading="lazy"></a>
+        <figcaption>
+          <div class="no">7.3</div>
+          <div class="screen">All trips</div>
+          <div class="state">trip 없음</div>
+          <div class="action">trip 2개 삭제</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="edge-4">
+      <figure>
+        <a href="img/edge-04.jpg" target="_blank"><img src="img/edge-04.jpg" alt="Home — trip 모두 삭제 후 · 저장한 옷은 남음" loading="lazy"></a>
+        <figcaption>
+          <div class="no">7.4</div>
+          <div class="screen">Home</div>
+          <div class="state">trip 모두 삭제 후 · 저장한 옷은 남음</div>
+          <div class="action">뒤로</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="edge-5">
+      <figure>
+        <a href="img/edge-05.jpg" target="_blank"><img src="img/edge-05.jpg" alt="Trip — 오프라인에도 기록 탐색 가능" loading="lazy"></a>
+        <figcaption>
+          <div class="no">7.5</div>
+          <div class="screen">Trip</div>
+          <div class="state">오프라인에도 기록 탐색 가능</div>
+          <div class="action">host &quot;Offline&quot; 켬 → All trips → Sat, Oct 24</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="edge-6">
+      <figure>
+        <a href="img/edge-06.jpg" target="_blank"><img src="img/edge-06.jpg" alt="Item — 오프라인 · 이름은 연결될 때까지 &quot;Picked item&quot;으로 대기" loading="lazy"></a>
+        <figcaption>
+          <div class="no">7.6</div>
+          <div class="screen">Item</div>
+          <div class="state">오프라인 · 이름은 연결될 때까지 &quot;Picked item&quot;으로 대기</div>
+          <div class="action">사진 탭 → &quot;Use this item&quot; → 대기</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+    <li class="step" id="edge-7">
+      <figure>
+        <a href="img/edge-07.jpg" target="_blank"><img src="img/edge-07.jpg" alt="Item — 연결 복구 → 이름 처리" loading="lazy"></a>
+        <figcaption>
+          <div class="no">7.7</div>
+          <div class="screen">Item</div>
+          <div class="state">연결 복구 → 이름 처리</div>
+          <div class="action">host &quot;Offline&quot; 끔</div>
+          
+        </figcaption>
+      </figure>
+    </li>
+  </ol>
+</section></main>
+</body></html>

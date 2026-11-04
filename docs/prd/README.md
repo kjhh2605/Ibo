@@ -25,6 +25,7 @@ UI 기준은 프로토타입(`prototype/`)이다. 흐름, 문구, 상태, 인터
 | [ux/search.md](ux/search.md) | 에이전트 검색, 음성, 후보 선택(F-06~F-08) | S07, S08 |
 | [ux/tryon.md](ux/tryon.md) | 저장한 옷, 옷장, 피팅, 결과, Privacy(F-09~F-14, F-16) | S08, S10 |
 | [ux/walk.md](ux/walk.md) | 도보 길 안내(F-15) | S08, S09 |
+| [screens/index.html](screens/index.html) | 화면 흐름 캡처, 프로토타입 기준 | 모두 |
 | [contracts/relay-api.md](contracts/relay-api.md) | 릴레이 엔드포인트 7개, 인증, 질의 토큰, 오류, mock, OpenAPI | S00~S03, S07, S09, S10, S11 |
 | [contracts/agent-tools.md](contracts/agent-tools.md) | 에이전트 루프, 도구 3개, 최종 응답, UI 단계 이벤트 | S02, S07 |
 | [contracts/device-modules.md](contracts/device-modules.md) | Capacitor 플러그인 8개, JS 지도·경로 모듈, web mock | S00, S04~S10 |

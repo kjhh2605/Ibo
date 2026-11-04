@@ -6,7 +6,7 @@ import { I, PieceTile, Screen, Sheet, TopBar } from '../ui'
 
 export function Wardrobe() {
   const { push } = useNav()
-  const { wardrobe } = useStore()
+  const { wardrobe, demo } = useStore()
   const [adding, setAdding] = useState(false)
   const open = () => {
     setAdding(false)
@@ -24,8 +24,12 @@ export function Wardrobe() {
     >
       <div className="sf-pad">
         <div className="sf-grid sf-grid--last">
+          {!wardrobe.length && <div className="sf-empty">Your wardrobe is empty. Add a piece you own.</div>}
           {wardrobe.map((p) => (
-            <PieceTile key={p.id} piece={p} size={172} onClick={() => push({ name: 'item', pieceId: p.id })} />
+            <div key={p.id}>
+              <PieceTile piece={p} size={172} onClick={() => push({ name: 'item', pieceId: p.id })} />
+              {p.naming && <div className="sf-fineprint">{demo.offline ? 'Naming waits for connection' : 'Spark is naming this piece…'}</div>}
+            </div>
           ))}
         </div>
         <div className="sf-fineprint">Mix these with what you saved to see them together. Only the cut-out piece is ever sent, never the whole photo.</div>

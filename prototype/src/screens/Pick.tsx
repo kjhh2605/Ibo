@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { Hand, Undo2 } from 'lucide-react'
+import { Download, Hand, Trash2, Undo2 } from 'lucide-react'
 import { Button } from '../kit'
-import { photo, pieceFrom, shop, WARDROBE_PHOTO, type Box, type Candidate } from '../data'
-import { useNav, useStore } from '../state'
-import { Crop, I, Screen, Shot, TopBar } from '../ui'
+import { PICKED_ITEM, WARDROBE_PHOTO, type Box, type Candidate } from '../data'
+import { MAX_COMPANIONS, useNav, useStore } from '../state'
+import { ConfirmSheet, Crop, I, IconButton, Screen, Shot, TopBar } from '../ui'
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v))
 
@@ -23,15 +23,21 @@ function masksAt(x: number, y: number, ratio: number): Candidate[] {
     .sort((a, b) => b.score - a.score)
 }
 
-export function Pick({ photoId, mode, concept }: { photoId: string; mode: 'shop' | 'wardrobe'; concept?: string }) {
-  const { push, popTo } = useNav()
-  const { save, addToWardrobe, say } = useStore()
-  const ph = mode === 'wardrobe' ? WARDROBE_PHOTO : photo(photoId)
-  const [tapping, setTapping] = useState(mode === 'wardrobe')
+export function Pick({ photoId, mode, concept }: { photoId: string; mode: 'shop' | 'wardrobe' | 'outfit'; concept?: string }) {
+  const { push, pop, popTo } = useNav()
+  const { photo, shop, trip, pieceOf, save, addToWardrobe, deletePhoto, outfit, setOutfit, say } = useStore()
+  const shopPhoto = mode === 'wardrobe' ? undefined : photo(photoId)
+  const ph = shopPhoto ?? WARDROBE_PHOTO
+  const [tapping, setTapping] = useState(!concept || !ph.candidates.length)
   const [tap, setTap] = useState<{ x: number; y: number } | null>(null)
-  const list = tapping ? (tap ? masksAt(tap.x, tap.y, ph.w / ph.h) : []) : ph.candidates
-  const [selected, setSelected] = useState<string | undefined>(mode === 'shop' ? ph.candidates[0]?.id : undefined)
+  const [selected, setSelected] = useState<string | undefined>(concept ? ph.candidates[0]?.id : undefined)
+  const [deleting, setDeleting] = useState(false)
+  const [showAll, setShowAll] = useState(false)
+  const list = tapping ? (tap ? masksAt(tap.x, tap.y, ph.w / ph.h) : []) : [...ph.candidates].sort((a, b) => b.score - a.score)
+  const visible = showAll ? list : list.slice(0, 3)
   const chosen = list.find((c) => c.id === selected)
+
+  if (mode !== 'wardrobe' && !shopPhoto) return <Screen bar={<TopBar title="Photo deleted" />}><div className="sf-pad">This photo is no longer in your trips.</div></Screen>
 
   const use = () => {
     if (!chosen) return
@@ -39,25 +45,41 @@ export function Pick({ photoId, mode, concept }: { photoId: string; mode: 'shop'
     const under = tap && ph.candidates.find(({ box: [x, y, w, h] }) => tap.x >= x && tap.x <= x + w && tap.y >= y && tap.y <= y + h)
     const asked = concept && concept.charAt(0).toUpperCase() + concept.slice(1)
     const named = tapping ? { ...chosen, label: under?.label ?? asked ?? 'Picked item' } : chosen
-    const piece = pieceFrom(ph, named)
+    if (mode === 'outfit' && outfit.companions.length >= MAX_COMPANIONS) {
+      say(`You can add up to ${MAX_COMPANIONS} pieces`)
+      return
+    }
     if (mode === 'wardrobe') {
-      addToWardrobe(piece)
+      addToWardrobe({
+        id: `${ph.id}:${chosen.id}`, src: ph.src, w: ph.w, h: ph.h, box: chosen.box,
+        from: 'wardrobe', label: PICKED_ITEM, naming: named.label,
+      })
       say('Added to your wardrobe')
       popTo('wardrobe')
       return
     }
+    const piece = pieceOf(shopPhoto!, named, !!concept && !tapping)
     save(piece)
+    if (mode === 'outfit') {
+      setOutfit((o) => ({
+        ...o,
+        companions: o.companions.includes(piece.id) ? o.companions : [...o.companions, piece.id].slice(0, MAX_COMPANIONS),
+      }))
+      popTo('outfit')
+      say('Saved and added to your outfit')
+      return
+    }
     push({ name: 'item', pieceId: piece.id })
   }
 
-  const sub = mode === 'wardrobe' ? 'Tap the piece you own' : `${shop(ph.shop).name} · ${ph.time}`
+  const sub = mode === 'wardrobe' ? 'Tap the piece you own' : `${shop(shopPhoto!.shop)?.name} · ${trip(shopPhoto!.trip)?.date} · ${shopPhoto!.time}`
 
   return (
     <Screen
-      bar={<TopBar title={mode === 'wardrobe' ? 'Add to wardrobe' : 'Pick the item'} sub={sub} />}
+      bar={<TopBar title={mode === 'wardrobe' ? 'Add to wardrobe' : 'Pick the item'} sub={sub} actions={mode !== 'wardrobe' ? <><IconButton icon={Download} label="Save to gallery" onClick={() => say('Saved to gallery · location removed')} /><IconButton icon={Trash2} label="Delete photo" onClick={() => setDeleting(true)} /></> : undefined} />}
       foot={
         <div className="sf-foot-row">
-          {mode === 'shop' && (
+          {mode !== 'wardrobe' && concept && (
             <Button
               size="large"
               icon={<I icon={tapping ? Undo2 : Hand} size={18} />}
@@ -71,7 +93,7 @@ export function Pick({ photoId, mode, concept }: { photoId: string; mode: 'shop'
             </Button>
           )}
           <Button variant="primary" size="large" className="sf-grow" onClick={use} data-disabled={!chosen || undefined}>
-            {mode === 'wardrobe' ? 'Add to wardrobe' : 'Use this item'}
+            {mode === 'wardrobe' ? 'Add to wardrobe' : mode === 'outfit' ? 'Add to outfit' : 'Use this item'}
           </Button>
         </div>
       }
@@ -79,7 +101,7 @@ export function Pick({ photoId, mode, concept }: { photoId: string; mode: 'shop'
       <div className="sf-pick">
         <Shot
           photo={ph}
-          candidates={list}
+          candidates={visible}
           selected={selected}
           onSelect={setSelected}
           tap={tapping ? tap : null}
@@ -100,7 +122,7 @@ export function Pick({ photoId, mode, concept }: { photoId: string; mode: 'shop'
           <div className="sf-hint">{tapping ? 'Which area?' : `Found ${list.length} ${list.length === 1 ? 'item' : 'items'}, best first`}</div>
         )}
         <div className="sf-options">
-          {list.map((c, i) => (
+          {visible.map((c, i) => (
             <button key={c.id} type="button" className="sf-option" data-on={c.id === selected || undefined} onClick={() => setSelected(c.id)}>
               <span className="sf-option__n">{i + 1}</span>
               <Crop src={ph.src} w={ph.w} h={ph.h} box={c.box} width={52} height={52} />
@@ -109,7 +131,16 @@ export function Pick({ photoId, mode, concept }: { photoId: string; mode: 'shop'
             </button>
           ))}
         </div>
+        {!showAll && list.length > 3 && <Button onClick={() => setShowAll(true)}>Show all ({list.length})</Button>}
       </div>
+      <ConfirmSheet
+        open={deleting}
+        title="Delete photo?"
+        text="This photo will be removed from your trip. Saved items and their walking directions will stay."
+        action="Delete photo"
+        onClose={() => setDeleting(false)}
+        onConfirm={() => { deletePhoto(photoId); pop(); say('Photo deleted') }}
+      />
     </Screen>
   )
 }

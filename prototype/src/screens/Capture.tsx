@@ -1,121 +1,70 @@
 import { useEffect, useState } from 'react'
-import { ArrowLeft, LocateFixed, Store } from 'lucide-react'
-import { Button, Spinner } from '../kit'
-import { CAMERA_ROLL, photo, SHOPS } from '../data'
+import { ArrowLeft, LocateFixed, Store, X } from 'lucide-react'
+import { CAMERA_ROLL, STOREFRONT_SAMPLE } from '../data'
 import { useNav, useStore } from '../state'
-import { I, Sheet } from '../ui'
-
-const STOREFRONT = SHOPS[0].storefront.src
+import { I, NoteSheet } from '../ui'
 
 export function Capture() {
   const { pop } = useNav()
-  const { shopping, setShopping, say } = useStore()
+  const { shopping, shop, photo, photosOf, tripPhotos, startShop, capturePhoto, saveStorefront, shopBanner, dismissShopBanner, say } = useStore()
   const [flash, setFlash] = useState(0)
-  const [asking, setAsking] = useState(false)
   const [storefront, setStorefront] = useState(false)
-  const [describing, setDescribing] = useState<'idle' | 'working' | 'done'>('idle')
-  const view = storefront ? STOREFRONT : photo(CAMERA_ROLL[shopping.captured % CAMERA_ROLL.length]).src
-  const last = shopping.captured > 0 ? photo(CAMERA_ROLL[(shopping.captured - 1) % CAMERA_ROLL.length]).src : null
+  const [noting, setNoting] = useState(false)
+  const current = shopping.shop ? shop(shopping.shop) : undefined
+  const view = storefront ? STOREFRONT_SAMPLE.src : photo(CAMERA_ROLL[shopping.captured % CAMERA_ROLL.length])?.src
+  const tripShots = shopping.trip ? tripPhotos(shopping.trip) : []
+  const last = tripShots[tripShots.length - 1]?.src
 
   useEffect(() => {
-    if (describing !== 'working') return
-    const id = window.setTimeout(() => setDescribing('done'), 1800)
-    return () => window.clearTimeout(id)
-  }, [describing])
+    setStorefront(false)
+    setNoting(false)
+  }, [shopping.shop])
 
   const shoot = () => {
     setFlash((n) => n + 1)
     if (storefront) {
+      saveStorefront()
       setStorefront(false)
-      setDescribing('working')
-      setShopping((s) => ({ ...s, shop: s.shop + 1 }))
+      say('Storefront saved')
       return
     }
-    setShopping((s) => ({ ...s, photos: s.photos + 1, captured: s.captured + 1 }))
+    capturePhoto()
   }
+
+  if (!current) return null
 
   return (
     <div className="sf-camera">
       <img className="sf-camera__view" src={view} alt="" draggable={false} key={view} />
       <span className="sf-camera__flash" key={flash} data-go={flash > 0 || undefined} />
-
       <div className="sf-camera__top">
-        <button type="button" className="sf-iconbtn sf-iconbtn--glass" aria-label="Back" onClick={pop}>
-          <I icon={ArrowLeft} />
-        </button>
+        <button type="button" className="sf-iconbtn sf-iconbtn--glass" aria-label="Back" onClick={pop}><I icon={ArrowLeft} /></button>
         <div className="sf-camera__pill">
           <span className="sf-rec" />
-          {storefront ? 'New shop · storefront' : `Shop ${shopping.shop}${shopping.captured ? ` · ${shopping.captured} new` : ''}`}
-          <span className="sf-camera__gps">
-            <I icon={LocateFixed} size={14} />
-            ±12 m
-          </span>
+          {storefront ? `${current.name} · storefront` : `${current.name} · ${photosOf(current.id).length} new`}
+          <span className="sf-camera__gps"><I icon={LocateFixed} size={14} /> ±12 m</span>
         </div>
         <span className="sf-camera__spacer" />
       </div>
-
-      {storefront && <div className="sf-camera__hint">Fit the whole shop front in the frame</div>}
-
-      {describing !== 'idle' && (
-        <div className="sf-camera__note" data-done={describing === 'done' || undefined}>
-          <img src={STOREFRONT} alt="" />
-          <div>
-            <div className="sf-camera__note-title">Shop {shopping.shop} started</div>
-            <div className="sf-camera__note-text">
-              {describing === 'working' ? (
-                <span className="sf-inline">
-                  <Spinner size={12} /> Describing the storefront…
-                </span>
-              ) : (
-                '“Two-tone house, clothes hung along the balcony”'
-              )}
-            </div>
+      {storefront ? (
+        <div className="sf-camera__hint">Fit the whole shop front in the frame <button type="button" onClick={() => setStorefront(false)}>Cancel</button></div>
+      ) : shopBanner === current.id && (
+        <div className="sf-camera__banner">
+          <button type="button" className="sf-iconbtn sf-camera__banner-close" aria-label="Dismiss shop banner" onClick={dismissShopBanner}><I icon={X} size={18} /></button>
+          <div className="sf-camera__banner-title">{current.name} started</div>
+          <div className="sf-camera__banner-text">This spot is saved.</div>
+          <div className="sf-camera__banner-actions">
+            <button type="button" className="sf-link" onClick={() => setStorefront(true)}>Storefront photo</button>
+            <button type="button" className="sf-link" onClick={() => setNoting(true)}>Add note</button>
           </div>
-          {describing === 'done' && (
-            <button type="button" className="sf-camera__note-close" onClick={() => setDescribing('idle')}>
-              OK
-            </button>
-          )}
         </div>
       )}
-
       <div className="sf-camera__bottom">
         <div className="sf-camera__last">{last && <img src={last} alt="" key={last} />}</div>
-        <button type="button" className="sf-shutter" aria-label={storefront ? 'Take storefront photo' : 'Take photo'} onClick={shoot} data-store={storefront || undefined}>
-          <span />
-        </button>
-        <button type="button" className="sf-camera__newshop" onClick={() => setAsking(true)} disabled={storefront}>
-          <I icon={Store} size={20} />
-          New shop
-        </button>
+        <button type="button" className="sf-shutter" aria-label={storefront ? 'Take storefront photo' : 'Take photo'} onClick={shoot} data-store={storefront || undefined}><span /></button>
+        <button type="button" className="sf-camera__newshop" onClick={startShop} disabled={storefront}><I icon={Store} size={20} />New shop</button>
       </div>
-
-      <Sheet open={asking} onClose={() => setAsking(false)} label="New shop">
-        <div className="sf-sheet__title">In a new shop?</div>
-        <div className="sf-sheet__text">Take one photo of the shop front. Market stalls sit close together, and this is what helps you spot the right one when you walk back.</div>
-        <div className="sf-sheet__actions">
-          <Button
-            size="large"
-            onClick={() => {
-              setAsking(false)
-              setShopping((s) => ({ ...s, shop: s.shop + 1 }))
-              say(`Shop ${shopping.shop + 1} started · no storefront`)
-            }}
-          >
-            Skip
-          </Button>
-          <Button
-            variant="primary"
-            size="large"
-            onClick={() => {
-              setAsking(false)
-              setStorefront(true)
-            }}
-          >
-            Take storefront photo
-          </Button>
-        </div>
-      </Sheet>
+      {noting && <NoteSheet shop={current} onClose={() => setNoting(false)} />}
     </div>
   )
 }
