@@ -1,9 +1,11 @@
+import os as _os
+VIDEO = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))); REPO = _os.path.dirname(VIDEO); WORK = _os.path.join(VIDEO, '.work')
 import json, math, os, shutil
 from PIL import Image, ImageDraw
-MD = json.loads(open('/home/user/sfvideo/comp/mapdata.js').read().split('=', 1)[1].rstrip(';\n'))
+MD = json.loads(open(_os.path.join(VIDEO, 'comp/mapdata.js')).read().split('=', 1)[1].rstrip(';\n'))
 R = MD['paths']['back']; P2 = MD['pins']['p2']
-MAP = Image.open('/home/user/sfvideo/comp/assets/dongmyo-map.png').convert('RGB')  # 2x of world
-SHOTS = '/home/user/sfvideo/shots'
+MAP = Image.open(_os.path.join(VIDEO, 'comp/assets/dongmyo-map.png')).convert('RGB')  # 2x of world
+SHOTS = _os.path.join(VIDEO, 'comp/assets/shots')
 # (file, box x0,y0,x1,y1 in screenshot px, top clipped?, progress along route)
 JOBS = [('08-walk-route', (38, 724, 786, 1644), False, 0.0), ('08b-walk-route-scrolled', (38, 96, 786, 644), True, 0.0),
         ('08c-walk-direction', (38, 96, 786, 524), True, 0.86), ('08d-walk-nearby', (38, 96, 786, 524), True, 0.95),

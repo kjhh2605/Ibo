@@ -1,0 +1,92 @@
+{
+  "status": 200,
+  "body": {
+    "photos": [
+      {
+        "photoRef": "{{photos[0].photoRef}}",
+        "candidates": [
+          {
+            "id": "candidate-1",
+            "label": "a blue jacket",
+            "score": 1.0,
+            "mask": {
+              "mimeType": "image/png",
+              "data": {
+                "asset": "assets/shop-2-candidate-1.png"
+              },
+              "width": 927,
+              "height": 930
+            },
+            "bbox": [
+              52,
+              291,
+              308,
+              376
+            ]
+          },
+          {
+            "id": "candidate-2",
+            "label": "a blue jacket",
+            "score": 0.9,
+            "mask": {
+              "mimeType": "image/png",
+              "data": {
+                "asset": "assets/shop-2-candidate-2.png"
+              },
+              "width": 927,
+              "height": 930
+            },
+            "bbox": [
+              353,
+              335,
+              173,
+              513
+            ]
+          },
+          {
+            "id": "candidate-3",
+            "label": "a blue jacket",
+            "score": 0.8,
+            "mask": {
+              "mimeType": "image/png",
+              "data": {
+                "asset": "assets/shop-2-candidate-3.png"
+              },
+              "width": 927,
+              "height": 930
+            },
+            "bbox": [
+              509,
+              290,
+              237,
+              363
+            ]
+          },
+          {
+            "id": "candidate-4",
+            "label": "a blue jacket",
+            "score": 0.7,
+            "mask": {
+              "mimeType": "image/png",
+              "data": {
+                "asset": "assets/shop-2-candidate-4.png"
+              },
+              "width": 927,
+              "height": 930
+            },
+            "bbox": [
+              720,
+              329,
+              203,
+              436
+            ]
+          }
+        ]
+      },
+      {
+        "photoRef": "{{photos[1].photoRef}}",
+        "candidates": []
+      }
+    ]
+  }
+}

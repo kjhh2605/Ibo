@@ -2,11 +2,14 @@
 import {createRequire} from 'node:module';
 import {mkdir, writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
-const require = createRequire('/home/user/Meta-Hackathon/app/package.json');
+import {fileURLToPath as __f} from 'node:url'; import {dirname as __d, resolve as __r} from 'node:path'; import {mkdirSync as __mk} from 'node:fs';
+const VIDEO = __r(__d(__f(import.meta.url)), '..'), REPO = __r(VIDEO, '..');
+const COMP_URL = process.env.COMP_URL ?? 'http://127.0.0.1:8811';
+const require = createRequire(__r(REPO, 'app/package.json'));
 const {chromium, expect} = require('@playwright/test');
 
 const url = process.argv[2];
-const out = '/home/user/sfvideo/shots';
+const out = process.env.SHOTS_DIR ?? __r(VIDEO, 'comp/assets/shots');
 await mkdir(out, {recursive: true});
 const W = 412, H = 915;
 let browser;

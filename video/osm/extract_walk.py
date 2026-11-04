@@ -1,4 +1,6 @@
 """Stream the Seoul walk GraphML and keep only edges near Dongmyo."""
+import os as _os
+VIDEO = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))); REPO = _os.path.dirname(VIDEO); WORK = _os.path.join(VIDEO, '.work')
 import json
 import re
 import xml.etree.ElementTree as ET
@@ -8,7 +10,7 @@ NS = '{http://graphml.graphdrawing.org/xmlns}'
 KEYS = {}
 nodes = {}
 edges = []
-for ev, el in ET.iterparse('/home/user/sfvideo/osm/seoul_walk.graphml', events=('end',)):
+for ev, el in ET.iterparse(__import__('sys').argv[1] if len(__import__('sys').argv) > 1 else _os.path.join(WORK, 'osm/seoul_walk.graphml'), events=('end',)):
     tag = el.tag.replace(NS, '')
     if tag == 'key':
         KEYS[el.get('id')] = el.get('attr.name')
@@ -34,7 +36,7 @@ for ev, el in ET.iterparse('/home/user/sfvideo/osm/seoul_walk.graphml', events=(
                 el.clear(); continue
             edges.append({'u': u, 'v': v, 'pts': pts, 'name': d.get('name'), 'highway': d.get('highway'), 'len': d.get('length')})
         el.clear()
-json.dump({'nodes': nodes, 'edges': edges}, open('/home/user/sfvideo/osm/walk.json', 'w'))
+json.dump({'nodes': nodes, 'edges': edges}, open(_os.path.join(VIDEO, 'osm/walk.json'), 'w'))
 print(len(nodes), len(edges))
 from collections import Counter
 print(Counter(e['highway'] for e in edges).most_common(15))
