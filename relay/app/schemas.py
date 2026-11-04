@@ -5,6 +5,8 @@ import base64
 import math
 import io
 import struct
+import zlib
+from xml.etree import ElementTree
 from PIL import Image as PILImage, UnidentifiedImageError
 from datetime import datetime
 from typing import Annotated, Literal
@@ -288,20 +290,111 @@ def validate_base64(value: str, maximum: int) -> str:
         raise ValueError('Invalid base64') from exc
     return value
 
+def _gps_property(name):
+    local = name.rsplit('}', 1)[-1].rsplit(':', 1)[-1].lower()
+    return local.startswith('gps') or local in ('latitude', 'longitude', 'coordinates')
+
+
+def _check_xmp_metadata(packet):
+    # XML parsing handles namespace aliases and UTF-16; byte substring checks do not.
+    try:
+        root = ElementTree.fromstring(packet)
+    except (ElementTree.ParseError, ValueError, TypeError, LookupError):
+        raise ValueError('Invalid XMP metadata') from None
+    for element in root.iter():
+        if _gps_property(element.tag) or any(_gps_property(name) for name in element.attrib):
+            raise ValueError('GPS metadata')
+
+
+def _check_exif_metadata(exif):
+    if 34853 in exif:
+        raise ValueError('GPS metadata')
+    if 700 in exif:
+        _check_xmp_metadata(exif[700])
+
+
+def _inflate_metadata(data):
+    # Match Pillow's per-chunk text limit without allocating an unbounded bomb.
+    inflater = zlib.decompressobj()
+    try:
+        decoded = inflater.decompress(data, 1048577)
+    except zlib.error:
+        raise ValueError('Invalid compressed metadata') from None
+    if len(decoded) > 1048576 or not inflater.eof or inflater.unused_data:
+        raise ValueError('Invalid compressed metadata')
+    return decoded
+
+
+def _check_png_metadata(raw):
+    # Read every chunk, including duplicate keys and text following IDAT.
+    # Pillow's info dict keeps only the last value for duplicate metadata keys.
+    offset = 8
+    while offset + 12 <= len(raw):
+        size = int.from_bytes(raw[offset:offset + 4], 'big')
+        tag = raw[offset + 4:offset + 8]
+        end = offset + 12 + size
+        if end > len(raw):
+            raise ValueError('Invalid PNG metadata')
+        if tag == b'eXIf':
+            exif = PILImage.Exif()
+            exif.load(raw[offset + 8:end - 4])
+            _check_exif_metadata(exif)
+        elif tag in (b'tEXt', b'zTXt', b'iTXt'):
+            key, data = raw[offset + 8:end - 4].split(b'\0', 1)
+            if _gps_property(key.decode('latin-1')):
+                raise ValueError('GPS metadata')
+            if tag == b'zTXt':
+                if not data or data[0] != 0:
+                    raise ValueError('Invalid compressed metadata')
+                data = _inflate_metadata(data[1:])
+            elif tag == b'iTXt':
+                if len(data) < 2 or data[0] not in (0, 1) or data[1] != 0:
+                    raise ValueError('Invalid international metadata')
+                compressed = data[0]
+                _, _, data = data[2:].split(b'\0', 2)
+                if compressed:
+                    data = _inflate_metadata(data)
+            if key == b'XML:com.adobe.xmp':
+                _check_xmp_metadata(data)
+        offset = end
+        if tag == b'IEND':
+            break
+
+
+def _check_upload_metadata(image, raw):
+    _check_exif_metadata(image.getexif())
+    if image.format == 'PNG':
+        _check_png_metadata(raw)
+    else:
+        for marker, data in image.applist:
+            if marker != 'APP1':
+                continue
+            if data.startswith(b'Exif\0\0'):
+                exif = PILImage.Exif()
+                exif.load(data)
+                _check_exif_metadata(exif)
+            elif data.startswith(b'http://ns.adobe.com/xap/1.0/\0'):
+                _check_xmp_metadata(data.split(b'\0', 1)[1])
+            elif data.startswith(b'http://ns.adobe.com/xmp/extension/\0'):
+                # Fragmented extension packets cannot be treated as GPS-free.
+                raise ValueError('Unsupported extended XMP metadata')
+
+
 def validate_image(value, mime, width, height, maximum, *, reject_gps=False, mask=False):
     validate_base64(value, maximum)
     try:
-        with PILImage.open(io.BytesIO(base64.b64decode(value))) as image:
+        raw = base64.b64decode(value)
+        with PILImage.open(io.BytesIO(raw)) as image:
             if image.format != {'image/png': 'PNG', 'image/jpeg': 'JPEG'}[mime] or image.size != (width, height):
                 raise ValueError('Image format or dimensions mismatch')
             if getattr(image, 'n_frames', 1) != 1:
                 raise ValueError('Multiple image frames')
-            if reject_gps and 34853 in image.getexif():
-                raise ValueError('GPS metadata')
             image.load()
+            if reject_gps:
+                _check_upload_metadata(image, raw)
             if mask and (image.mode != 'L' or any(v not in (0, 255) for v in image.getdata())):
                 raise ValueError('Invalid binary mask')
-    except (UnidentifiedImageError, OSError, SyntaxError, PILImage.DecompressionBombError) as exc:
+    except (UnidentifiedImageError, OSError, SyntaxError, struct.error, PILImage.DecompressionBombError) as exc:
         raise ValueError('Invalid image') from exc
 
 class Audio(Wire):

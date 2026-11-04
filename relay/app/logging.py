@@ -20,8 +20,8 @@ _UNSAFE = re.compile(
 
 
 def configure_logging():
-    # urllib3/httpx access messages may embed OSRM coordinates. No SDK tracing.
-    for name in ('httpx', 'httpcore', 'urllib3', 'firebase_admin', 'google.auth', 'uvicorn.access'):
+    # Transport URLs and decoder metadata may contain coordinates or payloads.
+    for name in ('httpx', 'httpcore', 'urllib3', 'firebase_admin', 'google.auth', 'uvicorn.access', 'PIL'):
         logger = logging.getLogger(name)
         logger.disabled = True
         logger.propagate = False

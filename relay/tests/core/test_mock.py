@@ -177,3 +177,28 @@ def test_asset_path_escape_rejected(tmp_path, image):
     (assets / 'valid.png').write_bytes(outside.read_bytes())
     fixture(tmp_path, 'tryon', {'image': {**image, 'data': {'asset': 'assets/valid.png'}}})
     assert FixtureLoader(tmp_path).prepare('normal', 'tryon', 1, request)[0].result()['image']['data'] == image['data']
+
+
+@pytest.mark.parametrize('retryable', [False, True])
+def test_provider_error_replay_preserves_retryability_and_consumed_token(tmp_path, tokens, sub, context, retryable):
+    fixture(tmp_path, 'search-turn', {'error': {
+        'code': 'upstream_error', 'message': 'PRIVATE_PROVIDER_SENTINEL', 'retryable': retryable,
+    }}, status=502)
+    replay, state = FixtureLoader(tmp_path).prepare(
+        'normal', 'search-turn', 1, {'query': 'coat', 'context': context}, tokens=tokens, sub=sub)
+    with pytest.raises(RelayError) as error:
+        with tokens.attempt(state, 'spark') as consumed:
+            replay.result(tokens=tokens, state=consumed)
+    assert (error.value.status, error.value.code, error.value.retryable) == (502, 'upstream_error', retryable)
+    failed = tokens.verify(error.value.headers['X-Query-Token'], sub, scenario='normal')
+    assert failed.closed and failed.sparkTurns == 1 and failed.exp == state.exp
+    assert b'PRIVATE_PROVIDER_SENTINEL' not in error.value.response().body
+
+
+def test_fixture_cannot_override_fixed_error_retryability(tmp_path, image):
+    fixture(tmp_path, 'describe-piece', {'error': {
+        'code': 'upstream_timeout', 'message': 'The provider timed out.', 'retryable': False,
+    }}, status=504)
+    with pytest.raises(RelayError) as error:
+        FixtureLoader(tmp_path).prepare('normal', 'describe-piece', 1, {'image': image})
+    assert error.value.code == 'fixture_invalid'

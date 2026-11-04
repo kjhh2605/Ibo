@@ -47,11 +47,41 @@ Meta `responses`는 `https://api.meta.ai/v1/responses`만 호출하며 model/sto
 - request는 `{expected,match,ignore}`만 가진다. match/ignore는 RFC6901 pointer 배열이며 wildcard가 아니다. match 순서 및 내부 pointer 순서의 첫 불일치만 409에 포함한다. ignore는 descendant 값만 생략하며 배열 길이/순서는 유지한다. match 자체/ancestor를 ignore하는 정의는 500이다.
 - `prepare`는 schema/실제 media/token binding/budget/fixture matching을 먼저 검사한다. 반환된 state로 `tokens.attempt`를 열고 그 안에서 `replay.result(tokens=tokens,state=consumed)`를 호출한다. 단발은 `replay.result()`다. Fixture 오류도 실제 provider 실패와 같은 소비/closed 전이를 따른다.
 - response는 `{status,body,headers?}`다. header는 429의 숫자 Retry-After만 허용한다. body 어디에도 queryToken을 저장하지 않는다; runtime이 현재 ref와 상태로 서명한다.
+- `upstream_error`의 502는 `retryable:true`(일시 장애)와 `false`(provider 인증/기타 4xx)를 모두 재생한다. 다른 오류의 고정 retryability를 fixture가 덮어쓸 수 없다. 검색 오류는 소비된 횟수와 closed 토큰을 유지한다.
 - ref echo는 exact `{{toolResults[0].result[0].photoRef}}` 형태만 허용한다. source/destination 모두 photoRef/shopRef/tripRef/pieceRef/toolCallId/id 또는 허용 ref 배열/index여야 한다. 부분 문자열/임의 텍스트 echo는 없다.
 - binary data는 `{ "asset": "assets/name.png" }`로 response의 data 필드에서만 읽는다. **scenario directory 안**으로 resolve돼야 한다. 절대경로, URL, traversal, 바깥 symlink는 500이다. Response도 schema/실제 media를 다시 검증한다.
 - missing501/mismatch409/invalid500이며 live fallback/자동 녹화는 없다.
 
-## 관측된 검증 (2026-11-04, 기준 M1)
+## 재개 후 검증 (2026-11-04, MacBook — mock/core gate)
+
+이 절은 현재 수정 후 관측이다. 아래 M1의 이전 인증 증거와 별개이며, 이번 실행에는 모델·실제 자격 증명·native/device·live Meta/OSRM 호출이 없다.
+
+### 재현 후 수정한 결함
+
+- 수정 전 실제 test ASGI 요청에서 GPS XMP가 담긴 JPEG APP1과 PNG iTXt가 모두 HTTP 200으로 통과했다. `schemas.py`의 `validate_image`와 private metadata helper 수정은 coordinator가 명시적으로 위임했다. 업로드는 XML namespace alias/UTF-16, EXIF tag 700, 압축 PNG text, IDAT 뒤 text, 중복 metadata의 모든 값을 검사하고 GPS를 400으로 거부한다. 일반 위치 없는 XMP는 허용한다.
+- GPS 검사에서 해석할 수 없는 XMP와 fragmented extended XMP는 업로드 실패로 처리한다. 압축 text의 해제 상한은 chunk당 1 MiB다. 이 검사는 `reject_gps=True`인 입력에만 적용하며 `GeneratedImage`의 원본 바이트·메타데이터·워터마크를 제거하거나 재인코딩하지 않는다.
+- 별도 재현에서 짧은 EXIF XMLPacket의 GPS 값이 Pillow의 DEBUG 로그로 유출됐다. `configure_logging`에 decoder logger 차단을 추가했다. 거부된 이미지도 DEBUG 로그에 GPS/XML/base64를 남기지 않는 회귀 검사를 유지한다.
+- `502 upstream_error retryable:false` fixture가 잘못 `500 fixture_invalid`로 바뀌는 결함을 재현하고 수정했다. 이제 영구/일시 provider 실패를 구별하며 안전한 메시지·소비된 closed 토큰을 유지한다.
+
+### 최종 실행
+
+```sh
+source scripts/worktree-env.sh
+uv --directory relay run pytest tests/core -q
+uv --directory relay run python -c "import json; from app.main import create_app; assert create_app(schema_only=True).openapi() == json.load(open('openapi.json')); print('OpenAPI semantic equality: PASS; public schema shapes unchanged')"
+```
+
+- **72 passed**, skip/xfail 0, 0.49초. 최종 코드 수정 뒤 전체 core suite를 한 번 실행했다. 기존 Starlette/httpx deprecation warning 1개만 있다. socket connect 차단 상태에서 Firebase Admin의 실제 RSA 서명/claim 검증과 HTTP transport mock을 사용했다.
+- OpenAPI 객체 비교 exit 0. DTO·OpenAPI·생성 TS의 공개 shape는 바꾸지 않았다. bootstrap 전체 suite는 이번 실행에 포함하지 않았으며 아래 과거 결과와 합산하지 않는다.
+- 별도 메모리 내 Python `-c` smoke가 Uvicorn을 `127.0.0.1`의 임시 TCP 포트로 실행하고 실제 HTTP 요청을 보냈다. `install_core`를 설치한 **core 검증 전용 ASGI app**이며 S02/S03 제품 endpoint 성공을 뜻하지 않는다. Firebase verifier는 합성 adapter, Meta/OSRM은 `httpx.MockTransport`이고 실제 외부 socket은 차단했다.
+- 상세 관측: [`http-smoke.json`](http-smoke.json). HTTP 응답 22개 모두 `Cache-Control:no-store`; image/audio/route 성공, 인증 우선 401, App Check 403, 안전한 validation 400, GPS XMP carrier 9종 400, chunked 본문 413, 검색 성공·502 실패·429/Retry-After, 변조 token 401, closed보다 우선하는 5번째 턴 409를 확인했다. 성공/실패 검색 토큰 모두 1회 소비·closed 상태를 확인했다.
+- smoke의 mock provider 호출은 7회, 외부 provider 호출 0회, 파일/임시 파일 write spy 호출 0회다. DEBUG root 로그 32개에서 미디어·음성·좌표·토큰·원본 UID·인증/키 sentinel이 없었다. 취소 경로의 무저장은 최종 core suite에서 확인했다. smoke server/thread/socket은 종료했고 임시 실행 스크립트 파일은 만들지 않았다.
+
+**S02/S03 입력:** 공통 core의 현재 MacBook 코드 gate는 통과했다. coordinator의 통합 검토와 M1 검증은 별도이며 main/PR merge를 수행하지 않았다. 실제 모델 API 변환·PE 로딩·M1 native 인증·완성 제품 endpoint·E2E의 합격으로 확대하지 않는다.
+
+## 이전 관측 기록 (2026-11-04, M1)
+
+이전 작업자의 기록이며 마지막 logger 수정 이후 전체 재실행 결과가 아니었다. 현재 수정의 M1 재검증 증거로 사용하지 않는다.
 
 저장소 루트 명령:
 
