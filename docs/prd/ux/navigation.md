@@ -93,6 +93,12 @@ flowchart LR
 ### 실제 구현
 
 - UI는 React 스택이며 네이티브 기능은 Capacitor 플러그인으로 호출한다. 권한/알림은 실제 Android UI다. 딥링크는 `streetfitting://home`, `streetfitting://capture`, `streetfitting://capture?newShop=1`을 사용한다(D-R2-01, D-R7-03; [device-modules](../contracts/device-modules.md)).
+- S08은 durable Store와 실제 owner controller를 사용한다. 화면별 in-memory 성공 adapter나 route/state를 변경하는 검증 hook은 없다. Web 검증은 명시적 `web-mock`과 native-web 입력 fixture를 사용하며 release/native 성공으로 간주하지 않는다.
+- 같은 카메라 목적/대상은 중복 쌓지 않고 다른 목적/가게로 바뀌면 기존 Camera entry를 교체한다. 상세 ID가 바뀌면 해당 화면의 비동기 수명을 분리한다. 삭제로 무효가 된 상세 entry는 stack에서 제거한다.
+- 토스트는 버튼 입력을 가로막지 않는다. 촬영 직후 "Photo saved"가 남아 있어도 "End shopping" 확인을 열 수 있다.
+- 늦게 끝난 촬영·검색·tap·save는 떠난 화면을 다시 열지 않는다. Pick의 임시 파일/Media 원본/Segmenter 해제 실패를 성공으로 숨기지 않는다. 화면이 열려 있으면 "Temporary selection data could not be removed from this device. Try again."과 실제 cleanup 재시도를 제공하고, 화면을 떠난 뒤에는 "Some temporary photo data could not be removed from this device." 또는 "On-device selection resources could not be released."를 알린다. 한 정리 단계가 실패해도 독립적인 다른 정리 단계는 시도한다.
+- shopping error event의 `service_unavailable`은 "Shopping location service is unavailable. Try again when it is ready.", 위치 권한 거부/비활성은 "Shopping location is unavailable. Check location access in settings."로 구분한다. shopping 시작의 일시적 fix 부재는 [F-01](capture.md#권한-흐름)의 별도 `location_unavailable` 시트를 따른다.
+- 위 문구는 실제 구현 기록이며 새 화면 배치·영어 문구의 인간 승인은 미확인이다. 실행 증거와 전체 acceptance의 실제 입력 blocker는 [S08 CHECKPOINT](../../../verification/results/2026-11-04-s08-ui/CHECKPOINT.md)에 기록한다.
 
 ### 프로토타입
 

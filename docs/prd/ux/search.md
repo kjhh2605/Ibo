@@ -67,6 +67,9 @@
 
 - `Voice` 플러그인이 WAV를 반환하고 `/v1/transcribe`를 거쳐 Muse Voice Transcribe로 보낸다. 전사 성공을 F-06의 일반 영어 질의 제출에 연결한다. 무음 판정 세부값은 [device-modules](../contracts/device-modules.md)에서 공유한다(D-R3-07, D-R7-03).
 - debug 에뮬레이터 음성 fixture는 intent extra `sf_voice_source=fixture|mic`, `sf_voice_fixture_dir`로 선택한다. `start()`마다 WAV를 실시간 속도로 VAD에 공급해 실제 마이크와 같은 무음 종료 경로를 탄다. fixture 재생 → silence 자동 종료 → `completed` 1회 → 전사·즉시 검색을 E2E 경계로 사용하며 호스트 마이크나 사람 발화를 필수 기준으로 두지 않는다. release에서는 제외하고 화면 표시도 없다. 세부는 [device-modules §8 Voice](../contracts/device-modules.md)를 따른다(D-R3-07, D-R7-10 원칙을 확장한 통합 구현 결정).
+- S08은 native `microphone_permission_denied`를 같은 코드로 처리한다. obsolete `microphone_permission` alias는 두지 않는다. 이때 "Microphone access is off. Allow access in device settings, or type your question."을 표시하고 질의·전사 요청을 보내지 않는다.
+- `no_speech`는 "I didn’t catch that. Try speaking again or type your question.", `audio_unavailable`은 "The microphone is unavailable. Try again or type your question."으로 구분한다. 실패 뒤에는 다시 녹음하거나 텍스트로 입력할 수 있다. 위 문구는 실제 구현 기록이며 인간 화면 세션 승인은 미확인이다.
+- 실제 web-mock smoke에서는 VoiceWeb의 VAD 종료 → `/v1/transcribe` 1회 → 전사문 즉시 검색을 확인했다. tone-silence fixture이므로 사람 발화나 실제 전사 모델 품질의 증거는 아니다. 권한 거부 입력에서는 relay 호출이 없었다.
 
 ### 프로토타입
 
@@ -98,6 +101,8 @@
 - 쇼핑 사진 상단 내려받기 아이콘의 접근성 이름 "Save to gallery", 완료 "Saved to gallery · location removed"는 유지한다. 옷장 입력에는 이 내려받기가 없다(D-R2-09, D-R2-11).
 - 사진 삭제의 위치·확인·삭제 후 복귀, 실패/빈 상태, 직접 선택의 이름 편집, 피팅 복귀 배치는 **프로토타입 세션에서 확정**한다. 검색 없이 바로 자른 옷은 이름 처리 대기 중 "Picked item"으로 보이며, 오프라인이면 이름 작업을 대기열에 넣는다(D-R3-11, D-R4-08, D-R9-02).
 - **프로토타입 초안:** 부제는 "Shop · trip date · time" 맥락을 표시한다. "Delete photo"는 확인 시트를 열고, 피팅용 완료는 "Add to outfit", 옷장용 완료는 "Add to wardrobe"다. 새 문구·배치는 **프로토타입 화면 세션에서 확정**한다(D-R3-03, D-R3-11, D-R4-08).
+- S08 실제 연결은 검색 후보를 들고 Item으로 이동했다 돌아오는 동안 해당 Agent mask handle을 유지한다. Ask/Pick이 스택에서 모두 사라지면 취소·해제하고, 원본 Photo 삭제 뒤 사라진 후보/원본 화면은 다시 열지 않는다.
+- 같은 기존 후보의 "Show all"은 로컬 펼침이며 추가 Spark/SAM 호출을 하지 않는다. Trip 직접 자르기의 "Add to outfit"은 실제 조각 저장 성공 후 기존 target을 유지한 조합으로 복귀한다. "Cancel" / "Cancel selection"은 선택 전 조합을 유지하며 임시 원본 정리 실패를 성공 저장으로 취급하지 않는다.
 
 ### 실제 구현
 

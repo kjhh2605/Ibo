@@ -186,10 +186,12 @@ R9 추가 근거: D-R9-01(자동 수치 판정), D-R9-02(바로 자른 옷 이�
 - **그 밖의 외부 요청:** 출발·도착 좌표는 릴레이 경유 OSRM, 지도 영역 타일은 앱에서 OpenFreeMap 직접 요청. 모든 요청이 Meta로 간다고 쓰지 않는다(D-R7-03; research §8.2).
 - **보관 안내:** 릴레이 기본 메타데이터 로그와 로컬 개발 플래그의 질의/Spark 응답 예외를 구분한다. 이미지·음성·좌표 로그는 항상 금지다. Meta의 즉시 삭제를 보장하지 않는다(D-R6-04; research §6.3).
 - **내려받기:** 사용자가 내보내는 사진은 GPS를 제거한다. 결과는 provenance 보존 확인 전 플래그 OFF다(D-R2-11, D-R4-10).
+- **기존 가게 외관(D-R11-01):** 쇼핑 종료 뒤 외관 추가·재촬영은 shutter 시점 현재 위치를 한 번 사용하지만 trail을 만들지 않는다. 위치 실패를 과거 `Shop.spot`으로 대체하지 않는다. 보행 역시 shopping trail을 시작하지 않는다.
 
 ### 화면 배치·문구
 
 - 화면 제목과 부제는 유지한다. 데이터별 경계와 보관 예외를 설명하는 목록이 프로토타입에 반영됐으며 최종 영어 목록·배치는 **프로토타입 세션에서 확정**한다(D-R3-01, D-R3-04, D-R4-06, D-R6-04, D-R7-08).
+- 실제 앱의 "Your location trail" 설명은 "Recorded only while shopping. The raw trail is deleted when you end the trip and is never uploaded. Saved photo locations remain for walking back. Retaking a saved shop’s storefront uses your current location once when you take the photo, even outside shopping mode; it does not start a trail. Walking guidance does not create a shopping trail."이다. prototype의 대응 문구는 "Recorded only while shopping, deleted when the trip ends. Retaking a saved shop’s storefront uses your current location once, even outside shopping mode, without starting a trail."이다. D-R11-01 예외를 반영한 구현 문구이며 인간 화면 세션 승인 여부는 미확인이다.
 
 ### 실제 구현
 

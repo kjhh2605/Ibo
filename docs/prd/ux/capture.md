@@ -40,6 +40,15 @@
 | 허용 | 허용 | 시작함. 알림 카드 표시. "Shopping mode on · recording your location" |
 | 허용 | 거부 | 시작함. 알림 카드 없음. "Shopping mode on · no notification card" |
 
+실제 앱의 오류 분기는 다음과 같다. 이는 S08 구현 문구 기록이며 새 배치·문구의 인간 화면 세션 승인을 뜻하지 않는다.
+
+| native code | 실제 화면·재시도 |
+| --- | --- |
+| `location_permission_denied`, `location_disabled` | 위 "Shopping mode needs your location" 시트. "Not now" / "Open settings"; trip을 만들지 않음 |
+| `location_unavailable` | "Your location is unavailable". "A current location fix is needed before shopping can start. Move somewhere with a clearer signal, then try again. No trip has been started."와 "OK". 닫고 "Start shopping"으로 다시 시도; 일시적 fix 부재를 권한 거부로 바꾸거나 설정 변경을 요구하지 않음 |
+
+실제 앱의 종료 확인은 "End shopping mode?", "Your photos and saved locations stay on this device. The raw location trail will be deleted.", "End shopping" / "Cancel"이다. 성공한 `ShoppingSession.stop()` 뒤 Home으로 돌아가며 실패를 종료 성공으로 처리하지 않는다. 위 R2 표는 프로토타입 문구 기록이다.
+
 ### 기록 중 알림
 
 - **화면:** 상태 표시줄을 누르거나 아래로 끌면 위에서 내려오는 알림 창이 열린다. 상단에는 시각과 날짜가 있다.
@@ -73,6 +82,13 @@
 - **실제 구현:** CameraX로 촬영하고 촬영 시각의 위치를 연결한다. 에뮬레이터 debug 빌드는 adb로 넣은 폴더의 이미지를 셔터마다 순서대로 반환하는 fixture 캡처 소스를 둔다. adb intent extra로 켜며 화면에 표시하지 않고 release 빌드에는 포함하지 않는다. fixture 설정과 파일 오류는 [device-modules](../contracts/device-modules.md)을 따른다(D-R7-10).
 - **프로토타입:** 샘플 사진을 순환하며 셔터마다 메모리 store에 실제 Photo 항목을 추가한다. Trip 사진 그리드에서 새 사진을 열어 선택할 수 있다. 실제 카메라·파일 저장은 아니며 칩과 썸네일로 피드백한다(D-R3-03, D-R7-10).
 
+### 실제 앱의 카메라 오류
+
+- `camera_permission_denied`: "Camera access is off. Allow access in device settings, then try again."
+- 그 밖의 preview 실패(`preview_not_open`, `fixture_empty`, `fixture_invalid` 포함): "The camera preview could not start. Try again or return to your saved photos." 권한 거부로 오인해 설정 변경을 요구하지 않는다.
+- 공통 액션은 "Try again". preview 준비 전/실패 중 셔터는 비활성이다. 실패한 촬영·파일 저장을 Photo 성공으로 세지 않고, 화면을 나가면 preview를 닫는다.
+- 문구는 실제 구현 기록이며 인간 화면 세션 승인은 미확인이다.
+
 ## F-03 가게 방문 구분과 외관 사진
 
 - **우선순위:** P0
@@ -89,6 +105,15 @@
   6. 저장하면 "Note saved" 토스트가 뜬다. 기존 메모가 있으면 채운 채로 연다. Trip의 가게별 메모에서도 같은 시트를 쓴다(D-R9-04).
 - **실제 구현:** "New shop" 시점의 현재 좌표를 가게의 `spot`으로 저장한다. 외관 사진과 메모는 선택 사항이다. 가게 번호, 시작 시각, 좌표는 외관 촬영 여부와 무관하게 보존한다.
 - **프로토타입:** 가게를 세션 store에 추가하고 샘플 좌표를 쓴다. 실제 GPS/카메라는 연결하지 않는다.
+
+### 기존 가게 외관 추가·재촬영(D-R11-01)
+
+- Trip의 "Add storefront photo" / "Retake storefront"에서 해당 `shopId`의 Camera를 연다. 쇼핑이 종료된 과거 trip도 허용한다. 별도 Visit route는 만들지 않는다.
+- 안내는 "Fit the whole shop front in the frame. Taking this photo uses your current location once; it does not start a shopping trail."이고 "Capture storefront" / "Cancel"을 제공한다. 성공하면 "Storefront saved" 후 원래 Trip으로 복귀한다.
+- shutter 시점의 현재 위치를 한 번 취득한다. 위치 권한/현재 fix가 없으면 촬영 저장을 실패시키며 `Shop.spot`이나 과거 위치로 대체하지 않는다. trip·shopping trail·FGS를 새로 시작하지 않고 기존 `Shop.spot`도 바꾸지 않는다.
+- 실제 호출은 `Capture.openPreview({purpose:'storefront',shopId,facing:'back'})` → `takePhoto({kind:'storefront'})`다. 새 외관 Photo ID를 `describe_storefront` queue의 `refId`로 사용한다. 실패 상태의 "Retry description"도 같은 Photo ID로 재시도한다.
+- 기존 외관의 "Delete storefront photo" 확인은 "The storefront and its description will be removed. Saved look snapshots stay."다. 삭제는 기존 Result의 독립 snapshot을 변경하지 않는다.
+- D-R11-01의 위치 계약은 확정이며 새 영어 문구·배치의 인간 화면 세션 승인은 미확인이다.
 
 ## F-04 외관 사진 자동 묘사
 

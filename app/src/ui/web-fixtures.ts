@@ -40,7 +40,8 @@ export async function installWebFixtures():Promise<()=>void> {
   async function itemFixture(image:string):Promise<SegmenterFixture> {
     const input=await asset(image),choices=masks.filter(mask=>mask.image===image);
     const decoded=await Promise.all(choices.map(async mask=>({pixels:binaryPixels(await decodeWebRaster(await(await fetchFixture(mask.mask)).blob())),score:mask.score})));
-    return {person:[],taps:choices.map((mask,index)=>({x:mask.tap[0]/input.w,y:mask.tap[1]/input.h,masks:[decoded[index],...decoded.filter((_,i)=>i!==index)].slice(0,3)}))};
+    // Keyboard's initial center prompt has an explicit supplied three-mask fixture, not model inference.
+    return {person:[],taps:[{x:0.5,y:0.5,masks:decoded.slice(0,3)},...choices.map((mask,index)=>({x:mask.tap[0]/input.w,y:mask.tap[1]/input.h,masks:[decoded[index],...decoded.filter((_,i)=>i!==index)].slice(0,3)}))]};
   }
   for(const image of new Set(masks.map(mask=>mask.image))){const input=await asset(image);context.setFixture(`Segmenter.asset:${input.id}`,await itemFixture(image));}
   const captures:Asset[]=[];
@@ -100,13 +101,14 @@ export async function installWebFixtures():Promise<()=>void> {
   }
   const removeTransport=installWebMockTransport(async(input,init)=>{
     init?.signal?.throwIfAborted();
-    const endpoint=new URL(input instanceof Request?input.url:String(input)).pathname.split('/').at(-1)!;
+    const endpoint=new URL(input instanceof Request?input.url:String(input)).pathname.replace(/^\/v1\//,'').replaceAll('/','-');
     const request=JSON.parse(String(init?.body));
     if(endpoint==='search-turn'&&!request.queryToken)calls.set(endpoint,0);
     const count=(calls.get(endpoint)??0)+1;calls.set(endpoint,count);
     const sequence=endpoint==='search-turn'?count:1;
     const fixture=await json<{status:number;body:unknown}>(`relay/normal/${endpoint}.${String(sequence).padStart(2,'0')}.response.json`);
-    const body=await resolveFixture(fixture.body,request);init?.signal?.throwIfAborted();
+    const resolved=await resolveFixture(fixture.body,request);init?.signal?.throwIfAborted();
+    const body=endpoint.startsWith('search-')&&resolved&&typeof resolved==='object'?{...resolved,queryToken:'explicit-web-fixture-query'}:resolved;
     return Response.json(body,{status:fixture.status,headers:{'X-Query-Token':'explicit-web-fixture-query'}});
   });
   return removeTransport;

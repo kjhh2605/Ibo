@@ -3,7 +3,7 @@ import { Screen, Section, TopBar } from '../ui'
 
 const STAYS = [
   ['Your original self photo', 'Your face and hair stay here. Only a face-and-hair-removed copy is sent for try-on.'],
-  ['Your location trail', 'Recorded only while shopping, deleted when the trip ends.'],
+  ['Your location trail', 'Recorded only while shopping, deleted when the trip ends. Retaking a saved shop’s storefront uses your current location once, even outside shopping mode, without starting a trail.'],
   ['Photo embeddings', 'The image search index is processed and kept on this phone.'],
   ['Your wardrobe originals', 'Only garment cut-outs leave, never the full wardrobe photo.'],
   ['Your finished looks', 'Your face is put back on this phone. The result is not uploaded again.'],

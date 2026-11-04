@@ -5,7 +5,7 @@ import {resolve,dirname,extname,sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {once} from 'node:events';
 import {setTimeout as delay} from 'node:timers/promises';
-import {browserScenario} from './browser-scenarios.ts';
+import {runBrowserScenario} from './browser-scenarios.ts';
 
 const args=process.argv.slice(2);
 const scenario=args[args.indexOf('--scenario')+1];
@@ -30,7 +30,7 @@ if(!fixtureAddress||typeof fixtureAddress==='string')throw new Error('No fixture
 const reserve=createServer();reserve.listen(0,'127.0.0.1');await once(reserve,'listening');
 const address=reserve.address();if(!address||typeof address==='string')throw new Error('No browser server address');const port=address.port;
 const reservedClosed=once(reserve,'close');reserve.close();await reservedClosed;
-const server=spawn(process.execPath,['node_modules/vite/bin/vite.js','--host','127.0.0.1','--port',String(port),'--strictPort'],{cwd:resolve(root,'app'),env:{...process.env,VITE_SF_RUNTIME:'web-mock',VITE_SF_RELAY_MODE:'mock',VITE_SF_WEB_FIXTURES:`http://127.0.0.1:${fixtureAddress.port}`},stdio:['ignore','pipe','pipe']});
+const server=spawn(process.execPath,['node_modules/vite/bin/vite.js','--host','127.0.0.1','--port',String(port),'--strictPort'],{cwd:resolve(root,'app'),env:{...process.env,VITE_SF_RUNTIME:'web-mock',VITE_SF_RELAY_MODE:'mock',VITE_SF_VERIFICATION:'1',VITE_SF_WEB_FIXTURES:`http://127.0.0.1:${fixtureAddress.port}`},stdio:['ignore','pipe','pipe']});
 let serverLog='';server.stdout.on('data',bytes=>{serverLog+=String(bytes);});server.stderr.on('data',bytes=>{serverLog+=String(bytes);});
 const url=`http://127.0.0.1:${port}`;
 try {
@@ -42,19 +42,12 @@ try {
   }
   if(!ready)throw new Error('Vite readiness deadline exceeded');
   console.log(`WEB_MOCK_URL=${url}`);
-  if(scenario==='serve')await new Promise<void>(()=>{});
-  const code=browserScenario(scenario as 'full'|'states',url);
-  const run=spawn('aside',['repl',code],{cwd:root,stdio:['ignore','pipe','pipe']});let stdout='';let stderr='';
-  run.stdout.on('data',bytes=>{stdout+=String(bytes);});run.stderr.on('data',bytes=>{stderr+=String(bytes);});
-  const [status]=await once(run,'close');
-  await writeFile(resolve(output,'browser.log'),stdout.replace(/SF_SCREENSHOT:[^\n]+/g,'[Screenshot captured separately]')+stderr);
-  for(const line of stdout.split('\n'))if(line.startsWith('SF_SCREENSHOT:')){const shot: {name:string;data:string}=JSON.parse(line.slice('SF_SCREENSHOT:'.length));await writeFile(resolve(output,`${shot.name}.png`),Buffer.from(shot.data,'base64'));}
-  const evidenceLine=stdout.split('\n').find(line=>line.startsWith('SF_EVIDENCE:'));
-  if(status!==0||!evidenceLine)throw new Error(`Aside scenario failed (exit ${status}); see ${output}/browser.log`);
-  const evidence=JSON.parse(evidenceLine.slice('SF_EVIDENCE:'.length));
-  if(!Array.isArray(evidence.routes)||evidence.routes.length===0||evidence.passed!==true)throw new Error('No successful route assertions');
-  await writeFile(resolve(output,'matrix.json'),JSON.stringify({...evidence,engine:'Aside browser',fixtureRoot,approval:'Prototype layout/copy session not performed; visual approval pending',nativeIntegration:'Not claimed by browser-only contract adapter'},null,2)+'\n');
-  console.log(`${scenario}: PASS; ${evidence.routes.length} routes; evidence ${output}`);
+  if(scenario==='serve'){
+    await Promise.race([once(process,'SIGINT'),once(process,'SIGTERM')]);
+  }else{
+    await runBrowserScenario(scenario as 'full'|'states',url,output);
+    console.log(`${scenario}: PASS; evidence ${output}`);
+  }
 }finally {
   server.kill('SIGTERM');fixtures.close();
   await writeFile(resolve(output,'server.log'),serverLog);

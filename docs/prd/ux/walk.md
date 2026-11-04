@@ -40,6 +40,11 @@ R9 추가 근거: D-R9-03(결과 목적지 스냅샷), D-R9-04(Item/Result 전�
 - 지도는 WebView MapLibre GL JS + OpenFreeMap 직접 타일 요청이다. 앱은 출발·도착을 `/v1/route`에 보내고 로컬 Mac 릴레이가 FOSSGIS OSRM foot을 호출한다. Spark/Meta에는 경로 좌표를 보내지 않는다(D-R6-05, D-R7-03; research §8.2).
 - Item은 저장 시 사진 위치를 복사한 `Piece.walkTo`, Result는 생성 시 독립 복사한 대상 옷의 위치 스냅샷을 사용한다. 원래 Piece가 삭제됐다고 결과 안내를 차단하거나 다른 가게 좌표로 바꾸지 않는다. 스냅샷 필드는 [data-model](../contracts/data-model.md)을 따른다(D-R3-11, D-R5-01, D-R9-03).
 - JS가 경로·이탈 감지·끝 구간 방향/거리 계산을 맡고 Capacitor Geolocation으로 현재 위치를 받는다. 전환 임계값과 위치 정확도 처리는 [device-modules](../contracts/device-modules.md)을 따른다. 음성·백그라운드·실내 안내는 제외한다(D-R5-04, D-R7-03; research §9).
+- S08의 실제 오류 문구: `location_permission_denied`는 "Walking directions need your current location. Allow location access in your device settings, then try again.", `location_unavailable`은 "Your current location is unavailable. No turn, direction or distance can be calculated yet. Try again where location is available."이다. 둘 다 "Try again"을 제공하며 가짜 fix나 거리로 복구하지 않는다.
+- 오프라인 문구는 "The walking route can’t load while you’re offline. Your saved destination is still here. Connect, then try again."이다. 이전 경로는 참고값일 뿐 live 안내가 아님을 밝히고 offline 중 재시도는 비활성, reconnect 후 실제 재시도를 허용한다. 지도 타일 오류는 경로/위치 오류와 분리하고 이용 가능한 텍스트 안내를 보존한다.
+- 실제 `nearby` 화면은 "Check the surroundings"와 "I found this shop"을 제공한다. 사용자가 확인한 뒤에만 "You confirmed Shop N"(원래 shop이 삭제됐으면 "You confirmed Saved photo spot")와 "Done"을 표시한다. prototype의 "You're at Shop N" 문구를 GPS 자동 확정에 사용하지 않는다.
+- WebView 브라우저의 위치 권한은 `watchPosition`/`getCurrentPosition`에서 처리하고, native는 Capacitor의 명시적 권한 요청을 사용한다. 이것은 플랫폼 API 차이 처리이며 위치 제공자를 바꾸는 fallback이 아니다.
+- 위 문구는 실제 앱 구현 기록이며 인간 화면 세션 승인은 미확인이다.
 
 ### 프로토타입
 

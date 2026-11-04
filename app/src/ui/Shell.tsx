@@ -30,7 +30,7 @@ export function Shell({children}:{children:ReactNode}) {
       <Heading level={1}>{titles[route.name]}</Heading>
       {children}
     </VStack>
-    {toast&&<VStack role="status" padding={4} style={{position:'fixed',insetInline:'var(--spacing-6)',bottom:'var(--spacing-6)',background:'var(--color-surface)',borderRadius:'var(--radius-md)',boxShadow:'var(--shadow-md)',zIndex:20}}><Text>{toast}</Text></VStack>}
+    {toast&&<VStack role="status" padding={4} style={{position:'fixed',insetInline:'var(--spacing-6)',bottom:'var(--spacing-6)',background:'var(--color-surface)',borderRadius:'var(--radius-md)',boxShadow:'var(--shadow-md)',zIndex:20,pointerEvents:'none'}}><Text>{toast}</Text></VStack>}
     <BottomSheet isOpen={sheet!==null} onOpenChange={open=>{if(!open)showSheet(null);}} label={sheet?.title??'Options'} purpose="form" padding={6}>{sheet&&<VStack gap={4}><Heading level={2}>{sheet.title}</Heading>{sheet.content}<Button label="Close" variant="ghost" onClick={()=>showSheet(null)}/></VStack>}</BottomSheet>
   </AppShell>;
 }
