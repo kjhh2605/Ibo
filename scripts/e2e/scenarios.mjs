@@ -82,7 +82,16 @@ async function startShopping(page) {
 async function shoppingFix(page,point) {
   const previous=(await native(page,'ShoppingSession','getState')).latestFix?.t??-Infinity;
   await fix(point);
-  return until(()=>native(page,'ShoppingSession','getState'),s=>s.latestFix&&Number.isFinite(s.latestFix.t)&&s.latestFix.t>previous&&Math.abs(s.latestFix.lat-point.lat)<1e-7&&Math.abs(s.latestFix.lng-point.lng)<1e-7,'injected_fix_not_received');
+  return until(()=>native(page,'ShoppingSession','getState'),s=>{
+    const current=s.latestFix;
+    if(!current||!Number.isFinite(current.t)||!(current.t>previous))return false;
+    const radians=Math.PI/180;
+    const a=Math.sin((current.lat-point.lat)*radians/2)**2+Math.cos(point.lat*radians)*Math.cos(current.lat*radians)*Math.sin((current.lng-point.lng)*radians/2)**2;
+    const distanceM=6371008.8*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+    // Emulator/FLP output was observed submeter away from the injected target.
+    // This 1m target-identity bound is not a product accuracy or freshness policy.
+    return distanceM<=1;
+  },'injected_fix_not_received');
 }
 async function priorTrip(context,points) {
   const {page}=context;
