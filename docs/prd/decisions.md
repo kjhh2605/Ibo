@@ -140,4 +140,5 @@
 | ID | 항목 | 결정 | 이전 문서와의 관계 |
 | --- | --- | --- | --- |
 | D-R11-01 | 과거 가게 외관의 위치 | 사용자가 Trip에서 과거 가게의 외관을 직접 촬영하면 쇼핑 모드가 꺼져 있어도 **셔터 때 현재 위치를 1회 취득·저장**한다. 연속 위치 기록·TrailPoint·FGS는 시작하지 않는다. 위치를 얻지 못하면 저장하지 않으며 과거 Shop.spot을 새 촬영 위치로 대체하지 않는다 | 사용자가 “셔터 때 위치 1회 허용”을 선택. 쇼핑 모드 밖 위치 기록 제외의 좁은 예외이며 Photo.location 필수·Piece.walkTo 규칙은 유지 |
-| D-R11-02 | 두 Mac 구현 재개 | MacBook은 TS/web·relay·공유 계약·검증 도구 구현, M1은 Java/native·모델·직렬 기기 검증을 담당한다. main/PR 병합 금지 유지, 기존 WIP 기준에서 별도 브랜치로 재개한다. 모든 작업은 Fast/priority 모드로 진행한다 | 사용자 재개 지시 및 양쪽 조정자 합의. S01 선행 gate는 PR 병합 대신 검증·리뷰 승인된 고정 WIP 커밋 배포로 대체 |
+| D-R11-02 | 두 Mac 구현 재개 | MacBook은 TS/web·relay·공유 계약·검증 도구 구현, M1은 Java/native·모델·직렬 기기 검증을 담당한다. main/PR 병합 금지 유지, 기존 WIP 기준에서 별도 브랜치로 재개한다. 모든 작업은 Fast/priority 모드로 진행한다 | 사용자 재개 지시 및 양쪽 조정자 합의. S01 선행 gate는 PR 병합 대신 검증·리뷰 승인된 고정 WIP 커밋 배포로 대체한다. MacBook의 코드 검증은 병렬 구현의 입력일 뿐이며 최종 합격은 계속 M1 재검증이 필요하다 |
+| D-R11-03 | Muse Image 출력 형식 | 공식 Responses API의 `image_generation_call.result` base64 결과만 지원한다. 원본 이미지 바이트·메타데이터·워터마크는 그대로 보존한다. URL-only 결과는 `upstream_error`로 거부하고 추가 다운로드 요청을 하지 않는다 | 사용자가 “공식 base64만 지원”을 선택. 공식 URL-only 응답 형식·허용 호스트가 확인되지 않아 기존 PRD의 URL 다운로드 분기를 제거한다. [공식 문서](https://dev.meta.ai/docs/image-generation#read-the-response) |

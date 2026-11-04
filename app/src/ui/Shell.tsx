@@ -23,8 +23,8 @@ export function Shell({children}:{children:ReactNode}) {
   useEffect(()=>{
     body.current?.scrollIntoView({block:'start'});
     if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches) body.current?.animate([{opacity:0,transform:'translateX(3%)'},{opacity:1,transform:'translateX(0)'}],{duration:180,easing:'ease-out'});
-    if(!['ask','pick'].includes(route.name))void services.agent.cancel();
-  },[route,services]);
+    if(!stack.some(entry=>entry.name==='ask'||entry.name==='pick'))void services.agent.cancel().catch(()=>{});
+  },[route,stack,services]);
   return <AppShell variant="surface" contentPadding={6} mobileNav={false} topNav={<TopNav label="Street Fitting navigation" heading={<TopNavHeading heading="Street Fitting"/>} endContent={stack.length>1?<Button label="Back" variant="ghost" onClick={back}/>:undefined}/>} banner={!online?<VStack padding={3}><Text>You’re offline. Saved photos and pieces are still available.</Text></VStack>:undefined}>
     <VStack gap={10} width="100%" maxWidth="var(--layout-max-width, 70rem)" ref={body} data-route={route.name} style={{marginInline:'auto'}}>
       <Heading level={1}>{titles[route.name]}</Heading>

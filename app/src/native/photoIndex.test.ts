@@ -1,3 +1,4 @@
+import {deferred} from '../deferred';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import type {Photo, PhotoEmbedding} from './contracts';
 import {createMockContext} from './web/context';
@@ -48,7 +49,7 @@ describe('PhotoIndex behavior', () => {
   it('pendingTimeoutIsNotNotFound and failed indexing never silently disappears from results', async () => {
     vi.useFakeTimers();
     state.photos.set('p', photo('p'));
-    const gate = Promise.withResolvers<Blob>(); state.gate = gate.promise;
+    const gate = deferred<Blob>(); state.gate = gate.promise;
     const index = createWebPhotoIndex(createMockContext({fixtures: {'PhotoIndex.vector:p': vector()}}));
     const result = index.search({phraseVector: vector(), k: 1});
     const rejected = expect(result).rejects.toMatchObject({code: 'index_unavailable'});
@@ -59,7 +60,7 @@ describe('PhotoIndex behavior', () => {
   });
   it('deletedPhotoCannotResurrect when inference finishes after deletion', async () => {
     state.photos.set('p', photo('p'));
-    const gate = Promise.withResolvers<Blob>(); state.gate = gate.promise;
+    const gate = deferred<Blob>(); state.gate = gate.promise;
     const index = createWebPhotoIndex(createMockContext({fixtures: {'PhotoIndex.vector:p': vector()}}));
     const result = index.index({photoId: 'p'}), rejected = expect(result).rejects.toMatchObject({code: 'invalid_reference'});
     await vi.waitFor(() => expect(state.reads).toBe(1));

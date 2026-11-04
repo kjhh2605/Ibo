@@ -4,7 +4,7 @@ import type {RelayRequest, RelayResponse} from '../relay/client';
 export type DescribePath = '/v1/describe/storefront' | '/v1/describe/piece';
 export type DescribeImage = RelayRequest<'/v1/describe/piece'>['image'];
 export interface DescribeTransport {
-  request<P extends DescribePath>(path: P, body: RelayRequest<P>, options: {beforeSend: () => Promise<void>; forceRefresh?: boolean; signal: AbortSignal}): Promise<RelayResponse<P>>;
+  request<P extends DescribePath>(path: P, body: RelayRequest<P>, options: {beforeSend: () => Promise<void>; forceRefreshAuth?: boolean; signal: AbortSignal}): Promise<RelayResponse<P>>;
 }
 export interface QueueEnvironment {
   now(): number;
@@ -27,6 +27,7 @@ function failure(error: unknown) {
 export class DescribeQueue {
   private running = false;
   private pumping = false;
+  private wakePending = false;
   private timer: unknown;
   private listener: Listener | undefined;
   private controller: AbortController | undefined;
@@ -59,7 +60,8 @@ export class DescribeQueue {
   }
   wake() {
     this.clearTimer();
-    if (!this.running || this.pumping || !this.environment.foreground() || !this.environment.online()) return;
+    if (!this.ready()) return;
+    if (this.pumping) { this.wakePending = true; return; }
     if (this.preflightRetryAt > this.environment.now()) { this.arm(this.preflightRetryAt - this.environment.now()); return; }
     void this.pump();
   }
@@ -84,17 +86,20 @@ export class DescribeQueue {
   }
   private async dispatch(job: QueueJob) {
     let claimed = false;
+    let imageFailure = false;
     this.controller = new AbortController();
     try {
       const file = await this.source(job);
       if (!file) return;
-      const image = await this.environment.image(file);
+      let image: DescribeImage;
+      try { image = await this.environment.image(file); }
+      catch (error) { imageFailure = true; throw error; }
       const beforeSend = async () => {
         if (!this.ready()) throw {code: 'offline', retryable: true};
         await this.store.beginJob({id: job.id, now: this.environment.now()});
         claimed = true;
       };
-      const options = {beforeSend, forceRefresh: this.refreshAuth, signal: this.controller.signal};
+      const options = {beforeSend, forceRefreshAuth: this.refreshAuth, signal: this.controller.signal};
       if (job.kind === 'describe_storefront') {
         const response = await this.transport.request('/v1/describe/storefront', {image}, options);
         await this.store.completeJob({id: job.id, description: response.description});
@@ -106,9 +111,12 @@ export class DescribeQueue {
       this.preflightRetryAt = 0;
     } catch (error) {
       const problem = failure(error);
-      if (problem.code === 'unauthorized' || problem.code === 'invalid_auth' || problem.code === 'invalid_app_check' || problem.code === 'auth_unavailable' || problem.code === 'forbidden') this.refreshAuth = true;
+      if (problem.code === 'unauthenticated' || problem.code === 'unauthorized' || problem.code === 'invalid_auth' || problem.code === 'invalid_app_check' || problem.code === 'auth_unavailable' || problem.code === 'forbidden') this.refreshAuth = true;
       if (claimed) {
         await this.store.failJob({id: job.id, retryable: problem.retryable, ...(problem.retryAfterMs === undefined ? {} : {retryAfterMs: problem.retryAfterMs})});
+      } else if (imageFailure && !problem.retryable) {
+        await this.store.failJob({id: job.id, retryable: false, preflight: true});
+        this.preflightRetryAt = 0;
       } else if (problem.code !== 'invalid_reference' && problem.code !== 'job_not_claimed') {
         // Authentication/image preparation does not count as an HTTP attempt.
         this.preflightRetryAt = this.environment.now() + Math.max(5000, problem.retryAfterMs ?? 0);
@@ -117,6 +125,7 @@ export class DescribeQueue {
   }
   private async pump() {
     this.pumping = true;
+    this.wakePending = false;
     try {
       while (this.ready() && this.preflightRetryAt <= this.environment.now()) {
         const job = await this.store.nextJob({now: this.environment.now()});
@@ -133,7 +142,11 @@ export class DescribeQueue {
       }
     } catch {
       // Persistence failures must not become an unhandled promise or a tight foreground loop.
+      this.preflightRetryAt = this.environment.now() + 5000;
       this.arm(5000);
-    } finally { this.pumping = false; }
+    } finally {
+      this.pumping = false;
+      if (this.wakePending) { this.wakePending = false; this.wake(); }
+    }
   }
 }

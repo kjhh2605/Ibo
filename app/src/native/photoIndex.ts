@@ -1,3 +1,4 @@
+import {deferred} from '../deferred';
 import {Capacitor} from '@capacitor/core';
 import type {Photo, PhotoEmbedding, PhotoIndex as PhotoIndexContract} from './contracts';
 import {registerDevicePlugin} from './registerDevicePlugin';
@@ -79,7 +80,7 @@ export function createWebPhotoIndex(context?: MockContext): PhotoIndexContract {
       const repository = getWebRepository();
       const scope = photoIds === undefined ? (await allPhotos()).filter(photo => photo.kind === 'item') : (await Promise.all([...new Set(photoIds)].map(id => repository.get({entity: 'Photo', id})))).filter((photo): photo is Photo => photo !== null);
       if (scope.some(photo => photo.indexState === 'failed')) mlError('index_unavailable');
-      const timeout = Promise.withResolvers<never>();
+      const timeout = deferred<never>();
       const timer = setTimeout(() => timeout.reject({code: 'index_unavailable', message: 'Photo indexing is unavailable.', retryable: true}), 30_000);
       try {
         await Promise.race([

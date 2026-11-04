@@ -1,3 +1,4 @@
+import {deferred} from '../../deferred';
 import type {Asset, EntityMap, FileRef, ResultPieceSnapshot, SelfPhoto} from '../../native/contracts';
 import {failure} from './images';
 
@@ -10,7 +11,7 @@ export type SelfVersion = {selfPhoto: SelfPhoto; refs: number; current: boolean}
 type Rows = EntityMap & {files: FileRow; assets: AssetRow; drafts: Draft; self: SelfVersion; meta: {value: string}};
 
 function request<T>(value: IDBRequest<T>): Promise<T> {
-  const {promise, resolve, reject} = Promise.withResolvers<T>();
+  const {promise, resolve, reject} = deferred<T>();
   value.onsuccess = () => resolve(value.result);
   value.onerror = () => reject(value.error);
   return promise;
@@ -49,7 +50,7 @@ export class Database {
   constructor(name: string) { this.name = name; }
   private open(): Promise<IDBDatabase> {
     if (this.connection) return this.connection;
-    const {promise, resolve, reject} = Promise.withResolvers<IDBDatabase>();
+    const {promise, resolve, reject} = deferred<IDBDatabase>();
     this.connection = promise;
     if (!globalThis.indexedDB) { reject({code: 'io_error', message: 'IndexedDB unavailable', retryable: false}); return promise; }
     const opening = indexedDB.open(this.name, 1);
@@ -62,7 +63,7 @@ export class Database {
   async run<T>(write: boolean, work: (tx: Transaction) => Promise<T>): Promise<T> {
     const db = await this.open();
     const transaction = db.transaction(stores, write ? 'readwrite' : 'readonly');
-    const {promise: done, resolve, reject} = Promise.withResolvers<void>();
+    const {promise: done, resolve, reject} = deferred<void>();
     transaction.oncomplete = () => resolve();
     transaction.onabort = () => reject(transaction.error ?? new Error('Aborted'));
     transaction.onerror = () => { /* The abort event owns rejection. */ };

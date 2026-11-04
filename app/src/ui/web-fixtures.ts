@@ -1,201 +1,113 @@
-import type {BBox, Candidate, Listener, SegMask} from '../native/contracts';
-import type {components} from '../generated/relay-api';
+import {config} from '../config';
+import type {Asset, BBox} from '../native/contracts';
+import {createMockContext, setMockContext} from '../native/web/context';
+import {binaryPixels, decodeWebRaster} from '../native/segmenter';
+import type {SegmenterFixture} from '../native/segmenter';
+import {getWebRepository} from '../data/web/repository';
+import {installWebMockTransport} from '../relay/client';
 
-type RouteResponse = components['schemas']['RouteResponse'];
-type FixturePoint = {lat:number; lng:number; accuracyM?:number};
-export type StoreFixture = {
-  now:string;
-  trips:{id:string; startedAt:string; endedAt:string|null; status:'recording'|'ended'}[];
-  shops:{id:string; tripId:string; n:number; startedAt:string; spot:FixturePoint; descriptionState:'none'|'pending'|'done'|'failed'; description?:string; note?:string}[];
-  photos:{id:string; tripId:string; shopId:string; takenAt:string; image:string; location:FixturePoint; indexState:'pending'|'done'|'failed'; vector:number[]}[];
-  captureManifest:string[];
-};
-export type FixtureMask = {image:string; mask:string; cutout:string; bbox:BBox; score:number};
-export type MaskPixels = {w:number; h:number; binary:Uint8Array; bbox:BBox};
-type Envelope<T> = {status:number; body:T};
+type Mask = {image:string; mask:string; bbox:BBox; score:number; tap:[number,number]};
+type Seed = {now:string; trips:{id:string;startedAt:string;endedAt:string}[]; shops:{id:string;tripId:string;startedAt:string;spot:{lat:number;lng:number};note?:string}[]; photos:{id:string;tripId:string;shopId:string;takenAt:string;image:string;location:{lat:number;lng:number};vector:number[]}[];captureManifest:string[]};
 
-export function deviceError(code:string, message:string, retryable=true) {
-  return Object.assign(new Error(message), {code, retryable});
-}
-
-export function createEvents<E>() {
-  const listeners = new Map<keyof E, Set<(event:unknown)=>void>>();
-  return {
-    async addListener<K extends keyof E & string>(name:K, callback:(event:E[K])=>void):Promise<Listener> {
-      let group = listeners.get(name);
-      if (!group) {group=new Set(); listeners.set(name,group);}
-      const listener=callback as (event:unknown)=>void;
-      group.add(listener);
-      return {async remove() {group.delete(listener);}};
-    },
-    emit<K extends keyof E & string>(name:K, event:E[K]) {
-      for (const listener of [...(listeners.get(name)??[])]) listener(structuredClone(event));
-    },
-    clear() {listeners.clear();},
-  };
-}
-
-/** Only reads S11 assets. The returned images and masks are unreviewed fixtures, not inference. */
-export class UiFixtures {
-  readonly base:URL;
-  readonly store:StoreFixture;
-  readonly masks:FixtureMask[];
-  readonly route:RouteResponse;
-  readonly transcript:string;
-  readonly concept:string;
-  readonly summary:string;
-  readonly generatedFile:string;
-  readonly pieceDescription:{label:string; category:string};
-  readonly storeDescription:string;
-  readonly walkDestination:{lat:number; lng:number};
-  readonly walkFixes:{lat:number; lng:number; t:number; accuracyM:number}[];
-  private images=new Map<string,Promise<HTMLImageElement>>();
-  private pixels=new Map<string,Promise<MaskPixels>>();
-  private blobs=new Map<string,Promise<Blob>>();
-  private imageUrls=new Set<string>();
-  private owned=new Set<string>();
-
-  private constructor(base:URL, store:StoreFixture, masks:FixtureMask[], route:RouteResponse, transcript:string, final:{concept:string; summary:string}, generatedFile:string, walkDestination:{lat:number; lng:number}, walkFixes:UiFixtures['walkFixes'], pieceDescription:{label:string; category:string}, storeDescription:string) {
-    this.base=base; this.store=store; this.masks=masks; this.route=route;
-    this.transcript=transcript; this.concept=final.concept; this.summary=final.summary;
-    this.generatedFile=generatedFile; this.walkDestination=walkDestination; this.walkFixes=walkFixes;
-    this.pieceDescription=pieceDescription; this.storeDescription=storeDescription;
+/** Explicit local verification only: fixtures feed the real native-web plugins and durable Store. */
+export async function installWebFixtures():Promise<()=>void> {
+  const root=import.meta.env.VITE_SF_WEB_FIXTURES as string|undefined;
+  if(config.runtime!=='web-mock'||!root)return ()=>{};
+  const base=new URL(root.endsWith('/')?root:`${root}/`,location.href);
+  if(!['localhost','127.0.0.1','[::1]'].includes(base.hostname))throw new Error('Web fixtures require a local server.');
+  const repository=getWebRepository();
+  async function fetchFixture(path:string):Promise<Response> {
+    const url=new URL(path,base);
+    if(!url.href.startsWith(base.href))throw new Error('Fixture path escapes its root.');
+    const response=await fetch(url);
+    if(!response.ok)throw new Error(`Missing verification fixture: ${path}`);
+    return response;
   }
-
-  static async load(baseValue:string):Promise<UiFixtures> {
-    const base=new URL(baseValue.endsWith('/')?baseValue:`${baseValue}/`,window.location.href);
-    if (base.protocol!=='http:' && base.protocol!=='https:') throw deviceError('fixture_invalid','An HTTP fixture server is required.',false);
-    async function json<T>(path:string):Promise<T> {
-      const response=await fetch(new URL(path,base));
-      if (!response.ok) throw deviceError('fixture_invalid','A required verification fixture could not be loaded.',false);
-      return response.json() as Promise<T>;
-    }
-    const [store,masks,route,voice,final,generated,walkExpected,gpxResponse,pieceDescription,storeDescription]=await Promise.all([
-      json<StoreFixture>('store/e2e.json'),
-      json<{candidates:FixtureMask[]}>('masks/items/cases.json'),
-      json<Envelope<RouteResponse>>('relay/normal/route.01.response.json'),
-      json<Envelope<{text:string}>>('relay/normal/transcribe.01.response.json'),
-      json<Envelope<{final:{concept:string; summary:string}}>>('relay/normal/search-turn.04.response.json'),
-      json<Envelope<{image:{data:{asset:string}}}>>('relay/normal/tryon.01.response.json'),
-      json<{destination:{lat:number; lng:number}; checkpoints:{accuracyM:number}[]}>('gpx/walk.expected.json'),
-      fetch(new URL('gpx/walk.gpx',base)),
-      json<Envelope<{label:string; category:string}>>('relay/normal/describe-piece.01.response.json'),
-      json<Envelope<{description:string}>>('relay/normal/describe-storefront.01.response.json'),
-    ]);
-    if (!gpxResponse.ok || !store.captureManifest.length || !masks.candidates.length) throw deviceError('fixture_empty','Required verification assets are missing.',false);
-    const gpx=new DOMParser().parseFromString(await gpxResponse.text(),'application/xml');
-    const fixes=Array.from(gpx.getElementsByTagName('trkpt')).map((point,index)=>({
-      lat:Number(point.getAttribute('lat')), lng:Number(point.getAttribute('lon')),
-      t:Date.parse(point.getElementsByTagName('time')[0]?.textContent??''),
-      accuracyM:walkExpected.checkpoints[index]?.accuracyM??5,
-    }));
-    if (fixes.length<6 || fixes.some(point=>!Number.isFinite(point.lat+point.lng+point.t))) throw deviceError('fixture_invalid','The walking fixture is invalid.',false);
-    return new UiFixtures(base,store,masks.candidates,route.body,voice.body.text,final.body.final,
-      `relay/normal/${generated.body.image.data.asset}`,walkExpected.destination,fixes,pieceDescription.body,storeDescription.body.description);
+  async function json<T>(path:string):Promise<T>{return (await fetchFixture(path)).json() as Promise<T>;}
+  const seed=await json<Seed>('store/e2e.json');
+  const context=createMockContext({now:Date.parse(seed.now),permissions:{camera:'granted',location:'granted',notification:'granted',microphone:'granted'}});
+  setMockContext(context);
+  const destination=await json<{destination:{lat:number;lng:number}}>('gpx/walk.expected.json');
+  context.setFixture('location',{...destination.destination,t:context.clock.now(),accuracyM:5});
+  const masks=(await json<{candidates:Mask[]}>('masks/items/cases.json')).candidates;
+  const assets=new Map<string,Asset>();
+  async function asset(path:string):Promise<Asset> {
+    const cached=assets.get(path);if(cached)return cached;
+    const blob=await (await fetchFixture(path)).blob(),raster=await decodeWebRaster(blob);
+    const value={id:crypto.randomUUID(),file:await repository.writeBlob(blob,'fixture'),w:raster.w,h:raster.h};
+    assets.set(path,value);return value;
   }
-
-  url(path:string):string {
-    const url=new URL(path,this.base);
-    if (!url.href.startsWith(this.base.href)) throw deviceError('invalid_argument','Only verification fixture assets are allowed.',false);
-    return url.href;
+  async function itemFixture(image:string):Promise<SegmenterFixture> {
+    const input=await asset(image),choices=masks.filter(mask=>mask.image===image);
+    const decoded=await Promise.all(choices.map(async mask=>({pixels:binaryPixels(await decodeWebRaster(await(await fetchFixture(mask.mask)).blob())),score:mask.score})));
+    return {person:[],taps:choices.map((mask,index)=>({x:mask.tap[0]/input.w,y:mask.tap[1]/input.h,masks:[decoded[index],...decoded.filter((_,i)=>i!==index)].slice(0,3)}))};
   }
-
-  private ref(file:string):string {
-    if (this.owned.has(file)) return file;
-    return this.url(file);
+  for(const image of new Set(masks.map(mask=>mask.image))){const input=await asset(image);context.setFixture(`Segmenter.asset:${input.id}`,await itemFixture(image));}
+  const captures:Asset[]=[];
+  for(const path of seed.captureManifest){
+    const input=await asset(path);captures.push(input);
+    const index=seed.captureManifest.indexOf(path);
+    if(index%2===1){
+      const source=`images/shops/shop-${Math.floor(index/2)+1}-items.png`;
+      context.setFixture(`Segmenter.asset:${input.id}`,await itemFixture(source));
+      context.setFixture(`PhotoIndex.vector:${input.id}`,seed.photos.find(photo=>photo.image===source)?.vector??seed.photos[0].vector);
+    }else context.setFixture(`PhotoIndex.vector:${input.id}`,seed.photos[0].vector);
   }
-
-  private blob(file:string):Promise<Blob> {
-    const ref=this.ref(file);
-    if (this.owned.has(ref)) return fetch(ref).then(response=>response.blob());
-    let blob=this.blobs.get(ref);
-    if (!blob) {
-      blob=fetch(ref).then(response=>{
-        if (!response.ok) throw deviceError('fixture_invalid','A verification image could not be loaded.',false);
-        return response.blob();
-      });
-      this.blobs.set(ref,blob);
-    }
-    return blob;
-  }
-
-  image(file:string):Promise<HTMLImageElement> {
-    const ref=this.ref(file);
-    let image=this.images.get(ref);
-    if (!image) {
-      image=this.blob(ref).then(async blob=>{
-        const source=URL.createObjectURL(blob); this.imageUrls.add(source);
-        const element=new Image(); element.src=source;
-        await element.decode().catch(()=>{throw deviceError('fixture_invalid','A verification image is invalid.',false);});
-        return element;
-      });
-      this.images.set(ref,image);
-    }
-    return image;
-  }
-
-  maskPixels(mask:string):Promise<MaskPixels> {
-    const ref=this.ref(mask);
-    let pixels=this.pixels.get(ref);
-    if (!pixels) {
-      pixels=this.image(ref).then(image=>{
-        const canvas=document.createElement('canvas'); canvas.width=image.naturalWidth; canvas.height=image.naturalHeight;
-        const context=canvas.getContext('2d',{willReadFrequently:true});
-        if (!context) throw deviceError('io_error','Image processing is unavailable.');
-        context.drawImage(image,0,0);
-        const rgba=context.getImageData(0,0,canvas.width,canvas.height).data;
-        const binary=new Uint8Array(canvas.width*canvas.height);
-        let left=canvas.width, top=canvas.height, right=-1, bottom=-1;
-        for (let index=0;index<binary.length;index++) {
-          if (rgba[index*4]>=128 && rgba[index*4+3]>0) {
-            binary[index]=255;
-            const x=index%canvas.width, y=Math.floor(index/canvas.width);
-            left=Math.min(left,x); top=Math.min(top,y); right=Math.max(right,x); bottom=Math.max(bottom,y);
-          }
+  context.setFixture('capture',captures);
+  context.setFixture('media.self',await asset('images/self/positive/calibration-hat.png'));
+  context.setFixture('media.wardrobe',await asset('images/wardrobe/jeans-original.png'));
+  const wav=await(await fetchFixture('audio/tone-silence.wav')).arrayBuffer();
+  const view=new DataView(wav);let samples:Int16Array|undefined;
+  for(let at=12;at+8<=view.byteLength;){const size=view.getUint32(at+4,true);if(String.fromCharCode(...new Uint8Array(wav,at,4))==='data'){samples=new Int16Array(wav.slice(at+8,at+8+size));break;}at+=8+size+(size%2);}
+  if(!samples)throw new Error('Missing PCM16 fixture samples.');context.setFixture('voice',samples);
+  // The marker prevents deleted historical records from being silently recreated on reload.
+  if(!localStorage.getItem('sf-web-fixtures-seeded')&&!(await repository.list({entity:'Trip',limit:1})).items.length){
+    for(const trip of seed.trips){
+      const shops=seed.shops.filter(shop=>shop.tripId===trip.id);
+      const first=shops[0];
+      const session=await repository.startSession({fix:{...first.spot,t:Date.parse(trip.startedAt),accuracyM:5}});
+      for(let index=0;index<shops.length;index++){
+        const source=shops[index];
+        const shop=index===0?session.shop:await repository.newShop({tripId:session.trip.id,fix:{...source.spot,t:Date.parse(source.startedAt),accuracyM:5}});
+        if(source.note)await repository.updateShop({id:shop.id,note:source.note});
+        for(const photo of seed.photos.filter(row=>row.shopId===source.id)){
+          const input=await asset(photo.image),file=await repository.writeBlob(await repository.readBlob(input.file),'fixture');
+          await repository.commitPhoto({photo:{id:photo.id,tripId:session.trip.id,shopId:shop.id,file,w:input.w,h:input.h,kind:'item',takenAt:Date.parse(photo.takenAt),location:{...photo.location,accuracyM:5},indexState:'pending'}});
+          await repository.commitEmbedding({embedding:{photoId:photo.id,model:'pe-core-t16-image',dim:512,vector:photo.vector}});
         }
-        if (right<left) throw deviceError('inference_failed','The fixture mask is empty.');
-        return {w:canvas.width,h:canvas.height,binary,bbox:[left,top,right-left+1,bottom-top+1] as BBox};
-      });
-      this.pixels.set(ref,pixels);
+      }
+      await repository.stopSession({tripId:session.trip.id,endedAt:Date.parse(trip.endedAt)});
     }
-    return pixels;
+    localStorage.setItem('sf-web-fixtures-seeded','1');
   }
-
-  forImage(image:string):FixtureMask[] {return this.masks.filter(mask=>mask.image===image);}
-  findMask(file:string):FixtureMask|undefined {return this.masks.find(mask=>this.url(mask.mask)===file);}
-
-  async candidate(photoId:string,source:Candidate['source'],mask:FixtureMask,label:string):Promise<Candidate> {
-    const {binary,bbox}=await this.maskPixels(mask.mask);
-    const prefix=new TextEncoder().encode(photoId+source);
-    const input=new Uint8Array(prefix.length+binary.length); input.set(prefix); input.set(binary,prefix.length);
-    const digest=new Uint8Array(await crypto.subtle.digest('SHA-256',input));
-    const id=[...digest].map(value=>value.toString(16).padStart(2,'0')).join('');
-    return {id,photoId,source,label,score:mask.score,mask:this.url(mask.mask),bbox:[...bbox]};
+  for(const photo of seed.photos){if(await repository.getPhoto({id:photo.id}))context.setFixture(`Segmenter.asset:${photo.id}`,await itemFixture(photo.image));}
+  const calls=new Map<string,number>();
+  async function resolveFixture(value:unknown,request:unknown):Promise<unknown>{
+    if(typeof value==='string'&&value.startsWith('{{')&&value.endsWith('}}')){
+      let current:unknown=request;
+      for(const part of value.slice(2,-2).replaceAll('[','.').replaceAll(']','').split('.')){if(current===null||typeof current!=='object')throw new Error('Unresolved fixture token.');current=(current as Record<string,unknown>)[part];}
+      if(current===undefined)throw new Error('Unresolved fixture token.');return current;
+    }
+    if(Array.isArray(value))return Promise.all(value.map(item=>resolveFixture(item,request)));
+    if(value&&typeof value==='object'){
+      if('asset' in value&&typeof value.asset==='string'){
+        const bytes=new Uint8Array(await(await fetchFixture(`relay/normal/${value.asset}`)).arrayBuffer());
+        let binary='';for(const byte of bytes)binary+=String.fromCharCode(byte);return btoa(binary);
+      }
+      return Object.fromEntries(await Promise.all(Object.entries(value).map(async([key,item])=>[key,await resolveFixture(item,request)])));
+    }
+    return value;
   }
-
-  async segMask(mask:FixtureMask):Promise<SegMask> {
-    return {mask:this.url(mask.mask),bbox:[...(await this.maskPixels(mask.mask)).bbox],score:mask.score};
-  }
-
-  async wardrobe(kind:'jeans'|'shoes'):Promise<FixtureMask> {
-    const mask=`masks/items/${kind}-draft.png`;
-    return {image:`images/wardrobe/${kind}-original.png`,mask,cutout:`images/wardrobe/${kind}-cutout.png`,bbox:(await this.maskPixels(mask)).bbox,score:1};
-  }
-
-  async cutout(mask:FixtureMask):Promise<string> {
-    const image=await this.image(mask.cutout);
-    const {bbox:[x,y,w,h]}=await this.maskPixels(mask.mask);
-    const canvas=new OffscreenCanvas(w,h);
-    const context=canvas.getContext('2d');
-    if (!context) throw deviceError('io_error','Image processing is unavailable.');
-    context.drawImage(image,x,y,w,h,0,0,w,h);
-    const blob=await canvas.convertToBlob({type:'image/png'});
-    return this.makeFile(blob);
-  }
-
-  private makeFile(blob:Blob):string {const file=URL.createObjectURL(blob);this.owned.add(file);return file;}
-  async copyFile(file:string):Promise<string> {return this.makeFile(await this.blob(file));}
-  release(file:string):void {if(this.owned.delete(file)){URL.revokeObjectURL(file);this.images.delete(file);}}
-  releaseOwned():void {for(const file of [...this.owned])this.release(file);}
-  stop():void {this.releaseOwned();for(const file of this.imageUrls)URL.revokeObjectURL(file);this.imageUrls.clear();this.images.clear();this.blobs.clear();this.pixels.clear();}
+  const removeTransport=installWebMockTransport(async(input,init)=>{
+    init?.signal?.throwIfAborted();
+    const endpoint=new URL(input instanceof Request?input.url:String(input)).pathname.split('/').at(-1)!;
+    const request=JSON.parse(String(init?.body));
+    if(endpoint==='search-turn'&&!request.queryToken)calls.set(endpoint,0);
+    const count=(calls.get(endpoint)??0)+1;calls.set(endpoint,count);
+    const sequence=endpoint==='search-turn'?count:1;
+    const fixture=await json<{status:number;body:unknown}>(`relay/normal/${endpoint}.${String(sequence).padStart(2,'0')}.response.json`);
+    const body=await resolveFixture(fixture.body,request);init?.signal?.throwIfAborted();
+    return Response.json(body,{status:fixture.status,headers:{'X-Query-Token':'explicit-web-fixture-query'}});
+  });
+  return removeTransport;
 }

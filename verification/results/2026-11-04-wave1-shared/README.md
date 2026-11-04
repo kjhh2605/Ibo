@@ -36,3 +36,16 @@
 - `VITE_SF_RUNTIME=web-mock npm run dev -- --host 127.0.0.1 --port 5191`로 실제 Vite를 실행하고 Chromium에서 해당 모듈을 로드했다. 실제 IndexedDB에 저장한 provider 바이트 왕복 동일성, discard 후 읽기 실패, owner 없는 candidate 거부, 삭제된 owner 거부를 확인했다.
 - 실제 2×2 PNG를 저장한 Photo의 mask owner로 등록한 뒤 mask 바이트 동일성, Photo 삭제의 mask 삭제 연쇄, 삭제 후 늦게 호출된 discard의 안전성을 확인했다. 임시 Photo/Trip 및 브라우저 탭은 정리했다.
 - 이 추가 확인은 MacBook web 저장소 범위다. native URI 검사·실기기 파일 소유권·M1 기기 검증을 대신하지 않는다.
+
+## 두 Mac 재개: 공유 runtime 연결 (MacBook, 2026-11-04)
+
+- ES2023 baseline을 유지하며 기존 deferred helper를 공통 위치로 옮겼다. Node 기반 검사 타입과 native Store nullable envelope 검사를 복구했다.
+- 설명 큐의 전송 전 영구 이미지 오류를 실제 브라우저에서 재현했다: 수정 전 image 1회/HTTP 0회 뒤 약 5초 재시도·attempts 0·pending 유지. 수정 후 같은 경로에서 job 0·외관 failed·HTTP 0회·재시도 0회였다. 인증 실패는 별도로 pending/attempts 0을 유지하고 강제 갱신 후 보내며, 마지막 빈 snapshot과 enqueue의 경합도 회귀 검사한다.
+- `MediaWeb.pick` 성공 후 `file_not_owned`가 발생하던 경로를 실제 브라우저에서 재현하고 촬영/가져오기 소유권 승격 뒤 임시 정리를 막았다. 종료된 trip의 외관 촬영에서 현재 위치 저장, active session/trail 불변, kind=item·위치 거부·삭제된 대상 차단을 검사했다.
+- 실제 Chromium에서 native/web camera fixture surface를 렌더하고 screenshot으로 확인했다. 16×16 합성 검사용 PNG가 지정 viewport에 보이며 close 후 DOM surface 0개였다. 이는 카메라 하드웨어/실제 ML/제품 화면 합격 증거가 아니다.
+- 명시 browser fixture bootstrap은 `installWebMockTransport`로 기존 relay singleton에도 적용되며 Android에서는 금지한다. `VITE_SF_RELAY_MODE=mock` + `VITE_SF_FIXTURE=normal`의 실제 요청 선택과 uninstall 뒤 `unauthenticated`를 확인했다. native mock relay는 실제 Firebase 인증을 유지한다. live 빌드의 fixture 선택은 거부한다.
+- provider 파일의 실제 SHA256에 연결된 명시 `Segmenter.provider:<sha256>` fixture를 새 fileRef로 전달한다. 브라우저에서 바이트 동일성과 실제 web Segmenter.prepare/person의 세 mask 소비를 확인했다. 합성 fixture만 사용했으며 모델 추론·사람 GT 승인으로 간주하지 않는다.
+- 실행: `npx vitest run src/data/queue.test.ts src/native/photoIndex.test.ts src/relay` → 4개 파일 58개 통과. `npx vitest run src/native/capture.test.ts` → 3개 통과. 이후 `tsc -b`에서 발견한 작성 중 UI bootstrap의 updateShopNote 오호출은 UI owner에게 전달했고 수정 보고를 받았다. 최종 app build/M1 검증은 별도 기록한다.
+- 후속 동결 checkpoint: `npm run lint && npm run build && npx astryx doctor --built dist` 모두 exit 0. lint 25개 경고, theme-fonts 및 bundle 크기 경고는 남는다. `npx vitest run`은 218개 통과/1개 실패: 기존 `faceMask.test.ts`가 nonbinary RGB 입력의 오류를 undefined로 기대한다. 이 checkpoint는 M1 cap sync/컴파일 선행본이며 전체 제품 합격이 아니다.
+- UI owner가 확인한 남은 web smoke 차단점: `/v1/search/turn` fixture 경로와 queryToken 연결, 구형 browser scenario 교체, 실제 person-mask fixture. 최종 검색/피팅 성공을 주장하지 않는다.
+- M1 coordinator 보고: 고정 core commit의 pytest 72개 및 `tests/core/http_smoke.py` 실제 TCP 22개 응답 합격. 모두 no-store, mock-provider 7회, 외부 요청·파일 쓰기 0회, 로그 sentinel 없음. S02/S03 live 모델 검증은 별도다.

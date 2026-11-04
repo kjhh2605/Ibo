@@ -19,7 +19,11 @@ export const Store = new Proxy(transport, {
     const method = Reflect.get(target, key);
     return async (...args: unknown[]) => {
       const result = await Reflect.apply(method, target, args);
-      return Capacitor.isNativePlatform() && nullable[String(key)] ? result.value : result;
+      if (!Capacitor.isNativePlatform() || !nullable[String(key)]) return result;
+      if (!result || typeof result !== 'object' || !('value' in result)) {
+        throw {code: 'io_error', message: 'The device operation could not be completed.', retryable: false};
+      }
+      return result.value;
     };
   },
 }) as unknown as StoreContract;

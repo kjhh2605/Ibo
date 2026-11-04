@@ -64,7 +64,7 @@ export class MockMap extends EventSource<{ready: Record<string, never>; error: {
     this.svg.setAttribute('width', '100%');
     this.svg.setAttribute('height', '100%');
     this.svg.setAttribute('role', 'img');
-    this.svg.setAttribute('aria-label', 'Walking route fixture');
+    this.svg.setAttribute('aria-label', 'Walking route');
     element.append(this.svg);
     this.emit('ready', {});
   }

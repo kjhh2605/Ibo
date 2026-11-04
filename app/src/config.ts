@@ -25,7 +25,14 @@ export function runtimeConfig(env: Record<string, string | boolean | undefined> 
   }
   const runtime: Runtime = native ? 'native' : env.VITE_SF_RUNTIME === 'web-mock' ? 'web-mock' : 'web';
   const relayBaseUrl = String(env.VITE_SF_RELAY_URL || (native ? 'http://10.0.2.2:8787' : 'http://127.0.0.1:8787'));
-  return {runtime, relayBaseUrl: validateRelayOrigin(relayBaseUrl), resultDownload: false as const};
+  const relayMode = env.VITE_SF_RELAY_MODE ?? 'live';
+  if (relayMode !== 'mock' && relayMode !== 'live') throw new Error('Invalid relay mode.');
+  const fixture = env.VITE_SF_FIXTURE;
+  if (fixture !== undefined && (relayMode !== 'mock' || typeof fixture !== 'string' || !/^[a-z][a-z0-9-]{0,63}$/.test(fixture))) {
+    throw new Error('Fixture selection requires an explicit mock relay.');
+  }
+  const relayFixture = relayMode === 'mock' ? String(fixture ?? 'normal') : undefined;
+  return {runtime, relayMode, relayFixture, relayBaseUrl: validateRelayOrigin(relayBaseUrl), resultDownload: false as const};
 }
 
 export const config = runtimeConfig();

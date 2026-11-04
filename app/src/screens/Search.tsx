@@ -3,7 +3,8 @@ import type {KeyboardEvent, PointerEvent} from 'react';
 import type {Asset, Candidate, Photo, SegMask, Shop, Trip} from '../native/contracts';
 import type {Route} from '../ui/navigation';
 import type {AgentState} from '../ui/services';
-import {fileUrl} from '../ui/services';
+import {candidateId} from '../data';
+import {imageUrl} from '../ui/images';
 import {useData, useUi} from '../ui/state';
 import {Action, Button, Confirm, Empty, Heading, HStack, Loading, Problem, Section, Text, TextInput, VStack} from '../ui/components';
 
@@ -48,21 +49,12 @@ function errorMessage(code: string): string {
   }
 }
 
-// S06 owns this contract helper after integration; hash decoded pixels, never PNG encoding or a tap index.
-export async function candidateId(photoId: string, source: Candidate['source'], binaryPixels: Uint8Array): Promise<string> {
-  const prefix = new TextEncoder().encode(photoId + source);
-  const input = new Uint8Array(prefix.length + binaryPixels.length);
-  input.set(prefix);
-  input.set(binaryPixels, prefix.length);
-  const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', input));
-  return Array.from(digest, byte => byte.toString(16).padStart(2, '0')).join('');
-}
 
 async function readImage(file: string): Promise<HTMLImageElement> {
   const image = new Image();
-  image.src = fileUrl(file);
-  await image.decode();
-  return image;
+  const source = await imageUrl(file);
+  try {image.src = source.url; await image.decode(); return image;}
+  finally {source.release();}
 }
 
 async function readMask(file: string, asset: Asset): Promise<DecodedMask> {
@@ -418,7 +410,7 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [prepareAttempt, setPrepareAttempt] = useState(0);
   const cache = useMemo(() => photoCache(asset), [asset]);
-  const lifecycle = useRef<{live: boolean; handle: string | null; sequence: number; tap: Promise<void> | null; save: Promise<void> | null; release: (() => Promise<void>) | null; files: Set<string>}>({live: false, handle: null, sequence: 0, tap: null, save: null, release: null, files: new Set()});
+  const lifecycle = useRef<{live: boolean; handle: string | null; sequence: number; tap: Promise<void> | null; save: Promise<void> | null; release: (() => Promise<void>) | null; files: Set<string>; cancellation: AbortController}>({live: false, handle: null, sequence: 0, tap: null, save: null, release: null, files: new Set(), cancellation: new AbortController()});
   const fittingSubscribe = useCallback((listener: () => void) => services.fitting.subscribe(listener), [services]);
   const fittingSnapshot = useCallback(() => services.fitting.getSnapshot(), [services]);
   const fitting = useSyncExternalStore(fittingSubscribe, fittingSnapshot, fittingSnapshot);
@@ -434,10 +426,11 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
   }, [cache, services]);
 
   useEffect(() => {
-    const current = {live: true, handle: null as string | null, sequence: 0, tap: null as Promise<void> | null, save: null as Promise<void> | null, release: null as (() => Promise<void>) | null, files: new Set<string>()};
+    const current = {live: true, handle: null as string | null, sequence: 0, tap: null as Promise<void> | null, save: null as Promise<void> | null, release: null as (() => Promise<void>) | null, files: new Set<string>(), cancellation: new AbortController()};
     lifecycle.current = current;
     return () => {
       current.live = false;
+      current.cancellation.abort();
       current.sequence++;
       void (async () => {
         await current.release?.();
@@ -543,7 +536,7 @@ function PickPhoto({route, source}: {route: PickRoute; source: PickSource}) {
     const task = (async () => {
       try {
         if (route.mode === 'outfit') {
-          await services.fitting.addTripCandidate(candidate);
+          await services.fitting.addTripCandidate(candidate, current.cancellation.signal);
           if (current.live) {say('Saved and added to your outfit'); popTo('outfit');}
         } else {
           const piece = await services.store.saveCandidate({candidate, origin: route.mode === 'wardrobe' ? 'wardrobe' : 'shop', labelMode: route.mode !== 'wardrobe' && route.concept ? 'concept' : 'describe'});

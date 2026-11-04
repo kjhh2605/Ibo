@@ -1,4 +1,4 @@
-import type {DeviceError, Permission} from '../contracts';
+import type {Asset, DeviceError, Permission} from '../contracts';
 
 export type MockClock = {now(): number; advance(ms: number): void};
 export type MockOptions = {
@@ -38,6 +38,14 @@ export function createMockContext(options: MockOptions = {}) {
   };
 }
 export type MockContext = ReturnType<typeof createMockContext>;
+
+/** Keep explicit fixture inference attached when capture/import assigns durable asset identity. */
+export function copyAssetFixtures(context: MockContext, source: Asset, asset: Asset): void {
+  for (const prefix of ['Segmenter.asset', 'PhotoIndex.vector']) {
+    const fixture = context.fixture<unknown>(`${prefix}:${source.id}`) ?? context.fixture<unknown>(`${prefix}:${source.file}`);
+    if (fixture !== undefined) context.setFixture(`${prefix}:${asset.id}`, fixture);
+  }
+}
 let defaultContext: MockContext | undefined;
 export function getMockContext(): MockContext { return defaultContext ??= createMockContext(); }
 export function setMockContext(context: MockContext): void { defaultContext = context; }

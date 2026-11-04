@@ -1,4 +1,4 @@
-/** ES2022 is the app's runtime/type baseline; Promise.withResolvers requires ES2024. */
+/** Keep deferred promises compatible with the app's ES2023 runtime baseline. */
 export function deferred<T>() {
   let resolve!: (value: T | PromiseLike<T>) => void;
   let reject!: (reason?: unknown) => void;

@@ -23,6 +23,12 @@ describe('home-rooted navigation',()=>{
     expect(deepLink(capture,'streetfitting://home',true)).toEqual(home);
     expect(deepLink(home,'streetfitting://walk',true)).toBe(home);
   });
+  it('replaces a different camera purpose instead of reusing its target or adding a second camera',()=>{
+    const stack:Route[]=[{name:'home'},{name:'trip',tripId:'old'},{name:'capture',purpose:'storefront',shopId:'old-shop'}];
+    const recording=deepLink(stack,'streetfitting://capture',true);
+    expect(recording).toEqual([...stack.slice(0,-1),{name:'capture'}]);
+    expect(pushRoute(stack,{name:'capture',purpose:'storefront',shopId:'next-shop'})).toEqual([...stack.slice(0,-1),{name:'capture',purpose:'storefront',shopId:'next-shop'}]);
+  });
   it('prunes deleted source routes and their descendants but keeps result snapshots',()=>{
     const stack:Route[]=[{name:'home'},{name:'trips'},{name:'trip',tripId:'trip-1'},{name:'pick',photoId:'photo-1',mode:'shop'},{name:'item',pieceId:'piece-1'}];
     expect(pruneDeleted(stack,'Trip','trip-1')).toEqual(stack.slice(0,2));

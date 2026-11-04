@@ -3,7 +3,7 @@ import {Heading, Section, Text, VStack} from '../ui/components';
 
 const localOnly = [
   ['Your original self photo, face and hair', 'One self photo is kept in app-private storage. Its original and face-and-hair mask are used only on this phone. Registration must safely remove face and hair before a copy can be used for try-on; an unsuccessful mask never falls back to sending the original.'],
-  ['Your location trail', 'Recorded only while shopping. The raw trail is deleted when you end the trip and is never uploaded. Saved photo locations remain for walking back. Walking guidance does not create a shopping trail.'],
+  ['Your location trail', 'Recorded only while shopping. The raw trail is deleted when you end the trip and is never uploaded. Saved photo locations remain for walking back. Retaking a saved shop’s storefront uses your current location once when you take the photo, even outside shopping mode; it does not start a trail. Walking guidance does not create a shopping trail.'],
   ['Photo embeddings', 'The photo search index is processed and stored on this phone. Photo vectors are not uploaded. A text vector comes back from the relay and is compared with the local index.'],
   ['Your wardrobe originals', 'Wardrobe photos are cut out on this phone. The whole wardrobe photo is not sent; only a garment cut-out can leave for the purposes below.'],
   ['Your face-restored looks', 'Any face restoration happens on this phone. The finished look is not uploaded again. If the automatic neck and shoulder checks do not pass, the look is saved without your face.'],

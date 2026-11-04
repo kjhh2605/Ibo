@@ -288,7 +288,7 @@ Muse Image Responses에 `store:false`, 도구 없음, `safety_identifier`, 출�
 |---|---|---|
 | `image` | `{mimeType:"image/jpeg"|"image/png",data:base64,width:int,height:int}`. 생성 이미지 정확히 1장. 최대 디코딩 32 MiB, 가로·세로 각 8192 이하, 총 33,554,432픽셀 이하 | D-R4-07; `[추론·기술 결정]` |
 
-provider가 준 파일 바이트를 **재인코딩·메타데이터 제거·워터마크 제거 없이** base64로 감싼다. provider가 URL만 주면 릴레이가 공식 Meta 파일 호스트 allowlist로 검증하고 메모리에 다운로드한다(사용자 URL은 받지 않음). 이미지 크기가 앱 계약 상한을 넘으면 `upstream_error`로 종료하고 임의 축소하지 않는다. 앱은 받은 바이트 그대로 `Result.providerFile`에 보존하고 별도 기기 파생본으로 얼굴 재합성/얼굴 없는 결과를 만든다. 서버는 `faceless`를 결정하지 않는다. 결과 내려받기는 보존 검증까지 기능 플래그로 꺼 둔다. 근거: D-R4-04, D-R4-10; research §6.3.
+공식 Responses API의 `image_generation_call.result` base64에서 얻은 provider 파일 바이트를 **재인코딩·메타데이터 제거·워터마크 제거 없이** 반환한다. URL-only 결과는 `upstream_error`로 거부하며 파일 URL 다운로드 요청을 하지 않는다(사용자 URL도 받지 않음). 이미지 크기가 앱 계약 상한을 넘으면 `upstream_error`로 종료하고 임의 축소하지 않는다. 앱은 받은 바이트 그대로 `Result.providerFile`에 보존하고 별도 기기 파생본으로 얼굴 재합성/얼굴 없는 결과를 만든다. 서버는 `faceless`를 결정하지 않는다. 결과 내려받기는 보존 검증까지 기능 플래그로 꺼 둔다. 근거: D-R4-04, D-R4-10, D-R11-03; [공식 출력 계약](https://dev.meta.ai/docs/image-generation#read-the-response).
 
 오류: 인증·입력·크기·Meta 오류. 6번째 companion/두 번째 selfPhoto/wardrobe target은 호출 전 `invalid_request`. Meta `content_policy_violation`은 400 false로 그대로 의미를 보존한다. 마스킹이 실패했다면 앱은 이 API를 호출하지 않는다. mock은 `tryon.01`에서 선택한 조합에 맞는 provider 원본 파일을 재생하며 입력 이미지를 합성한 척하지 않는다. 근거: D-R1-04, D-R4-07, D-R4-11.
 

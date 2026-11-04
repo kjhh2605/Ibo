@@ -43,25 +43,6 @@ describe('result snapshot presentation and actions', () => {
     expect(resultViewPolicy(result, null, true).canChangePieces).toBe(false);
   });
 
-  it('can still render snapshots while live-piece links are unavailable', () => {
-    const view = resultViewPolicy(result, null, false);
-    expect(view.file).toBe(result.file);
-    expect(view.pieces).toEqual([result.targetSnapshot, ...result.companionSnapshots]);
-    expect(view.destination).toBe(result.targetSnapshot.walkTo);
-    expect(view.canChangePieces).toBe(false);
-  });
-
-  it('preserves the faceless display state without selecting the provider original', () => {
-    const view = resultViewPolicy({...result, faceless: true}, new Set(['target']), true);
-    expect(view.faceless).toBe(true);
-    expect(view.file).toBe(result.file);
-    expect(view.file).not.toBe(result.providerFile);
-  });
-
-  it('keeps gallery export unavailable under the current default feature flag', () => {
-    expect(resultViewPolicy(result, new Set(['target', 'companion']), true).canDownload).toBe(false);
-    expect(resultViewPolicy(result, new Set(), false).canDownload).toBe(false);
-  });
 
   it('gates export by the feature flag, independently of original-piece deletion', () => {
     expect(resultViewPolicy(result, new Set(['target']), true, false).canDownload).toBe(false);

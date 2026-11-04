@@ -2,7 +2,7 @@ import {afterEach, describe, expect, it, vi} from 'vitest';
 import type {GeolocationPlugin, Position, WatchPositionCallback} from '@capacitor/geolocation';
 import {createRelayClient} from '../relay/client';
 import {ForegroundLocation} from './location';
-import {deferred} from './deferred';
+import {deferred} from '../deferred';
 import {RelayRoute} from './route';
 import {fix, position, routeFixture} from './test-fixtures';
 
