@@ -258,10 +258,10 @@ UI 배치·세부 문구의 최종 확정은 프로토타입 세션에서 한다
 | `query_started` | running / thinking | 질의 말풍선 + 진행 시작 | 유효한 텍스트 질의 제출 | D-R3-09 |
 | `voice_started` | running / listening | "Listening…" | Find it 입력창 마이크 탭 | D-R3-07, D-R7-09 |
 | `voice_stopped` | running / transcribing | "Transcribing…" | 무음 또는 15초 자동 종료 | D-R3-07 |
-| `tool_started(list_visits)` | running / reading_visits | "Read your trips" | 로컬 방문 조회 직전 | D-R3-09 |
-| `scope_narrowed` | running / narrowing | "Narrowed to Shop N" | find_photos가 단일 shopRef로 좁혀졌을 때. 내부 payload에 tripRef/shopRef/n | D-R3-03, D-R3-09 |
-| `tool_started(find_photos)` | running / searching_photos | "Searched its photos" | 기기 색인 검색 직전 | D-R3-09 |
-| `tool_started(extract_items)` | running / outlining_items | "Outlined the items" | segment 요청 직전 | D-R3-09 |
+| `tool_started(list_visits)` | running / reading_visits | "Checking your trips…" (단계 목록 "Check your trips") | 로컬 방문 조회 직전 | D-R3-09 |
+| `scope_narrowed` | running / narrowing | "Narrowing the search…" (단계 목록 "Focus on Shop N") | find_photos가 단일 shopRef로 좁혀졌을 때. 내부 payload에 tripRef/shopRef/n | D-R3-03, D-R3-09 |
+| `tool_started(find_photos)` | running / searching_photos | "Searching photos…" (단계 목록 "Search photos") | 기기 색인 검색 직전 | D-R3-09 |
+| `tool_started(extract_items)` | running / outlining_items | "Outlining items…" (단계 목록 "Outline items") | segment 요청 직전 | D-R3-09 |
 | `tool_completed` | running / thinking | 해당 단계 완료 표시 | 도구 결과 검증·캐시 반영 후 | D-R3-09 |
 | `query_completed` | results | final.summary 한 줄로 진행을 접음. 탭하면 단계 이력 재확장 | 유효한 final 수신 | D-R3-09 |
 | `query_not_found` | not_found | reason 한 줄 + 다시 묻기/기록 탐색. 이력 재확장 가능 | not_found 또는 아래 예산 종료 | D-R3-06, D-R3-09 |

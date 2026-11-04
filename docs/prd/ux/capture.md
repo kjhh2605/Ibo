@@ -31,23 +31,23 @@
 1. "Start shopping"을 처음 누르면 중앙의 시스템 카드가 뜨고 뒤가 어두워진다. 앱 바텀 시트가 아니다.
 2. 위치 제목은 "Allow Street Fitting to access this device's location?"다. 세로 선택지는 "While using the app", "Only this time", "Don't allow"다.
 3. 위치를 허용하면 알림 제목 "Allow Street Fitting to send you notifications?"와 "Allow" / "Don't allow"를 보여 준다.
-4. 위치를 거부하면 앱 시트 "Shopping mode needs your location"을 띄운다. 본문은 "It's how each shop gets pinned so you can walk back to it. Shopping mode can't start without it."이고, 버튼은 "Not now" / "Open settings"다. 쇼핑은 시작하지 않는다.
+4. 위치를 거부하면 앱 시트 "Shopping mode needs your location"을 띄운다. 본문은 "Ibo pins each shop so you can walk back to it later. Shopping mode needs location to start."이고, 버튼은 "Not now" / "Open settings"다. 쇼핑은 시작하지 않는다.
 5. 다음 시작 시 위치를 다시 묻는다. 한 번 허용한 위치는 세션이 끝날 때까지 다시 묻지 않는다. 알림 선택도 세션 store에 남는다.
 
 | 위치 | 알림 | 쇼핑 모드 / 알림 카드 / 토스트 |
 | --- | --- | --- |
 | 거부 | 묻지 않음 | 시작하지 않음. 위치 설명 시트만 표시 |
 | 허용 | 허용 | 시작함. 알림 카드 표시. "Shopping mode on · recording your location" |
-| 허용 | 거부 | 시작함. 알림 카드 없음. "Shopping mode on · no notification card" |
+| 허용 | 거부 | 시작함. 알림 카드 없음. "Shopping mode is on. Allow notifications to see it in your status bar." |
 
 실제 앱의 오류 분기는 다음과 같다. 이는 S08 구현 문구 기록이며 새 배치·문구의 인간 화면 세션 승인을 뜻하지 않는다.
 
 | native code | 실제 화면·재시도 |
 | --- | --- |
 | `location_permission_denied`, `location_disabled` | 위 "Shopping mode needs your location" 시트. "Not now" / "Open settings"; trip을 만들지 않음 |
-| `location_unavailable` | "Your location is unavailable". "A current location fix is needed before shopping can start. Move somewhere with a clearer signal, then try again. No trip has been started."와 "OK". 닫고 "Start shopping"으로 다시 시도; 일시적 fix 부재를 권한 거부로 바꾸거나 설정 변경을 요구하지 않음 |
+| `location_unavailable` | "Your location is unavailable". "Ibo couldn’t find where you are. Move somewhere with a clearer signal and try again."와 "OK". 닫고 "Start shopping"으로 다시 시도; 일시적 fix 부재를 권한 거부로 바꾸거나 설정 변경을 요구하지 않음 |
 
-실제 앱의 종료 확인은 "End shopping mode?", "Your photos and saved locations stay on this device. The raw location trail will be deleted.", "End shopping" / "Cancel"이다. 성공한 `ShoppingSession.stop()` 뒤 Home으로 돌아가며 실패를 종료 성공으로 처리하지 않는다. 위 R2 표는 프로토타입 문구 기록이다.
+실제 앱의 종료 확인은 "End shopping mode?", "Your photos and shop locations stay on this phone. Your route history will be deleted.", "End shopping" / "Cancel"이다. 성공한 `ShoppingSession.stop()` 뒤 Home으로 돌아가며 실패를 종료 성공으로 처리하지 않는다. 위 R2 표는 프로토타입 문구 기록이다.
 
 ### 기록 중 알림
 
@@ -85,7 +85,7 @@
 ### 실제 앱의 카메라 오류
 
 - `camera_permission_denied`: "Camera access is off. Allow access in device settings, then try again."
-- 그 밖의 preview 실패(`preview_not_open`, `fixture_empty`, `fixture_invalid` 포함): "The camera preview could not start. Try again or return to your saved photos." 권한 거부로 오인해 설정 변경을 요구하지 않는다.
+- 그 밖의 preview 실패(`preview_not_open`, `fixture_empty`, `fixture_invalid` 포함): "The camera couldn’t start. Try again, or go back to your saved photos." 권한 거부로 오인해 설정 변경을 요구하지 않는다.
 - 공통 액션은 "Try again". preview 준비 전/실패 중 셔터는 비활성이다. 실패한 촬영·파일 저장을 Photo 성공으로 세지 않고, 화면을 나가면 preview를 닫는다.
 - 문구는 실제 구현 기록이며 인간 화면 세션 승인은 미확인이다.
 - 실제 Camera는 화면 높이 안에서 preview 영역과 하단 촬영 controls를 나눈다. 새 가게 배너는 preview 위에 있고, 작은 화면/오프라인 배너에서 본문이 길어져도 셔터는 하단에 남는다. "End shopping"은 상태 행, 마지막 사진·셔터·"New shop"은 하단에 둔다. native preview 좌표와 WebView가 어긋나지 않도록 Camera 진입에는 본문 이동 애니메이션을 적용하지 않는다.
@@ -110,10 +110,10 @@
 ### 기존 가게 외관 추가·재촬영(D-R11-01)
 
 - Trip의 "Add storefront photo" / "Retake storefront"에서 해당 `shopId`의 Camera를 연다. 쇼핑이 종료된 과거 trip도 허용한다. 별도 Visit route는 만들지 않는다.
-- 안내는 "Fit the whole shop front in the frame. Taking this photo uses your current location once; it does not start a shopping trail."이고 "Capture storefront" / "Cancel"을 제공한다. 성공하면 "Storefront saved" 후 원래 Trip으로 복귀한다.
+- 안내는 "Fit the whole shop front in the frame. Your current location is saved with this photo."이고 "Capture storefront" / "Cancel"을 제공한다. 성공하면 "Storefront saved" 후 원래 Trip으로 복귀한다.
 - shutter 시점의 현재 위치를 한 번 취득한다. 위치 권한/현재 fix가 없으면 촬영 저장을 실패시키며 `Shop.spot`이나 과거 위치로 대체하지 않는다. trip·shopping trail·FGS를 새로 시작하지 않고 기존 `Shop.spot`도 바꾸지 않는다.
 - 실제 호출은 `Capture.openPreview({purpose:'storefront',shopId,facing:'back'})` → `takePhoto({kind:'storefront'})`다. 새 외관 Photo ID를 `describe_storefront` queue의 `refId`로 사용한다. 실패 상태의 "Retry description"도 같은 Photo ID로 재시도한다.
-- 기존 외관의 "Delete storefront photo" 확인은 "The storefront and its description will be removed. Saved look snapshots stay."다. 삭제는 기존 Result의 독립 snapshot을 변경하지 않는다.
+- 기존 외관의 "Delete storefront photo" 확인은 "The storefront photo and its description will be removed. Looks you’ve saved keep their copy."다. 삭제는 기존 Result의 독립 snapshot을 변경하지 않는다.
 - D-R11-01의 위치 계약은 확정이며 새 영어 문구·배치의 인간 화면 세션 승인은 미확인이다.
 
 ## F-04 외관 사진 자동 묘사
@@ -148,7 +148,7 @@
 
 - 홈은 최근 trip 하나와 "All trips"를 유지한다. 가게별 외관·시각·설명/상태·사진 수·사진 목록을 Trip에 통합한다. 홈 가게 선택 시 Trip 해당 위치로 스크롤하는 상세 배치는 **프로토타입 세션에서 확정**한다(D-R3-10, D-R9-04).
 - "Note", 메모가 있을 때의 "Edit", 없을 때의 "Add note", "Photos", 외관 없는 경우 "No storefront photo"는 유지한다. 큰 외관과 묘사·메모 편집·사진을 Trip 안에서 어떻게 배치할지는 **프로토타입 세션에서 확정**한다(D-R1-03, D-R9-04).
-- 기록 중 "Your location trail is recorded while shopping mode is on."은 유지한다. 종료 후 원본 trail 삭제와 가게·사진 위치 보존 설명, 빈 상태·삭제 확인·완료 후 복귀의 새 문구는 **프로토타입 세션에서 확정**한다(D-R0-03, D-R3-03, D-R3-11).
+- 기록 중 "Your route is recorded while shopping mode is on."은 유지한다. 종료 후 원본 trail 삭제와 가게·사진 위치 보존 설명, 빈 상태·삭제 확인·완료 후 복귀의 새 문구는 **프로토타입 세션에서 확정**한다(D-R0-03, D-R3-03, D-R3-11).
 - **프로토타입 초안:** "All trips"는 날짜별로 시간 범위·가게/사진 수와 "Recording" 배지를 표시하며 빈 상태는 "No trips yet…"다. Trip의 "Delete trip" → "Delete this trip?" 확인 → "Trip deleted · saved pieces kept" 토스트를 제공한다. 배치·문구는 **프로토타입 화면 세션에서 확정**한다(D-R3-03, D-R3-10, D-R3-11).
 
 ### 실제 구현
