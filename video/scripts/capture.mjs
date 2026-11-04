@@ -46,6 +46,12 @@ async function tap(name, locator, label) {
   await locator.click();
 }
 const click = (name, label) => tap(name, button(name), label);
+async function rename(name, cat) {
+  await click('Rename'); await page.waitForTimeout(500);
+  const d = page.locator('dialog[open]');
+  await d.getByRole('textbox', {name: 'Name'}).fill(name); await d.getByRole('textbox', {name: 'Category'}).fill(cat);
+  await d.getByRole('button', {name: 'Save', exact: true}).click(); await page.waitForTimeout(4500);
+}
 const confirm = async (name) => { await page.locator('dialog[open]').getByRole('button', {name, exact: true}).click(); };
 const routeIs = (n) => expect.poll(async () => (await inspect()).route, {timeout: 20000}).toBe(n);
 
@@ -79,7 +85,8 @@ try {
   await page.mouse.wheel(0, 600); await still('06b-pick-scrolled', 600);
   const showAll = page.getByRole('button', {name: /^Show all/}).first();
   if (await showAll.count()) { await tap('Show all', showAll); await still('06c-pick-all', 700); }
-  await click('Use this item'); await routeIs('item');
+  await click('Use this item'); await routeIs('item'); await page.waitForTimeout(800);
+  await rename('Blue work jacket', 'jacket'); await page.mouse.wheel(0, -2000);
   await still('07-item', 900);
   await page.mouse.wheel(0, 500); await still('07b-item-scrolled', 600);
   await page.mouse.wheel(0, -2000);

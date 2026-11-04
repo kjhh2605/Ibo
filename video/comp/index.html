@@ -522,7 +522,7 @@ show('d07b-item-scrolled', 87.3, 'scroll');
 }
 
 // ===== S9 TRY ON (90–124) =====
-tap(90.2, 0.269, 0.5262 + 0.39 * 0); // Try it on (top of item)
+tap(90.2, 0.269, 0.8197); // Try it on
 show('c11-outfit-empty', 90.5, 'push');
 tap(92.4, 0.5, 0.8695); show('c11b-companion-sheet', 92.7, 'sheet');
 tap(94.4, 0.668, 0.6914); show('c11c-companion-added', 94.6, 'fade'); cue(94.65, 'tick', 0.5);
@@ -535,7 +535,7 @@ seq('c12-self-mask', sm, 100.95, 101.9, [0, 1, 2]);
 show('c12b-outfit-ready', 101.9, 'fade');
 zoom(102.6, 0.5, 0.36, 1.25, 1.4); unzoom(106.0, 0.9);
 show('c12d-outfit-ready-bottom', 107.0, 'scroll');
-tap(108.1, 0.5, 0.8709);
+tap(108.1, 0.5, 0.7967);
 const gf = window.BURSTS['c13-generate'];
 seq('c13-generate', gf, 108.35, 112.8, [0, 1, 2, 3]);
 show('c13-result', 112.8, 'push'); cue(112.85, 'success', 0.9);
@@ -543,10 +543,10 @@ const mb = el('div', 'mockbadge', $('#screen')); mb.style.left = '24px'; mb.styl
 tl.to(mb, {opacity: 1, duration: 0.4}, 113.3); tl.to(mb, {opacity: 0, duration: 0.4}, 118.6);
 show('c13b-result-scrolled', 119.0, 'scroll');
 zoom(119.6, 0.5, 0.33, 1.3, 1.2); unzoom(122.4, 0.8);
-tap(123.4, 0.73, 0.073);
+tap(123.4, 0.731, 0.1388);
 {
   const p = panel(90.4, 99.0, '04 · TRY IT ON', 'Mix it with what you own.', 'One shop piece, plus up to 5 more: your wardrobe, other stalls, any trip photo.');
-  const srcs = [['assets/jeans-cutout.png', 'Your wardrobe'], ['assets/jacket-cutout.png', 'Saved from other stalls'], ['assets/storefront.png', 'Any trip photo']];
+  const srcs = [['assets/jeans-cutout.png', 'Your wardrobe'], ['assets/shirt-cutout.png', 'Saved from other stalls'], ['assets/storefront.png', 'Any trip photo']];
   srcs.forEach(([s, l], i) => { const c = el('div', 'card', p); Object.assign(c.style, {left: (i * 280) + 'px', top: '420px', width: '250px', height: '300px'});
     c.innerHTML = `<img src="${s}" style="width:250px;height:220px;object-fit:${i === 2 ? 'cover' : 'contain'};background:#FAF6EF"><div style="padding:16px 18px;font-size:22px;font-weight:600">${l}</div>`;
     pop(c, 91.6 + i * 0.25, {from: 0.8, y: 30}); });
@@ -566,7 +566,7 @@ tap(123.4, 0.73, 0.073);
   const c2 = el('div', 'card', p); Object.assign(c2.style, {left: '230px', top: '450px', width: '200px', height: '300px'});
   c2.innerHTML = `<img src="assets/self-masked.png" style="width:200px;height:300px;object-fit:cover">`;
   slideIn(c2, 101.4, {x: -120});
-  chip(p, 101.6, 'dev', 'Head mask', 'EdgeTAM-based, on the device', 0, 790).style.minWidth = '440px';
+  chip(p, 101.6, 'dev', 'Head mask', 'EdgeTAM-based, on device', 0, 790).style.minWidth = '0px';
   // garments + masked self fly across boundary
   const g1 = el('div', 'card', p); Object.assign(g1.style, {left: '520px', top: '450px', width: '140px', height: '140px'}); g1.innerHTML = '<img src="assets/jacket-cutout.png" style="width:140px;height:140px;object-fit:contain">';
   const g2 = el('div', 'card', p); Object.assign(g2.style, {left: '680px', top: '450px', width: '140px', height: '140px'}); g2.innerHTML = '<img src="assets/jeans-cutout.png" style="width:140px;height:140px;object-fit:contain">';
