@@ -1,0 +1,151 @@
+1
+00:00:06,000 --> 00:00:09,441
+This is Dongmyo, in Seoul. Hundreds of street stalls.
+
+2
+00:00:09,441 --> 00:00:13,142
+No signs, no addresses, and every piece is one of a kind.
+
+3
+00:00:14,300 --> 00:00:17,846
+You spot a jacket you love. An hour later, which stall was it?
+
+4
+00:00:17,846 --> 00:00:19,619
+And which of your forty photos?
+
+5
+00:00:20,800 --> 00:00:22,923
+Will it go with the jeans you already own?
+
+6
+00:00:22,923 --> 00:00:24,288
+You can't try that on here.
+
+7
+00:00:25,800 --> 00:00:27,447
+And the shirt two stalls down.
+
+8
+00:00:27,447 --> 00:00:29,148
+Would it work with that jacket?
+
+9
+00:00:29,148 --> 00:00:30,905
+Walk away, and it might be gone.
+
+10
+00:00:32,800 --> 00:00:36,903
+Meet Ibo. Find it, try it on, and walk back, with Meta's models.
+
+11
+00:00:38,800 --> 00:00:41,083
+Turn on shopping mode and just snap.
+
+12
+00:00:41,083 --> 00:00:43,937
+Every photo keeps the spot where you took it.
+
+13
+00:00:43,937 --> 00:00:49,644
+PE-Core indexes each photo right on your phone, and Muse Spark describes every storefront.
+
+14
+00:00:51,400 --> 00:00:52,541
+Later, just ask.
+
+15
+00:00:53,100 --> 00:00:55,395
+“Find the blue jacket in the second shop.”
+
+16
+00:00:57,300 --> 00:01:00,708
+Muse Voice Transcribe turns your voice into text.
+
+17
+00:01:00,708 --> 00:01:03,768
+Muse Spark plans the search with tool calls.
+
+18
+00:01:03,768 --> 00:01:08,915
+It checks your trips, narrows to the right shop, and searches your photos.
+
+19
+00:01:08,915 --> 00:01:11,419
+Then SAM 3.1 outlines every garment.
+
+20
+00:01:11,419 --> 00:01:12,601
+Best match first.
+
+21
+00:01:15,500 --> 00:01:17,269
+Tap the jacket and save it.
+
+22
+00:01:17,269 --> 00:01:21,396
+Flea markets have no product photos, so your photo becomes one.
+
+23
+00:01:21,396 --> 00:01:26,375
+If SAM missed something, EdgeTAM cuts it out on the phone with a single tap.
+
+24
+00:01:26,375 --> 00:01:29,192
+And the piece remembers where you found it.
+
+25
+00:01:30,600 --> 00:01:32,670
+Now, will it work with what you own?
+
+26
+00:01:32,670 --> 00:01:37,328
+Add your jeans from your wardrobe, or pieces saved from other stalls. Up to five.
+
+27
+00:01:39,600 --> 00:01:44,249
+Before anything leaves your phone, your face and hair are masked on the device.
+
+28
+00:01:44,249 --> 00:01:48,016
+Only that masked photo and the garment cutouts go to Muse Image.
+
+29
+00:01:53,400 --> 00:01:55,347
+Your face is put back on the phone.
+
+30
+00:01:55,347 --> 00:01:58,573
+If it can't be done cleanly, the look is shown without it.
+
+31
+00:02:04,600 --> 00:02:08,760
+One tap, and Ibo walks you back to the spot where you took the photo.
+
+32
+00:02:08,760 --> 00:02:10,689
+Street stalls aren't on any map.
+
+33
+00:02:10,689 --> 00:02:15,211
+Your photo is the address. Near the end, check the storefront, and confirm.
+
+34
+00:02:18,800 --> 00:02:20,932
+One of a kind pieces. No signs.
+
+35
+00:02:20,932 --> 00:02:24,576
+No fitting rooms. Every flea market has this problem.
+
+36
+00:02:24,576 --> 00:02:27,808
+Ibo lets you find it, try it on, and walk back.
+
+37
+00:02:31,000 --> 00:02:36,395
+Built this week: the Ibo app, its relay, and all product code. Pre-existing:
+
+38
+00:02:36,395 --> 00:02:45,694
+the Astryx design system, the Capacitor template, a vendored UI kit for the prototype, and Meta's open EdgeTAM and PE-Core weights.

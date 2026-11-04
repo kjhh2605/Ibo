@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ibo demo</title>
+<style>
+@font-face{font-family:Outfit;src:url(assets/outfit.woff2) format('woff2');font-weight:100 900;}
+:root{
+  --giwa:#4A4D50;--timber:#7E5F42;--earth:#CDB999;--stone:#B5A68D;--sky:#DDE3E3;--hanji:#F1EBDF;
+  --bead:#E9DCC2;--indigo:#34507A;--ink:#2B2C2E;--surface:#FAF6EF;--muted:#E8DECF;--border:#DDD0BC;
+  --text2:#625A50;--indigo-muted:#DCE3EE;--jacket:#2F55A4;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:var(--hanji);font-family:Outfit,sans-serif;color:var(--ink)}
+#stage{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--hanji)}
+.scene{position:absolute;inset:0;opacity:0}
+.abs{position:absolute}
+.mask{overflow:hidden;display:block}
+.mask>span{display:inline-block;will-change:transform}
+/* title */
+#title .eyebrow{left:140px;top:250px;font-size:22px;letter-spacing:.14em;font-weight:600;color:var(--timber);text-transform:uppercase}
+#title .brand{left:132px;top:300px;display:flex;align-items:center;gap:34px}
+#title .brand img{width:170px;height:170px;border-radius:38px}
+#title .brand .word{font-size:230px;font-weight:700;letter-spacing:-.04em;line-height:1}
+#title .tag{left:140px;top:560px;font-size:64px;font-weight:600;color:var(--indigo);letter-spacing:-.01em}
+#title .sub{left:142px;top:660px;font-size:30px;color:var(--text2);font-weight:400;width:900px;line-height:1.35}
+#title .photo{left:1280px;top:0;width:640px;height:1080px;overflow:hidden}
+#title .photo img{width:100%;height:100%;object-fit:cover}
+#title .credit{right:24px;bottom:18px;font-size:14px;color:#fff;opacity:.85;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+/* map */
+#map{background:#E9E0CE}
+#cam{position:absolute;left:0;top:0;width:2600px;height:1600px;transform-origin:0 0}
+.pin{position:absolute;width:0;height:0}
+.pin .drop{position:absolute;left:-22px;top:-58px;width:44px;height:58px}
+.pin .card{position:absolute;left:-118px;top:-262px;width:236px;background:#fff;padding:9px 9px 34px;border-radius:6px;box-shadow:0 14px 34px rgba(43,44,46,.22);transform-origin:50% 100%}
+.pin .card img{display:block;width:218px;height:164px;object-fit:cover;border-radius:2px}
+.pin .card .cap{position:absolute;left:12px;bottom:8px;font-size:17px;font-weight:600;color:var(--giwa)}
+.pin .card .num{position:absolute;right:10px;bottom:7px;font-size:15px;font-weight:600;color:#fff;background:var(--indigo);border-radius:20px;padding:1px 9px}
+.pcard{position:absolute;width:0;height:0}
+.pcard .card2{position:absolute;left:-100px;top:-82px;width:200px;background:#fff;padding:8px 8px 30px;border-radius:6px;box-shadow:0 12px 30px rgba(43,44,46,.22);transform-origin:50% 50%}
+.pcard .card2 img{display:block;width:184px;height:124px;object-fit:cover;border-radius:2px}
+.pcard .card2 .cap{position:absolute;left:10px;bottom:6px;font-size:16px;font-weight:600;color:var(--giwa)}
+#bubbles .bubble{position:absolute}
+.maplabel{position:absolute;font-size:22px;font-weight:600;color:var(--timber);letter-spacing:.06em;text-transform:uppercase}
+#char{position:absolute;width:0;height:0}
+.bubble{position:absolute;background:#fff;border-radius:26px;padding:22px 30px;font-size:40px;font-weight:600;box-shadow:0 18px 40px rgba(43,44,46,.18);white-space:nowrap;display:flex;align-items:center;gap:18px;transform-origin:0% 100%}
+.bubble .box{width:40px;height:40px;border-radius:10px;border:4px solid var(--stone);position:relative;flex:none}
+.bubble .box .tick{position:absolute;inset:-4px;border-radius:10px;background:var(--indigo);display:flex;align-items:center;justify-content:center;transform:scale(0)}
+.bubble .solved{position:absolute;left:96px;top:86px;font-size:27px;font-weight:600;color:var(--indigo);opacity:0;white-space:nowrap}
+.hud{position:absolute;left:60px;top:52px;display:flex;align-items:center;gap:16px;background:rgba(250,246,239,.92);padding:14px 22px;border-radius:40px;font-size:24px;font-weight:600;color:var(--giwa);box-shadow:0 8px 24px rgba(43,44,46,.10)}
+/* reveal */
+#reveal{background:var(--indigo);color:#fff;opacity:1;clip-path:circle(0px at 960px 540px)}
+#reveal .logo{left:760px;top:240px;width:400px;text-align:center}
+#reveal .logo img{width:200px;height:200px;border-radius:46px}
+#reveal .logo .word{font-size:150px;font-weight:700;letter-spacing:-.04em;line-height:1.05}
+#reveal .lines{left:0;width:1920px;top:700px;display:flex;justify-content:center;gap:56px;font-size:52px;font-weight:600}
+#reveal .lines .mask{padding:4px 0}
+/* app scenes */
+#app{background:var(--hanji)}
+#app .grid{position:absolute;inset:0;background-image:radial-gradient(rgba(126,95,66,.18) 1.4px,transparent 1.5px);background-size:34px 34px;opacity:.55}
+#phone{position:absolute;left:378px;top:58px;width:445px;height:964px;border-radius:64px;background:var(--ink);padding:16px;box-shadow:0 40px 80px rgba(43,44,46,.28),0 8px 18px rgba(43,44,46,.18);transform-origin:50% 50%}
+#screen{position:relative;width:413px;height:932px;border-radius:50px;overflow:hidden;background:var(--surface)}
+#zoomer{position:absolute;left:0;top:0;width:413px;height:917px;transform-origin:0 0}
+#zoomer .scr{position:absolute;left:0;top:0;width:413px;height:917px;opacity:0}
+#statusbar{position:absolute;left:0;top:917px;width:413px;height:15px;background:var(--surface)}
+.ripple{position:absolute;width:90px;height:90px;margin:-45px 0 0 -45px;border-radius:50%;background:rgba(52,80,122,.35);border:3px solid rgba(52,80,122,.7);transform:scale(0);opacity:0;pointer-events:none}
+.dot{position:absolute;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;background:rgba(43,44,46,.38);border:3px solid rgba(255,255,255,.85);opacity:0;transform:scale(.6)}
+.disclose{position:absolute;left:378px;top:1032px;width:445px;text-align:center;font-size:17px;color:var(--text2);font-weight:500}
+.brandbug{position:absolute;left:56px;top:48px;display:flex;align-items:center;gap:14px;font-size:34px;font-weight:700}
+.brandbug img{width:52px;height:52px;border-radius:13px}
+.panel{position:absolute;left:1000px;top:0;width:860px;height:1080px;opacity:0}
+.step{position:absolute;left:0;top:120px;font-size:24px;font-weight:700;letter-spacing:.16em;color:var(--timber)}
+.ptitle{position:absolute;left:0;top:166px;white-space:nowrap;font-size:70px;font-weight:700;letter-spacing:-.025em;line-height:1.02;width:860px}
+.psub{position:absolute;left:0;top:262px;font-size:30px;color:var(--text2);width:820px;line-height:1.34}
+.chip{position:absolute;display:flex;align-items:stretch;background:#fff;border-radius:22px;box-shadow:0 12px 30px rgba(43,44,46,.10);overflow:hidden;min-width:520px;opacity:0;transform-origin:0 50%}
+.chip .tagc{writing-mode:horizontal-tb;display:flex;align-items:center;justify-content:center;padding:0 20px;font-size:17px;font-weight:700;letter-spacing:.12em;color:#fff;min-width:150px}
+.chip .tagc.dev{background:var(--timber)}
+.chip .tagc.api{background:var(--indigo)}
+.chip .tagc.oth{background:var(--giwa)}
+.chip .body{padding:18px 26px}
+.chip .name,.chip .desc{white-space:nowrap}
+.chip .name{font-size:32px;font-weight:700;letter-spacing:-.01em}
+.chip .desc{font-size:23px;color:var(--text2);margin-top:3px}
+.card{position:absolute;background:#fff;border-radius:24px;box-shadow:0 14px 34px rgba(43,44,46,.12);overflow:hidden;opacity:0}
+.note{position:absolute;font-size:21px;color:var(--text2);font-weight:500}
+.pill{position:absolute;padding:10px 18px;border-radius:30px;font-size:22px;font-weight:600;background:var(--indigo-muted);color:var(--indigo);opacity:0;white-space:nowrap}
+.tool{position:absolute;display:flex;align-items:center;gap:14px;padding:14px 22px;border-radius:16px;background:var(--surface);border:2px solid var(--border);font-size:25px;font-weight:600;color:var(--text2);opacity:0}
+.tool code{font-family:ui-monospace,Menlo,monospace;font-size:21px;color:var(--indigo);background:var(--indigo-muted);padding:3px 9px;border-radius:8px}
+.tool .ck{width:30px;height:30px;border-radius:50%;background:#6E9B6A;display:flex;align-items:center;justify-content:center;transform:scale(0)}
+.boundary{position:absolute;width:0;border-left:3px dashed var(--stone);opacity:0}
+.blabel{position:absolute;font-size:19px;font-weight:700;letter-spacing:.14em;opacity:0}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+.mockbadge{position:absolute;padding:9px 16px;border-radius:12px;background:rgba(43,44,46,.82);color:#fff;font-size:18px;font-weight:600;opacity:0;white-space:nowrap}
+/* end */
+#end{background:var(--surface)}
+#end h2{position:absolute;left:160px;top:150px;font-size:30px;letter-spacing:.14em;color:var(--timber);font-weight:700}
+#end .col{position:absolute;top:230px;width:740px}
+#end .col h3{font-size:46px;font-weight:700;margin-bottom:22px;letter-spacing:-.01em}
+#end .col li{list-style:none;font-size:30px;line-height:1.45;color:var(--ink);padding-left:34px;position:relative}
+#end .col li:before{content:'';position:absolute;left:4px;top:19px;width:12px;height:12px;border-radius:50%;background:var(--indigo)}
+#end .col.pre li:before{background:var(--stone)}
+#end .credits{position:absolute;left:160px;top:820px;width:1600px;font-size:21px;line-height:1.6;color:var(--text2)}
+#wrapcard{position:absolute;inset:0;opacity:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(241,235,223,.0)}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- S0 TITLE -->
+  <section class="scene" id="title">
+    <div class="abs eyebrow mask"><span>Meta Global AI Developer Hackathon · Indie Developer · Build for Your World</span></div>
+    <div class="abs brand"><img src="assets/logo.svg" alt=""><div class="mask"><span class="word">Ibo</span></div></div>
+    <div class="abs tag mask"><span>Find it. Try it on. Walk back.</span></div>
+    <div class="abs sub mask"><span>A shopping memory for street markets.</span></div>
+    <div class="abs photo" id="titlePhoto"><img id="titleImg" alt=""><div class="abs credit" id="titleCredit"></div></div>
+  </section>
+
+  <!-- S1–S4, S11 MAP -->
+  <section class="scene" id="map">
+    <div id="cam"><img id="mapimg" src="assets/dongmyo-map.png" style="position:absolute;left:0;top:0;width:2600px;height:1600px"><svg id="mapov" width="2600" height="1600" style="position:absolute;left:0;top:0;overflow:visible"></svg><div id="pins"></div><div id="char"></div></div><div id="bubbles"></div>
+    <div id="homecard" class="card" style="left:1250px;top:640px;width:420px;padding:18px 22px;display:flex;gap:18px;align-items:center"><img src="assets/jeans-cutout.png" style="width:96px;height:96px;object-fit:contain;background:#FAF6EF;border-radius:14px"><div><div style="font-size:19px;font-weight:700;letter-spacing:.12em;color:#7E5F42">AT HOME</div><div style="font-size:30px;font-weight:700">Your jeans</div><div style="font-size:21px;color:#625A50">in your wardrobe, not here</div></div></div>
+    <div class="abs" style="right:28px;bottom:18px;font-size:15px;color:#8A7A62">Map data © OpenStreetMap contributors</div>
+    <div class="hud" id="maphud"><svg width="22" height="28" viewBox="0 0 44 58"><path d="M22 2C11 2 2 11 2 22c0 14 20 34 20 34s20-20 20-34C42 11 33 2 22 2z" fill="#34507A"/><circle cx="22" cy="21" r="7" fill="#F1EBDF"/></svg><span id="hudtext">Dongmyo Flea Market · Seoul</span></div>
+    <div id="clock" class="pill" style="left:860px;top:96px;font-size:30px;padding:12px 24px">+1 hour</div>
+    <div id="wrapcard"></div>
+    <div class="flash" id="mapflash"></div>
+  </section>
+
+  <!-- S5 REVEAL -->
+  <section class="scene" id="reveal">
+    <div class="abs logo"><img src="assets/logo-dark.svg" alt=""><div class="mask"><span class="word">Ibo</span></div></div>
+    <div class="abs lines"><div class="mask"><span>Find it.</span></div><div class="mask"><span>Try it on.</span></div><div class="mask"><span>Walk back.</span></div></div>
+  </section>
+
+  <!-- S6–S10 APP -->
+  <section class="scene" id="app">
+    <div class="grid"></div>
+    <div class="brandbug"><img src="assets/logo.svg" alt="">Ibo</div>
+    <div id="phone"><div id="screen"><div id="zoomer"></div><div id="statusbar"></div><div class="flash" id="phoneflash"></div></div></div>
+    <div class="disclose" id="disclose">Ibo app UI · preview build with sample data (mock relay)</div>
+    <div id="panels"></div>
+  </section>
+
+  <!-- S12 END -->
+  <section class="scene" id="end">
+    <h2>ORIGINAL WORK DISCLOSURE</h2>
+    <div class="col" style="left:160px"><h3>Built this week</h3><ul>
+      <li>The Ibo Android app (React + Capacitor)</li><li>Native camera, location and on-device ML plugins</li><li>The local relay to Meta's APIs</li><li>All product code, tests and this video</li></ul></div>
+    <div class="col pre" style="left:1000px"><h3>Pre-existing</h3><ul>
+      <li>Astryx design system</li><li>Capacitor app template</li><li>Vendored stageshow UI kit (prototype only)</li><li>Meta's open EdgeTAM and PE-Core weights</li></ul></div>
+    <div class="credits" id="credits"></div>
+  </section>
+</div>
+
+<script src="node_modules/gsap/dist/gsap.min.js"></script>
+<script src="photos.js"></script>
+<script src="mapdata.js"></script>
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const el = (tag, cls, parent, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; if (parent) parent.appendChild(e); return e; };
+const tl = gsap.timeline({paused: true, defaults: {ease: 'expo.out'}});
+const CUES = [];
+const cue = (t, name, gain = 1) => CUES.push({t: +t.toFixed(3), name, gain});
+const PH = window.PHOTOS; // [{src, credit, portrait}]
+const byKey = (k) => PH.find(p => p.key === k) || PH[0];
+const PIN_KEYS = ['06', '08', '09', 'jan-2024-02', 'jan-2024-01', '02', 'jan-2024-04', '03'];
+const photo = (i) => byKey(PIN_KEYS[(i - 1 + PIN_KEYS.length) % PIN_KEYS.length]);
+const USED = new Set(['08', ...PIN_KEYS]);
+
+// ---------- motion vocabulary ----------
+function rise(sel, t, {dur = 1.0, stagger = 0.08, root = document} = {}) {
+  const spans = [...root.querySelectorAll(sel)].map(m => m.matches('.mask') ? m.firstElementChild : m);
+  tl.set(spans, {yPercent: 115, opacity: 1}, 0);
+  tl.to(spans, {yPercent: 0, duration: dur, stagger, ease: 'expo.out'}, t);
+}
+function sink(sel, t, {dur = 0.5, root = document} = {}) {
+  const spans = [...root.querySelectorAll(sel)].map(m => m.matches('.mask') ? m.firstElementChild : m);
+  tl.to(spans, {yPercent: -115, duration: dur, ease: 'power3.in', stagger: 0.04}, t);
+}
+function pop(e, t, {from = 0.6, dur = 0.7, ease = 'back.out(1.7)', y = 0, x = 0} = {}) {
+  tl.set(e, {opacity: 0, scale: from, y, x}, 0);
+  tl.to(e, {opacity: 1, scale: 1, y: 0, x: 0, duration: dur, ease}, t);
+}
+function slideIn(e, t, {x = 60, y = 0, dur = 0.9, blur = true} = {}) {
+  tl.set(e, {opacity: 0, x, y, filter: blur ? 'blur(10px)' : 'none'}, 0);
+  tl.to(e, {opacity: 1, x: 0, y: 0, filter: 'blur(0px)', duration: dur, ease: 'expo.out'}, t);
+}
+function fade(e, t, to = 0, dur = 0.5) { tl.to(e, {opacity: to, duration: dur, ease: 'power2.inOut'}, t); }
+
+// ---------- TITLE (0–5.5) ----------
+const tp = byKey('08');
+$('#titleImg').src = tp.src; $('#titleImg').style.objectPosition = '18% 50%'; $('#titleCredit').textContent = 'Photo: ' + tp.credit;
+tl.set('#title', {opacity: 1}, 0);
+tl.set('#titlePhoto', {clipPath: 'inset(0% 0% 100% 0%)'}, 0);
+tl.to('#titlePhoto', {clipPath: 'inset(0% 0% 0% 0%)', duration: 1.3, ease: 'expo.inOut'}, 0.1);
+tl.fromTo('#titleImg', {scale: 1.18}, {scale: 1.0, duration: 6, ease: 'power1.out'}, 0.1);
+rise('#title .eyebrow', 0.45);
+tl.set('#title .brand img', {scale: 0, rotate: -12}, 0);
+tl.to('#title .brand img', {scale: 1, rotate: 0, duration: 0.9, ease: 'back.out(1.6)'}, 0.55);
+cue(0.6, 'pop', 0.8);
+rise('#title .brand', 0.7);
+rise('#title .tag', 1.1);
+rise('#title .sub', 1.35);
+cue(0.1, 'whoosh', 0.6);
+// transition: photo panel expands to full frame, text sinks
+sink('#title .mask', 4.3);
+tl.to('#title .brand img', {scale: 0, duration: 0.4, ease: 'power3.in'}, 4.3);
+tl.to('#titlePhoto', {left: 0, width: 1920, duration: 0.9, ease: 'expo.inOut'}, 4.5);
+cue(4.5, 'whoosh', 0.7);
+tl.to('#titleCredit', {opacity: 0, duration: 0.3}, 4.5);
+tl.to('#title', {opacity: 0, scale: 1.12, duration: 0.7, ease: 'power2.in'}, 5.1);
+
+// ---------- MAP (5.5–32, 138–150) ----------
+const MD = window.MAPDATA;
+const CARD = {p1: [900, 250], p2: [1150, 500], p3: [700, 560], p4: [1900, 330], p5: [1700, 960], p6: [1330, 1290], p7: [560, 1110], p8: [2260, 600]};
+const PINS = ['p1', 'p2', 'p3', 'p5', 'p4', 'p6', 'p7', 'p8'].map((k, i) => ({k, x: MD.pins[k][0], y: MD.pins[k][1], cx: CARD[k][0], cy: CARD[k][1], cap: 'Stall ' + (i + 1), star: k === 'p2', shirt: k === 'p5'}));
+const ov = $('#mapov');
+const pinEls = PINS.map((p, i) => {
+  const ln = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  ln.setAttribute('x1', p.x); ln.setAttribute('y1', p.y); ln.setAttribute('x2', p.cx); ln.setAttribute('y2', p.cy);
+  ln.setAttribute('stroke', '#4A4D50'); ln.setAttribute('stroke-width', '3'); ln.setAttribute('stroke-dasharray', '4 6'); ln.setAttribute('opacity', '0'); ov.appendChild(ln);
+  const d = el('div', 'pin', $('#pins')); d.style.left = p.x + 'px'; d.style.top = p.y + 'px';
+  d.innerHTML = `<svg class="drop" viewBox="0 0 44 58"><path d="M22 2C11 2 2 11 2 22c0 14 20 34 20 34s20-20 20-34C42 11 33 2 22 2z" fill="${p.star || p.shirt ? '#34507A' : '#4A4D50'}"/><circle cx="22" cy="21" r="7" fill="#F1EBDF"/></svg>`;
+  const c = el('div', 'pcard', $('#pins')); c.style.left = p.cx + 'px'; c.style.top = p.cy + 'px';
+  c.innerHTML = `<div class="card2"><img src="${photo(i + 1).src}"><div class="cap">${p.cap}</div></div>`;
+  d.card = c.firstElementChild; d.line = ln; return d;
+});
+const abPath = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+abPath.setAttribute('points', MD.paths.ab.map(q => q.join(',')).join(' ')); abPath.setAttribute('fill', 'none'); abPath.setAttribute('stroke', '#34507A');
+abPath.setAttribute('stroke-width', '9'); abPath.setAttribute('stroke-dasharray', '2 16'); abPath.setAttribute('stroke-linecap', 'round'); abPath.setAttribute('opacity', '0'); abPath.id = 'abLine'; ov.appendChild(abPath);
+// character
+$('#char').innerHTML = `<svg id="charsvg" width="120" height="200" viewBox="-60 -190 120 200" style="position:absolute;left:-60px;top:-190px;overflow:visible">
+ <ellipse cx="0" cy="4" rx="34" ry="9" fill="rgba(43,44,46,.18)"/>
+ <g id="legs"><rect id="legL" x="-16" y="-62" width="14" height="62" rx="7" fill="#4A4D50"/><rect id="legR" x="2" y="-62" width="14" height="62" rx="7" fill="#3A3D40"/></g>
+ <g id="torso"><rect x="-26" y="-128" width="52" height="74" rx="20" fill="#7E5F42" id="top"/>
+  <rect id="jacketL" x="-28" y="-128" width="28" height="74" rx="14" fill="#2F55A4" opacity="0"/><rect id="jacketR" x="0" y="-128" width="28" height="74" rx="14" fill="#2F55A4" opacity="0"/>
+  <rect x="18" y="-112" width="30" height="40" rx="6" fill="#E9DCC2" stroke="#CDB999" stroke-width="3"/><path d="M24 -112 Q33 -128 42 -112" stroke="#CDB999" stroke-width="3" fill="none"/>
+  <circle cx="0" cy="-150" r="24" fill="#D9AE86"/><path d="M-25 -152 Q-22 -180 0 -178 Q24 -178 25 -150 Q14 -164 -2 -160 Q-16 -158 -25 -152Z" fill="#2B2C2E"/>
+  <rect id="phoneInHand" x="-40" y="-118" width="18" height="30" rx="4" fill="#2B2C2E" opacity="0"/></g>
+</svg>`;
+// camera helper: focus world point (x,y) at screen (sx,sy) with scale s
+const cam = $('#cam');
+function camTo(t, x, y, s, dur = 1.6, ease = 'power3.inOut', sx = 960, sy = 560) {
+  tl.to(cam, {x: sx - x * s, y: sy - y * s, scale: s, duration: dur, ease}, t);
+}
+function camSet(t, x, y, s, sx = 960, sy = 560) { tl.set(cam, {x: sx - x * s, y: sy - y * s, scale: s}, t); }
+function walk(t, pts, dur) {
+  const ch = $('#char');
+  const segs = []; let total = 0;
+  for (let i = 1; i < pts.length; i++) { const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); segs.push(d); total += d; }
+  let tt = t;
+  for (let i = 1; i < pts.length; i++) { const d = segs[i - 1] / total * dur; tl.to(ch, {left: pts[i][0], top: pts[i][1], duration: d, ease: 'none'}, tt); tt += d; }
+  const steps = Math.max(2, Math.round(dur / 0.32));
+  const o = {p: 0};
+  tl.to(o, {p: steps, duration: dur, ease: 'none', onUpdate() {
+    const ph = o.p * Math.PI; const sw = Math.sin(ph) * 16;
+    gsap.set('#legL', {rotation: sw, transformOrigin: '50% 0%'}); gsap.set('#legR', {rotation: -sw, transformOrigin: '50% 0%'});
+    gsap.set('#torso', {y: -Math.abs(Math.sin(ph)) * 5});
+  }}, t);
+  return tt;
+}
+const PA = MD.paths;
+const pin = k => MD.pins[k];
+const last = a => a[a.length - 1];
+tl.set('#char', {left: PA.enter[0][0], top: PA.enter[0][1]}, 0);
+tl.set('#map', {opacity: 0}, 0);
+tl.set('#map', {opacity: 1}, 5.0);
+camSet(0, 1330, 760, 0.86);
+tl.fromTo('#map', {scale: 1.08}, {scale: 1, duration: 1.4, ease: 'expo.out', immediateRender: false}, 5.0);
+camTo(5.2, 1280, 740, 0.92, 8.5, 'sine.inOut');
+slideIn('#maphud', 6.0, {x: -40});
+tl.set('#homecard', {opacity: 0}, 0);
+pinEls.forEach((p, i) => {
+  const t = 6.1 + i * 0.32;
+  tl.set(p.querySelector('.drop'), {y: -80, opacity: 0}, 0);
+  tl.to(p.querySelector('.drop'), {y: 0, opacity: 1, duration: 0.6, ease: 'bounce.out'}, t);
+  tl.to(p.line, {opacity: 0.55, duration: 0.4}, t + 0.2);
+  tl.set(p.card, {scale: 0.2, opacity: 0, rotation: (i % 2 ? 3 : -3)}, 0);
+  tl.to(p.card, {scale: 1, opacity: 1, duration: 0.8, ease: 'back.out(1.5)'}, t + 0.25);
+  cue(t + 0.12, 'pin', 0.55);
+});
+tl.set('#char', {opacity: 0}, 0); tl.to('#char', {opacity: 1, duration: 0.4}, 9.0);
+walk(9.0, PA.enter, 4.6);
+// S2 (14–20.5): spot the jacket at stall 2, then an hour passes
+const card2 = pinEls[1].card;
+camTo(13.9, (pin('p2')[0] + 1150) / 2, (pin('p2')[1] + 500) / 2 + 20, 1.45, 1.4, 'expo.inOut', 700, 560);
+tl.to(card2, {scale: 1.35, zIndex: 5, duration: 0.8, ease: 'expo.out'}, 14.2);
+tl.to('#phoneInHand', {opacity: 1, duration: 0.2}, 14.6);
+tl.to('#mapflash', {opacity: 0.85, duration: 0.06, ease: 'none'}, 15.0); tl.to('#mapflash', {opacity: 0, duration: 0.5, ease: 'power2.out'}, 15.06);
+cue(15.0, 'shutter', 0.9);
+tl.to(card2, {scale: 1, duration: 0.6, ease: 'power3.inOut'}, 15.9);
+tl.to('#phoneInHand', {opacity: 0, duration: 0.2}, 15.9);
+pop('#clock', 16.1, {from: 0.4}); cue(16.1, 'tick', 0.7);
+camTo(16.2, 1330, 860, 0.98, 1.4, 'expo.inOut', 700, 560);
+walk(16.3, PA.away, 1.6);
+tl.to('#clock', {opacity: 0, duration: 0.4}, 18.6);
+[0, 1, 2, 3].forEach(i => tl.to(pinEls[i].card, {filter: 'blur(7px) grayscale(.6)', opacity: 0.55, duration: 1.0, ease: 'power2.out'}, 18.0 + i * 0.1));
+const bubbles = $('#bubbles');
+const BQ = [
+  {txt: 'Where was that jacket?', solved: 'Find it · Walk back'},
+  {txt: 'Will it go with what I own?', solved: 'Try it on with your wardrobe'},
+  {txt: 'Jacket A + shirt B, together?', solved: 'Mix pieces from any stall'}];
+const bEls = BQ.map((b, i) => el('div', 'bubble', bubbles, `<div class="box"><div class="tick"><svg width="26" height="26" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" stroke="#fff" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div><span>${b.txt}</span><div class="solved">${b.solved}</div>`));
+const BPOS = [[1250, 210], [1250, 360], [1250, 510]];
+bEls.forEach((b, i) => tl.set(b, {left: BPOS[i][0], top: BPOS[i][1], opacity: 0}, 0));
+pop(bEls[0], 17.9, {from: 0.3, y: 30}); cue(17.9, 'ding', 0.8);
+// S3 (20.5–25.5): what you own is at home
+pop(bEls[1], 21.0, {from: 0.3, y: 30}); cue(21.0, 'ding', 0.8);
+tl.set('#homecard', {left: 1290, top: 670}, 0);
+pop('#homecard', 21.6, {from: 0.85, y: 30});
+tl.to('#homecard', {opacity: 0, y: 20, duration: 0.5}, 25.2);
+// S4 (25.5–32): stall 5's shirt with stall 2's jacket
+camTo(25.4, 1400, 830, 1.0, 1.4, 'expo.inOut', 700, 560);
+walk(25.6, PA.toB, 1.1);
+tl.to(pinEls[1].card, {filter: 'blur(0px) grayscale(0)', opacity: 1, duration: 0.6}, 25.8);
+tl.to(pinEls[3].card, {filter: 'blur(0px) grayscale(0)', opacity: 1, scale: 1.15, duration: 0.6, ease: 'back.out(1.6)'}, 26.4);
+tl.to('#abLine', {opacity: 1, duration: 0.6}, 26.6);
+pop(bEls[2], 27.0, {from: 0.3, y: 30}); cue(27.0, 'ding', 0.8);
+cue(29.5, 'whoosh', 0.35);
+tl.to('#abLine', {opacity: 0, duration: 0.6}, 30.2);
+tl.to(pinEls[3].card, {scale: 1, duration: 0.5}, 30.2);
+tl.to(bEls, {opacity: 0, duration: 0.4}, 31.2);
+// transition to reveal at 32
+camTo(31.0, last(PA.toB)[0], last(PA.toB)[1] - 80, 1.7, 1.3, 'expo.in');
+
+// ---------- REVEAL (32–38) ----------
+tl.set('#reveal', {opacity: 1, clipPath: 'circle(0px at 960px 560px)'}, 0);
+tl.to('#reveal', {clipPath: 'circle(1300px at 960px 560px)', duration: 1.0, ease: 'expo.inOut'}, 31.9);
+cue(31.9, 'whoosh', 0.9);
+tl.set('#map', {opacity: 0}, 33.0);
+tl.set('#reveal .logo img', {scale: 0, rotate: -20}, 0);
+tl.to('#reveal .logo img', {scale: 1, rotate: 0, duration: 1.0, ease: 'back.out(1.8)'}, 32.6);
+cue(32.65, 'pop', 1.0);
+rise('#reveal .logo .mask', 32.9);
+rise('#reveal .lines .mask', 33.6, {stagger: 0.32});
+cue(33.6, 'tick', 0.5); cue(33.92, 'tick', 0.5); cue(34.24, 'tick', 0.5);
+sink('#reveal .lines .mask', 36.6);
+tl.to('#reveal .logo', {y: -60, opacity: 0, duration: 0.6, ease: 'power3.in'}, 36.8);
+tl.to('#reveal', {clipPath: 'circle(0px at 600px 540px)', duration: 0.9, ease: 'expo.inOut'}, 37.2);
+
+// ---------- APP (38–138) ----------
+tl.set('#app', {opacity: 0}, 0);
+tl.set('#app', {opacity: 1}, 37.2);
+const phone = $('#phone');
+tl.set(phone, {y: 1100}, 0);
+tl.to(phone, {y: 0, duration: 1.1, ease: 'expo.out'}, 37.4);
+cue(37.4, 'whoosh', 0.6);
+tl.set(['.brandbug', '#disclose'], {opacity: 0}, 0);
+tl.to(['.brandbug', '#disclose'], {opacity: 1, duration: 0.6}, 38.0);
+const zoomer = $('#zoomer');
+const scr = {};
+function S(name, src) { const i = el('img', 'scr', zoomer); i.src = src || `assets/shots/${name}.png`; scr[name] = i; return i; }
+let current = null;
+function show(name, t, kind = 'push') {
+  const next = scr[name] || S(name);
+  const prev = current; current = next;
+  tl.set(next, {zIndex: ++show.z}, t);
+  if (!prev || kind === 'cut') { tl.set(next, {opacity: 1, x: 0, y: 0}, t); if (prev) tl.set(prev, {opacity: 0}, t + 0.01); return; }
+  if (kind === 'push') {
+    tl.set(next, {opacity: 1, x: 413, y: 0}, t);
+    tl.to(next, {x: 0, duration: 0.55, ease: 'power3.inOut'}, t);
+    tl.to(prev, {x: -120, duration: 0.55, ease: 'power3.inOut'}, t);
+    tl.set(prev, {opacity: 0, x: 0}, t + 0.56); cue(t, 'swipe', 0.35);
+  } else if (kind === 'fade') {
+    tl.set(next, {opacity: 0, x: 0, y: 0}, t);
+    tl.to(next, {opacity: 1, duration: 0.35, ease: 'power1.inOut'}, t);
+    tl.set(prev, {opacity: 0}, t + 0.36);
+  } else if (kind === 'scroll') {
+    tl.set(next, {opacity: 0, x: 0, y: 140}, t);
+    tl.to(next, {opacity: 1, y: 0, duration: 0.6, ease: 'power3.out'}, t);
+    tl.to(prev, {y: -140, opacity: 0, duration: 0.6, ease: 'power3.out'}, t);
+    tl.set(prev, {y: 0}, t + 0.61);
+  } else if (kind === 'sheet') {
+    tl.set(next, {opacity: 0, x: 0, y: 30}, t);
+    tl.to(next, {opacity: 1, y: 0, duration: 0.4, ease: 'power3.out'}, t);
+    tl.set(prev, {opacity: 0}, t + 0.41);
+  }
+}
+show.z = 1;
+function seq(dir, frames, t0, t1, idx) {
+  // frames: list of file names; idx: which frame indices to show evenly between t0..t1
+  const imgs = idx.map(k => { const i = el('img', 'scr', zoomer); i.src = `assets/shots/${dir}/${frames[k]}`; return i; });
+  const prev = current;
+  const step = (t1 - t0) / imgs.length;
+  imgs.forEach((im, j) => {
+    tl.set(im, {opacity: 1, zIndex: ++show.z}, t0 + j * step);
+    if (j > 0) tl.set(imgs[j - 1], {opacity: 0}, t0 + j * step + 0.02);
+  });
+  if (prev) tl.set(prev, {opacity: 0}, t0 + 0.02);
+  current = imgs[imgs.length - 1];
+}
+function tap(t, x, y) {
+  const r = el('div', 'ripple', $('#screen')); const d = el('div', 'dot', $('#screen'));
+  [r, d].forEach(e => { e.style.left = (x * 413) + 'px'; e.style.top = (y * 917) + 'px'; });
+  tl.set(d, {opacity: 0, scale: 0.6}, 0);
+  tl.to(d, {opacity: 1, scale: 1, duration: 0.18, ease: 'power2.out'}, t - 0.25);
+  tl.to(d, {scale: 0.82, duration: 0.1}, t);
+  tl.to(d, {opacity: 0, scale: 1.1, duration: 0.3}, t + 0.15);
+  tl.set(r, {scale: 0, opacity: 0}, 0);
+  tl.set(r, {opacity: 1, scale: 0.2}, t);
+  tl.to(r, {scale: 1.7, opacity: 0, duration: 0.6, ease: 'power2.out'}, t);
+  cue(t, 'tap', 0.7);
+}
+function zoom(t, cx, cy, s, dur = 1.2, ease = 'expo.inOut') { // cx,cy normalized focus
+  tl.to(zoomer, {scale: s, x: 413 / 2 - cx * 413 * s, y: 917 / 2 - cy * 917 * s, duration: dur, ease}, t);
+}
+function unzoom(t, dur = 1.0) { tl.to(zoomer, {scale: 1, x: 0, y: 0, duration: dur, ease: 'expo.inOut'}, t); }
+tl.set(zoomer, {scale: 1, x: 0, y: 0}, 0);
+function phoneFlash(t) { tl.to('#phoneflash', {opacity: 0.9, duration: 0.05, ease: 'none'}, t); tl.to('#phoneflash', {opacity: 0, duration: 0.4}, t + 0.05); cue(t, 'shutter', 0.8); }
+
+// panel builder
+const panels = $('#panels');
+function panel(t0, t1, step, title, sub) {
+  const p = el('div', 'panel', panels);
+  el('div', 'step', p, step); el('div', 'ptitle', p, `<span class="mask"><span>${title}</span></span>`); el('div', 'psub', p, sub);
+  tl.set(p, {opacity: 1}, t0);
+  rise('.step', t0 + 0.05, {root: p});
+  const ttl = p.querySelector('.ptitle .mask > span'); tl.set(ttl, {yPercent: 115}, 0); tl.to(ttl, {yPercent: 0, duration: 1.0, ease: 'expo.out'}, t0 + 0.1);
+  slideIn(p.querySelector('.psub'), t0 + 0.35, {x: 0, y: 24});
+  tl.to(p, {opacity: 0, x: -40, duration: 0.5, ease: 'power2.in'}, t1 - 0.5);
+  return p;
+}
+function chip(p, t, kind, name, desc, x, y) {
+  const c = el('div', 'chip', p, `<div class="tagc ${kind}">${kind === 'dev' ? 'ON DEVICE' : kind === 'api' ? 'META API' : 'MAPS'}</div><div class="body"><div class="name">${name}</div><div class="desc">${desc}</div></div>`);
+  c.style.left = x + 'px'; c.style.top = y + 'px';
+  tl.set(c, {opacity: 0, scale: 0.85, x: -30}, 0);
+  tl.to(c, {opacity: 1, scale: 1, x: 0, duration: 0.8, ease: 'back.out(1.4)'}, t);
+  cue(t, 'chip', 0.5);
+  return c;
+}
+function note(p, t, html, x, y, w = 820) { const n = el('div', 'note', p, html); n.style.left = x + 'px'; n.style.top = y + 'px'; n.style.width = w + 'px'; slideIn(n, t, {x: 0, y: 16, blur: false}); return n; }
+const ICON = {
+  pin: '<svg width="30" height="38" viewBox="0 0 44 58"><path d="M22 2C11 2 2 11 2 22c0 14 20 34 20 34s20-20 20-34C42 11 33 2 22 2z" fill="#34507A"/><circle cx="22" cy="21" r="7" fill="#F1EBDF"/></svg>',
+  check: '<svg width="20" height="20" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" stroke="#fff" stroke-width="3.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  lock: '<svg width="26" height="26" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2.5" fill="#7E5F42"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="#7E5F42" stroke-width="2.4" fill="none"/></svg>'};
+
+// ===== S6 SNAP (38–51) =====
+show('01-home', 38.0, 'cut');
+tap(40.2, 0.5, 0.2945); show('02-capture', 40.45);
+tap(42.0, 0.274, 0.2244); show('02b-storefront-mode', 42.2, 'fade');
+tap(43.3, 0.307, 0.954); phoneFlash(43.35); show('02c-after-storefront', 43.45, 'fade');
+tap(45.2, 0.347, 0.954); phoneFlash(45.25); show('02d-after-photo', 45.35, 'fade');
+tap(47.4, 0.058, 0.026); show('03-home-shopping', 47.65, 'push');
+{
+  const p = panel(38.4, 51.0, '01 · SNAP', 'Snap anything you like.', 'Shopping mode keeps the spot where every photo was taken. No signs needed.');
+  const mapCard = el('div', 'card', p); Object.assign(mapCard.style, {left: '0px', top: '400px', width: '400px', height: '290px', background: '#E9E0CE'});
+  mapCard.innerHTML = `<svg width="400" height="290" viewBox="0 0 400 290"><rect width="400" height="290" fill="#E9E0CE"/><g stroke="#FAF6EF" stroke-width="26" stroke-linecap="round"><path d="M0 150H400"/><path d="M140 0V290"/><path d="M300 0V290"/></g><g fill="#E3D8C2"><rect x="10" y="10" width="110" height="120" rx="12"/><rect x="160" y="10" width="125" height="120" rx="12"/><rect x="10" y="170" width="110" height="110" rx="12"/><rect x="160" y="170" width="125" height="110" rx="12"/><rect x="316" y="10" width="80" height="120" rx="12"/><rect x="316" y="170" width="80" height="110" rx="12"/></g></svg>
+  <div class="abs" id="mcPin" style="left:200px;top:150px;width:0;height:0"><div style="position:absolute;left:-22px;top:-58px">${ICON.pin.replace('width="30" height="38"', 'width="44" height="58"')}</div></div>
+  <div class="abs" id="mcThumb" style="left:228px;top:40px;width:150px;height:110px;border-radius:12px;overflow:hidden;border:5px solid #fff;box-shadow:0 8px 20px rgba(0,0,0,.18)"><img src="assets/storefront.png" style="width:100%;height:100%;object-fit:cover"></div>`;
+  pop(mapCard, 43.6, {from: 0.85});
+  const pinE = mapCard.querySelector('#mcPin'); tl.set(pinE, {y: -60, opacity: 0}, 0); tl.to(pinE, {y: 0, opacity: 1, duration: 0.7, ease: 'bounce.out'}, 44.0); cue(44.05, 'pin', 0.6);
+  pop(mapCard.querySelector('#mcThumb'), 44.3, {from: 0.5});
+  note(p, 44.6, 'Pinned where you took the photo', 0, 705, 400);
+  chip(p, 45.9, 'dev', 'PE-Core · image', 'Indexes each photo on your phone', 440, 410);
+  const vec = el('div', 'abs', p); Object.assign(vec.style, {left: '440px', top: '530px', width: '420px', height: '60px', display: 'flex', gap: '6px', alignItems: 'flex-end'});
+  for (let i = 0; i < 28; i++) { const b = el('div', '', vec); Object.assign(b.style, {width: '9px', height: (12 + ((i * 37) % 44)) + 'px', background: i % 4 ? '#CDB999' : '#7E5F42', borderRadius: '4px'}); tl.set(b, {scaleY: 0, transformOrigin: '50% 100%'}, 0); tl.to(b, {scaleY: 1, duration: 0.5, ease: 'back.out(2)'}, 46.3 + i * 0.025); }
+  chip(p, 47.8, 'api', 'Muse Spark 1.3', 'Describes each storefront', 440, 630);
+  const ty = el('div', 'note', p); Object.assign(ty.style, {left: '440px', top: '752px', width: '420px', fontSize: '24px', color: '#34507A', fontWeight: '600'});
+  const full = '“A blue awning above a dark storefront.”';
+  const o = {n: 0}; tl.to(o, {n: full.length, duration: 1.6, ease: 'none', onUpdate() { ty.textContent = full.slice(0, Math.round(o.n)); }}, 48.4);
+}
+
+// ===== S7 FIND (51–75) =====
+tap(50.85, 0.058, 0.026); show('04-home-ended', 51.05, 'push');
+tap(51.85, 0.5, 0.3404); show('d05-ask', 52.1, 'push');
+tap(52.9, 0.2003, 0.3016);
+const vf = window.BURSTS['d05-voice-search'];
+seq('d05-voice-search', vf, 53.05, 56.0, [0, 3, 6, 9, 12, 15, 18, 21]);
+seq('d05-voice-search', vf, 56.0, 65.5, [vf.length - 6, vf.length - 5, vf.length - 4, vf.length - 3, vf.length - 2]);
+show('d05b-results', 65.6, 'fade'); cue(65.6, 'success', 0.6);
+zoom(66.6, 0.5, 0.3, 1.32, 1.4);
+unzoom(69.6, 1.0);
+show('d05c-results-scrolled', 70.8, 'scroll');
+show('d05b-results', 72.6, 'scroll');
+tap(74.1, 0.5, 0.634);
+{
+  const p = panel(51.4, 75.0, '02 · FIND IT', 'Just ask.', 'Describe it the way you remember it. Ibo searches every trip.');
+  const wave = el('div', 'card', p); Object.assign(wave.style, {left: '0px', top: '390px', width: '820px', height: '110px', display: 'flex', alignItems: 'center', gap: '7px', padding: '0 34px'});
+  const bars = []; for (let i = 0; i < 44; i++) { const b = el('div', '', wave); Object.assign(b.style, {width: '10px', height: '70px', borderRadius: '5px', background: '#34507A'}); bars.push(b); }
+  pop(wave, 52.9, {from: 0.9});
+  const o = {p: 0}; tl.to(o, {p: 1, duration: 2.8, ease: 'none', onUpdate() { const tt = o.p * 2.8; bars.forEach((b, i) => { const a = 0.15 + 0.85 * Math.abs(Math.sin(tt * 7.3 + i * 0.55) * Math.sin(tt * 2.1 + i * 0.19)); b.style.transform = `scaleY(${a})`; }); }}, 53.0);
+  tl.to(bars, {scaleY: 0.08, duration: 0.4}, 55.9);
+  const q = el('div', 'abs', wave); Object.assign(q.style, {left: '34px', top: '30px', fontSize: '36px', fontWeight: '600', color: '#2B2C2E', opacity: 0});
+  q.textContent = '“Find the blue jacket in the second shop”';
+  tl.to(bars, {opacity: 0, duration: 0.3}, 56.1); tl.to(q, {opacity: 1, duration: 0.5}, 56.2);
+  chip(p, 57.4, 'api', 'Muse Voice Transcribe', 'Your voice → English text', 0, 540);
+  chip(p, 59.2, 'api', 'Muse Spark 1.3 · tool calling', 'Plans the search, step by step', 0, 660);
+  const tools = [['list_visits', 'Check your trips', 60.6], ['find_photos', 'Search photos', 62.2], ['extract_items', 'Outline items', 63.8]];
+  tools.forEach(([c, l, t], i) => {
+    const e = el('div', 'tool', p, `<div class="ck">${ICON.check}</div><code>${c}</code>${l}`); e.style.left = '0px'; e.style.top = (780 + i * 72) + 'px';
+    slideIn(e, t, {x: 40, blur: false}); tl.to(e.querySelector('.ck'), {scale: 1, duration: 0.5, ease: 'back.out(2.5)'}, t + 0.9); cue(t + 0.9, 'tick', 0.45);
+    tl.to(e, {borderColor: '#34507A', color: '#2B2C2E', duration: 0.3}, t);
+  });
+  chip(p, 62.6, 'dev', 'PE-Core', 'Query on relay × photos on phone', 470, 770).style.minWidth = '0px';
+  chip(p, 64.4, 'api', 'SAM 3.1', 'Outlines every garment', 470, 890).style.minWidth = '0px';
+  note(p, 67.2, 'Per question: up to 4 Spark calls · up to 3 photos to SAM', 0, 1010);
+}
+
+// ===== S8 PICK (75–90) =====
+show('c06-pick', 74.4, 'push');
+zoom(75.6, 0.5, 0.33, 1.6, 1.4);
+const hl = el('div', 'abs', zoomer); Object.assign(hl.style, {left: (0.03 * 413) + 'px', top: (0.18 * 917) + 'px', width: (0.25 * 413) + 'px', height: (0.36 * 917) + 'px', border: '3px solid #F1EBDF', borderRadius: '6px', boxShadow: '0 0 0 3px #34507A', opacity: 0, zIndex: 999});
+tl.to(hl, {opacity: 1, duration: 0.3}, 76.8); tl.to(hl, {opacity: 0.2, duration: 0.4, yoyo: true, repeat: 3}, 77.1); tl.to(hl, {opacity: 0, duration: 0.3}, 79.4);
+unzoom(79.4, 1.0);
+show('c06b-pick-scrolled', 80.5, 'scroll');
+zoom(81.0, 0.5, 0.72, 1.5, 1.2);
+tap(84.6, 0.5, 0.5 + (0.8798 - 0.72) * 1.5); show('d07-item', 84.85, 'push');
+unzoom(85.45, 0.01); cue(84.9, 'success', 0.45);
+show('d07b-item-scrolled', 87.3, 'scroll');
+{
+  const p = panel(75.2, 90.0, '03 · PICK', 'Your photo is the catalog.', 'Flea markets have no catalog. Ibo cuts the piece out of your own shot.');
+  chip(p, 76.2, 'api', 'SAM 3.1', 'Top 3 outlines first, best match on top', 0, 410);
+  chip(p, 80.0, 'dev', 'EdgeTAM', 'Tap anything SAM missed → 3 area options', 0, 530);
+  const ex = el('div', 'card', p); Object.assign(ex.style, {left: '0px', top: '650px', width: '560px', height: '380px'});
+  ex.innerHTML = `<img src="assets/shots/09d-wardrobe-areas.png" style="position:absolute;left:0;top:-640px;width:560px">`;
+  pop(ex, 80.6, {from: 0.9});
+  const r = el('div', 'ripple', ex); r.style.left = '280px'; r.style.top = '30px'; tl.set(r, {opacity: 1, scale: 0.2}, 81.2); tl.to(r, {scale: 1.8, opacity: 0, duration: 0.7}, 81.2); cue(81.2, 'tap', 0.6);
+  note(p, 81.8, 'On-device: ≈0.35 s per photo · ≈33 ms per tap<br><span style="font-size:17px">Median on the Android emulator (M1 Mac mini)</span>', 600, 690, 260);
+  const pinc = el('div', 'card', p); Object.assign(pinc.style, {left: '600px', top: '840px', width: '260px', padding: '16px 18px', display: 'flex', gap: '12px', alignItems: 'center', fontSize: '21px', fontWeight: '600'});
+  pinc.innerHTML = `${ICON.pin}<span>Saved with the spot you found it</span>`;
+  pop(pinc, 86.4); cue(86.4, 'pin', 0.6);
+}
+
+// ===== S9 TRY ON (90–124) =====
+tap(90.2, 0.269, 0.5262 + 0.39 * 0); // Try it on (top of item)
+show('c11-outfit-empty', 90.5, 'push');
+tap(92.4, 0.5, 0.8695); show('c11b-companion-sheet', 92.7, 'sheet');
+tap(94.4, 0.668, 0.6914); show('c11c-companion-added', 94.6, 'fade'); cue(94.65, 'tick', 0.5);
+tap(96.0, 0.5, 0.9013); show('c11d-outfit-jeans', 96.3, 'fade');
+show('c11-outfit-empty', 98.6, 'cut'); // top of page with Your photo
+show('c12-self-sheet', 99.0, 'sheet');
+tap(100.7, 0.5, 0.6871);
+const sm = window.BURSTS['c12-self-mask'];
+seq('c12-self-mask', sm, 100.95, 101.9, [0, 1, 2]);
+show('c12b-outfit-ready', 101.9, 'fade');
+zoom(102.6, 0.5, 0.36, 1.25, 1.4); unzoom(106.0, 0.9);
+show('c12d-outfit-ready-bottom', 107.0, 'scroll');
+tap(108.1, 0.5, 0.8709);
+const gf = window.BURSTS['c13-generate'];
+seq('c13-generate', gf, 108.35, 112.8, [0, 1, 2, 3]);
+show('c13-result', 112.8, 'push'); cue(112.85, 'success', 0.9);
+const mb = el('div', 'mockbadge', $('#screen')); mb.style.left = '24px'; mb.style.top = '520px'; mb.textContent = 'Placeholder image · mock relay';
+tl.to(mb, {opacity: 1, duration: 0.4}, 113.3); tl.to(mb, {opacity: 0, duration: 0.4}, 118.6);
+show('c13b-result-scrolled', 119.0, 'scroll');
+zoom(119.6, 0.5, 0.33, 1.3, 1.2); unzoom(122.4, 0.8);
+tap(123.4, 0.73, 0.073);
+{
+  const p = panel(90.4, 99.0, '04 · TRY IT ON', 'Mix it with what you own.', 'One shop piece, plus up to 5 more: your wardrobe, other stalls, any trip photo.');
+  const srcs = [['assets/jeans-cutout.png', 'Your wardrobe'], ['assets/jacket-cutout.png', 'Saved from other stalls'], ['assets/storefront.png', 'Any trip photo']];
+  srcs.forEach(([s, l], i) => { const c = el('div', 'card', p); Object.assign(c.style, {left: (i * 280) + 'px', top: '420px', width: '250px', height: '300px'});
+    c.innerHTML = `<img src="${s}" style="width:250px;height:220px;object-fit:${i === 2 ? 'cover' : 'contain'};background:#FAF6EF"><div style="padding:16px 18px;font-size:22px;font-weight:600">${l}</div>`;
+    pop(c, 91.6 + i * 0.25, {from: 0.8, y: 30}); });
+  chip(p, 94.9, 'api', 'Muse Spark 1.3', 'Names your wardrobe cut-outs', 0, 770);
+  note(p, 95.8, 'Only the cut-out of a piece is sent, never the whole photo.', 0, 890);
+}
+{
+  const p = panel(99.2, 112.6, '04 · PRIVACY', 'Your face never leaves.', 'Face and hair are masked on the device before anything is sent.');
+  const b = el('div', 'boundary', p); Object.assign(b.style, {left: '470px', top: '400px', height: '560px'});
+  tl.to(b, {opacity: 1, duration: 0.5}, 100.0);
+  const l1 = el('div', 'blabel', p, 'PHONE'); Object.assign(l1.style, {left: '330px', top: '400px', color: '#7E5F42'});
+  const l2 = el('div', 'blabel', p, 'META API'); Object.assign(l2.style, {left: '500px', top: '400px', color: '#34507A'});
+  tl.to([l1, l2], {opacity: 1, duration: 0.5}, 100.1);
+  const c1 = el('div', 'card', p); Object.assign(c1.style, {left: '0px', top: '450px', width: '200px', height: '300px'});
+  c1.innerHTML = `<img src="assets/self.png" style="width:200px;height:300px;object-fit:cover"><div class="abs" style="left:10px;top:10px;background:#fff;border-radius:20px;padding:6px 10px;display:flex;gap:6px;align-items:center;font-size:16px;font-weight:700">${ICON.lock.replace(/26/g, '18')}Stays here</div>`;
+  pop(c1, 100.3, {from: 0.85});
+  const c2 = el('div', 'card', p); Object.assign(c2.style, {left: '230px', top: '450px', width: '200px', height: '300px'});
+  c2.innerHTML = `<img src="assets/self-masked.png" style="width:200px;height:300px;object-fit:cover">`;
+  slideIn(c2, 101.4, {x: -120});
+  chip(p, 101.6, 'dev', 'Head mask', 'EdgeTAM-based, on the device', 0, 790).style.minWidth = '440px';
+  // garments + masked self fly across boundary
+  const g1 = el('div', 'card', p); Object.assign(g1.style, {left: '520px', top: '450px', width: '140px', height: '140px'}); g1.innerHTML = '<img src="assets/jacket-cutout.png" style="width:140px;height:140px;object-fit:contain">';
+  const g2 = el('div', 'card', p); Object.assign(g2.style, {left: '680px', top: '450px', width: '140px', height: '140px'}); g2.innerHTML = '<img src="assets/jeans-cutout.png" style="width:140px;height:140px;object-fit:contain">';
+  const c3 = el('div', 'card', p); Object.assign(c3.style, {left: '520px', top: '610px', width: '120px', height: '180px'}); c3.innerHTML = '<img src="assets/self-masked.png" style="width:120px;height:180px;object-fit:cover">';
+  slideIn(c3, 104.2, {x: -260, blur: true}); cue(104.2, 'whoosh', 0.5);
+  pop(g1, 104.6, {from: 0.6}); pop(g2, 104.8, {from: 0.6});
+  chip(p, 105.6, 'api', 'Muse Image', 'Creates the look', 490, 820).style.minWidth = '0px';
+  tl.to([c1, c2, c3, g1, g2], {opacity: 0.35, duration: 0.6}, 109.0);
+  const gen = el('div', 'pill', p, 'Generating your look…'); Object.assign(gen.style, {left: '500px', top: '950px'});
+  tl.to(gen, {opacity: 1, duration: 0.4}, 108.4); tl.to(gen, {opacity: 0, duration: 0.3}, 112.0);
+}
+{
+  const p = panel(112.8, 123.8, '04 · YOUR LOOK', 'Restored on your phone.', 'If it can’t be done cleanly, the look is shown without it.');
+  chip(p, 113.6, 'dev', 'Face restore', 'Recomposed on the device', 0, 420);
+  const w = el('div', 'card', p); Object.assign(w.style, {left: '0px', top: '560px', width: '820px', padding: '26px 30px'});
+  w.innerHTML = `<div style="font-size:20px;font-weight:700;letter-spacing:.14em;color:#7E5F42">WEARING</div>
+  <div style="display:flex;gap:18px;align-items:center;margin-top:14px"><img src="assets/jacket-cutout.png" style="width:90px;height:90px;object-fit:contain;background:#FAF6EF;border-radius:14px"><div><div style="font-size:30px;font-weight:700">Blue work jacket</div><div style="font-size:22px;color:#625A50">Shop piece · Shop 1</div></div></div>
+  <div style="display:flex;gap:18px;align-items:center;margin-top:14px"><img src="assets/jeans-cutout.png" style="width:90px;height:90px;object-fit:contain;background:#FAF6EF;border-radius:14px"><div><div style="font-size:30px;font-weight:700">Dark wash jeans</div><div style="font-size:22px;color:#625A50">Your wardrobe</div></div></div>`;
+  slideIn(w, 115.4, {x: 40});
+  note(p, 117.5, 'Saving to gallery stays off until the image watermark and metadata are verified.', 0, 880);
+}
+
+// ===== S10 WALK (124–138) =====
+show('08-walk-route', 123.65, 'push');
+show('08c-walk-direction', 127.6, 'fade');
+show('08d-walk-nearby', 130.0, 'fade'); cue(130.0, 'tick', 0.5);
+show('08e-walk-nearby-scrolled', 131.6, 'scroll');
+tap(133.3, 0.5, 0.8445); show('08f-walk-arrived', 133.55, 'push'); cue(133.6, 'success', 0.9);
+{
+  const p = panel(123.9, 138.0, '05 · WALK BACK', 'Your photo is the address.', 'Street stalls aren’t on any map. Ibo walks you back to the spot where you took the photo.');
+  const mc = el('div', 'card', p); Object.assign(mc.style, {left: '0px', top: '420px', width: '820px', height: '420px', background: '#E4D8C0'});
+  const R = MD.paths.back; const xs = R.map(q => q[0]), ys = R.map(q => q[1]);
+  const S2 = 0.68, cxw = (Math.min(...xs) + Math.max(...xs)) / 2 + 30, cyw = Math.min(...ys) + (210 - 112) / 0.68;
+  const inner = el('div', 'abs', mc); Object.assign(inner.style, {left: '0px', top: '0px', width: '2600px', height: '1600px', transformOrigin: '0 0', transform: `translate(${410 - cxw * S2}px, ${210 - cyw * S2}px) scale(${S2})`});
+  const L = R.reduce((s, q, i) => i ? s + Math.hypot(q[0] - R[i - 1][0], q[1] - R[i - 1][1]) : 0, 0);
+  const P2 = pin('p2');
+  inner.innerHTML = `<img src="assets/dongmyo-map.png" style="position:absolute;left:0;top:0;width:2600px;height:1600px">
+   <svg width="2600" height="1600" style="position:absolute;left:0;top:0"><polyline id="wr" points="${R.map(q => q.join(',')).join(' ')}" fill="none" stroke="#34507A" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${L.toFixed(0)}" stroke-dashoffset="${L.toFixed(0)}"/></svg>
+   <div class="abs" style="left:${P2[0]}px;top:${P2[1]}px;width:0;height:0"><div style="position:absolute;left:-22px;top:-58px">${ICON.pin.replace('width="30" height="38"', 'width="44" height="58"')}</div>
+   <div class="abs" style="left:-210px;top:-150px;width:170px;background:#fff;padding:7px;border-radius:6px;box-shadow:0 10px 24px rgba(0,0,0,.18)"><img src="${photo(2).src}" style="width:156px;height:104px;object-fit:cover;display:block"></div></div>
+   <div class="abs" id="wdot" style="left:${R[0][0]}px;top:${R[0][1]}px;width:28px;height:28px;margin:-14px 0 0 -14px;border-radius:50%;background:#34507A;border:5px solid #fff;box-shadow:0 0 0 9px rgba(52,80,122,.2)"></div>`;
+  pop(mc, 124.8, {from: 0.9});
+  tl.to(inner.querySelector('#wr'), {strokeDashoffset: 0, duration: 1.4, ease: 'power2.inOut'}, 125.6);
+  const wd = inner.querySelector('#wdot');
+  const wo = {d: 0};
+  tl.to(wo, {d: L, duration: 6.2, ease: 'power1.inOut', onUpdate() { let rem = wo.d; for (let i = 1; i < R.length; i++) { const sl = Math.hypot(R[i][0] - R[i - 1][0], R[i][1] - R[i - 1][1]); if (rem <= sl || i === R.length - 1) { const f = sl ? Math.min(1, rem / sl) : 0; wd.style.left = (R[i - 1][0] + (R[i][0] - R[i - 1][0]) * f) + 'px'; wd.style.top = (R[i - 1][1] + (R[i][1] - R[i - 1][1]) * f) + 'px'; break; } rem -= sl; } }}, 127.0);
+  chip(p, 126.4, 'oth', 'OpenFreeMap + OSRM', 'Map tiles and a walking route, via the local relay', 0, 870);
+  note(p, 131.4, 'Near the end: arrow + straight-line distance. You confirm the shop by its storefront.', 0, 990);
+  note(p, 125.2, 'GPS is simulated in this preview.', 0, 380).style.fontSize = '18px';
+}
+tl.to('#app', {opacity: 0, duration: 0.7, ease: 'power2.inOut'}, 137.6);
+
+// ---------- WRAP (138–150): back to the map ----------
+tl.set('#map', {opacity: 1}, 137.6);
+tl.set('#map', {scale: 1}, 137.6);
+[0, 1, 2, 3].forEach(i => tl.set(pinEls[i].card, {filter: 'blur(0px) grayscale(0)', opacity: 1, scale: 1}, 137.6));
+tl.set('#char', {left: pin('p2')[0], top: pin('p2')[1]}, 137.6);
+tl.set(['#jacketL', '#jacketR'], {opacity: 1}, 137.6);
+camSet(137.6, 1250, 720, 1.2, 700, 560);
+camTo(137.7, 1300, 760, 0.98, 3.0, 'power2.out', 700, 560);
+bEls.forEach((b, i) => { tl.to(b, {opacity: 1, duration: 0.5}, 138.4 + i * 0.15); });
+bEls.forEach((b, i) => { const t = 140.4 + i * 1.5; tl.to(b.querySelector('.tick'), {scale: 1, duration: 0.5, ease: 'back.out(2.6)'}, t); tl.to(b.querySelector('.solved'), {opacity: 1, duration: 0.4}, t + 0.15); cue(t, 'check', 0.9); });
+tl.to(['#bubbles', '#pins', '#char', '#maphud', '#mapov'], {opacity: 0, duration: 0.7}, 145.6);
+camTo(145.4, 1300, 800, 0.62, 2.0, 'power2.inOut');
+const wc = $('#wrapcard');
+wc.innerHTML = `<div style="display:flex;align-items:center;gap:30px"><img src="assets/logo.svg" style="width:150px;height:150px;border-radius:34px"><div style="font-size:190px;font-weight:700;letter-spacing:-.04em;line-height:1">Ibo</div></div>
+<div style="font-size:56px;font-weight:600;color:#34507A;margin-top:26px">Find it. Try it on. Walk back.</div>
+<div style="font-size:28px;color:#625A50;margin-top:30px">github.com/kjhh2605/Meta-Hackathon</div>`;
+tl.set(wc, {opacity: 0, scale: 0.94, background: 'rgba(241,235,223,0)'}, 0);
+tl.to(wc, {opacity: 1, scale: 1, background: 'rgba(241,235,223,0.92)', duration: 1.0, ease: 'expo.out'}, 146.4);
+cue(146.4, 'pop', 0.8);
+tl.to('#map', {opacity: 0, duration: 0.7}, 149.6);
+
+// ---------- END CARD (150–167) ----------
+tl.set('#end', {opacity: 0}, 0);
+tl.to('#end', {opacity: 1, duration: 0.6}, 150.0);
+slideIn('#end h2', 150.3, {x: 0, y: 20});
+document.querySelectorAll('#end .col').forEach((c, i) => { slideIn(c.querySelector('h3'), 150.6 + i * 0.4, {x: 0, y: 26}); c.querySelectorAll('li').forEach((li, j) => slideIn(li, 151.0 + i * 0.4 + j * 0.12, {x: 0, y: 18, blur: false})); });
+$('#credits').innerHTML = `Dongmyo photos: ${PH.filter(p => USED.has(p.key)).map(p => p.credit).join(' · ')}.<br>App screens: preview build on sample data (web runtime, mock relay). Try-on image shown is a placeholder, not a Muse Image output.<br>Map: based on OpenStreetMap data, © OpenStreetMap contributors (ODbL). Narration: Kokoro TTS (Apache-2.0). Music and sound effects: generated for this video.`;
+slideIn('#credits', 152.4, {x: 0, y: 16, blur: false});
+const DURATION = 167.0;
+tl.to({}, {duration: 0.01}, DURATION - 0.01);
+
+window.CUES = CUES.sort((a, b) => a.t - b.t);
+window.DURATION = DURATION;
+window.seek = (t) => { tl.seek(t, false); };
+window.ready = Promise.all([...document.images].map(i => i.complete ? (i.decode ? i.decode().catch(() => {}) : 0) : new Promise(r => { i.onload = i.onerror = () => r(); }).then(() => i.decode && i.decode().catch(() => {})))).then(() => document.fonts.ready);
+tl.seek(0);
+</script>
+</body>
+</html>
