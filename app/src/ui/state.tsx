@@ -9,7 +9,8 @@ import type {Services} from './services';
 import {deepLink, popRoute, pruneDeleted, pushRoute, returnTo} from './navigation';
 import type {Route} from './navigation';
 
-type Sheet = {title:string; content:ReactNode};
+/** `form`: the sheet holds text fields, so a stray swipe or outside tap must not throw away what was typed. */
+type Sheet = {title:string; content:ReactNode; form?:boolean};
 type State = {services:Services; stack:Route[]; route:Route; push(route:Route):void; back():void; popTo(name:Route['name'], next?:Route):void; deleted(entity:'Trip'|'Photo'|'Piece'|'Result',id:string):void; sheet:Sheet|null; showSheet(sheet:Sheet|null):void; toast:string|null; say(text:string):void; session:SessionState|null; online:boolean; revision:number};
 const Context = createContext<State|null>(null);
 export function UiProvider({services, children}:{services:Services; children:ReactNode}) {

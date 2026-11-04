@@ -70,7 +70,7 @@ export function Shell({children}:{children:ReactNode}) {
       {children}
     </VStack>
     {toast&&<Toast key={toast} text={toast} raised={capturing||route.name==='pick'||route.name==='outfit'}/>}
-    <BottomSheet isOpen={sheet!==null} onOpenChange={open=>{if(!open)showSheet(null);}} label={sheet?.title??'Options'} purpose="form" padding={6}>{sheet&&<VStack gap={4}><Heading level={2}>{sheet.title}</Heading>{sheet.content}<Button label="Close" variant="ghost" onClick={()=>showSheet(null)}/></VStack>}</BottomSheet>
+    <BottomSheet isOpen={sheet!==null} onOpenChange={open=>{if(!open)showSheet(null);}} label={sheet?.title??'Options'} purpose={sheet?.form?'form':'info'} padding={6}>{sheet&&<VStack gap={4}><Heading level={2}>{sheet.title}</Heading>{sheet.content}<Button label="Close" variant="ghost" onClick={()=>showSheet(null)}/></VStack>}</BottomSheet>
   </AppShell>;
 }
 

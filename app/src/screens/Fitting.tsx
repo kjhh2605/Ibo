@@ -118,7 +118,7 @@ export function Item({route}: {route: Extract<Route, {name: 'item'}>}) {
       <PhotoView file={piece.cutoutFile} label={piece.label}/>
       <HStack gap={3} vAlign="start" hAlign="between">
         <VStack gap={1} style={{minWidth: 0}}><HStack gap={2} vAlign="center" wrap="wrap"><Chip tone={piece.origin === 'shop' ? 'accent' : 'muted'}>{piece.origin === 'shop' ? 'Shop piece' : 'Wardrobe'}</Chip>{piece.category !== 'unknown' && <Chip>{piece.category}</Chip>}</HStack><Heading level={2}>{piece.label}</Heading><Text type="supporting">{piece.origin === 'wardrobe' ? 'In your wardrobe' : shop ? `Shop ${shop.n} · ${dateTime(shop.startedAt)}` : 'Saved from a shop'}</Text></VStack>
-        <Button label="Rename" variant="secondary" size="sm" icon={<Icon icon={PencilIcon}/>} onClick={() => showSheet({title: 'Rename piece', content: <EditFields label={piece.label} category={piece.category} onSave={(label, category) => services.store.updatePiece({id: piece.id, label, category})}/>})}/>
+        <Button label="Rename" variant="secondary" size="sm" icon={<Icon icon={PencilIcon}/>} onClick={() => showSheet({title: 'Rename piece', form: true, content: <EditFields label={piece.label} category={piece.category} onSave={(label, category) => services.store.updatePiece({id: piece.id, label, category})}/>})}/>
       </HStack>
       <Naming piece={piece} jobs={jobs}/>
     </VStack>

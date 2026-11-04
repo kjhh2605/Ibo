@@ -23,6 +23,8 @@ export async function runBrowserScenario(scenario:'full'|'states',url:string,out
   let failure:string|null=null;
   const button=(name:string|RegExp)=>page.getByRole('button',{name,exact:typeof name==='string'}).first();
   async function click(name:string|RegExp){await button(name).click();}
+  // Home lists only the latest trip's saved pieces; everything else is in the See all sheet.
+  async function openSaved(name:string){await click('See all');const sheet=page.getByRole('dialog',{name:'All saved pieces'});await expect(sheet).toBeVisible();await sheet.getByRole('button',{name,exact:true}).click();}
   async function captureControls(state:string){
     const original=page.viewportSize()!;
     const shutter=page.getByRole('group',{name:'Camera controls'}).getByRole('button',{name:/^(Take photo|Capture storefront|Use this photo)$/});
@@ -86,7 +88,12 @@ export async function runBrowserScenario(scenario:'full'|'states',url:string,out
     const pieceId=(await inspect(page)).ids.pieces[0];
     await page.reload();await route('home');await expect.poll(async()=>(await inspect(page)).ids.pieces).toContain(pieceId);
     matrix.push({route:'home',state:'restart-persistence',passed:true});
-    await click('a blue jacket');await route('item');await click('Walk back');await route('walk');
+    // The jacket was picked from a photo of the trip this run recorded, so home shows it; See all lists every trip's pieces.
+    await expect(page.getByRole('list',{name:'Pieces saved on this trip'}).getByRole('button',{name:'a blue jacket',exact:true})).toBeVisible();
+    await click('See all');await expect(page.getByRole('dialog',{name:'All saved pieces'}).getByRole('button',{name:'a blue jacket',exact:true})).toBeVisible();
+    await page.keyboard.press('Escape');await expect(page.locator('dialog[open]')).toHaveCount(0);
+    matrix.push({route:'home',state:'saved-latest-trip-only-and-see-all',passed:true});
+    await openSaved('a blue jacket');await route('item');await click('Walk back');await route('walk');
     await expect.poll(async()=>(await inspect(page)).walk?.mode,{timeout:20000}).toBe('route');await shot('06-walk-route');
     const pin=(await inspect(page)).walk!.destination;
     await context.setGeolocation({latitude:pin.lat+0.00005,longitude:pin.lng,accuracy:5});
@@ -140,7 +147,7 @@ export async function runBrowserScenario(scenario:'full'|'states',url:string,out
     matrix.push({route:'wardrobe',state:scenario==='states'?'actual-tap-save-offline-naming-recovery':'actual-tap-save-and-name',passed:true});
     await home();await click('Privacy');await route('privacy');await shot('11-privacy');
     await home();await click('Try-ons');await route('results');await shot('12-results-empty');
-    await home();await click('a blue jacket');await route('item');await click('Try it on');await route('outfit');
+    await home();await openSaved('a blue jacket');await route('item');await click('Try it on');await route('outfit');
     await click('Add your photo');await click('Choose from gallery');
     // Media import starts asynchronously; the initial empty state is not a finished registration.
     await expect.poll(async()=>(await inspect(page)).fitting.selfState,{timeout:30000}).toBe('ready');
@@ -150,7 +157,7 @@ export async function runBrowserScenario(scenario:'full'|'states',url:string,out
     await click('Generate');await route('result');await shot('14-result');
     expect((await inspect(page)).transport?.counts['/v1/tryon']).toBe(before+1);
     await click('Delete look');await confirm('Delete look');await route('results');
-    await home();await click('a blue jacket');await route('item');await click('Delete piece');await confirm('Delete piece');
+    await home();await openSaved('a blue jacket');await route('item');await click('Delete piece');await confirm('Delete piece');
     await expect.poll(async()=>(await inspect(page)).ids.pieces).not.toContain(pieceId);
     await page.reload();await route('home');await expect.poll(async()=>(await inspect(page)).ids.pieces).not.toContain(pieceId);
     matrix.push({route:'home',state:'deletion-persists',passed:true});
