@@ -79,6 +79,8 @@ uv --directory relay run python -c "import json; from app.main import create_app
 
 **S02/S03 입력:** 공통 core의 현재 MacBook 코드 gate는 통과했다. coordinator의 통합 검토와 M1 검증은 별도이며 main/PR merge를 수행하지 않았다. 실제 모델 API 변환·PE 로딩·M1 native 인증·완성 제품 endpoint·E2E의 합격으로 확대하지 않는다.
 
+M1 동일 시나리오 재실행을 위해 최초 worker의 실행 payload를 복구해 `http_smoke.py`로 보존했다. 로그 검사(root DEBUG)·중복 WAV 준비 제거를 포함한 실제 실행본이며, 보고서 환경명만 현재 OS/아키텍처에서 얻는다. 루트에서 `uv --directory relay run python tests/core/http_smoke.py`를 실행한다. 이는 core 전용 mock provider TCP 검증이며 제품 endpoint·실모델·실제 자격 증명 검증을 대체하지 않는다.
+
 ## 이전 관측 기록 (2026-11-04, M1)
 
 이전 작업자의 기록이며 마지막 logger 수정 이후 전체 재실행 결과가 아니었다. 현재 수정의 M1 재검증 증거로 사용하지 않는다.
