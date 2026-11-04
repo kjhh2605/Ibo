@@ -53,6 +53,13 @@ function AllSaved({pieces,open,onClose,onOpenPiece}:{pieces:Piece[];open:boolean
     </VStack>
   </BottomSheet>;
 }
+// One quiet line at the foot of home, set apart on a tinted strip. Information only, no action.
+function PrivacyNote() {
+  return <HStack gap={2} vAlign="center" hAlign="center" paddingBlock={2} paddingInline={3} style={{borderRadius:'var(--radius-element)',background:'var(--color-hanok-bead)',color:'var(--color-text-secondary)'}}>
+    <Icon icon={ShieldIcon} size="sm" color="inherit" style={{flexShrink:0}}/>
+    <Text type="supporting" size="xsm" color="inherit">Your original self photo and route never leave this phone.</Text>
+  </HStack>;
+}
 function EndShopping({style}:{style?:CSSProperties}) {
   const {services,popTo}=useUi();
   return <Confirm tone="plain" style={style} title="End shopping mode?" description="Your photos and shop locations stay on this phone. Your route history will be deleted." action="End shopping" onConfirm={async()=>{await services.shopping.stop();popTo('home');}}/>;
@@ -112,7 +119,7 @@ export function Home() {
       <Divider/>
       <RowButton flat label="Try-ons" start={<IconTile icon={ImageIcon}/>} meta={data.data?(data.data.results?`${data.data.results} ${data.data.results===1?'look':'looks'}, kept on this phone`:'No looks yet'):undefined} onClick={()=>push({name:'results'})}/>
     </Panel>
-    <Hint icon={ShieldIcon}>Your original self photo and route history never leave this phone.</Hint>
+    <PrivacyNote/>
     <AllSaved pieces={pieces} open={allSaved} onClose={closeAllSaved} onOpenPiece={piece=>{setAllSaved(false);push({name:'item',pieceId:piece.id});}}/>
   </>;
 }
