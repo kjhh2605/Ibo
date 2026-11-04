@@ -1,0 +1,48 @@
+{
+  "apk_sha256": "943f7f3e5d3ce6ce0eb102145612ac09806c57ce9468252d651a7811bf81795a",
+  "global_device_lock": true,
+  "first_class_in_fresh_instrumentation": true,
+  "metrics": {
+    "sessionLoadMs": 399.984334,
+    "loadIsColdOnlyWhenFirstClassInFreshInstrumentation": true,
+    "bridgeAndDisplay": "not exercised by direct native timing; end-to-end bridge scenario recorded separately",
+    "encoder": {
+      "warmup": 1,
+      "samplesMs": [
+        356.053291,
+        350.581042,
+        353.0535,
+        362.116083,
+        349.517292
+      ],
+      "medianMs": 353.0535,
+      "observedJavaPlusNativeHeapPeakBytes": 472945792
+    },
+    "decoder": {
+      "warmup": 1,
+      "samplesMs": [
+        33.140166,
+        32.75625,
+        32.6585,
+        33.241,
+        32.421833
+      ],
+      "medianMs": 32.75625,
+      "observedJavaPlusNativeHeapPeakBytes": 576825936
+    },
+    "peImage": {
+      "warmup": 1,
+      "samplesMs": [
+        83.701625,
+        76.400625,
+        74.862,
+        74.969875,
+        74.845292
+      ],
+      "medianMs": 74.969875,
+      "observedJavaPlusNativeHeapPeakBytes": 571815056
+    },
+    "package": "com.streetfitting.app",
+    "ortVersion": "1.22.0"
+  }
+}

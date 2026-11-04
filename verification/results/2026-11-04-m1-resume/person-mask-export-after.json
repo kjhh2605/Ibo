@@ -787,6 +787,65 @@
           "geometryRejection": "person_not_found"
         }
       ]
+    },
+    {
+      "id": "wardrobe-jeans",
+      "sourceSha256": "5e46e00a8e228126c27c9d0e94b8b3688776b247058b92522569679f8b51d682",
+      "w": 310,
+      "h": 310,
+      "masks": [
+        {
+          "rank": 0,
+          "decoderIndex": 0,
+          "score": 0.9353269934654236,
+          "png": "person-masks/wardrobe-jeans-0.png",
+          "binary": "person-masks/wardrobe-jeans-0.bin",
+          "pngSha256": "ace569268f45c5f85cf58692b3063b16cc818000099387b9f2e57964d4f4e886",
+          "binarySha256": "a96e95026850b4753767d367a3244982b3685323447a3d596e491c79a33176d3",
+          "bboxPixels": [
+            28,
+            18,
+            138,
+            282
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "head_not_found"
+        },
+        {
+          "rank": 1,
+          "decoderIndex": 1,
+          "score": 0.6497659683227539,
+          "png": "person-masks/wardrobe-jeans-1.png",
+          "binary": "person-masks/wardrobe-jeans-1.bin",
+          "pngSha256": "4083bdccf29ee4cafbaa92420e37de27605b4e1aabbfba7f5faf3dde1cd394ce",
+          "binarySha256": "7b734900b51b7af4006124b1b3f8fc6388c6bfd82881a43ff88cf14c8813b7a7",
+          "bboxPixels": [
+            29,
+            18,
+            136,
+            281
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "head_not_found"
+        },
+        {
+          "rank": 2,
+          "decoderIndex": 2,
+          "score": 0.021443575620651245,
+          "png": "person-masks/wardrobe-jeans-2.png",
+          "binary": "person-masks/wardrobe-jeans-2.bin",
+          "pngSha256": "c10ae9dd3d0dba8cc8382c849293d22c7c06703023d1d894b917ed1caddf4566",
+          "binarySha256": "036f072b35c9cc8395cfa4ed6e7bf14af8fd10aeddafdcfb51f23749faa0ac2a",
+          "bboxPixels": [
+            152,
+            59,
+            9,
+            130
+          ],
+          "geometryAccepted": false,
+          "geometryRejection": "person_not_found"
+        }
+      ]
     }
   ],
   "package": "com.streetfitting.app",

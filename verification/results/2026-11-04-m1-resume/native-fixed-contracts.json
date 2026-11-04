@@ -1,0 +1,96 @@
+{
+  "apk_sha256": "943f7f3e5d3ce6ce0eb102145612ac09806c57ce9468252d651a7811bf81795a",
+  "global_device_lock": true,
+  "cameraX": "1.5.2",
+  "fixtures": "app-private; actual root helper; fourteen person/wardrobe cases",
+  "gps": "synthetic fixture; coordinates not user trail",
+  "gps_errors": [],
+  "cases": [
+    {
+      "class": "capture.CaptureContractTest",
+      "phase": null,
+      "passed": true,
+      "elapsed_seconds": 21.450602041,
+      "instrumentation_output": "\ncom.streetfitting.app.plugins.capture.CaptureContractTest:......\n\nTime: 20.525\n\nOK (6 tests)\n\n\n"
+    },
+    {
+      "class": "media.MediaContractTest",
+      "phase": null,
+      "passed": false,
+      "elapsed_seconds": 39.010635334,
+      "instrumentation_output": "\ncom.streetfitting.app.plugins.media.MediaContractTest:.\nError in pickerCopiesWardrobeAndSelfIntoPrivateFiles(com.streetfitting.app.plugins.media.MediaContractTest):\njava.util.concurrent.TimeoutException\n\tat java.util.concurrent.CompletableFuture.timedGet(CompletableFuture.java:1936)\n\tat java.util.concurrent.CompletableFuture.get(CompletableFuture.java:2071)\n\tat com.streetfitting.app.plugins.shopping.NativeHarness$TestCall.await(NativeHarness.java:80)\n\tat com.streetfitting.app.plugins.media.MediaContractTest.pickerCopiesWardrobeAndSelfIntoPrivateFiles(MediaContractTest.java:113)\n..\n\nTime: 38.193\nThere was 1 failure:\n1) pickerCopiesWardrobeAndSelfIntoPrivateFiles(com.streetfitting.app.plugins.media.MediaContractTest)\njava.util.concurrent.TimeoutException\n\tat java.util.concurrent.CompletableFuture.timedGet(CompletableFuture.java:1936)\n\tat java.util.concurrent.CompletableFuture.get(CompletableFuture.java:2071)\n\tat com.streetfitting.app.plugins.shopping.NativeHarness$TestCall.await(NativeHarness.java:80)\n\tat com.streetfitting.app.plugins.media.MediaContractTest.pickerCopiesWardrobeAndSelfIntoPrivateFiles(MediaContractTest.java:113)\n\nFAILURES!!!\nTests run: 4,  Failures: 1\n\n\n"
+    },
+    {
+      "class": "voice.VoiceContractTest",
+      "phase": null,
+      "passed": true,
+      "elapsed_seconds": 32.005319791999995,
+      "instrumentation_output": "\ncom.streetfitting.app.plugins.voice.VoiceContractTest:.......\n\nTime: 31.254\n\nOK (7 tests)\n\n\n"
+    },
+    {
+      "class": "store.StoreRepositoryTest",
+      "phase": null,
+      "passed": true,
+      "elapsed_seconds": 1.754136458000005,
+      "instrumentation_output": "\ncom.streetfitting.app.plugins.store.StoreRepositoryTest:..............\n\nTime: 0.981\n\nOK (14 tests)\n\n\n"
+    },
+    {
+      "class": "store.StoreProcessSmokeTest",
+      "phase": "save",
+      "passed": true,
+      "elapsed_seconds": 0.7037073750000076,
+      "instrumentation_output": "\ncom.streetfitting.app.plugins.store.StoreProcessSmokeTest:.\n\nTime: 0.077\n\nOK (1 test)\n\n\n"
+    },
+    {
+      "class": "store.StoreProcessSmokeTest",
+      "phase": "restart-delete",
+      "passed": true,
+      "elapsed_seconds": 0.6860736670000023,
+      "instrumentation_output": "\ncom.streetfitting.app.plugins.store.StoreProcessSmokeTest:.\n\nTime: 0.044\n\nOK (1 test)\n\n\n"
+    },
+    {
+      "class": "photoindex.PhotoIndexResearchTest",
+      "phase": null,
+      "passed": true,
+      "elapsed_seconds": 5.673944250000005,
+      "instrumentation_output": "\ncom.streetfitting.app.plugins.photoindex.PhotoIndexResearchTest:..\n\nTime: 5.054\n\nOK (2 tests)\n\n\n"
+    },
+    {
+      "class": "segmenter.SegmenterResearchTest",
+      "phase": null,
+      "passed": true,
+      "elapsed_seconds": 4.654232999999991,
+      "instrumentation_output": "\ncom.streetfitting.app.plugins.segmenter.SegmenterResearchTest:.\n\nTime: 4.019\n\nOK (1 test)\n\n\n"
+    },
+    {
+      "class": "facemask.FaceMaskComposeTest",
+      "phase": null,
+      "passed": true,
+      "elapsed_seconds": 0.9236215420000065,
+      "instrumentation_output": "\ncom.streetfitting.app.plugins.facemask.FaceMaskComposeTest:.\n\nTime: 0.26\n\nOK (1 test)\n\n\n"
+    },
+    {
+      "class": "facemask.FaceMaskPrivacyTest",
+      "phase": null,
+      "passed": false,
+      "elapsed_seconds": 6.674672125000001,
+      "instrumentation_output": "\ncom.streetfitting.app.plugins.facemask.FaceMaskPrivacyTest:.\nError in frozenSelfCorpusRequiresActualDetectionAndApprovedGroundTruth(com.streetfitting.app.plugins.facemask.FaceMaskPrivacyTest):\njava.lang.AssertionError: BLOCKED: human-reviewed face+hair GT required for every positive; drafts and model masks are not approval: [\"calibration-hat\",\"calibration-long-hair\",\"hat\",\"heldout-hat\",\"heldout-long-hair\",\"long-hair\"]\n\tat org.junit.Assert.fail(Assert.java:89)\n\tat org.junit.Assert.assertTrue(Assert.java:42)\n\tat com.streetfitting.app.plugins.facemask.FaceMaskPrivacyTest.frozenSelfCorpusRequiresActualDetectionAndApprovedGroundTruth(FaceMaskPrivacyTest.java:65)\n.\n\nTime: 6.017\nThere was 1 failure:\n1) frozenSelfCorpusRequiresActualDetectionAndApprovedGroundTruth(com.streetfitting.app.plugins.facemask.FaceMaskPrivacyTest)\njava.lang.AssertionError: BLOCKED: human-reviewed face+hair GT required for every positive; drafts and model masks are not approval: [\"calibration-hat\",\"calibration-long-hair\",\"hat\",\"heldout-hat\",\"heldout-long-hair\",\"long-hair\"]\n\tat org.junit.Assert.fail(Assert.java:89)\n\tat org.junit.Assert.assertTrue(Assert.java:42)\n\tat com.streetfitting.app.plugins.facemask.FaceMaskPrivacyTest.frozenSelfCorpusRequiresActualDetectionAndApprovedGroundTruth(FaceMaskPrivacyTest.java:65)\n\nFAILURES!!!\nTests run: 3,  Failures: 1\n\n\n"
+    },
+    {
+      "class": "segmenter.PersonMaskExportTest",
+      "phase": null,
+      "passed": true,
+      "elapsed_seconds": 7.550464167000001,
+      "instrumentation_output": "\ncom.streetfitting.app.plugins.segmenter.PersonMaskExportTest:.\n\nTime: 6.857\n\nOK (1 test)\n\n\n"
+    },
+    {
+      "class": "segmenter.MlTimingTest",
+      "phase": null,
+      "passed": true,
+      "elapsed_seconds": 4.437149999999988,
+      "instrumentation_output": "\ncom.streetfitting.app.plugins.segmenter.MlTimingTest:.\n\nTime: 3.798\n\nOK (1 test)\n\n\n"
+    }
+  ],
+  "speech_scope": "synthetic amplitude VAD only; not live speech transcription",
+  "privacy_gate": "Human GT remains unapproved; never weaken this failure."
+}
