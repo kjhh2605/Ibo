@@ -28,7 +28,7 @@ export interface ShoppingSession extends Events<{state: SessionState; location: 
   getState(): Promise<SessionState>; start(): Promise<SessionState>; newShop(): Promise<Shop>; stop(): Promise<{trip: Trip}>; openSettings(): Promise<void>;
 }
 export interface Capture extends Events<{captured: {asset: Asset; photo: Photo | null}; preview: {ready: boolean}}> {
-  openPreview(o: {purpose: 'shopping' | 'wardrobe' | 'self'; facing: 'back' | 'front'}): Promise<void>;
+  openPreview(o: {facing: 'back' | 'front'} & ({purpose: 'shopping' | 'wardrobe' | 'self'; shopId?: never} | {purpose: 'storefront'; shopId: Id})): Promise<void>;
   setPreviewRect(o: {x: number; y: number; width: number; height: number}): Promise<void>;
   takePhoto(o: {kind: 'item' | 'storefront'}): Promise<{asset: Asset; photo: Photo | null}>; closePreview(): Promise<void>;
 }
@@ -66,7 +66,7 @@ export interface Store extends Events<{changed: {entities: (keyof EntityMap | 'S
   saveResult(o: {draftId: Id; file: FileRef; faceless: boolean; providerFile: FileRef}): Promise<Result>; discardResultDraft(o: {draftId: Id}): Promise<void>;
   deleteTrip(o: {id: Id}): Promise<void>; deletePhoto(o: {id: Id}): Promise<void>; deletePiece(o: {id: Id}): Promise<void>; deleteResult(o: {id: Id}): Promise<void>;
   enqueue(o: {kind: QueueJob['kind']; refId: Id}): Promise<QueueJob>; nextJob(o: {now: number}): Promise<QueueJob | null>; beginJob(o: {id: Id; now: number}): Promise<QueueJob>;
-  completeJob(o: {id: Id; description?: string; label?: string; category?: string}): Promise<void>; failJob(o: {id: Id; retryable: boolean; retryAfterMs?: number}): Promise<void>; discardTemp(o: {file: FileRef}): Promise<void>;
+  completeJob(o: {id: Id; description?: string; label?: string; category?: string}): Promise<void>; failJob(o: {id: Id; retryable: boolean; retryAfterMs?: number; preflight?: boolean}): Promise<void>; discardTemp(o: {file: FileRef}): Promise<void>;
 }
 
 // Internal repository capabilities for native plugin implementations, never a JS raw-write API.

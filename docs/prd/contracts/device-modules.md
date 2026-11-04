@@ -87,7 +87,10 @@ interface Capture extends Events<{
   captured:{asset:Asset; photo:Photo|null};
   preview:{ready:boolean};
 }> {
-  openPreview(o:{purpose:'shopping'|'wardrobe'|'self'; facing:'back'|'front'}):Promise<void>;
+  openPreview(o:{facing:'back'|'front'} & (
+    {purpose:'shopping'|'wardrobe'|'self'; shopId?:never} |
+    {purpose:'storefront'; shopId:Id}
+  )):Promise<void>;
   setPreviewRect(o:{x:number; y:number; width:number; height:number}):Promise<void>; // CSS viewport px
   takePhoto(o:{kind:'item'|'storefront'}):Promise<{asset:Asset; photo:Photo|null}>;
   closePreview():Promise<void>;
@@ -98,6 +101,7 @@ interface Capture extends Events<{
 - Manifest `CAMERA`, `<uses-feature android:name="android.hardware.camera.any" android:required="false"/>`. shopping은 recording을 요구하고 self/wardrobe는 shopping을 요구하지 않는다. 사진 목적은 openPreview 시 고정, takePhoto.kind는 shopping에서만 사용하며 그 외에는 item만 허용한다. (D-R2-09, D-R4-02)
 - 셔터 시각 takenAt을 먼저 잡고 당시 trip/shop을 고정한다. age≤15초의 trail 점 중 |t-takenAt| 최소(동점은 앞선 점)를 선택한다. 없으면 촬영 순간 요청한 최신 fix를 최대 15초 받아 연결한다. accuracy≤100m 조건은 Session과 같다. 위치 실패면 촬영 임시 파일을 지우고 `location_unavailable`, 사진 레코드 생성 안 함. GPS EXIF를 읽어 위치로 믿지 않으며 DB location이 원장이다. (D-R5-01, D-R7-10)
 - 앱 전용 파일을 확정하고 Photo(indexState=pending)를 commit한 **즉시** `PhotoIndex.index({photoId})`를 dispatch한다. 인덱싱 완료를 기다려 셔터 UI를 막지 않는다. 인덱싱 오류는 Photo.indexState=failed이며 사진 저장 성공을 취소하지 않는다. storefront면 같은 트랜잭션에서 Shop.storefrontPhotoId 변경/description=null/state=pending 및 QueueJob(kind=describe_storefront,refId=Photo.id)를 삽입한다. 묘사는 카메라 카드로 표시하지 않는다. (D-R2-04, D-R6-03)
+- Trip의 외관 추가/재촬영은 `purpose:'storefront', shopId`로 대상 가게를 명시한다. 다른 purpose의 shopId와 이 preview의 kind=item은 거부한다. 대상 Shop/Trip을 셔터 시 고정하며 recording 여부와 무관하게 저장 직전 존재·소속을 재확인한다. 명시적인 셔터 동작에서만 foreground 위치 권한·현재 fix 1회를 얻고 기존 age≤15초/accuracy≤100m/15초 timeout을 적용한다. 과거 trail/Shop.spot 재사용은 금지하며 위치 거부·실패 시 임시 파일을 삭제하고 Photo를 만들지 않는다. Session·현재 shop·FGS·TrailPoint는 변경하지 않는다. Photo+storefrontPhotoId+description pending+QueueJob은 원자 commit하고 삭제와 경합하면 저장하지 않는다. 이전 외관 원본은 기존 사진 삭제 규칙 외에 자동 삭제하지 않는다. (D-R11-01)
 - Fixture: debug-only intent extra **`sf_capture_source`** 값 `fixture`/`camera`, 선택 폴더 extra **`sf_capture_fixture_dir`**, 기본 `/sdcard/Android/data/com.streetfitting.app/files/capture-fixtures/`. allowlist는 앱 외부 전용 files 아래 하위 경로만. adb push로 넣은 JPG/JPEG/PNG를 파일명 UTF-8 오름차순으로 열거하고 셔터 성공마다 0→1→…→마지막→0 순환한다. 소스/폴더 변경 시 index=0; lifecycle 재생성은 index 유지, 새 프로세스는 0부터. fixture의 EXIF/GPS/촬영 시각은 무시하고 실제 셔터 시각+주입 GPS를 쓴다. 손상·빈 폴더는 명시 오류, 실제 카메라로 조용히 fallback하지 않는다. (D-R7-10)
 - debug `src/debug/java/.../FixtureCaptureSource.java` 및 debug factory/intent reader에만 fixture 구현을 둔다. release source set의 동명 factory는 CameraX만 반환하며 extra를 읽는 코드·fixture 파일을 APK에 포함하지 않는다. fixture source에서는 CAMERA 권한 요청/하드웨어 preview 없이 같은 viewport에 선택 이미지를 보여 준다. 화면에 fixture/dev badge는 없다. (D-R7-07, D-R7-10)
 
@@ -312,7 +316,7 @@ interface Store extends Events<{changed:{entities:(keyof EntityMap|'SelfPhoto')[
   nextJob(o:{now:number}):Promise<QueueJob|null>;
   beginJob(o:{id:Id; now:number}):Promise<QueueJob>;
   completeJob(o:{id:Id; description?:string; label?:string; category?:string}):Promise<void>;
-  failJob(o:{id:Id; retryable:boolean; retryAfterMs?:number}):Promise<void>;
+  failJob(o:{id:Id; retryable:boolean; retryAfterMs?:number; preflight?:boolean}):Promise<void>;
   discardTemp(o:{file:FileRef}):Promise<void>;
 }
 ```
@@ -320,6 +324,7 @@ interface Store extends Events<{changed:{entities:(keyof EntityMap|'SelfPhoto')[
 - `get`의 id는 PhotoEmbedding이면 photoId, TrailPoint이면 `${tripId}:${t}`의 마지막 colon 분리 키다. 일반 list 기본 limit=50, 1~200, cursor는 `(정렬값,id)` 불투명 인코딩. Trip/Photo/Piece/Result는 시간 내림차순+id, Shop은 tripId+n 오름차순, TrailPoint는 t, QueueJob은 nextAt+id, Embedding은 photoId. 지원하지 않는 filter 조합은 invalid_argument, 무시하지 않는다. tripId 필터는 Shop/Photo/TrailPoint/Piece, shopId는 Photo/Piece, origin은 Piece만 허용한다. (D-R3-03, D-R7-04)
 - Java SQLiteOpenHelper 내부 repository가 ShoppingSession의 start/newShop/stop, Capture의 commitPhoto, PhotoIndex의 commitEmbedding, FaceMask의 replaceSelfPhoto를 제공한다. 이 쓰기는 각 public plugin 안에서만 호출하여 JS가 권한·마스킹·위치 제약을 우회해 raw insert하지 못하게 한다. 단일 writer와 data-model의 foreign key/nullable 정책을 공유한다. (D-R2-10, D-R4-11)
 - 큐 실행 주체는 **S06의 foreground worker**다. S06이 Store 네이티브, `app/src/native/store.ts`, DB/파일, 대기열 저장·재시도·worker 루프와 describe_storefront/label_piece HTTP handler를 모두 소유한다. Store nextJob은 조회만, beginJob은 직렬 claim+attempts/nextAt 갱신. in-process claim은 DB 재시작 시 해제하지만 잠정 nextAt은 유지하므로 즉시 중복 실행하지 않는다. completeJob은 kind별 payload만 허용한다. ref 삭제/외관 교체/사용자 label 수정과 경합하면 응답 폐기. retry 정책은 data-model §6 그대로다. S07의 에이전트 루프와 큐 수명을 결합하지 않는다. (D-R6-03, D-R7-04)
+- 전송 전 이미지 준비의 영구 실패는 `failJob({id,retryable:false,preflight:true})`로 종료한다. preflight는 boolean이며 true일 때 retryable=false·retryAfterMs 없음만 허용한다. 이미 claim된 작업에는 `job_not_claimed`, claim 없는 작업에는 기존 terminal failure(외관 failed 및 작업 삭제)를 적용하되 attempts를 증가시키지 않는다. 이미 삭제된 작업은 idempotent no-op이며 일반 failJob은 계속 claim을 요구한다. [추론·두 Mac owner 합의]
 - Candidate와 SelfPhoto는 generic list/get 대상이 아니다. Candidate는 화면 캐시, SelfPhoto는 singleton getter. saveCandidate는 앱 발급 mask/원본만 허용하고 id를 다시 계산한다. `saveResult`도 앱 관리 providerFile·FaceMask 산출 file만 허용한다. discardTemp는 cache만 삭제하고 영구 파일은 거부한다. (D-R3-11, D-R4-11)
 - saveCandidate의 labelMode=concept는 검색 concept가 있는 shop만 허용한다. wardrobe 또는 검색 없는 trip 직접 탭은 describe이며 label=`"Picked item"`, category=`"unknown"`과 label_piece QueueJob을 같은 transaction으로 저장한다. `/v1/describe/piece` 성공 후 두 필드를 갱신한다. origin/source/표시 문자열만으로 검색 여부를 추측하지 않는다. 중복 저장이면 기존 Piece와 사용자 수정값을 유지하고 큐를 중복 생성하지 않는다. (D-R9-02)
 - ResultPieceSnapshot은 data-model에 정의된 내장 값 객체다. prepareResult는 직렬 writer에서 원본 존재·조합을 검증하고 대상/동반의 이름·종류·walkTo·가게 표시 정보와 실제 cutout/외관 파일을 `cache/result-drafts/<draftId>/`로 복사한다. 복사 도중 원본 삭제와 경합하지 않도록 참조를 pin한다. HTTP 요청은 이 고정 cutout 복사본을 사용하고 saveResult는 원본을 재조회하지 않고 draft를 Result 소유 디렉터리로 승격한다. Result.id=draftId로 저장하여 같은 draftId 재저장은 같은 Result를 반환하고 중복 결과를 만들지 않는다. 실패/취소는 discardResultDraft로 회수하고, 프로세스 재시작은 Result가 없는 미완료 draft만 회수한다. (D-R9-03)

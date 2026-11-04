@@ -46,6 +46,7 @@ R9 추가 근거: D-R9-01(자동 수치 판정), D-R9-02(바로 자른 가게 �
 ## 보관·삭제·오프라인
 
 - 쇼핑 모드 종료는 `Trip.status='ended'`와 `endedAt`을 기록하고 해당 trip의 `TrailPoint`를 모두 지운다. `Shop`, `Photo`, 메모와 사진 위치는 남는다(D-R0-03, D-R3-03).
+- 과거 가게 외관의 명시적 재촬영은 쇼핑 모드 밖에서도 셔터 시 현재 위치 1회만 Photo에 연결한다. 연속 trail/FGS는 생성하지 않으며 위치 실패 시 과거 가게 좌표로 대체하지 않고 촬영 저장을 실패시킨다(D-R11-01).
 - trip 삭제는 그 trip의 `Shop`, `Photo`, `PhotoEmbedding`, `TrailPoint`를 삭제한다. 저장한 `Piece`는 잘라낸 이미지와 `walkTo`를 유지하고 `photoId`, `shopId`, `tripId`를 null로 만든다. "Original photo"만 사라지고 길 안내·피팅은 유지한다(D-R3-11, D-R5-01).
 - 사진 하나 삭제는 해당 파일·`Photo`·`PhotoEmbedding`을 지우고 연결된 원본 열기를 끊는다. 저장한 조각을 함께 지우는 동작으로 바꾸지 않는다. 저장한 옷·옷장 옷·결과 삭제는 각각 별도 제공한다. 세부 참조 정리는 [data-model](../contracts/data-model.md)을 따른다(D-R3-11).
 - 대상 Piece를 삭제해도 Result의 옷 이름·잘라낸 이미지·길 안내 위치 복사본은 남고 결과 보기·길 안내는 유지한다. 대상이 없으면 "Change pieces"를 비활성화한다. 결과를 삭제할 때 그 결과 소유 복사본도 정리하며 원래 Piece와 삭제 수명을 분리한다(D-R9-03).
