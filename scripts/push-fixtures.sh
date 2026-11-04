@@ -7,8 +7,14 @@ if [[ $# -ne 2 || ! -d "$2" || ( "$1" != capture && "$1" != voice ) ]]; then
   exit 64
 fi
 exec "$ROOT/scripts/emulator-lock.sh" bash -eu -o pipefail -c '
-  adb shell run-as com.streetfitting.app true
-  destination="/sdcard/Android/data/com.streetfitting.app/files/$1-fixtures"
-  adb shell mkdir -p "$destination"
-  adb push "$2/." "$destination/"
+  package=com.streetfitting.app
+  adb shell run-as "$package" true
+  staging="$(adb shell mktemp -d /data/local/tmp/street-fitting-fixtures.XXXXXX | tr -d "\r")"
+  trap "adb shell rm -rf \"$staging\" >/dev/null" EXIT
+  adb push "$2/." "$staging/"
+  adb shell chmod -R a+rX "$staging"
+  destination="files/$1-fixtures"
+  adb shell run-as "$package" mkdir -p files
+  adb shell run-as "$package" rm -rf "$destination"
+  adb shell run-as "$package" cp -R "$staging" "$destination"
 ' -- "$1" "$2"
