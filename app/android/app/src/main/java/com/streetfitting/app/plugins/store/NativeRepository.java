@@ -2,18 +2,43 @@ package com.streetfitting.app.plugins.store;
 
 import com.getcapacitor.JSObject;
 
-/** S06 owns the SQLite implementation; each operation is an atomic domain transaction. */
+/** Device-only repository. All mutations are serialized atomic domain transactions. */
 public interface NativeRepository {
-    /** {fix} -> {trip, shop}. */
     JSObject startSession(JSObject input);
-    /** {tripId, fix} -> Shop. */
     JSObject newShop(JSObject input);
-    /** {tripId, endedAt} -> Trip. */
     JSObject stopSession(JSObject input);
-    /** {photo} -> Photo. */
     JSObject commitPhoto(JSObject input);
-    /** {embedding} -> PhotoEmbedding. */
     JSObject commitEmbedding(JSObject input);
-    /** {selfPhoto} -> SelfPhoto. */
     JSObject replaceSelfPhoto(JSObject input);
+    JSObject get(JSObject input);
+    JSObject list(JSObject input);
+    JSObject getSelfPhoto();
+    JSObject appendTrail(JSObject input);
+    JSObject markIndexFailed(JSObject input);
+    JSObject registerAsset(JSObject input);
+    JSObject getAsset(JSObject input);
+    JSObject discardAsset(JSObject input);
+    JSObject adoptCandidate(JSObject input);
+    JSObject retainSelf(JSObject input);
+    JSObject releaseSelf(JSObject input);
+    JSObject getSession();
+    JSObject nearestFix(JSObject input);
+    JSObject getPhoto(JSObject input);
+    void setSessionStopper(Runnable stopper);
+    JSObject saveCandidate(JSObject input);
+    JSObject updateShop(JSObject input);
+    JSObject updatePiece(JSObject input);
+    JSObject prepareResult(JSObject input);
+    JSObject saveResult(JSObject input);
+    JSObject discardResultDraft(JSObject input);
+    JSObject deleteTrip(JSObject input);
+    JSObject deletePhoto(JSObject input);
+    JSObject deletePiece(JSObject input);
+    JSObject deleteResult(JSObject input);
+    JSObject enqueue(JSObject input);
+    JSObject nextJob(JSObject input);
+    JSObject beginJob(JSObject input);
+    JSObject completeJob(JSObject input);
+    JSObject failJob(JSObject input);
+    JSObject discardTemp(JSObject input);
 }
