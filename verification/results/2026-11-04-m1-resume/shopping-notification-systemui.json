@@ -1,9 +1,0 @@
-{
-  "scope": "real SystemUI notification body/actions, actual changed-Intent lifecycle/recreation, and shopping native regression",
-  "apkSha256": "c85265637c6110abb1089a5b58a48b4bff0b19f93a5366e7465d32fdcd1e024e",
-  "globalDeviceLock": true,
-  "passed": false,
-  "tests": null,
-  "elapsedSeconds": 52.368,
-  "instrumentationOutput": "\ncom.streetfitting.app.plugins.shopping.ShoppingSessionContractTest:..\nError in notificationActionsOpenAndNewShopExactlyOnce(com.streetfitting.app.plugins.shopping.ShoppingSessionContractTest):\njava.lang.AssertionError: Preview must reopen after the notification\n\tat org.junit.Assert.fail(Assert.java:89)\n\tat org.junit.Assert.assertTrue(Assert.java:42)\n\tat com.streetfitting.app.plugins.shopping.ShoppingSessionContractTest.notificationActionsOpenAndNewShopExactlyOnce(ShoppingSessionContractTest.java:88)\n...\n\nTime: 51.549\nThere was 1 failure:\n1) notificationActionsOpenAndNewShopExactlyOnce(com.streetfitting.app.plugins.shopping.ShoppingSessionContractTest)\njava.lang.AssertionError: Preview must reopen after the notification\n\tat org.junit.Assert.fail(Assert.java:89)\n\tat org.junit.Assert.assertTrue(Assert.java:42)\n\tat com.streetfitting.app.plugins.shopping.ShoppingSessionContractTest.notificationActionsOpenAndNewShopExactlyOnce(ShoppingSessionContractTest.java:88)\n\nFAILURES!!!\nTests run: 6,  Failures: 1\n\n\n"
-}

@@ -21,7 +21,7 @@ _ROLE = {
            'sweater or hoodie); replace the person\'s own top with it',
     'outer': 'the outer layer (jacket, coat or blazer); layer it over the top',
 }
-# Slot rules for a mannequin with empty slots (docs/prd/ux/tryon.md):
+# Slot rules for a mannequin with empty slots:
 # an empty slot keeps what the person already wears, except an outer layer
 # in the photo is removed when it would hide a top the user chose.
 _EMPTY = {

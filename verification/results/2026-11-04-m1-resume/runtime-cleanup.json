@@ -1,9 +1,0 @@
-{
-  "scope": "Owned M1 runtime cleanup after user-cancelled hour test and completed reachable checks",
-  "avd": "Medium_Phone",
-  "serial": "emulator-5554",
-  "appStopped": true,
-  "emulatorShutdownAcknowledged": true,
-  "adbDisconnected": true,
-  "completedAt": "2026-11-04T18:17:28.037Z"
-}

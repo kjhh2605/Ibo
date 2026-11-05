@@ -124,7 +124,7 @@ async function run() {
     let mask, prepared;
     try {
       if (spec.assetId === id('asset_jeans')) {
-        const base = path.join(root, 'verification/results/2026-11-04-m1-resume');
+        const base = path.join(root, 'verification/native-proof');
         const report = JSON.parse(await readFile(path.join(base, 'person-mask-export-after.json'), 'utf8'));
         const source = report.cases.find(row => row.id === 'wardrobe-jeans');
         check(source?.sourceSha256 === inventory.get(spec.image).sha256 && source.w === asset.w && source.h === asset.h, 'real_jeans_mask_source_mismatch');

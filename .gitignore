@@ -9,3 +9,12 @@
 # Models remain outside Git; S00 packages them from SF_MODELS_DIR.
 *.onnx
 *.onnx.data
+
+# Python bytecode
+__pycache__/
+
+# macOS
+.DS_Store
+
+# Run output from verify-web and the e2e harness
+verification/results/

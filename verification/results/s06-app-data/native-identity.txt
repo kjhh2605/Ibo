@@ -1,1 +1,0 @@
-S06 native acceptance worktree=/Users/user/orca/workspaces/Meta-Hackathon/s06-app-data emulator=default

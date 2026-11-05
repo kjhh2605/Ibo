@@ -1,7 +1,0 @@
-{
-  "apk_sha256": "943f7f3e5d3ce6ce0eb102145612ac09806c57ce9468252d651a7811bf81795a",
-  "global_device_lock": true,
-  "passed": true,
-  "elapsed_seconds": 16.143963917,
-  "instrumentation_output": "\ncom.streetfitting.app.plugins.media.MediaContractTest:....\n\nTime: 15.306\n\nOK (4 tests)\n\n\n"
-}

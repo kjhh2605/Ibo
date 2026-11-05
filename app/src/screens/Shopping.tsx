@@ -114,7 +114,7 @@ export function Home() {
         {tripPieces.map((piece,index)=><VStack key={piece.id} role="listitem" style={{flex:'none',width:'calc((100% - var(--spacing-3) * 2) / 2.3)',scrollSnapAlign:'start'}}><Reveal index={index} from="scale"><PieceTile piece={piece} onOpen={()=>push({name:'item',pieceId:piece.id})}/></Reveal></VStack>)}
       </HStack>:pieces.length?<Text type="supporting">Nothing saved from this trip yet. Tap See all for pieces from earlier trips.</Text>:<Empty title="No saved pieces" icon={HangerIcon}><Text type="supporting">Find a garment in your trip photos to save it.</Text></Empty>}
     </Section>
-    {/* Same order as the prototype: Wardrobe and Try-ons as two rows under Saved; Privacy is the shield in the top bar. */}
+    {/* Wardrobe and Try-ons as two rows under Saved; Privacy is the shield in the top bar. */}
     <Panel gap={1} padding={3}>
       <RowButton flat label="Wardrobe" start={<IconTile icon={HangerIcon}/>} meta={data.data?`${data.data.wardrobe} ${data.data.wardrobe===1?'piece':'pieces'} you own`:undefined} onClick={()=>push({name:'wardrobe'})}/>
       <Divider/>
